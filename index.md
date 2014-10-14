@@ -5,21 +5,20 @@ tagline: 介绍
 ---
 {% include JB/setup %}
 
-任职于国内某互联网公司tx，奋战一线的程序猿一只。个人博客请移步： [点我](http://cool.sinaapp.com)
+任职于国内某互联网公司tx，一只奋战一线的程序猿。个人博客请移步： [点我](http://cool.sinaapp.com)
 
 
-## Update Author Attributes
+## 联系方式 
 
-In `_config.yml` remember to specify your own data:
+可在blog留言.
     
-    title : My Blog =)
+    title : have fun!=)
     
     author :
-      name : Name Lastname
-      email : blah@email.test
-      github : username
-      twitter : username
+      name : anonymous 
+      email : anonymous 
+      github : anonymous 
+      twitter : anonymous 
 
-The theme should reference these variables whenever needed.
     
 
