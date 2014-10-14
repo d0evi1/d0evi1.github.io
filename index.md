@@ -1,11 +1,11 @@
 ---
 layout: page
-title: d0evi1 
-tagline: have fun 
+title: d0evi1's blog 
+tagline: 介绍 
 ---
 {% include JB/setup %}
 
-Read [Jekyll Quick Start](http://jekyllbootstrap.com/usage/jekyll-quick-start.html)
+任职于国内某互联网公司tx，奋战一线的程序猿一只。个人博客请移步： [点我](http://cool.sinaapp.com)
 
 Complete usage and documentation available at: [Jekyll Bootstrap](http://jekyllbootstrap.com)
 
