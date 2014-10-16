@@ -9,7 +9,8 @@ tagline: 介绍
 
 个人博客请移步： 
 
-[点我](http://cool.sinaapp.com)
+原创博文:[独立博客](http://cool.sinaapp.com)
+大杂烩：[网易博客](http://wangjunle23.blog.163.com)
 
 ## 联系方式 
 
