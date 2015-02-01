@@ -101,4 +101,106 @@ String到Vector的转换
 
 ##语料流-一次一个文档
 
-注意，上面的语料完全在内存中以python list的形式存在. 在这个简单的示例中，它
+注意，上面的语料完全在内存中以python list的形式存在. 在这个简单的示例中，可能关系不大。我们假设语料中有几百万的文档。想把它们所有都保存在RAM中做不到。相反的，我们可以假设，文档存储在磁盘中的文件，每行一个文档。gensim只需要一个语料，一次必须返回一个文档向量:
+
+    >>> class MyCorpus(object):
+    >>>     def __iter__(self):
+    >>>         for line in open('mycorpus.txt'):
+    >>>             # assume there's one document per line, tokens separated by whitespace
+    >>>             yield dictionary.doc2bow(line.lower().split())
+    
+Corpus是一个对象。我们没有定义任何方法来打印它，因此它只打印内存对象的地址。不是非常有用。为了查看相应的矢量，可以迭代corpus对象来打印每个文档向量(一次一个) ：
+
+    >>> for vector in corpus_memory_friendly: # load one vector into memory at a time
+    ...     print(vector)
+    [(0, 1), (1, 1), (2, 1)]
+    [(0, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1)]
+    [(2, 1), (5, 1), (7, 1), (8, 1)]
+    [(1, 1), (5, 2), (8, 1)]
+    [(3, 1), (6, 1), (7, 1)]
+    [(9, 1)]
+    [(9, 1), (10, 1)]
+    [(9, 1), (10, 1), (11, 1)]
+    [(4, 1), (10, 1), (11, 1)]
+
+尽管输出与python list对象相似，corpus会友好地占用更多内存，因为至多一个向量在内存RAM中驻留一次。你的corpus可以如你想像的大。
+
+相似的，我们可以不用将所有文本载入到内存中来构成这个字典：
+
+    >>> # collect statistics about all tokens
+    >>> dictionary = corpora.Dictionary(line.lower().split() for line in open('mycorpus.txt'))
+    >>> # remove stop words and words that appear only once
+    >>> stop_ids = [dictionary.token2id[stopword] for stopword in stoplist
+    >>>             if stopword in dictionary.token2id]
+    >>> once_ids = [tokenid for tokenid, docfreq in dictionary.dfs.iteritems() if docfreq == 1]
+    >>> dictionary.filter_tokens(stop_ids + once_ids) # remove stop words and words that appear only once
+    >>> dictionary.compactify() # remove gaps in id sequence after words that were removed
+    >>> print(dictionary)
+    Dictionary(12 unique tokens)
+
+当然，我们如何处理这样的语料，是另一个问题；如何统计这些不同的词汇的频率可以十分有用。我们需要使用这个转换，我们可以使用它来计算任何有用的文档vs.文档相似度。转换将在下一篇教程中介绍。在此之前，我们将关注下语料的持久化。
+
+##语料格式
+
+存在许多文件格式，用来将一个向量空量语料序列化到磁盘上。gensim通过流接口来实现：文档通过一个延迟加载的方式读取（或存储），而非将整个语料读到内存中。
+
+一个常用的文档格式是：mm(Market Matrix)格式. 为了将语料库保存成mm格式：
+
+    >>> from gensim import corpora
+    >>> # create a toy corpus of 2 documents, as a plain Python list
+    >>> corpus = [[(1, 0.5)], []]  # make one document empty, for the heck of it
+    >>>
+    >>> corpora.MmCorpus.serialize('/tmp/corpus.mm', corpus)
+
+其它的格式包括：joachim的SVMlight格式， Blei的LDA-C格式，以及GibbsLDA++格式.
+
+    >>> corpora.SvmLightCorpus.serialize('/tmp/corpus.svmlight', corpus)
+    >>> corpora.BleiCorpus.serialize('/tmp/corpus.lda-c', corpus)
+    >>> corpora.LowCorpus.serialize('/tmp/corpus.low', corpus)
+
+相反的，当我们从一个MM文件中加载一个语料时：
+
+    >>> corpus = corpora.MmCorpus('/tmp/corpus.mm')
+
+语料对象是流，因此通常你不能直接打印它：
+
+    >>> print(corpus)
+    MmCorpus(2 documents, 2 features, 1 non-zero entries)
+
+相反的，为了查看语料中的内容：
+
+    >>> # one way of printing a corpus: load it entirely into memory
+    >>> print(list(corpus)) # calling list() will convert any sequence to a plain Python list
+    [[(1, 0.5)], []]
+
+或者
+
+    >>> # another way of doing it: print one document at a time, making use of the streaming interface
+    >>> for doc in corpus:
+    ...     print(doc)
+    [(1, 0.5)]
+    []
+
+第二种方式明显更内存占用友好些，对于测试和开发来说，则使用list(corpus)更方便.
+
+为了将相似的MM文档流保存成Blei的LDA-C格式：
+
+    >>> corpora.BleiCorpus.serialize('/tmp/corpus.lda-c', corpus)
+
+这种方式下，gensim可以当成是一个内存I/O格式转换器：只需要加载一个使用一种格式的文档流，就可以保存成另外一种。添加新的格式相当容易，可以checkout [SVMlight语料的代码](https://github.com/piskvorky/gensim/blob/develop/gensim/corpora/svmlightcorpus.py).
+
+##兼容NumPy和SciPy
+
+gensim也包含了有效的工具函数，来帮助转换numpy矩阵：
+
+    >>> corpus = gensim.matutils.Dense2Corpus(numpy_matrix)
+    >>> numpy_matrix = gensim.matutils.corpus2dense(corpus)
+
+以及scipy.sparse矩阵的from/to函数：
+
+    >>> corpus = gensim.matutils.Sparse2Corpus(scipy_sparse_matrix)
+    >>> scipy_csc_matrix = gensim.matutils.corpus2csc(corpus)
+
+下一篇将介绍：[主题和变换](d0evi1.github.com/gensim/tut2)
+
+
