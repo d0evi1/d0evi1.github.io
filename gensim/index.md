@@ -20,3 +20,14 @@ gensim可以处理原始的，非结构化的文本（"plain text"）。gensim�
 - 对流行的数据格式进行了IO封装和转换
 - 在其语义表达中，可以相似查询
 
+gensim的创建的目的是，由于缺乏简单的（java很复杂）实现主题建模的可扩展软件框架. 。。。
+
+gensim的设计原则：
+- 1.简单的接口，学习曲线低。对于原型实现很方便
+- 2.根据输入的语料的size来说，内存各自独立；基于流的算法操作，一次访问一个文档.
+
+更多：document similarity server(http://pypi.python.org/pypi/simserver).
+
+## 核心概念
+
+gensim的整个package会涉及三个概念：corpus(d0evil.github.io/gensim/corpus.html), vector(), model. 
