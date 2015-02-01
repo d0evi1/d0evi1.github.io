@@ -8,7 +8,7 @@ title: 教程
 
 示例分成以下几部分：
 
-- [语料和矢量空间]()
+- [语料和矢量空间](d0evi1.github.io/gensim/tut1)
     - String转成向量
     - 语料流
     - 语料格式
