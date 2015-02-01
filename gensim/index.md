@@ -31,7 +31,7 @@ gensim的设计原则：
 
 ## 核心概念
 
-gensim的整个package会涉及三个概念：corpus(d0evil.github.io/gensim/corpus.html), vector(), model.
+gensim的整个package会涉及三个概念：[corpus](d0evil.github.io/gensim/corpus.html), vector(), model.
 
 ### 语库(corpus)
 文档集合.该集合用来自动推出文档结构，以及它们的主题等。出于这个原因，这个集合被称为：训练语料。
