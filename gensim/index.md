@@ -27,11 +27,11 @@ gensim的设计原则：
 - [1].简单的接口，学习曲线低。对于原型实现很方便
 - [2].根据输入的语料的size来说，内存各自独立；基于流的算法操作，一次访问一个文档.
 
-更多：document similarity server(http://pypi.python.org/pypi/simserver).
+更多：[document similarity server](http://pypi.python.org/pypi/simserver).
 
 ## 核心概念
 
-gensim的整个package会涉及三个概念：[corpus](d0evil.github.io/gensim/corpus.html), vector(), model.
+gensim的整个package会涉及三个概念：[corpus](d0evi1.github.io/gensim/corpus.html), [vector](d0evi1.github.io/gensim/vector.html), [model](d0evi1.github.io/gensim/model.html).
 
 ### 语库(corpus)
 文档集合.该集合用来自动推出文档结构，以及它们的主题等。出于这个原因，这个集合被称为：训练语料。
