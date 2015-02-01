@@ -29,4 +29,11 @@ title: 教程
     - 核心概念
     - 提供的分布式算法 
 
+## 先决条件
 
+所有的示例都可以通过Python解析器shell直接copy运行.  IPython的cpaste命令可以拷贝代码段，包含前导的>>>字符.
+
+gensim使用Python的标准logging模块来记录不同优先级的日志；如果想激活日志，运行：
+
+    >>> import logging
+    >>> logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
