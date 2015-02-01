@@ -13,6 +13,9 @@ tagline: 介绍
   
 大杂烩：[网易博客](http://wangjunle23.blog.163.com)
 
+翻译的中文文档：
+1.[gensim教程](http://d0evi1.github.io/gensim/)
+
 
 ## 联系方式 
 
