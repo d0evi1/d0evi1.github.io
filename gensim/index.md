@@ -1,3 +1,12 @@
+---
+layout: page
+title: gensim 
+tagline: gensim 
+---
+{% include JB/setup %}
+
+
+
 #介绍
 
 gemsim是一个免费python库，设计目的是，从文档中有效地自动抽取语义主题。
