@@ -60,7 +60,7 @@ title: 语料与向量空间
 
     "How many times does the word system appear in the document? Once."
 
-通过整型id来表示问题的优点很明显。问题及id之间的映射，可以称为字典：
+通过整型id来表示answer的优点很明显。answer及id之间的映射，可以称为字典：
 
     >>> dictionary = corpora.Dictionary(texts)
     >>> dictionary.save('/tmp/deerwester.dict') # store the dictionary, for future reference
@@ -199,6 +199,6 @@ gensim也包含了有效的工具函数，来帮助转换numpy矩阵：
     >>> corpus = gensim.matutils.Sparse2Corpus(scipy_sparse_matrix)
     >>> scipy_csc_matrix = gensim.matutils.corpus2csc(corpus)
 
-下一篇将介绍：[主题和变换](d0evi1.github.com/gensim/tut2)
+下一篇将介绍：[主题和变换](http://d0evi1.github.com/gensim/tut2)
 
 
