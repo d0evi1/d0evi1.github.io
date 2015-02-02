@@ -2,7 +2,6 @@
 layout: page
 title: 相似查询 
 ---
-{% include JB/setup %}
 
 同样的，如查希望查看日志，请打开：
 
