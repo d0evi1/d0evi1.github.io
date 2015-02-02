@@ -1,19 +1,17 @@
 ---
 layout: page
-title: gensim 
-tagline: gensim 
+title: gensim教程 
+tagline: 介绍
 ---
 {% include JB/setup %}
 
-
-
-#介绍
+#1.介绍
 
 gemsim是一个免费python库，设计目的是，从文档中有效地自动抽取语义主题。
 
 gensim可以处理原始的，非结构化的文本（"plain text"）。gensim中的算法，包括：LSA(Latent Semantic Analysis), LDA(Latent Dirichlet Allocation), RP (Random Projections), 通过在一个训练文档语料库中，检查词汇统计联合出现模式, 可以用来发掘文档语义结构. 这些算法属于非监督学习，这意味着无需人工输入－－你只需提供一个语料库即可。
 
-## 特性
+#2.特性
 
 - 内存独立- 对于训练语料来说，没必要在任何时间将整个语料都驻留在RAM中
 - 有效实现了许多流行的向量空间算法－包括tf-idf，分布式LSA, 分布式LDA 以及 RP；并且很容易添加新算法
@@ -29,14 +27,14 @@ gensim的设计原则：
 
 更多：[document similarity server](http://pypi.python.org/pypi/simserver).
 
-## 核心概念
+#3.核心概念
 
 gensim的整个package会涉及三个概念：[corpus](d0evi1.github.io/gensim/corpus.html), [vector](d0evi1.github.io/gensim/vector.html), [model](d0evi1.github.io/gensim/model.html).
 
-### 语库(corpus)
+## a.语库(corpus)
 文档集合.该集合用来自动推出文档结构，以及它们的主题等。出于这个原因，这个集合被称为：训练语料。
 
-### 向量(vector) 
+## b.向量(vector) 
 在向量空间模型(VSM)中，每个文档被表示成一个特征数组。例如，一个单一特征可以被表示成一个问答对(question-answer pair):
 
 - [1].在文档中单词"splonge"出现的次数？ 0个
@@ -47,10 +45,10 @@ gensim的整个package会涉及三个概念：[corpus](d0evi1.github.io/gensim/c
 
 对于每个文档来说问题是类似的.两个向量（分别表示两个文档），我们希望可以下类似的结论：“如果两个向量中的数是相似的，那么，原始的文档也相似”。
 
-### 稀疏矩阵(Sparse vector)
+## c.稀疏矩阵(Sparse vector)
 
 [todo]
 
-### 模型(model)
+## d.模型(model)
 
 [todo]
