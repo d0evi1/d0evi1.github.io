@@ -4,12 +4,10 @@ title: 语料与向量空间
 ---
 {% include JB/setup %}
 
-
 开始时，如果想设置日志，别忘记设置：
 
     >>> import logging
     >>> logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-
 
 String到Vector的转换
 

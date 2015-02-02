@@ -9,7 +9,7 @@ title: 主题和变换
     >>> import logging
     >>> logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-#变换接口
+# 1.变换接口
 
 在先前的教程中，我们创建了一个文档语料，将它表示成向量流。接下来，我们将使用gensim并使用它的语料：
 
@@ -24,7 +24,7 @@ title: 主题和变换
 - 1.为了得到语料背向的结构，发现词之间的关系，并使用一种新的或者更加语义化的方式来使用它们描述文档。
 - 2.为了让文档表示更紧凑。这个更有效（新的表示法消耗更低资源）且效果好（降低噪声等）
 
-## 创建一个变换
+# 2.创建一个变换
 
 变换这个概念其实是个python对象，可以通过一个训练语料初始化：
 
@@ -144,4 +144,6 @@ gensim使用一个快速的在线实现版本[[3]](http://radimrehurek.com/gensi
 
 需要重复的是，所有唯一的，增量的实现，不必在主内存中完整训练整个语料。我们正在改进[分布式计算](http://radimrehurek.com/gensim/distributed.html)，来改进cpu性能。如果你想贡献（测试、用例、或编码），可以联系我们。
 
-下一节：[相似查询]().
+下一节：[相似查询](http://d0evi1.github.io/gensim/tut3).
+
+[英文原版](http://radimrehurek.com/gensim/tut2.html)
