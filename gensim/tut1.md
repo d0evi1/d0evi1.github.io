@@ -9,7 +9,7 @@ title: 语料与向量空间
     >>> import logging
     >>> logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-String到Vector的转换
+# 1.将String映射到Vector
 
 这次，我们的文档由字符串表示：
 
@@ -97,7 +97,7 @@ String到Vector的转换
 
 对于“How many times does the word graph appear in the document?”这个问题，它的id=10的向量特征表示十分清楚。第六个文档的答案为0,其余三个为1. 实际上，我们可以通过快速示例看到类似的语料向量。
 
-##语料流-一次一个文档
+#2.语料流-一次一个文档
 
 注意，上面的语料完全在内存中以python list的形式存在. 在这个简单的示例中，可能关系不大。我们假设语料中有几百万的文档。想把它们所有都保存在RAM中做不到。相反的，我们可以假设，文档存储在磁盘中的文件，每行一个文档。gensim只需要一个语料，一次必须返回一个文档向量:
 
@@ -138,7 +138,7 @@ Corpus是一个对象。我们没有定义任何方法来打印它，因此它�
 
 当然，我们如何处理这样的语料，是另一个问题；如何统计这些不同的词汇的频率可以十分有用。我们需要使用这个转换，我们可以使用它来计算任何有用的文档vs.文档相似度。转换将在下一篇教程中介绍。在此之前，我们将关注下语料的持久化。
 
-##语料格式
+#3.语料格式
 
 存在许多文件格式，用来将一个向量空量语料序列化到磁盘上。gensim通过流接口来实现：文档通过一个延迟加载的方式读取（或存储），而非将整个语料读到内存中。
 
@@ -187,7 +187,7 @@ Corpus是一个对象。我们没有定义任何方法来打印它，因此它�
 
 这种方式下，gensim可以当成是一个内存I/O格式转换器：只需要加载一个使用一种格式的文档流，就可以保存成另外一种。添加新的格式相当容易，可以checkout [SVMlight语料的代码](https://github.com/piskvorky/gensim/blob/develop/gensim/corpora/svmlightcorpus.py).
 
-##兼容NumPy和SciPy
+#4.兼容NumPy和SciPy
 
 gensim也包含了有效的工具函数，来帮助转换numpy矩阵：
 
