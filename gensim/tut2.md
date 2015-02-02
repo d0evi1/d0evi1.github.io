@@ -124,6 +124,24 @@ LSI训练是唯一的，因为我们可以在任何时候继续训练，只需�
 
 gensim使用一个小说在线增量流分布式训练算法，可以在这查看[[5]](http://radimrehurek.com/gensim/tut2.html#id10)。gensim也执行一个stochastic multi-pass algorithm from Halko et al. ...
 
-- RP
+- RP：目换是为了减少向量空间维度。 这是个非常有效的方法（内存和CPU友好），逼近文档之里的tfidf距离，通过使用一个小的随机数。推荐目标维度在成千上万，依赖于数据集。
 
+    >>> model = rpmodel.RpModel(tfidf_corpus, num_topics=500)
 
+- LDA: 另一个可以将词袋数转换到主题低维空间的变换。LDA是LSA（也称为PCA）的扩展。因此，LDA的主题可以被解释成词的概率分布。类似于LSA，这个分布自动从自动从一个训练语料中进行infer。文档被解析成一个 主题的softmix混合（同样类似于LSA）。
+
+    >>> model = ldamodel.LdaModel(bow_corpus, id2word=dictionary, num_topics=100)
+
+gensim使用在线LDA参数估计的一个快速实现版本，可以修改运行在分布式模式的计算机集群上。
+
+- HDP：一种非参数贝叶斯方法（注意缺少请求的主题数）：
+
+    >>> model = hdpmodel.HdpModel(bow_corpus, id2word=dictionary)
+
+gensim使用一个快速的在线实现版本[[3]](http://radimrehurek.com/gensim/tut2.html#id8). HDP模型是一个gensim的新添加特性，在学术界仍在探索。
+
+添加新的VSM变换（比如：不同的权重模式）是相当琐碎的；可以查看API等。
+
+需要重复的是，所有唯一的，增量的实现，不必在主内存中完整训练整个语料。我们正在改进[分布式计算](http://radimrehurek.com/gensim/distributed.html)，来改进cpu性能。如果你想贡献（测试、用例、或编码），可以联系我们。
+
+下一节：[相似查询]().
