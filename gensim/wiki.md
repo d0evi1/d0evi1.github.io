@@ -4,13 +4,13 @@ title: wiki语料实验
 ---
 {% include JB/setup %}
 
-为了测试gensim的性能，我们在它之上运行了wikipedia英文版本.
+为了测试gensim的性能，我们在它之上运行了wikipedia英文语料.
 
-该页描述了如何获取和处理Wikipedia，任何人都可以获取结果。当然前提是你安装了合适的gensim。
+该页描述了如何获取和处理Wikipedia语料，并且任何人都可以获取结果。当然，前提是你安装了合适的gensim。
 
 # 1.准备语料
 
-- 1.首先，下载wikipedia英文语料[enwiki-latest-pages-articles.xml.bz2](http://download.wikimedia.org/enwiki/)，该文件8G,包含了English Wikipedia的所有文章.
+- 1.首先，下载wikipedia英文语料[enwiki-latest-pages-articles.xml.bz2](http://download.wikimedia.org/enwiki/)，该文件大小8G，包含了English Wikipedia的所有文章。
 - 2.将文章转换成plain text(需处理wiki markup)，并将结果存储在TF-IDF的稀疏矩阵. 在python中，可以很容易做到，我们不必解压整个文件到磁盘。gensim相应的运行脚本如下：
 
     $ python -m gensim.scripts.make_wiki
