@@ -31,10 +31,10 @@ gensim的设计原则：
 
 gensim的整个package会涉及三个概念：[corpus](d0evi1.github.io/gensim/corpus.html), [vector](d0evi1.github.io/gensim/vector.html), [model](d0evi1.github.io/gensim/model.html).
 
-## a.语库(corpus)
+## 3.1 语库(corpus)
 文档集合.该集合用来自动推出文档结构，以及它们的主题等。出于这个原因，这个集合被称为：训练语料。
 
-## b.向量(vector) 
+## 3.2 向量(vector) 
 在向量空间模型(VSM)中，每个文档被表示成一个特征数组。例如，一个单一特征可以被表示成一个问答对(question-answer pair):
 
 - [1].在文档中单词"splonge"出现的次数？ 0个
@@ -45,10 +45,10 @@ gensim的整个package会涉及三个概念：[corpus](d0evi1.github.io/gensim/c
 
 对于每个文档来说问题是类似的.两个向量（分别表示两个文档），我们希望可以下类似的结论：“如果两个向量中的数是相似的，那么，原始的文档也相似”。
 
-## c.稀疏矩阵(Sparse vector)
+## 3.3 稀疏矩阵(Sparse vector)
 
 [todo]
 
-## d.模型(model)
+## 3.4 模型(model)
 
 [todo]
