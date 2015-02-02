@@ -20,7 +20,7 @@ tagline: 总述
 - [相似查询](http://d0evi1.github.com/gensim/tut3)
     - 相似接口
     - next?
-- 英文Wikipedia示例
+- [英文Wikipedia示例](http://d0evi1.github.com/gensim/wiki)
     - 准备语料
     - LSA
     - LDA
