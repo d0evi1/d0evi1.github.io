@@ -24,7 +24,7 @@ tagline: 总述
     - 准备语料
     - LSA
     - LDA
-- 分布式计算
+- [分布式计算](http://d0evi1.github.com/gensim/distributed)
     - 为什么要分布式计算?
     - 先决条件
     - 核心概念
