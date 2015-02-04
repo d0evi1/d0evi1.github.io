@@ -17,6 +17,7 @@ gensim 0.7.x系列版本正在改进性能和API. 0.8.x将会有新特性：文�
 - 2.使用语义模型建立索引
 - 3.对相似文档进行索引查询（查询可以是一个索引中存在的id，或者一个文本）
 
+
     >>> from simserver import SessionServer
     >>> server = SessionServer('/tmp/my_server') # resume server (or create a new one)
 
