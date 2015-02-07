@@ -63,9 +63,9 @@ classmethod load(fname, mmap=None)
 
 save(fname, separately=None, sep_limit=10485760, ignore=frozenset([]))
 
-  将对象保存成文件 (可以参见 load)。
+>  将对象保存成文件 (可以参见 load)。
 
-  如果separatedly是None，将自动检测对象中保存的numpy/scipy的大稀疏矩阵，并将它们以独立的方式进行保存。这可以避免很多内存问题，并且允许将大数组通过mmap进行有效加载。
+>  如果separatedly是None，将自动检测对象中保存的numpy/scipy的大稀疏矩阵，并将它们以独立的方式进行保存。这可以避免很多内存问题，并且允许将大数组通过mmap进行有效加载。
 
   你可以人工设置separately，它必须是以不同的文件存储的一列属性名。这种情况下将处动执行check。
 
