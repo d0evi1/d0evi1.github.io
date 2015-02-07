@@ -35,15 +35,15 @@ Similarity将索引(index)划分成许多更细粒度的子索引(sub-indexs)，
 
 class gensim.similarities.docsim.MatrixSimilarity(corpus, num_best=None, dtype=<type 'numpy.float32'>, num_features=None, chunksize=256)
 
-  通过存储索引在内存中，来计算语料库文档中的相似度。这个相似度计算通过两个向量之间的余弦相似度（cosine）来计算。
+    通过存储索引在内存中，来计算语料库文档中的相似度。这个相似度计算通过两个向量之间的余弦相似度（cosine）来计算。
 
-  如果你的输入语料包含了dense vector(比如在LSI空间上的文档)，并且符合内存空间大小，可以使用它。
+    如果你的输入语料包含了dense vector(比如在LSI空间上的文档)，并且符合内存空间大小，可以使用它。
 
-  这个矩阵内部以dense numpy array的形式进行存储。必须满足整个矩阵都符合主内存，否则可以使用Similarity进行替代。
+    这个矩阵内部以dense numpy array的形式进行存储。必须满足整个矩阵都符合主内存，否则可以使用Similarity进行替代。
 
-  可以参考该模块中的Similarity和SparseMatrixSimilarity。
+    可以参考该模块中的Similarity和SparseMatrixSimilarity。
 
-  num_features 是语料中的特征总数（可以通过扫描语料库来自动完成）。可以参见Similarity类的其它描述。
+    num_features 是语料中的特征总数（可以通过扫描语料库来自动完成）。可以参见Similarity类的其它描述。
 
 ----------------------------------------------------------------
 
