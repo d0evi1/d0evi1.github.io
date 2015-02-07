@@ -53,7 +53,7 @@ get_similarities(query)
 
     如果query是一个文档集，返回一个2D数组，query中的每个文档都在语料的所有文档中（批查询，每个文档更快处理）都有一个相似度。
 
-    **不要直接使用该函数，可以使用self[query]语法作为替代**
+    __不要直接使用该函数，可以使用self[query]语法作为替代__
 
 classmethod load(fname, mmap=None)
 
