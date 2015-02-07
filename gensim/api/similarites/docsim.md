@@ -49,40 +49,40 @@ class gensim.similarities.docsim.MatrixSimilarity(corpus, num_best=None, dtype=<
 
 get_similarities(query)
 
-  作为一个numpy array返回在语料库中的所有文档的sparse vector query的相似度。
+    作为一个numpy array返回在语料库中的所有文档的sparse vector query的相似度。
 
-  如果query是一个文档集，返回一个2D数组，query中的每个文档都在语料的所有文档中（批查询，每个文档更快处理）都有一个相似度。
+    如果query是一个文档集，返回一个2D数组，query中的每个文档都在语料的所有文档中（批查询，每个文档更快处理）都有一个相似度。
 
-  **不要直接使用该函数，可以使用self[query]语法作为替代**
+    **不要直接使用该函数，可以使用self[query]语法作为替代**
 
 classmethod load(fname, mmap=None)
 
-  加载一个之间保存的文件对象 (可以参见 save)。
+    加载一个之间保存的文件对象 (可以参见 save)。
 
-  如果对象被保存成独立的大数组，通过设置mmap='r'，你就可以通过mmap（共享内存）方式加载它们。缺省不使用mmap，加载大对象时会当成普通对象处理。
+    如果对象被保存成独立的大数组，通过设置mmap='r'，你就可以通过mmap（共享内存）方式加载它们。缺省不使用mmap，加载大对象时会当成普通对象处理。
 
 save(fname, separately=None, sep_limit=10485760, ignore=frozenset([]))
 
->  将对象保存成文件 (可以参见 load)。
+    将对象保存成文件 (可以参见 load)。
 
->  如果separatedly是None，将自动检测对象中保存的numpy/scipy的大稀疏矩阵，并将它们以独立的方式进行保存。这可以避免很多内存问题，并且允许将大数组通过mmap进行有效加载。
+    如果separatedly是None，将自动检测对象中保存的numpy/scipy的大稀疏矩阵，并将它们以独立的方式进行保存。这可以避免很多内存问题，并且允许将大数组通过mmap进行有效加载。
 
-  你可以人工设置separately，它必须是以不同的文件存储的一列属性名。这种情况下将处动执行check。
+    你可以人工设置separately，它必须是以不同的文件存储的一列属性名。这种情况下将处动执行check。
 
-  ignore是一个非序列化（比如：文件句柄，cache等）的属性列名。随后的load()这些属性将被设置成None。
+    ignore是一个非序列化（比如：文件句柄，cache等）的属性列名。随后的load()这些属性将被设置成None。
 
 ------------------------------------------------------------------
 
 class gensim.similarities.docsim.Shard(fname, index)
 
-  一个proxy类，它使用一个Similarity索引来表示单个共享实例。
+    一个proxy类，它使用一个Similarity索引来表示单个共享实例。
 
-  基本上，它封装了(Sparse)MatrixSimilarity，因而，它可以从磁盘上进行mmap，在相请的请求查询。
+    基本上，它封装了(Sparse)MatrixSimilarity，因而，它可以从磁盘上进行mmap，在相请的请求查询。
 
 ------------------------------------------------------------------
 
 get_document_id(pos)
 
-  在合适的pos位置返回索引vector。
+    在合适的pos位置返回索引vector。
 
-  vector与底层的索引是相似类型（）
+    vector与底层的索引是相似类型（）
