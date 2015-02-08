@@ -8,7 +8,7 @@ class gensim.models.tfidfmodel.TfidfModel(corpus=None, id2word=None, dictionary=
 
 基类：[gensim.interfaces.TransformationABC](http://radimrehurek.com/gensim/interfaces.html)
 
-该类的对象，实现了从词－文档之间的协矩阵（integer）转换成一个本地/全局权重的TF_IDF矩阵（正，float型）。
+该类的对象，实现了从词－文档之间的协矩阵（integer）转换成一个locally/globally权重的TF_IDF矩阵（正，float型）。
 
 主要的函数有：
 
@@ -16,6 +16,7 @@ class gensim.models.tfidfmodel.TfidfModel(corpus=None, id2word=None, dictionary=
 - 2.[]方法，它将一个简单的count表示转换成tfidf空间.
 
 调用：
+
     >>> tfidf = TfidfModel(corpus)
     >>> print(tfidf[some_doc])
     >>> tfidf.save('/tmp/foo.tfidf_model')
