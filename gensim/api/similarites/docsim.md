@@ -4,15 +4,15 @@ title: similarities.docsim 文档相似查询
 ---
 {% include JB/setup %}
 
-该模块包含了在VSM集合中进行相似计算的查询函数和类。
+该模块包含了在向量空间模型（VSM）集合中进行相似计算的查询函数和类。
 
-主类为Similarity，它将从一个给定的文档集合上创建索引。一旦索引被创建好，你就可以执行类似这样的快速查询：“Tell me how similar is this query document to each document in the index?”. 返回结果是一个数组，大小与初始化文档集一样大，也就是说，每个索引文档都有一个float值。可选的，你可以为该查询只请求top-N个最近似的索引文档。
+主类为Similarity，它会在一个给定的文档集合上创建索引。一旦索引被创建好，你就可以执行类似这样的快速查询：“Tell me how similar is this query document to each document in the index?”. 结果返回是一个数组，其大小与初始化文档集一样大，也就是说，每个索引文档都有一个float值。可选的，你可以为该查询只请求top-N个最近似的索引文档。
 
 你可以通过Similarity.add_documents() 来添加新的文档到索引中。
 
 # 1. 工作机制？
 
-Similarity将索引(index)划分成许多更细粒度的子索引(sub-indexs)，称为"shards"，它们是基于磁盘存储的。如果你的整个索引满足内存（比如 成千上万的文档需1GB RAM），你也可以直接使用MatrixSimilarity或者SparseMatrixSimilarity。它们很简单，但是扩展性很差（整个索引会保存在RAM中）
+Similarity将索引(index)划分成许多更细粒度的子索引(sub-indexs)，称为"shards"，它们是基于磁盘存储的。如果你的整个索引空间满足内存（比如 成千上万的文档需1GB RAM），你也可以直接使用MatrixSimilarity或者SparseMatrixSimilarity。它们很简单，但是扩展性很差（整个索引会保存在RAM中）
 
 一旦索引被初始化，你就可以查询文档的相似度了：
 
