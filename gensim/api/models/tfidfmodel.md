@@ -15,6 +15,7 @@ class gensim.models.tfidfmodel.TfidfModel(corpus=None, id2word=None, dictionary=
 - 1.构造函数：用于计算在训练语料中的所有term的逆文档数 idf。
 - 2.[]方法，它将一个简单的count表示转换成tfidf空间.
 
+调用：
     >>> tfidf = TfidfModel(corpus)
     >>> print(tfidf[some_doc])
     >>> tfidf.save('/tmp/foo.tfidf_model')
