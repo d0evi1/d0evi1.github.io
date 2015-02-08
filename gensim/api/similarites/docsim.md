@@ -12,7 +12,7 @@ title: similarities.docsim 文档相似查询
 
 # 1. 工作机制？
 
-Similarity将索引(index)划分成许多更细粒度的子索引(sub-indexs)，称为"shards"，它们是基于磁盘存储的。如果你的整个索引空间满足内存（比如 成千上万的文档需1GB RAM），你也可以直接使用MatrixSimilarity或者SparseMatrixSimilarity。它们很简单，但是扩展性很差（整个索引会保存在RAM中）
+Similarity将索引(index)划分成许多更细粒度的子索引(sub-indexs)，称为"shards"，它们是基于磁盘存储的。如果你的整个索引空间内存刚好容得下（比如 成千上万的文档需1GB RAM），那么你可以直接使用MatrixSimilarity或者SparseMatrixSimilarity。它们很简单，但是扩展性很差（因为整个索引会保存在RAM中）
 
 一旦索引被初始化，你就可以查询文档的相似度了：
 
@@ -24,7 +24,7 @@ Similarity将索引(index)划分成许多更细粒度的子索引(sub-indexs)，
     >>> for similarities in index[batch_of_documents]: # the batch is simply an iterable of documents (=gensim corpus)
     >>>     ...
 
-该批处理查询（称为：chunked）的好处是：性能更高。如果想在你的机器上获得加速，你可以运行：python -m gensim.test.simspeed 。
+这种批处理的查询方式，（称为：chunked）其好处是：性能更高。如果想在你的机器上获得加速，你可以运行：python -m gensim.test.simspeed 。
 
 当你需要比较索引与索引之间的相似文档时（比如：查询=索引文档），可以有一个特别的语法。这种特别的语法在内部使用更快的批查询：
 
