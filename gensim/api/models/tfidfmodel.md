@@ -6,7 +6,7 @@ title: similarities.docsim 文档相似查询
 
 class gensim.models.tfidfmodel.TfidfModel(corpus=None, id2word=None, dictionary=None, wlocal=<function identity at 0x114b0d758>, wglobal=<function df2idf at 0x1152e6488>, normalize=True)
 
-基类：gensim.interfaces.TransformationABC
+基类：[gensim.interfaces.TransformationABC](http://radimrehurek.com/gensim/interfaces.html)
 
 该类的对象，实现了从词－文档之间的协矩阵（integer）转换成一个本地/全局权重的TF_IDF矩阵（正，float型）。
 
