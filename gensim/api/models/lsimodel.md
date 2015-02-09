@@ -94,5 +94,148 @@ add_documents(corpus, chunksize=None, decay=None)
 
    一次训练只处理chunksize大于的文档chunk。chunksize的大小，需要在增速（更大的chunksize） vs 低内存footprint（更小的chunksize）之间权衡。如果分布式模式是打开的，每个chunk都被发送到一个不同的worker/computer。
 
-   若设置decay < 1.0，因为.
+   若设置decay < 1.0，会造成在输入文档流中偏向新数据，通过给定少量的emphasis给老数据。这将允许LSA逐渐“忘记”老的文档，并将更多偏向给新数据。
+
+classmethod load(fname, *args, **kwargs)
+
+    加载之前保存的对象文件。
+
+    可以被还原成mmap大数组.
+
+----------------------------------------------------------
+
+print_debug(num_topics=5, num_words=10)
+
+    打印日志给num_topics个主题以最重要的信息。
+
+    不同于print_topics()，对于一个指定的主题来说，words信息很重要。这可以产生一个可读性良好的主题描述。
+
+----------------------------------------------------------
+
+print_topic(topicno, topn=10)
+
+    返回对应主题号单个主题字符串。可以参见show_topic()的参数。
+
+见：
+
+>>> lsimodel.print_topic(10, topn=5)
+'-0.340 * "category" + 0.298 * "$M$" + 0.183 * "algebra" + -0.174 * "functor" + -0.168 * "operator"'
+
+----------------------------------------------------------
+
+print_topics(num_topics=5, num_words=10)
+
+    show_topics()的别名函数，可以打印top5主题的日志。
+
+----------------------------------------------------------
+
+save(fname, *args, **kwargs)
+
+    将model保存成文件。
+
+    大的内部array将被保存成独立的文件，使用fname作为前缀.
+
+-----------------------------------------------------------
+
+show_topic(topicno, topn=10)
+
+    返回一个指定的主题（=左奇异矩阵）字符串， 0 <= topicno < self.num_topics。
+
+    只返回topn的话语，它会最接近该主题的方向（正或者负）
+
+    >>> lsimodel.show_topic(10, topn=5)
+    [(-0.340, "category"), (0.298, "$M$"), (0.183, "algebra"), (-0.174, "functor"), (-0.168, "operator")]
+
+
+-----------------------------------------------------------
+
+show_topics(num_topics=-1, num_words=10, log=False, formatted=True)
+
+    返回num_topics 的最大主题（缺省返回所有）。对于每个主题，可以展示给num_words最重要的word信息（缺省10个word）
+
+    如果formatted=True,该主题将返回一个列表；若为False，则返回一个(weight,word)的2-tuples的list。
+
+    如果log为True，也会输出该结果到日志上。
+
+-----------------------------------------------------------
+
+class gensim.models.lsimodel.Projection(m, k, docs=None, use_svdlibc=False, power_iters=2, extra_dims=100)
+
+    Bases:  gensim.utils.SaveLoad
+
+    从一个corpus文档中构造一个(U,S)的projection。该projection可以接着通过self.merge()将另一个Projection进行merge时进行更新动作。
+
+    该类负责“核心数学计算”，通过高层的LsiModel类操作，可以处理包含处理corpora的接口，将大的corpora分割成chunks，或将它们进行merge等。
+
+-----------------------------------------------------------
+
+empty_like()
+
+classmethod load(fname, mmap=None)
+
+    加载之前保存的一个文件对象。
+
+-----------------------------------------------------------
+
+merge(other, decay=1.0)
+
+    merge另一个projection。
+
+    other: 它的内容会在处理过程中销毁，如果你在后面还需要用到它，可以考虑传给该函数一个other的copy。
+
+-----------------------------------------------------------
+
+save(fname, separately=None, sep_limit=10485760, ignore=frozenset([]))
+
+    保存文件对象.
+
+    同其它。
+
+-----------------------------------------------------------
+
+gensim.models.lsimodel.ascarray(a, name='')
+
+-----------------------------------------------------------
+
+gensim.models.lsimodel.asfarray(a, name='')
+
+-----------------------------------------------------------
+
+gensim.models.lsimodel.clip_spectrum(s, k, discard=0.001)
+
+    给定本征值s，它将返回：需要保存的因子个数，从而避免假值（tiny, numerically instable）。
+
+    它将忽略spectrum的尾部，relative combined mass < min(discard, 1/k).
+
+    返回值被k截断（=不会返回多于k个值）
+
+-----------------------------------------------------------
+
+gensim.models.lsimodel.print_debug(id2token, u, s, topics, num_words=10, num_neg=None)
+
+-----------------------------------------------------------
+
+gensim.models.lsimodel.stochastic_svd(corpus, rank, num_terms, chunksize=20000, extra_dims=None, power_iters=0, dtype=<type 'numpy.float64'>, eps=1e-06)
+
+    在一个sparse输入上，运行SVD。
+
+    (U,S): 返回值。输入数据流语料上的左SV和奇异值。语料本身可能比RAM大（通过vector迭代）。
+
+    这将返回比请求的top rank因子还要少，因为输入本身的rank就很低。extra_dims（过采样）和指定的power_iters(power次迭代)参数将影响分解。
+
+    该算法使用2+power_iters传给输入数据。这种情况下，你只能承担一个single的输入，在LsiModel中将onepass=True，并且直接避免使用该函数。
+
+    该分解算法基于：Halko, Martinsson, Tropp. Finding structure with randomness, 2009
+
+
+
+
+
+
+
+
+
+
+
+
 
