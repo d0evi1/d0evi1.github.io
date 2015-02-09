@@ -78,12 +78,10 @@ power_iters和extra_samples影响了stochastic multi-pass算法的精准度，�
 
 示例：
 
->>> lsi = LsiModel(corpus, num_topics=10)
->>> print(lsi[doc_tfidf]) # project some document into LSI space
->>> lsi.add_documents(corpus2) # update LSI on additional documents
->>> print(lsi[doc_tfidf])
-
-
+    >>> lsi = LsiModel(corpus, num_topics=10)
+    >>> print(lsi[doc_tfidf]) # project some document into LSI space
+    >>> lsi.add_documents(corpus2) # update LSI on additional documents
+    >>> print(lsi[doc_tfidf])
 
 [3] [http://nlp.fi.muni.cz/~xrehurek/nips/rehurek_nips.pdf](http://nlp.fi.muni.cz/~xrehurek/nips/rehurek_nips.pdf)
 
