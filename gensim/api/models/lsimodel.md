@@ -15,9 +15,9 @@ python 隐含语义分析LSA（或者LSI）模块。
 - 语料不能被临时存储：每个文档只能被查看一次，必须被立即处理（one-pass算法）
 - 对于非常大的语料，可以通过使用集群进行分布式运算
 
-English Wikipedia的性能测试（2G的语料position，3.2M文档，100k特征，在最终的TF-IDF矩阵中0.5G的非零实体），请求 top 400 LSI因素：
+English Wikipedia的性能测试（2G的语料position，3.2M文档，100k特征，在最终的TF-IDF矩阵中0.5G的非零实体），请求 top 400 LSI因子：
 
-<table>
+<table border="1">
     <tr>
         <th>算法</th>
         <th>单机串行</th>
