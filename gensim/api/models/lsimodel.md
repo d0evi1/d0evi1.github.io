@@ -48,11 +48,11 @@ distributed = cluster of four logical nodes on three physical machines, each wit
 
 class gensim.models.lsimodel.LsiModel(corpus=None, num_topics=200, id2word=None, chunksize=20000, decay=1.0, distributed=False, onepass=True, power_iters=2, extra_samples=100)
 
-    Bases:  gensim.interfaces.TransformationABC
+    Bases:  [gensim.interfaces.TransformationABC](http://radimrehurek.com/gensim/interfaces.html#gensim.interfaces.TransformationABC)
 
     该类允许构建和维护一个LSI的模型。
 
-    main方法有：
+    主要的方法有：
 
     － 1.构造函数：用来初始化潜语义空间
     － 2.[]方法：它返回任何输入文件在潜语义空间的表示
