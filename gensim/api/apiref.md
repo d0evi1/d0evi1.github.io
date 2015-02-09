@@ -23,7 +23,7 @@ title: API参考
 - models.ldamulticore - 并行LDA
 - models.ldamallet - 通过Mallet进行LDA
 - models.lsimodel - 潜语义索引
-- models.tfidfmodel - TF-IDF模型
+- [models.tfidfmodel - TF-IDF模型](http://d0evi1.github.io/gensim/api/models/tfidfmodel)
 - models.rpmodel - Random Projections
 - models.hdpmodel - HDP
 - models.logentropy_model - LogEntropy模型
