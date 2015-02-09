@@ -36,4 +36,4 @@ title: API参考
 - models.dtmmodel - 动态主题模型（DTM）和动态
 - models.phrases - 短语检测
 - similarities.docsim - 文档相似查询
-- simserver - 文档相似服务器
+- [simserver - 文档相似服务器](http://d0evi1.github.io/gensim/api/similarities/simserver)
