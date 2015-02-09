@@ -33,7 +33,7 @@ title: API参考
 - models.lda_worker - 分布式LDA的worker
 - models.word2vec - word2vec进行深度学习
 - models.doc2vec - 使用paragraph2vec进行深度学习
-- models.dtmmodel - 动态主题模型（DTM）和动态
+- models.dtmmodel - 动态主题模型（DTM）和dynamic influence model(DIM)
 - models.phrases - 短语检测
 - [similarities.docsim - 文档相似查询](http://d0evi1.github.io/gensim/api/similarities/docsim)
 - [simserver - 文档相似服务器](http://d0evi1.github.io/gensim/api/similarities/simserver)
