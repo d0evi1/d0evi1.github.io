@@ -37,3 +37,6 @@ title: API参考
 - models.phrases - 短语检测
 - [similarities.docsim - 文档相似查询](http://d0evi1.github.io/gensim/api/similarities/docsim)
 - [simserver - 文档相似服务器](http://d0evi1.github.io/gensim/api/similarities/simserver)
+
+
+[英文原版](http://radimrehurek.com/gensim/apiref.html)

@@ -150,7 +150,4 @@ static save_corpus(fname, corpus, id2word=None, metadata=False)
     优先调用serialize()函数.
 
 
-
-
-
-
+[英文原版](http://radimrehurek.com/gensim/interfaces.html)
