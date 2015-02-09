@@ -227,15 +227,4 @@ gensim.models.lsimodel.stochastic_svd(corpus, rank, num_terms, chunksize=20000, 
 
     该分解算法基于：Halko, Martinsson, Tropp. Finding structure with randomness, 2009
 
-
-
-
-
-
-
-
-
-
-
-
-
+    如果corpus使用的是一个scipy.sparse矩阵，那么假设整个corpus满足主内存大小，并选择一个不同的代码路径（效率更高）.
