@@ -6,7 +6,7 @@ title: API参考
 
 模块：
 
-- interfaces - 核心gensim接口
+- [interfaces - 核心gensim接口](http://d0evi1.github.io/gensim/api/interfaces)
 - utils - 多个工具函数
 - matutils - 数学工具
 - corpora.bleicorpus - 在Blei的LDA-C格式的语料
