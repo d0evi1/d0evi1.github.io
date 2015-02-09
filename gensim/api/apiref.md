@@ -27,13 +27,13 @@ title: API参考
 - models.rpmodel - Random Projections
 - models.hdpmodel - HDP
 - models.logentropy_model - LogEntropy模型
-- models.lsi_dispatcher - 分布式lsi的dispatcher
-- models.lsi_worker - 分布式lsi的worker
+- [models.lsi_dispatcher - 分布式lsi的dispatcher](http://d0evi1.github.io/gensim/api/models/lsi_dispatcher)
+- [models.lsi_worker - 分布式lsi的worker](http://d0evi1.github.io/gensim/api/models/lsi_worker)
 - models.lda_dispatcher - 分布式LDA的dispatcher
 - models.lda_worker - 分布式LDA的worker
 - models.word2vec - word2vec进行深度学习
 - models.doc2vec - 使用paragraph2vec进行深度学习
 - models.dtmmodel - 动态主题模型（DTM）和动态
 - models.phrases - 短语检测
-- similarities.docsim - 文档相似查询
+- [similarities.docsim - 文档相似查询](http://d0evi1.github.io/gensim/api/similarities/docsim)
 - [simserver - 文档相似服务器](http://d0evi1.github.io/gensim/api/similarities/simserver)
