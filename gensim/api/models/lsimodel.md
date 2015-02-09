@@ -77,7 +77,6 @@ power_iters和extra_samples影响了stochastic multi-pass算法的精准度，�
 打开distributed可以使用分布式计算。
 
 示例：
-
     >>> lsi = LsiModel(corpus, num_topics=10)
     >>> print(lsi[doc_tfidf]) # project some document into LSI space
     >>> lsi.add_documents(corpus2) # update LSI on additional documents
