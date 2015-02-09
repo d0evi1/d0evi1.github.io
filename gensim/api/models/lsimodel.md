@@ -32,7 +32,7 @@ English Wikipedia的性能测试（2G的语料position，3.2M文档，100k特征
     <tr>
         <td>multi-pass stochastic算法（2阶迭代）</td>
         <td>5h 39m</td>
-        <td>N/A</td>
+        <td>N/A[注]</td>
     </tr>
 </table>
 
@@ -42,7 +42,7 @@ serial = Core 2 Duo MacBook Pro 2.53Ghz, 4GB RAM, libVec
 
 distributed = cluster of four logical nodes on three physical machines, each with dual core Xeon 2.0GHz, 4GB RAM, ATLAS
 
-stochastic算法可以是分布式的，但是花费大多数时间在读取/解压输入磁盘文件上。额外的网络传输是因为数据分布在集群节点上，所以看起来变慢了。
+[注]stochastic算法可以设成分布式，此由于数据分布在集群节点上，时大量的时间花费在读取/解压输入磁盘文件、额外的网络传输，所以看起来变慢了。
 
 -------------------------------------------------------------
 
