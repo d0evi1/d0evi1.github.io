@@ -10,7 +10,7 @@ title: API参考
 - utils - 多个工具函数
 - matutils - 数学工具
 - corpora.bleicorpus - 在Blei的LDA-C格式的语料
-- corpora.dictionary - 构建word<->id的映射关系
+- [corpora.dictionary - 构建word<->id的映射关系](http://d0evi1.github.io/gensim/api/corpora/dictionary)
 - corpora.hashdictionary - 构建word<->id的映射关系
 - corpora.lowcorpus - 以word list格式存在的语料
 - [corpora.mmcorpus - 以Matrix Market格式存在的语料](http://d0evi1.github.io/gensim/api/corpora/mmcorpus)
