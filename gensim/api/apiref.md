@@ -13,7 +13,7 @@ title: API参考
 - corpora.dictionary - 构建word<->id的映射关系
 - corpora.hashdictionary - 构建word<->id的映射关系
 - corpora.lowcorpus - 以word list格式存在的语料
-- corpora.mmcorpus - 以Matrix Market格式存在的语料
+- [corpora.mmcorpus - 以Matrix Market格式存在的语料](http://d0evi1.github.io/gensim/api/corpora/mmcorpus)
 - corpora.svmlightcorpus - 以SVMlight格式存在的语料
 - corpora.wikicorpus - dump自Wikipedia的语料
 - corpora.textcorpus - 使用字典来构建corpora
