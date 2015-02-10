@@ -50,7 +50,7 @@ dispatcher主要负责所有的计算、排队、分派任务给worker。计算�
 
 # 提供的分布式算法
 
-- [分布式LSA]()
-- [分布式LDA]()
+- [分布式LSA](http://d0evi1.github.io/gensim/dis_lsi)
+- [分布式LDA](http://d0evi1.github.io/gensim/dis_lda)
 
 [英文文档](http://radimrehurek.com/gensim/distributed.html)
