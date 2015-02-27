@@ -83,7 +83,7 @@ title: 相似查询
 
 ##下一步
 
-看到这样，那么恭喜你，你已经完成了教程。你已经理解了gensim的工作机制，如果想了解更多细节，可以查看API文档，或者查看Wiki，或者cheout出gensim的[分布式计算](http://radimrehurek.com/gensim/distributed.html)。
+看到这样，那么恭喜你，你已经完成了教程。你已经理解了gensim的工作机制，如果想了解更多细节，可以查看API文档，或者查看Wiki，或者cheout出gensim的[分布式计算](http://d0evi1.github.io/gensim/distributed)。
 
 gensim是一个相当成熟的包，它已经成功地用在了许多行业和公司，在快速原型以及生产环境中都已经在使用。当然这并不意味着一切很完美：
 
@@ -92,3 +92,5 @@ gensim是一个相当成熟的包，它已经成功地用在了许多行业和�
   - 需要你的回馈（不仅仅是代码）：包括贡献 思想、bug 或者其它等。。
 
 gensim的目的不是成为一个通用的跨越NLP/机器学习等子领域的全领域框架。它的目标只是帮助NLP实践者在大数据集上进行主题建模算法，对新研究者来说可以进行新算法的快速原型实践。
+
+[英文文档](http://radimrehurek.com/gensim/tut3.html)
