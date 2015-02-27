@@ -144,7 +144,7 @@ gensim使用一个快速的在线实现版本[[3]](http://radimrehurek.com/gensi
 
 添加新的VSM变换（比如：不同的权重模式）是相当琐碎的；可以查看API等。
 
-需要重复的是，所有唯一的，增量的实现，不必在主内存中完整训练整个语料。我们正在改进[分布式计算](http://radimrehurek.com/gensim/distributed.html)，来改进cpu性能。如果你想贡献（测试、用例、或编码），可以联系我们。
+需要重复的是，所有唯一的，增量的实现，不必在主内存中完整训练整个语料。我们正在改进[分布式计算](http://d0evi1.github.io/gensim/distributed)，来改进cpu性能。如果你想贡献（测试、用例、或编码），可以联系我们。
 
 下一节：[相似查询](http://d0evi1.github.io/gensim/tut3).
 
