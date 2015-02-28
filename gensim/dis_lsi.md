@@ -35,7 +35,7 @@ title: 分布式LSA
 
     由于该版本的代码只支持broadcast域的分布式节点，如果你的局域网不支持，可以通过修改gensim的代码来实现。如果你的Pyro名字服务器运行在：
     
-
+    python -m Pyro4.naming -n 10.177.128.143 &
     
     在site-packages下找到gensim，将gensim/utils.py中的代码的getNS()函数进行修改：
 
