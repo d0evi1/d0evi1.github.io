@@ -31,11 +31,15 @@ title: 分布式LSA
 当集群建立和运行时，准备开始接受job。如果为了移除worker，可以终止它的lsi_worker进程。为了添加另一个worker，可以运行另一个lsi_worker（它不会影响正在运行的计算，添加和删除都不是动态的）。但如果你终止了lsi_dispatcher，你将不会运行计算，直到你再次运行它（worker进程可以被重用）.
 
 
-## 1.1 译者注
+## 1.1 多机部署(译者添加)
+
 
 由于该版本的代码只支持broadcast域的分布式节点，如果你的局域网不支持，可以通过修改gensim的代码来实现。如果你的Pyro名字服务器运行在：
     
     python -m Pyro4.naming -n 10.177.128.143 &
+
+
+### 1.1.1 utils.py修改
     
 在site-packages下找到gensim，将gensim/utils.py中的代码的getNS()函数进行修改：
 
@@ -45,7 +49,27 @@ title: 分布式LSA
 
     return Pyro4.locateNS("10.177.128.143", 9090)
 
+同时，将get_my_ip()函数下的:
+    
+    ns = Pyro4.naming.locateNS()
+
+也替换成：
+
+    ns = Pyro4.naming.locateNS("10.177.128.143", 9090)
+
 即可。
+
+### 1.1.2 lsi_dispatcher.py 修改
+
+gensim使用pyro的PYRONAME方式进行对象查询，因此，需要将initialize()函数中的：
+
+    self.callback = Pyro4.Proxy('PYRONAME:gensim.lsi_dispatcher')
+
+修改为：
+
+    self.callback = Pyro4.Proxy('PYRONAME:gensim.lsi_dispatcher@10.177.128.143')
+
+这样，一切就ok了。你可以在不同的机器上进行部署。
 
 通过运行命令，可以查看该pyro名字服务器的连接ip和端口.
 
