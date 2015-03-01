@@ -69,6 +69,17 @@ gensim使用pyro的PYRONAME方式进行对象查询，因此，需要将initiali
 
     self.callback = Pyro4.Proxy('PYRONAME:gensim.lsi_dispatcher@10.177.128.143')
 
+### 1.1.3 lsimodel.py 修改
+
+对__init__()函数处，修改：
+
+    dispatcher = Pyro4.Proxy('PYRONAME:gensim.lda_dispatcher')
+
+修改为：
+
+    dispatcher = Pyro4.Proxy('PYRONAME:gensim.lda_dispatcher@10.177.128.143')
+
+
 这样，一切就ok了。你可以在不同的机器上进行部署。
 
 通过运行命令，可以查看该pyro名字服务器的连接ip和端口.
