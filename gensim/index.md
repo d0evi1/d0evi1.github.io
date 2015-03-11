@@ -27,6 +27,8 @@ gensim的设计原则：
 
 更多：[document similarity server](http://pypi.python.org/pypi/simserver).
 
+[相似服务器](http://d0evi1.github.io/gensim/api/similarities/simserver)相关文档.
+
 #3.核心概念
 
 gensim的整个package会涉及三个概念：[corpus](d0evi1.github.io/gensim/corpus.html), [vector](d0evi1.github.io/gensim/vector.html), [model](d0evi1.github.io/gensim/model.html).
