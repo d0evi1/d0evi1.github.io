@@ -31,7 +31,7 @@ gensim的设计原则：
 
 #3.核心概念
 
-gensim的整个package会涉及三个概念：[corpus](d0evi1.github.io/gensim/corpus.html), [vector](d0evi1.github.io/gensim/vector.html), [model](d0evi1.github.io/gensim/model.html).
+gensim的整个package会涉及三个概念：[corpus](http://d0evi1.github.io/gensim/corpus.html), [vector](http://d0evi1.github.io/gensim/vector.html), [model](http://d0evi1.github.io/gensim/model.html).
 
 ## 3.1 语库(corpus)
 
