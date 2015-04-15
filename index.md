@@ -8,5 +8,5 @@ title: d0evi1's blog
 
 个人博客请移步： 
 
-原创博文:[独立博客](http://cool.sinaapp.com)
+原创博文:[独立博客](http://www.d0evi1.com)
 
