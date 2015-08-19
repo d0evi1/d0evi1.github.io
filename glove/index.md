@@ -66,7 +66,7 @@ GloVe的训练目的是，为了学习词相量，以及两者之间的点积等
 
 GloVe生成的词向量，可以用一个标记化频谱结构进行：
 
-![Alt text](http://nlp.stanford.edu/projects/glove/images/table.png)
+![Alt text](http://nlp.stanford.edu/projects/glove/images/word_vectors.jpg)
 
 
 水平带标识了该模型的共现交互。而，点积，总之，私。
