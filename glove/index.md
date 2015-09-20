@@ -39,6 +39,9 @@ GloVe是一个非监督学习算法，用来获取词向量表示. 它会对语�
 - 6.lizard
 - 7.eleutherodactylus
 
+![Alt text](http://nlp.stanford.edu/projects/glove/images/litoria.jpg) ![Alt text](http://nlp.stanford.edu/projects/glove/images/leptodactylidae.jpg) ![Alt text](http://nlp.stanford.edu/projects/glove/images/rana.jpg) ![Alt text](http://nlp.stanford.edu/projects/glove/images/eleutherodactylus.jpg)
+
+
 ### 2.线性结构
 
 用于计算最近邻的语义相似性，产生了另一个标量，来衡量两词间的相关性。这种简化还有点问题，因为两个结定词经常展示出更难理解的关系，它们可以由一个数字来表示。例如，'man'可以被认为是与'woman'相关，因为这两个词都用来描述人类；另外，两个词可以被认为是反义词。
