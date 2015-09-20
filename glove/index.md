@@ -50,7 +50,7 @@ GloVe是一个非监督学习算法，用来获取词向量表示. 它会对语�
 
 'man'和'woman'间区分的相关概念，有：性别（sex or gender），还有可能是近义词对：比如：'king'和'queen'，或者'brother'和'sister'。为了从数学上很明显地对：man-wowan，king-queen，brother-sister的向量进行区别，这种合适的以及其它感兴趣的模式可以通过上述可视化的集合进行观察。
 
-![Alt text](http://nlp.stanford.edu/projects/glove/images/man_woman.jpg) ![Alt text](http://nlp.stanford.edu/projects/glove/images/company_ceo_small.jpg) ![Alt text](http://nlp.stanford.edu/projects/glove/images/city_zip_small.jpg) ![Alt text](http://nlp.stanford.edu/projects/glove/images/comparative_superlative_small.jpg)
+![Alt text](http://nlp.stanford.edu/projects/glove/images/man_woman_small.jpg) ![Alt text](http://nlp.stanford.edu/projects/glove/images/company_ceo_small.jpg) ![Alt text](http://nlp.stanford.edu/projects/glove/images/city_zip_small.jpg) ![Alt text](http://nlp.stanford.edu/projects/glove/images/comparative_superlative_small.jpg)
 
 
 
