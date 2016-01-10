@@ -1,11 +1,9 @@
 ---
 layout: page
-Title         : 皮肤学数据集(Dermatology Dataset)
-Author        : 译者：d0evi1 2016.1.10
+title         : 皮肤学数据集(Dermatology Dataset)
+author        : 译者：d0evi1 2016.1.10
 ---
 {% include JB/setup %}
-
-[TITLE]
 
 # 数据来源于：
 
