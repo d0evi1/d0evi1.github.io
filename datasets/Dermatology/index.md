@@ -53,8 +53,8 @@ Email: guvenir '@' cs.bilkent.edu.tr
 
 该数据集包含了34个属性，其中33个通过线性值(linear valued)表示，还有一个标称（nominal）。
 
-在皮肤学中，有种疾病：[erythemato-squamous病](https://en.wikipedia.org/wiki/Erythema)，
-它的鉴别诊断是个头疼的问题。它和erythema and scaling病(注：另一种病)有着相同的临床特征，只有很
+在皮肤学中，皮肤病：[erythemato-squamous病](https://en.wikipedia.org/wiki/Erythema)，
+它的鉴别诊断是个头疼的问题。它们在erythema和scaling特征上有着相同的临床特征，只有很
 少的区别。这一族群的疾病有：银屑病（psoriasis）、脂溢性皮炎(seboreic dermatitis)、lichen planus、
 pityriasis rosea, cronic dermatitis, and pityriasis rubra pilaris。通常对于这类疾病，活体组织
 检查(biopsy)是必不可少的，但不幸的是，这类疾病有着相近的病理学特征。对于鉴别诊断来说，另一个难点是，
