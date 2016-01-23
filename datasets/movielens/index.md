@@ -10,32 +10,39 @@ author        : 译者：d0evi1 2016.1.10
 ml-data.tar.gz      压缩文件. 用于重新u数据文件: gunzip ml-data.tar.gz; tar xvf ml-data.tar; mku.sh
 
 
-u.data              完整的u数据集，10w条ratings打分数据：943个user在1682个item上。每个user至少为20个电影打分。users和items从1开始，数字连续。数据是随机排序的。通过tab进行分割，如：
+u.data:
+    完整的u数据集，10w条ratings打分数据：943个user在1682个item上。每个user至少为20个电影打分。users和items从1开始，数字连续。数据是随机排序的。通过tab进行分割，如：
 
     user_id | item_id | rating | timestamp。
 
     timestamps是至1/1/1970 UTC以来的unix秒.
 
 
-u.info          在u.data数据集中user、item、rating的总数.
+u.info:
+    
+    在u.data数据集中user、item、rating的总数.
 
 
-u.item          items(电影)的信息；通过tab进行分割：
+u.item:
 
-   movie_id | movie_title | release_date | video_release_date |
+    items(电影)的信息；通过tab进行分割：
 
-   IMDb URL | unknown | Action | Adventure | Animation |
+    movie_id | movie_title | release_date | video_release_date |
 
-   Children's | Comedy | Crime | Documentary | Drama | 
+    IMDb URL | unknown | Action | Adventure | Animation |
 
-   Fantasy | Film-Noir | Horror | Musical | Mystery | 
+    Children's | Comedy | Crime | Documentary | Drama | 
 
-   Romance | Sci-Fi | Thriller | War | Western |
+    Fantasy | Film-Noir | Horror | Musical | Mystery | 
+
+    Romance | Sci-Fi | Thriller | War | Western |
 
     最后19个字段都是类型(genres)，值为1,则表示电影为该类型，为0则表示不是该类型；一部电影可以有多个类型。电影id和u.data数据集中的一致.
 
 
 u.genre     类型列表
+
+
 u.user      人口统计学(Demographic)信息。通过tab列表进行分割。
 
             user id | age | gender | occupation | zip code
