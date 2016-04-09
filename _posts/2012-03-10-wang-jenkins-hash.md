@@ -4,10 +4,6 @@ title: Wang/Jenkins Hash算法
 description: "Just about everything you'll need to style in the theme: headings, paragraphs, blockquotes, tables, code blocks, and more."
 modified: 2012-12-24
 tags: [sample post]
-image:
-  feature: abstract-3.jpg
-  credit: dargadgetz
-  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
 ---
 
 Wang/Jenkins Hash算法在网上提到的也甚多，但是很少有人或有文章能系统地能将该算法的来龙去脉说明白。于是，我就充当了该苦工，幸好还是找到了一些东西，尝试着将该算法简单道来。
