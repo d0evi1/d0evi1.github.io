@@ -28,6 +28,7 @@ uint64_t hash(uint64_t key) {
     key = key + (key << 31);
     return key;
 }
+{% endraw %}
 {% endhighlight %}
 
 
@@ -77,6 +78,8 @@ uint64_t inverse_hash(uint64_t key) {
 
     return key;
 }
+
+{% endraw %}
 {% endhighlight %}
 
 
