@@ -30,8 +30,8 @@ uint64_t hash(uint64_t key) {
 
 其关键特性是：
 
--- 1.雪崩性（更改输入参数的任何一位，就将引起输出有一半以上的位发生变化）
--- 2.可逆性（input ==> hash ==> inverse_hash ==> input）
+- 1.雪崩性（更改输入参数的任何一位，就将引起输出有一半以上的位发生变化）
+- 2.可逆性（input ==> hash ==> inverse_hash ==> input）
 
 其逆Hash函数为：
 
@@ -83,5 +83,5 @@ uint64_t inverse_hash(uint64_t key) {
 
 参考：
 
--- 1.[jenkins 32位Hash算法](http://burtleburtle.net/bob/hash/integer.html)
--- 2.[Geoffrey Irving's blog](http://naml.us/blog/tag/thomas-wang)
+- 1.[jenkins 32位Hash算法](http://burtleburtle.net/bob/hash/integer.html)
+- 2.[Geoffrey Irving's blog](http://naml.us/blog/tag/thomas-wang)
