@@ -2,7 +2,15 @@
 layout: page
 title: glove简介 
 tagline: 介绍
+
+modified: 2016-12-24
+tags: [sample post]
+image:
+  feature: abstract-3.jpg
+  credit: dargadgetz
+  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
 ---
+
 {% include JB/setup %}
 
 #GloVe: Global Vectors for Word Representation
