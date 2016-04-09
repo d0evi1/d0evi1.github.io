@@ -1,6 +1,6 @@
 ---
 layout: page
-title: About the Jekyll Theme
+title: 版权声明
 image:
   feature: abstract-5.jpg
   credit: dargadgetz
@@ -9,9 +9,17 @@ comments: false
 modified: 2016-02-01
 ---
 
-They say three times the charm, so here is another free responsive Jekyll blog theme for you. I've learned a ton since open sourcing my first two themes [on Github](http://github.com/mmistakes), and wanted to try a few new things this time around. 
 
-If you've used any of [my other themes](http://mademistakes.com/work/jekyll-themes/) most of this should be familiar territory...
+本站所有文章均为原创文章，版权归本站和作者所有，除非特别声明，所有原创文章均采用“署名-非商业性使用-相同方式共享 2.5 中国大陆”的创作共用协议。
+
+如果你打算转载本站的文章，必须以超链接形式在文章开始处注明文章作者及原始出处，以示对我劳动成果的尊重，例如：
+
+- 原载：http://www.d0evi1.com
+- 作者：junGle
+- 原文网址：http://www.d0evi1.com/xxx.htm
+
+商业网站请勿复制本站内容。
+
 
 ## HPSTR Features:
 
