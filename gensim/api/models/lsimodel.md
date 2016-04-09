@@ -88,7 +88,7 @@ power_iters和extra_samples影响了stochastic multi-pass算法的精准度，�
 
 add_documents(corpus, chunksize=None, decay=None)
 
-   更新奇异值分解，来说明新文档语料。
+   更新奇异值分解，重视新文档语料。
 
    一次训练只处理chunksize大于的文档chunk。chunksize的大小，需要在增速（更大的chunksize） vs 低内存footprint（更小的chunksize）之间权衡。如果分布式模式是打开的，每个chunk都被发送到一个不同的worker/computer。
 
