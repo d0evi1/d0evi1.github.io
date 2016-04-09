@@ -15,7 +15,9 @@ Wang/Jenkins Hash算法在网上提到的也甚多，但是很少有人或有文
 最早，Bob Jenkins提出了多个基于字符串通用Hash算法（搜Jenkins Hash就知道了），而Thomas Wang在Jenkins的基础上，针对固定整数输入做了相应的Hash算法。因而，其名字也就成了Wang/Jenkins Hash，其64位版本的 Hash算法如下：
 
 
-{% highlight css %}
+{% highlight jinja %}
+{% raw %}
+
 uint64_t hash(uint64_t key) {
     key = (~key) + (key << 21); // key = (key << 21) - key - 1;
     key = key ^ (key >> 24);
@@ -37,7 +39,9 @@ uint64_t hash(uint64_t key) {
 其逆Hash函数为：
 
 
-{% highlight css %}
+{% highlight jinja %}
+{% raw %}
+
 uint64_t inverse_hash(uint64_t key) {
     uint64_t tmp;
 
@@ -82,14 +86,3 @@ uint64_t inverse_hash(uint64_t key) {
 
 -- 1.[jenkins 32位Hash算法](http://burtleburtle.net/bob/hash/integer.html)
 -- 2.[Geoffrey Irving's blog](http://naml.us/blog/tag/thomas-wang)
-
-
-{% highlight html %}
-<a href="#" class="btn btn-success">Success Button</a>
-{% endhighlight %}
-
-<div markdown="0"><a href="#" class="btn">Primary Button</a></div>
-<div markdown="0"><a href="#" class="btn btn-success">Success Button</a></div>
-<div markdown="0"><a href="#" class="btn btn-warning">Warning Button</a></div>
-<div markdown="0"><a href="#" class="btn btn-danger">Danger Button</a></div>
-<div markdown="0"><a href="#" class="btn btn-info">Info Button</a></div>
