@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Theme Setup
+title: 我的推荐：机器学习资料
 description: "Instructions on how to install and customize the modern Jekyll theme HPSTR."
 image:
   feature: abstract-11.jpg
@@ -11,7 +11,7 @@ share: true
 
 关于机器学习，一些我认为不错的东西，已亲测。
 
-一、基础学籍
+#一、基础学籍
 
 数学基础：
 
