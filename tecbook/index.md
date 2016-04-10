@@ -11,7 +11,7 @@ share: true
 
 关于机器学习，一些我认为不错的东西，已亲测。
 
-#一、基础学籍
+# 一、基础学籍
 
 数学基础：
 
@@ -21,7 +21,7 @@ share: true
 
 3.[微积分基础](https://www.coursera.org/learn/calculus1)
 
-二、机器学习
+# 二、机器学习
 
 1.[吴恩达: machine learning－coursera](https://www.coursera.org/learn/machine-learning)
 
@@ -37,16 +37,16 @@ share: true
 
 5.[机器学习技法（coursera）](https://class.coursera.org/ntumltwo-002/lecture)
 
-三、神经网络
+# 三、神经网络
 
 1.大神Geoffrey Hinton：[机器学习中使用的神经网络（coursera）](https://class.coursera.org/neuralnets-2012-001/lecture)
 
-四、NLP
+# 四、NLP
 
 1.宗庆成:[统计自然语言处理](http://book.douban.com/subject/3076996/)
 
 2.Michael Collins [<Natural Language Processing> coursera](https://class.coursera.org/nlangp-001/lecture)
 
-二、信息检索
+# 五、信息检索
 
 1.[信息检索-实现和评价搜索引擎－Stefan Büttcher](http://book.douban.com/subject/7154449/)
