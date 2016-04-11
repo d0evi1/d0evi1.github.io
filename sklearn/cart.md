@@ -1,0 +1,91 @@
+---
+layout: page
+title: sklearn中的cart分类树 
+tagline: 介绍
+---
+{% include JB/setup %}
+
+# 1.介绍
+
+cart是比较决策树中一个比较经典的算法，具体的算法原理不在此解释，它用于分类，后者用于回归。
+
+以分类树为例。
+
+一、回顾下简单决策树的要点：
+
+- 1.树的生长：分枝策略(or 特征选择)=>树的生成   (局部最优)
+- 2.树的剪枝：剪枝策略 => 解决overfit（全局最优）
+
+二、再回顾下C&RT：
+
+- 1.CART是二元树，即二切分。
+- 2.树的生长：分支原则：purifying. 纯不纯?
+- 3.树的剪枝：
+
+树的生成（from台大ML课程）：
+<figure>
+	<a href="http://img.hb.aicdn.com/db31bbfef15ef80e0879e111ca0669c270957c8321208-cL8sHu_fw658"><img src="http://img.hb.aicdn.com/db31bbfef15ef80e0879e111ca0669c270957c8321208-cL8sHu_fw658" alt=""></a>
+</figure>
+
+树的剪枝：
+
+<figure>
+	<a href="http://img.hb.aicdn.com/0d63d4495f9c3ebf1cc23c7804284389f8d453e41fc30-gjvsNP_fw658"><img src="http://img.hb.aicdn.com/0d63d4495f9c3ebf1cc23c7804284389f8d453e41fc30-gjvsNP_fw658" alt=""></a>
+</figure>
+
+
+我们都知道[gini系数](http://baike.baidu.com/link?url=IToPYLzxGl_nGQ30Axpz4HJMHbRKvo47HE_Qvx0S-8chg_W4ix8kzU6KOFzyk1WLec4WGEl4SOHolsOy_r_ml_)在经济学里用来衡量收入分配是否不均。gini系数越大，贫富差距越大。cart分类树采用gini系数来衡量一个节点纯不纯，其分支目标即是最小化gini系数。cart回归数采用的还是平方误差，此处不讨论。
+
+剪枝采用正则项进行判断。
+
+详细可参考李航的《统计学习方法》.
+
+# 2. cart实现
+
+scikit-learn上也有一个它的实现 DecisionTreeClassifier/DecisionTreeRegressor。本文以它的应用，做为一个示例。
+
+sklearn提供了一个CART的优化实现，但仍有个较大的总题：就是剪枝部分没有实现。
+
+tree的实现在我的mac目录下，为：
+/Library/Python/2.7/site-packages/scikit_learn-0.15.2-py2.7-macosx-10.9-intel.egg/sklearn/tree/tree.py
+
+
+其中，部分实现是用cython写的，可以github上看到其源码。
+
+在_tree.pyx中，是一棵二元树（binary decision tree）。由并列的数组一起表示。
+
+- node_count : 节点总数目。包括：internal nodes + leaves
+
+- capacity：<=node_count
+- max_depth: 最大深度
+- children_left：children_left[i]表示node i的左节点.
+- children_right:children_right[i]表示node i的右节点.
+- feature: feature[i]表示internal node i进行分割的feature.
+- threshold:threshold[i]表示internal node i的threshold.
+- value:包含了每个节点的预测值
+- impurity：impurity[i]表示node i的不纯度impurity.
+- n_node_samples：n_node_samples[i]表示node i下所有的训练样本数.
+
+- weighted_n_node_samples: weighted_n_node_samples[i]表示node i的样本权重。
+
+上面是树的定义。
+
+那么，在训练时(fit)，需要注意什么呢？
+
+| 参数                     | 说明                                                                                                                                                                                                                                         |
+|--------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| criterion                | 用来权衡划分的质量。缺省‘gini’： 即 Gini impurity。 或者‘entropy’： 信息增益. 其实现可参考： _creterion.pyx, 包含了分类和回归.缺省为：gini.                                                                                                  |
+| splitter                 | 划分方式有三种：best, presort-best, random. 它的实现在： _splitter.pyx，它会根据criterion对每个节点进行划分. best是最优划分，random: 随机划分. 缺省为：best                                                                                  |
+| max_features             | 当进行best划分时，会考虑max_features. 缺省: None                                                                                                                                                                                             |
+| max_depth                | 树的最大深度。缺省为：None                                                                                                                                                                                                                   |
+| min_samples_split        | 对于一个中间节点（internal node），必须有min个samples才对它进行分割。缺省为：2                                                                                                                                                               |
+| min_samples_leaf         | 对一个叶子节点（left node），必须有min个samples认为它是叶子节点。缺省为：1                                                                                                                                                                   |
+| min_weight_fraction_leaf | 在一个叶子节点上，输入样本必须有min个最小权重块。缺省为：0                                                                                                                                                                                   |
+| max_leaf_nodes           | 以最好优先（best-first）的方式使用该值生成树。如果为None:不限制叶子节点的数目。如果不为None，则忽略max_depth。缺省为：None                                                                                                                   |
+| class_weight             | 分类和权重以这种形式关联在一起：{class_label: weight}。如果示给定，那么所有的分类都认为具有权重1. 对于多分类总题，可以给出一个list of dicts，顺序与y列一致。“balanced”模式：自动调整权重。n_samples / (n_classes * np.bincount(y))详见文档。 |
+| random_state             | 随机种子                                                                                                                                                                                                                                     |
+| presort                  | bool, 是否对数据进行预先排序，以便在fitting时加快最优划分。对于大数据集，使用False，对于小数据集，使用True.                                                                                                                                  |
+
+
+## 2.1 训练/建模/预测/评测
+
