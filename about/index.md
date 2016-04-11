@@ -21,6 +21,14 @@ modified: 2016-02-01
 商业网站请勿复制本站内容。
 
 
+其它声明：
 
-<div markdown="0"><a href="{{ site.url }}/theme-setup/" class="btn btn-info">Theme Setup</a> <a href="https://github.com/mmistakes/hpstr-jekyll-theme" class="btn btn-success">Download HPSTR</a></div>
+本blog采用Jekyll+HPSTR.
 
+相应主题可以在下面提供的链接下载.
+
+<div markdown="0"> <a href="https://github.com/mmistakes/hpstr-jekyll-theme" class="btn btn-success">Download HPSTR</a></div>
+
+图片存储部分，采用huaban.
+
+评论部分采用Disqus.
