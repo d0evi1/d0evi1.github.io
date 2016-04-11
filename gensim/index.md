@@ -2,6 +2,7 @@
 layout: page
 title: gensim教程 
 tagline: 介绍
+tags: [gensim, LSA, LDA] 
 ---
 {% include JB/setup %}
 
