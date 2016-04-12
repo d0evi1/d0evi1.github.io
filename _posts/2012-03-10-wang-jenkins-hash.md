@@ -11,8 +11,7 @@ Wang/Jenkins Hash算法在网上提到的也甚多，但是很少有人或有文
 最早，Bob Jenkins提出了多个基于字符串通用Hash算法（搜Jenkins Hash就知道了），而Thomas Wang在Jenkins的基础上，针对固定整数输入做了相应的Hash算法。因而，其名字也就成了Wang/Jenkins Hash，其64位版本的 Hash算法如下：
 
 
-{% highlight jinja %}
-{% raw %}
+{% highlight c %}
 
 uint64_t hash(uint64_t key) {
     key = (~key) + (key << 21); // key = (key << 21) - key - 1;
@@ -24,7 +23,6 @@ uint64_t hash(uint64_t key) {
     key = key + (key << 31);
     return key;
 }
-{% endraw %}
 {% endhighlight %}
 
 
