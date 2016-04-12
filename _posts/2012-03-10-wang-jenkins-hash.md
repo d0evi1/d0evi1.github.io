@@ -36,8 +36,7 @@ uint64_t hash(uint64_t key) {
 其逆Hash函数为：
 
 
-{% highlight jinja %}
-{% raw %}
+{% highlight c %}
 
 uint64_t inverse_hash(uint64_t key) {
     uint64_t tmp;
@@ -75,7 +74,6 @@ uint64_t inverse_hash(uint64_t key) {
     return key;
 }
 
-{% endraw %}
 {% endhighlight %}
 
 
