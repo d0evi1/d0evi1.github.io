@@ -87,5 +87,99 @@ tree的实现在我的mac目录下，为：
 | presort                  | bool, 是否对数据进行预先排序，以便在fitting时加快最优划分。对于大数据集，使用False，对于小数据集，使用True.                                                                                                                                  |
 
 
-## 2.1 训练/建模/预测/评测
+## 2.1 模型及参数
+
+cart, 可参考：[sklearn 决策树](http://scikit-learn.org/stable/modules/tree.html)
+
+## 2.2 模型评价
+
+
+模型评价部分，可参考：[sklearn模型评测](http://scikit-learn.org/stable/modules/model_evaluation.html)
+
+## 2.3 参数优化及选择
+
+sklearn中，使用[Grid Search](http://scikit-learn.org/stable/modules/grid_search.html)对假设函数的参数进行最优化。列出你要测试的参数，然后Grid Search使用穷举搜索（exhaustive search）的方式，遍历你的模型参数组合，来训练和评估你的模型。因而，它的计算代价比较高昂。为此，sklearn内置提供了并行化实现。而RandomizedSearchCV则以特定分布的方式进行抽样和搜索。
+
+一个Grid Search包含了：
+
+- 1.一个estimator
+- 2.一个参数空间
+- 3.用于抽样或搜索修选参数的方法: GridSearchCV和RandomizedSearchCV
+- 4.cross-validation的scheme
+- 5.score函数
+
+{% highlight python %}
+
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+from sklearn import tree
+
+from sklearn.datasets import load_iris
+
+from matplotlib import pyplot
+import scipy as sp
+import numpy as np
+from matplotlib import pylab
+
+from sklearn import datasets
+from sklearn.cross_validation import train_test_split
+from sklearn.grid_search import GridSearchCV
+from sklearn.metrics import classification_report
+from sklearn.svm import SVC
+
+print(__doc__)
+
+# Loading the Digits dataset
+iris = load_iris()
+
+X = iris.data 
+y=iris.target
+
+# Split the dataset in two equal parts
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.75, random_state=0)
+
+# Set the parameters by cross-validation
+tuned_parameters = {"criterion": ["gini", "entropy"],
+              "min_samples_split": [2, 10, 20],
+              "max_depth": [None, 2, 5, 10],
+              "min_samples_leaf": [1, 5, 10],
+              "max_leaf_nodes": [None, 5, 10, 20],
+              }
+
+scores = ['precision', 'recall']
+
+clf = tree.DecisionTreeClassifier()
+
+for score in scores:
+    print("# Tuning hyper-parameters for %s" % score)
+    print()
+
+    clf = GridSearchCV(clf, tuned_parameters, cv=5)
+    clf.fit(X_train, y_train)
+
+    print("Best parameters set found on development set:")
+    print()
+    print(clf.best_params_)
+    print()
+    print("Grid scores on development set:")
+    print()
+    for params, mean_score, scores in clf.grid_scores_:
+        print("%0.3f (+/-%0.03f) for %r"
+              % (mean_score, scores.std() * 2, params))
+    print()
+
+    print("Detailed classification report:")
+    print()
+    print("The model is trained on the full development set.")
+    print("The scores are computed on the full evaluation set.")
+    print()
+    y_true, y_pred = y_test, clf.predict(X_test)
+    print(classification_report(y_true, y_pred))
+    print()
+
+
+{% endhighlight %}
+
 
