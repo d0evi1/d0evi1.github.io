@@ -108,6 +108,9 @@ sklearn中，使用[Grid Search](http://scikit-learn.org/stable/modules/grid_sea
 - 4.cross-validation的scheme
 - 5.score函数
 
+
+以一个示例作为解释，下面的示例会遍历288种参数组合，然后选出其中一个最优的参数，这里的判断标准是cross-validation中的选的score方式。
+
 {% highlight python %}
 
 #!/usr/bin/python
