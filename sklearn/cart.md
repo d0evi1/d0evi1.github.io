@@ -126,7 +126,6 @@ from sklearn import datasets
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
-from sklearn.svm import SVC
 
 print(__doc__)
 
@@ -148,36 +147,34 @@ tuned_parameters = {"criterion": ["gini", "entropy"],
               "max_leaf_nodes": [None, 5, 10, 20],
               }
 
-scores = ['precision', 'recall']
 
 clf = tree.DecisionTreeClassifier()
 
-for score in scores:
-    print("# Tuning hyper-parameters for %s" % score)
-    print()
+print("# Tuning hyper-parameters")
+print()
 
-    clf = GridSearchCV(clf, tuned_parameters, cv=5)
-    clf.fit(X_train, y_train)
+clf = GridSearchCV(clf, tuned_parameters, cv=3)
+clf.fit(X_train, y_train)
 
-    print("Best parameters set found on development set:")
-    print()
-    print(clf.best_params_)
-    print()
-    print("Grid scores on development set:")
-    print()
-    for params, mean_score, scores in clf.grid_scores_:
-        print("%0.3f (+/-%0.03f) for %r"
-              % (mean_score, scores.std() * 2, params))
-    print()
+print("Best parameters set found on development set:")
+print()
+print(clf.best_params_)
+print()
+print("Grid scores on development set:")
+print()
+for params, mean_score, scores in clf.grid_scores_:
+    print("%0.3f (+/-%0.03f) for %r"
+          % (mean_score, scores.std() * 2, params))
+print()
 
-    print("Detailed classification report:")
-    print()
-    print("The model is trained on the full development set.")
-    print("The scores are computed on the full evaluation set.")
-    print()
-    y_true, y_pred = y_test, clf.predict(X_test)
-    print(classification_report(y_true, y_pred))
-    print()
+print("Detailed classification report:")
+print()
+print("The model is trained on the full development set.")
+print("The scores are computed on the full evaluation set.")
+print()
+y_true, y_pred = y_test, clf.predict(X_test)
+print(classification_report(y_true, y_pred))
+print()
 
 
 {% endhighlight %}
