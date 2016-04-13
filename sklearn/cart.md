@@ -156,7 +156,7 @@ clf = tree.DecisionTreeClassifier()
 print("# Tuning hyper-parameters")
 print()
 
-clf = GridSearchCV(clf, tuned_parameters, cv=3)
+clf = GridSearchCV(clf, tuned_parameters, cv=10)
 clf.fit(X_train, y_train)
 
 print("Best parameters set found on development set:")
@@ -175,10 +175,115 @@ print()
 print("The model is trained on the full development set.")
 print("The scores are computed on the full evaluation set.")
 print()
+
+print("use the best estimator to predict...")
+
 y_true, y_pred = y_test, clf.predict(X_test)
 print(classification_report(y_true, y_pred))
 print()
 
+{% endhighlight %}
+
+随机参数优化：RandomizedSearchCV
+
+它通过参数进行随机搜索，每一参数设定会通过一个参数值分布进行抽样。对比穷举法，具有两个优势：
+
+- 1.参数个数和可能的值可以独立可以选择budget
+- 2.增加参数不会影响性能，不会降低效果
+
+参数设定部分和GridSearchCV类似，使用一个字典表来进行参数抽样。另外，计算开销（computation budget）, 抽取的样本数，抽样迭代次数，可以由n_iter来指定。对于每个参数，都可以指定在可能值上的分布，或者是一个离散值列表（均匀采样）。
+
+例如：
+
+[{'C': scipy.stats.expon(scale=100), 'gamma': scipy.stats.expon(scale=.1),
+  'kernel': ['rbf'], 'class_weight':['auto', None]}]
+
+这个例子使用scipy.stats模块，该模块包含了许多分布方法可以用来抽样，包括：指数分布（expon），gamma分布(gamma)，均匀分布（uniform），或randint分布。通常每个函数都可以提供一个rvs（随机变量抽样）方法进行抽样。
+
+使用RandomizedGrid的示例如下：
+
+{% highlight python %}
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+from sklearn import tree
+
+from sklearn.datasets import load_iris
+
+from matplotlib import pyplot
+import scipy as sp
+import numpy as np
+from matplotlib import pylab
+
+from scipy.stats import uniform as sp_rand
+from scipy.stats import randint as sp_randint
+from time import time
+
+from sklearn import datasets
+from sklearn.cross_validation import train_test_split
+from sklearn.grid_search import GridSearchCV, RandomizedSearchCV
+from sklearn.metrics import classification_report
+
+
+# Loading the Digits dataset
+iris = load_iris()
+
+X = iris.data 
+y=iris.target
+
+print X.shape
+print y.shape
+
+# Split the dataset in two equal parts
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.75, random_state=0)
+
+# Set the parameters by cross-validation
+tuned_parameters = {"criterion": ["gini", "entropy"],
+              "min_samples_split": sp_randint(1, 20),
+              "max_depth": sp_randint(1, 20),
+              "min_samples_leaf": sp_randint(1, 20),
+              "max_leaf_nodes": sp_randint(2,20),
+              }
+
+clf = tree.DecisionTreeClassifier()
+
+print("# Tuning hyper-parameters")
+print()
+
+n_iter_search = 288 
+clf = RandomizedSearchCV(clf, \
+        param_distributions=tuned_parameters, \
+        n_iter=n_iter_search, \
+        cv=10)
+
+start = time()
+clf.fit(X_train, y_train)
+
+
+print("RandomizedSearchCV took %.2f seconds for %d candidates"
+        " parameter settings." % ((time() - start), n_iter_search))
+
+print()
+print(clf.best_params_)
+print()
+print("Grid scores on development set:")
+print()
+for params, mean_score, scores in clf.grid_scores_:
+    print("%0.3f (+/-%0.03f) for %r"
+          % (mean_score, scores.std() * 2, params))
+print()
+
+print("Detailed classification report:")
+print()
+print("The model is trained on the full development set.")
+print("The scores are computed on the full evaluation set.")
+print()
+
+print("use the best...")
+y_true, y_pred = y_test, clf.predict(X_test)
+print(classification_report(y_true, y_pred))
+print()
 
 {% endhighlight %}
 
