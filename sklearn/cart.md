@@ -294,7 +294,7 @@ sklearn.metrics.accuracy_score，回归使用sklearn.metrics.r2_score。但是�
 # 2.4 实际使用注意事项
 
 - 1.如果feature数过多，那么决策树很容易overfit。样本数与特征数之比合适与否相当重要，一棵只有少量样本的树，在高维空间中很可能overfit.
-- 2.可以考虑执行降维，比如：[PCA]{http://scikit-learn.org/stable/modules/decomposition.html#pca}/ICA/或[特征选取]{http://scikit-learn.org/stable/modules/feature_selection.html#feature-selection}，让你的决策树可以更好的发现特征。
+- 2.可以考虑执行降维，比如：[PCA](http://scikit-learn.org/stable/modules/decomposition.html#pca)/[ICA](http://scikit-learn.org/stable/modules/decomposition.html#ica)/或[特征选取](http://scikit-learn.org/stable/modules/feature_selection.html#feature-selection)，让你的决策树可以更好的发现特征。
 - 3.可以通过export进行可视化。
 - 4.使用max_depth阻止过拟合
 - 5.使用min_samples_split或min_samples_leaf来控制叶结点的样本数. 节点样本数越小意味着树越容易overfit。这两者间的区别是，min_samples_leaf可以保证一个叶子节点的最小数目，而min_samples_split则可以创建更独裁的小节点。
