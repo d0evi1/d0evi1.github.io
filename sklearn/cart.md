@@ -291,8 +291,21 @@ print()
 缺省时，在search参数时，通过score来比较优劣。分类使用
 sklearn.metrics.accuracy_score，回归使用sklearn.metrics.r2_score。但是有时候这并不有效，比如：分类中的倾斜类，使用f1值更好。你可以根据你的优化目标设计或选择scoring，[详见]{http://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter}。
 
+# 2.4 实际使用注意事项
 
-# 2.4 决策树的导出
+- 1.如果feature数过多，那么决策树很容易overfit。样本数与特征数之比合适与否相当重要，一棵只有少量样本的树，在高维空间中很可能overfit.
+- 2.可以考虑执行降维（[PCA]{http://scikit-learn.org/stable/modules/decomposition.html#pca}/ICA/或[特征选取]{http://scikit-learn.org/stable/modules/feature_selection.html#feature-selection}），让你的决策树可以更好的发现特征。
+- 3.可以通过export进行可视化。
+- 4.使用max_depth阻止过拟合
+- 5.使用min_samples_split或min_samples_leaf来控制叶结点的样本数. 节点样本数越小意味着树越容易overfit。这两者间的区别是，min_samples_leaf可以保证一个叶子节点的最小数目，而min_samples_split则可以创建更独裁的小节点。
+- 6.在训练之前，平衡下你的数据集，以便阻止树偏向于大类。类的平衡可以通过对每个类抽样相等的样本数，或者通过为每个类对样本权重（sample_weight）的和进行归一化到相类似的值。注意，基于weight的事前剪枝的criteria（比如min_weight_fraction_leaf），在大类上比基于样本权重的criteria（比如：min_samples_leaf）具有更小的bias。
+- 7.如果样本是带权重的，则使用基于权重的事前剪枝策略(比如：min_weight_fraction_leaf)进行结构优化很容易。
+- 8.所有决策树内部都使用np.float32。如果训练数据不是这个格式，会生成该数据集的一个copy.
+- 9.如果输入矩阵X非常稀疏，推荐在调用fit前转成csc_matrix，在predict前转成csr_matrix. 可以加快速度。
+
+
+
+# 2.5 决策树的导出
 
 可以用dot文件导出，并用graphviz打开查看. 当训练fit完后，即可导出.
 
