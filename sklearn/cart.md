@@ -287,4 +287,17 @@ print()
 
 {% endhighlight %}
 
+# 2.4 决策树的导出
+
+可以用dot文件导出，并用graphviz打开查看. 当训练fit完后，即可导出.
+
+{% highlight python %}
+
+clf = clf.fit(iris.data, iris.target)
+from sklearn.externals.six import StringIO
+with open("iris.dot", 'w') as f:
+    f = tree.export_graphviz(clf, out_file=f)
+
+{% endhighlight %}
+
 
