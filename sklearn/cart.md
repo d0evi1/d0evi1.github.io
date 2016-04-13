@@ -287,6 +287,11 @@ print()
 
 {% endhighlight %}
 
+
+缺省时，在search参数时，通过score来比较优劣。分类使用
+sklearn.metrics.accuracy_score，回归使用sklearn.metrics.r2_score。但是有时候这并不有效，比如：分类中的倾斜类，使用f1值更好。你可以根据你的优化目标设计或选择scoring，[详见]{http://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter}。
+
+
 # 2.4 决策树的导出
 
 可以用dot文件导出，并用graphviz打开查看. 当训练fit完后，即可导出.
