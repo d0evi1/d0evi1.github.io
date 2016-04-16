@@ -303,6 +303,23 @@ sklearn.metrics.accuracy_score，回归使用sklearn.metrics.r2_score。但是�
 - 8.所有决策树内部都使用np.float32。如果训练数据不是这个格式，会生成该数据集的一个copy.
 - 9.如果输入矩阵X非常稀疏，推荐在调用fit前转成csc_matrix，在predict前转成csr_matrix. 可以加快速度。
 
+# 2.5 偏斜类
+
+举个栗子，对一个二元分类来说，你得到的一个结果，可能是：
+
+
+             precision    recall  f1-score   support
+
+          0       0.96      1.00      0.98     14591
+          1       0.26      0.01      0.02       613
+
+avg / total       0.93      0.96      0.94     15204
+
+class 0和class 1的样本的数目差异很大，对于class 0来说，这个预测的效果看起来还不错；如果求平均来看，它的precision竟然有0.93，f1有0.94，看起来也是很不错的，但是对于class 1来说，准确率为可怜的0.26，f1值更低，这显然不是一个好的预测。
+
+对于这种问题，我们应该在sklearn中怎么去解决它？
+
+
 
 
 # 2.5 决策树的导出
