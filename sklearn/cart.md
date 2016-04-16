@@ -312,7 +312,6 @@ sklearn.metrics.accuracy_score，回归使用sklearn.metrics.r2_score。但是�
 
           0       0.96      1.00      0.98     14591
           1       0.26      0.01      0.02       613
-
 avg / total       0.93      0.96      0.94     15204
 
 class 0和class 1的样本的数目差异很大，对于class 0来说，这个预测的效果看起来还不错；如果求平均来看，它的precision竟然有0.93，f1有0.94，看起来也是很不错的，但是对于class 1来说，准确率为可怜的0.26，f1值更低，这显然不是一个好的预测。
