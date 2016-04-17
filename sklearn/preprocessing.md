@@ -36,13 +36,18 @@ array([[ 0.  ..., -1.22...,  1.33...],
 
 我们可以看到，归一化后的数据，均值为0，方差为1：
 
+{% highlight python %}
 >>> X_scaled.mean(axis=0)
 array([ 0.,  0.,  0.])
 
 >>> X_scaled.std(axis=0)
 array([ 1.,  1.,  1.])
+{% endhighlight %}
+
 
 preprocessing模块提供了另一个工具类：StandardScaler，它实现了Transformer API，来计算在一个训练集上的平均值和标准差（standard deviation），同样需要在测试集上使用相同的转换。该类也可以应用在sklearn.pipeline.Pipeline上。
+
+{% highlight python %}
 
 >>> scaler = preprocessing.StandardScaler().fit(X)
 >>> scaler
@@ -58,12 +63,18 @@ array([ 0.81...,  0.81...,  1.24...])
 array([[ 0.  ..., -1.22...,  1.33...],
        [ 1.22...,  0.  ..., -0.26...],
        [-1.22...,  1.22..., -1.06...]])
+{% endhighlight %}
+
 
 
 scaler实例，可以用在新数据上，并可以以相同的方式在训练集上转换：
 
+{% highlight python %}
+
 >>> scaler.transform([[-1.,  1., 0.]])                
 array([[-2.44...,  1.22..., -0.26...]])
+{% endhighlight %}
+
 
 通过在StandardScaler的构造函数中设置with_mean=False or with_std=False，可以禁止centering和scaling。
 
