@@ -148,6 +148,8 @@ Normalization用来将各个样本归一化为norm为1的正态分布。如果�
 
 函数 normalize 提供了一个简单的方法来操作类似数组的数据集，使用l1或l2范式：
 
+{% highlight python %}
+
 >>> X = [[ 1., -1.,  2.],
 ...      [ 2.,  0.,  0.],
 ...      [ 0.,  1., -1.]]
@@ -157,15 +159,20 @@ Normalization用来将各个样本归一化为norm为1的正态分布。如果�
 array([[ 0.40..., -0.40...,  0.81...],
        [ 1.  ...,  0.  ...,  0.  ...],
        [ 0.  ...,  0.70..., -0.70...]])
+{% endhighlight %}
 
 preprocessing模块提供了一个工具类： Normalizer。
+
+{% highlight python %}
 
 >>> normalizer = preprocessing.Normalizer().fit(X)  # fit does nothing
 >>> normalizer
 Normalizer(copy=True, norm='l2')
-
+{% endhighlight %}
 
 normalizer实例可以作为转换器被用在样本向量上：
+
+{% highlight python %}
 
 >>> normalizer.transform(X)                            
 array([[ 0.40..., -0.40...,  0.81...],
@@ -174,7 +181,7 @@ array([[ 0.40..., -0.40...,  0.81...],
 
 >>> normalizer.transform([[-1.,  1., 0.]])             
 array([[-0.70...,  0.70...,  0.  ...]])
-
+{% endhighlight %}
 
 对于稀疏矩阵输入来说：
 
@@ -194,6 +201,8 @@ Feature二值化可以将数值形（numerical）的feature进行阀值化得到
 
 对于 Normalizer来说，工具类 Binarizer可以在sklearn.pipeline.Pipeline的早期使用。
 
+{% highlight python %}
+
 >>> X = [[ 1., -1.,  2.],
 ...      [ 2.,  0.,  0.],
 ...      [ 0.,  1., -1.]]
@@ -206,15 +215,18 @@ Binarizer(copy=True, threshold=0.0)
 array([[ 1.,  0.,  1.],
        [ 1.,  0.,  0.],
        [ 0.,  1.,  0.]])
+{% endhighlight %}
 
 我们有可能调整binarizer的threshold：
+
+{% highlight python %}
 
 >>> binarizer = preprocessing.Binarizer(threshold=1.1)
 >>> binarizer.transform(X)
 array([[ 0.,  0.,  1.],
        [ 1.,  0.,  0.],
        [ 0.,  0.,  0.]])
-
+{% endhighlight %}
 
 对于StandardScaler 或 Normalizer来说，preprocessing模块提供了另一个函数binarize。
 
@@ -238,13 +250,15 @@ array([[ 0.,  0.,  1.],
 
 例如：
 
+{% highlight python %}
+
 >>> enc = preprocessing.OneHotEncoder()
 >>> enc.fit([[0, 0, 3], [1, 1, 0], [0, 2, 1], [1, 0, 2]])  
 OneHotEncoder(categorical_features='all', dtype=<... 'float'>,
        handle_unknown='error', n_values='auto', sparse=True)
 >>> enc.transform([[0, 1, 3]]).toarray()
 array([[ 1.,  0.,  0.,  1.,  0.,  0.,  0.,  0.,  1.]])
-
+{% endhighlight %}
 
 # 6.补充缺失值
 
