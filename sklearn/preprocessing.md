@@ -266,15 +266,113 @@ array([[ 1.,  0.,  0.,  1.,  0.,  0.,  0.,  0.,  1.]])
 
 出于其他原因，现实世界中，有许多数据集中包含着缺失值(missing values)，经常编码成空格，NaN或者其它占位符。这样的数据集对于sklearn来说是不兼容的，它认为的输入数据必须是全是数值型的。一个基本策略是，使用不完整的数据（抛弃掉那些带缺失值的行）。然而，缺失的数据中也有可能含有有价值的信息（尽管不完整）。另一个更好地策略是，插入缺失值，比如：从已经数据中去模拟它们。
 
+Imputer类提供了基本策略来补充缺失值，或者使用均值、中值、或者行中最常用的值、或者缺失值所在列中最常用的值。该类提供了不同的缺失值补充策略。
+
+下面的代码段演示了如何使用np.nan替换缺失值，使用了包含了缺失值的列(axis 0)的均值：
 
 
-# 7.生成多态特征（polynomial features）
+{% highlight python %}
+
+>>> import numpy as np
+>>> from sklearn.preprocessing import Imputer
+>>> imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
+>>> imp.fit([[1, 2], [np.nan, 3], [7, 6]])
+Imputer(axis=0, copy=True, missing_values='NaN', strategy='mean', verbose=0)
+>>> X = [[np.nan, 2], [6, np.nan], [7, 6]]
+>>> print(imp.transform(X))                           
+[[ 4.          2.        ]
+ [ 6.          3.666...]
+ [ 7.          6.        ]]
+
+{% endhighlight %}
+
+Imputer类提支持稀疏策略：
+
+{% highlight python %}
+
+>>> import scipy.sparse as sp
+>>> X = sp.csc_matrix([[1, 2], [0, 3], [7, 6]])
+>>> imp = Imputer(missing_values=0, strategy='mean', axis=0)
+>>> imp.fit(X)
+Imputer(axis=0, copy=True, missing_values=0, strategy='mean', verbose=0)
+>>> X_test = sp.csc_matrix([[0, 2], [6, 0], [7, 6]])
+>>> print(imp.transform(X_test))                      
+[[ 4.          2.        ]
+ [ 6.          3.666...]
+ [ 7.          6.        ]]
+
+
+{% endhighlight %}
+
+注意，缺失值用0编码，并被显式地存于矩阵中。如果缺失值的数目比观测值还要多时，这种格式很合适。
+
+Imputer可以用在Pipeline上，来构建一个组合estimator来
+
+
+# 7.生成多项式特征（polynomial features）
+
+通常，由于考虑到输入数据的非线性feature的存在，你的模型变复杂。一个简单的方法是，使用多项式feature，它可以给出feature的高阶表示以及交叉项（interaction terms）。通过PolynomialFeatures实现：
+
+{% highlight python %}
+
+>>> import numpy as np
+>>> from sklearn.preprocessing import PolynomialFeatures
+>>> X = np.arange(6).reshape(3, 2)
+>>> X                                                 
+array([[0, 1],
+       [2, 3],
+       [4, 5]])
+>>> poly = PolynomialFeatures(2)
+>>> poly.fit_transform(X)                             
+array([[  1.,   0.,   1.,   0.,   0.,   1.],
+       [  1.,   2.,   3.,   4.,   6.,   9.],
+       [  1.,   4.,   5.,  16.,  20.,  25.]])
+       
+{% endhighlight %}
+
+X的feature可以通过(X1, X2) 转换成 (1,X1,X2,X1^2,X1X2,X2^2)
+
+在一些情况下，只有feature间的交叉项是必须的（忽略高阶项），可以通过interaction_only=True来实现：
+
+{% highlight python %}
+
+>>> X = np.arange(9).reshape(3, 3)
+>>> X                                                 
+array([[0, 1, 2],
+       [3, 4, 5],
+       [6, 7, 8]])
+>>> poly = PolynomialFeatures(degree=3, interaction_only=True)
+>>> poly.fit_transform(X)                             
+array([[   1.,    0.,    1.,    2.,    0.,    0.,    2.,    0.],
+       [   1.,    3.,    4.,    5.,   12.,   15.,   20.,   60.],
+       [   1.,    6.,    7.,    8.,   42.,   48.,   56.,  336.]])
+
+{% endhighlight %}
+
+
+X的feature可以从(X1,X2,X3)转换成(1,X1,X2,X3,X1X2,X1X3,X2X3,X1X2X3)
+
+注意：多项式feature只能显示地用在核方法（比如： sklearn.svm.SVC, sklearn.decomposition.KernelPCA）上的多项式核函数（polynomial Kernel functions）上。
+
+Ridge regression的多项式内插（Polynomial interpolation）用它来创建多项式feature。
 
 # 8.定制转换器
 
+ 通常，你需要将一个存在的python函数转换成一个transformer来进行数据清洗和处理。你可以使用一个专用函数来实现一个转换器： FunctionTransformer。例如，我们可以在一个pipeline上使用一个log函数来进行转换：
  
+ {% highlight python %}
 
+ >>> import numpy as np
+>>> from sklearn.preprocessing import FunctionTransformer
+>>> transformer = FunctionTransformer(np.log1p)
+>>> X = np.array([[0, 1], [2, 3]])
+>>> transformer.transform(X)
+array([[ 0.        ,  0.69314718],
+       [ 1.09861229,  1.38629436]])
 
+{% endhighlight %}
+
+详见原文.
 
 
 
