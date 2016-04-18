@@ -113,7 +113,7 @@ array([ 0.        ,  0.5       ,  0.33...])
 
 如果MinMaxScaler给出了显式的范围：feature_range=(min, max)。那么对应完整的公式为：
 
-{% highlight %}
+{% highlight python %}
 
 X_std = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
 
@@ -143,7 +143,6 @@ array([[ 0.5, -1. ,  1. ],
 array([[-1.5, -1. ,  2. ]])
 >>> max_abs_scaler.scale_         
 array([ 2.,  1.,  2.])
-
 
 {% endhighlight %}
 
