@@ -76,7 +76,7 @@ array([[-2.44...,  1.22..., -0.26...]])
 {% endhighlight %}
 
 
-通过在StandardScaler的构造函数中设置with_mean=False or with_std=False，可以禁止centering和scaling。
+通过在StandardScaler的构造函数中设置with_mean=False 或者 with_std=False，可以禁止均值中心化（centering）和归一化（scaling）。
 
 ## 2.1 将feature归一化到一个范围内
 
@@ -111,8 +111,43 @@ array([ 0.        ,  0.5       ,  0.33...])
 
 {% endhighlight %}
 
-如果MinMaxScaler。。。
+如果MinMaxScaler给出了显式的范围：feature_range=(min, max)。那么对应完整的公式为：
 
+{% highlight %}
+
+X_std = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
+
+X_scaled = X_std / (max - min) + min
+
+{% endhighlight %}
+
+MaxAbsScaler以相类似的方式运作，它的归一化会介于[-1, 1]之间，通过在每个feature上分隔最大值来实现。这意味着数据已经是以0为中心的，或者是稀疏数据。
+
+这里我们使用一个示例数据：
+
+{% highlight python %}
+
+>>> X_train = np.array([[ 1., -1.,  2.],
+...                     [ 2.,  0.,  0.],
+...                     [ 0.,  1., -1.]])
+...
+>>> max_abs_scaler = preprocessing.MaxAbsScaler()
+>>> X_train_maxabs = max_abs_scaler.fit_transform(X_train)
+>>> X_train_maxabs                # doctest +NORMALIZE_WHITESPACE^
+array([[ 0.5, -1. ,  1. ],
+       [ 1. ,  0. ,  0. ],
+       [ 0. ,  1. , -0.5]])
+>>> X_test = np.array([[ -3., -1.,  4.]])
+>>> X_test_maxabs = max_abs_scaler.transform(X_test)
+>>> X_test_maxabs                 
+array([[-1.5, -1. ,  2. ]])
+>>> max_abs_scaler.scale_         
+array([ 2.,  1.,  2.])
+
+
+{% endhighlight %}
+
+如果你不想创造对象，scale模块提供了另外的函数： minmax_scale 和 maxabs_scale。
 
 
 ## 2.2 归一化sparse矩阵
