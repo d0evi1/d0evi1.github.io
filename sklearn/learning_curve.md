@@ -26,13 +26,16 @@ bias/variance是estimator的固有属性，我们可以参考它们来选择学�
 # 2.1 交叉验证曲线
 
 三个得分：
-training score
-validation score
-testset score
+
+- training score
+- validation score
+- testset score
 
 为了验证一个模型，我们需要一个scoring函数，来评估分类器的准确度。同时选择一个estimator的多个超参数，可以使用GridSearch等办法，来找到在交叉验证集中的最大得分。注意，如果我们基于一个validation score上优化超参数时，如果验证得分偏差挺大，那么泛化的效果会很差。为得到一个合适的泛化估计，我们还必须计算另一个测试集的得分。
 
 在training score和validation score上，针对单个超参数绘制曲线，可以帮助我们发现在这些超参数上的estimator是overfitting还是underfitting。
+
+{% highlight python %}
 
 >>> import numpy as np
 >>> from sklearn.learning_curve import validation_curve
@@ -56,6 +59,7 @@ array([[ 0.94...,  0.92...,  0.92...],
 array([[ 0.90...,  0.92...,  0.94...],
        [ 0.90...,  0.92...,  0.94...],
        [ 0.44...,  0.39...,  0.45...]])
+{% endhighlight %} 
 
 - 如果training score和validation score都很低，那么该estimator将会是underfitting。
 - 如果training score很高，但validation score很低，那么estimator将overfitting。
