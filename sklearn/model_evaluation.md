@@ -135,7 +135,7 @@ sklearn.metrics模块实现了一些loss, score以及一些工具函数来计算
 - samples：应用在 multilabel问题上。它不会计算每个类，相反，它会在评估数据中，通过计算真实类和预测类的差异的metrics，来求平均（sample_weight-weighted）
 - average：average=None将返回一个数组，它包含了每个类的得分. 
 
-多分类（multiclass）数据提供了metric，和二分类类似，是一个label的数组，而多标签（multilabel）数据则返回一个索引矩阵，当样本i具有label j时，元素[i,j]的值为1，否则为0.
+多分类（multiclass）数据提供了metric，和二分类类似，是一个label的数组，**而多标签（multilabel）数据则返回一个索引矩阵，当样本i具有label j时，元素[i,j]的值为1，否则为0**.
 
 # 3.2 accuracy_score
 
