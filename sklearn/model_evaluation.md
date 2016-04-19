@@ -1,6 +1,6 @@
 ---
 layout: page
-title:  模型评估 
+title:  sklearn中的模型评估 
 tagline: 介绍
 ---
 {% include JB/setup %}
@@ -16,7 +16,7 @@ tagline: 介绍
 
 # 2. scoring参数
 
-模型选择和评估工具，例如： grid_search.GridSearchCV and cross_validation.cross_val_score，使用scoring参数来控制你的estimator的好坏。
+模型选择和评估工具，例如： grid_search.GridSearchCV 和 cross_validation.cross_val_score，使用scoring参数来控制你的estimator的好坏。
 
 ## 2.1 预定义的值
 
@@ -40,6 +40,7 @@ sklearn.metric提供了一些函数，用来计算真实值与预测值之间的
 第一个典型的用例是，将一个库中已经存在的metrics函数进行包装，使用定制参数，比如对fbeta_score函数中的beta参数进行设置：
 
 {% highlight python %}
+
 >>> from sklearn.metrics import fbeta_score, make_scorer
 >>> ftwo_scorer = make_scorer(fbeta_score, beta=2)
 >>> from sklearn.grid_search import GridSearchCV
@@ -58,6 +59,7 @@ sklearn.metric提供了一些函数，用来计算真实值与预测值之间的
 下例使用定制的scorer，使用了greater_is_better参数：
 
 {% hightlight python %}
+
 >>> import numpy as np
 >>> def my_custom_loss_func(ground_truth, predictions):
 ...     diff = np.abs(ground_truth - predictions).max()
@@ -150,6 +152,7 @@ accuracy_score函数计算了准确率，不管是正确预测的fraction（defa
 1(x)为指示函数。
 
 {% highlight python %}
+
 >>> import numpy as np
 >>> from sklearn.metrics import accuracy_score
 >>> y_pred = [0, 2, 1, 3]
@@ -164,8 +167,10 @@ accuracy_score函数计算了准确率，不管是正确预测的fraction（defa
 在多标签的case下，二分类label：
 
 {% highlight python %}
+
 >>> accuracy_score(np.array([[0, 1], [1, 1]]), np.ones((2, 2)))
 0.5
+
 {% endhighlight %}
 
 # 3.3 Cohen’s kappa
@@ -180,8 +185,4 @@ Kappa score可以用在二分类或多分类问题上，但不适用于多标签
 
 
 
-
-{% highlight python %}
-
-{% endhighlight %}
 
