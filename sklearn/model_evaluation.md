@@ -58,7 +58,7 @@ sklearn.metric提供了一些函数，用来计算真实值与预测值之间的
 
 下例使用定制的scorer，使用了greater_is_better参数：
 
-{% hightlight python %}
+{% highlight python %}
 
 >>> import numpy as np
 >>> def my_custom_loss_func(ground_truth, predictions):
