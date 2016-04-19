@@ -17,11 +17,11 @@ tagline: 介绍
 
 bias/variance是estimator的固有属性，我们可以参考它们来选择学习算法以及超参数，以便让bias/variance尽可能地低。另一个减少模型的variance的方法是：使用更多的训练数据。但是，如果true function过度复杂，而使用一个低variance的estimator来逼近它时，你应该收集更多的训练数据。
 
-在简单的一维问题中，我们可以很容易看出estimator是bias偏大还是variance偏大。而在高维空间里，模型很难可视化。我们可以使用以下的工具：
+在简单的一维问题中，我们可以很容易看出estimator是bias偏大还是variance偏大。而在高维空间里，模型很难可视化。我们可以使用以下的三个demo工具来绘制：
 
-- [Underfitting vs. Overfitting]
-- [Plotting Validation Curves]
-- [Plotting Learning Curves]
+- [Underfitting vs. Overfitting](http://scikit-learn.org/stable/auto_examples/model_selection/plot_underfitting_overfitting.html#example-model-selection-plot-underfitting-overfitting-py)
+- [Plotting Validation Curves](http://scikit-learn.org/stable/auto_examples/model_selection/plot_validation_curve.html#example-model-selection-plot-validation-curve-py)
+- [Plotting Learning Curves](http://scikit-learn.org/stable/auto_examples/model_selection/plot_learning_curve.html#example-model-selection-plot-learning-curve-py)
 
 # 2.1 交叉验证曲线
 
