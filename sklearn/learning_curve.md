@@ -31,7 +31,7 @@ bias/variance是estimator的固有属性，我们可以参考它们来选择学�
 - validation score
 - testset score
 
-为了验证一个模型，我们需要一个scoring函数，来评估分类器的准确度。同时选择一个estimator的多个超参数，可以使用GridSearch等办法，来找到在交叉验证集中的最大得分。注意，如果我们基于一个validation score上优化超参数时，如果验证得分偏差挺大，那么泛化的效果会很差。为得到一个合适的泛化估计，我们还必须计算另一个测试集的得分。
+为了验证一个模型，我们需要一个scoring函数，来评估分类器的准确度。同时选择一个estimator的多个超参数，可以使用GridSearch等办法，来找到在交叉验证集中的最大得分。注意，如果我们基于一个validation score上优化超参数时，如果valadation score的bias挺大，那么泛化的效果会很差。为得到一个合适的泛化估计，我们还必须计算另一个测试集的得分。
 
 在training score和validation score上，针对单个超参数绘制曲线，可以帮助我们发现在这些超参数上的estimator是overfitting还是underfitting。
 
