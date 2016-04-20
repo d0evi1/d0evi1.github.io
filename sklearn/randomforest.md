@@ -66,6 +66,7 @@ True
 
 {% endhightlight %}
 
+在iris数据集上的分类：
 
 <figure>
 	<a href="http://scikit-learn.org/stable/_images/plot_forest_iris_0011.png"><img src="http://scikit-learn.org/stable/_images/plot_forest_iris_0011.png" alt=""></a>
@@ -103,7 +104,7 @@ True
 
 通过对随机树之间的期望活动率求均值，我们可以减小评估器的varaince，并使用它进行特征选择（feature selection）。
 
-下例显示了各独立像素在人脸识别中的相对重要性，通过着色来表示。（使用了ExtraTreesClassifier模型）
+下例显示了各独立像素在人脸识别中的相对重要性，通过着色来表示。（使用了ExtraTreesClassifier模型）：
 
 <figure>
 	<a href="http://scikit-learn.org/stable/_images/plot_forest_importances_faces_0011.png"><img src="http://scikit-learn.org/stable/_images/plot_forest_importances_faces_0011.png" alt=""></a>
@@ -128,3 +129,7 @@ RandomTreesEmbedding实现了一个无监督的数据转换器。使用一个完
 - [Hashing feature transformation using Totally Random Trees](http://scikit-learn.org/stable/auto_examples/ensemble/plot_random_forest_embedding.html#example-ensemble-plot-random-forest-embedding-py)
 - [Manifold learning on handwritten digits: Locally Linear Embedding, Isomap... compares non-linear dimensionality reduction techniques on handwritten digits.](http://scikit-learn.org/stable/auto_examples/manifold/plot_lle_digits.html#example-manifold-plot-lle-digits-py)
 - [Feature transformations with ensembles of trees compares supervised and unsupervised tree based feature transformations.](http://scikit-learn.org/stable/auto_examples/ensemble/plot_feature_transformation.html#example-ensemble-plot-feature-transformation-py)
+
+参考：
+
+[http://scikit-learn.org/stable/modules/ensemble.html](http://scikit-learn.org/stable/modules/ensemble.html)
