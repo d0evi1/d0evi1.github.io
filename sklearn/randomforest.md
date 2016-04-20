@@ -8,9 +8,12 @@ tagline: 介绍
 # 1.介绍
 
 
-sklearn.ensemble模块包含了两种基于随机决策树的平均算法：RandomForest算法和Extra-Trees算法。这两种算法都是perturb-and-combine思想，专门用于树的设计。这意味着在分类器的构建时，通过引入随机化，创建一组各不一样（diverse）的分类器。这种ensemble方法的预测会给出各个分类器预测的平均。
+sklearn.ensemble模块包含了两种基于随机决策树的平均算法：RandomForest算法和Extra-Trees算法。这两种算法都采用了很流行的树设计思想：perturb-and-combine思想。这种方法会在分类器的构建时，通过引入随机化，创建一组各不一样（diverse）的分类器。这种ensemble方法的预测会给出各个分类器预测的平均。
 
-和其它分类器相比，forest分类器可以使用这两个数组更好的fit：一个sparse(或dense）数组X，它的训练样本的size为[n_samples, n_features]，一个size为[n_samples]的Y数组，它表示训练样本的target值:（注意：是大写的Y） 
+和其它分类器相比，forest分类器可以使用这两个数组更好的进行拟合（fit）：
+
+- X数组：一个sparse或dense数组，它的训练样本的size为[n_samples, n_features]；
+- Y数组：一个size为[n_samples]的Y数组，它表示训练样本的target值:（注意：是大写的Y） 
 
 {% highlight python %}
 
