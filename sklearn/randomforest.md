@@ -30,9 +30,9 @@ sklearn.ensemble模块包含了两种基于随机决策树的平均算法：Rand
 
 ## 2.1 RandomForests
 
-在随机森林中，该ensemble方法中的每棵树都基于一个可放回的抽样训练集构建（bootstrap）。另外，当构建树的过程中split一个节点时，split的选择不再是所有features的最佳选择。相反地，在features的子集中随机进行split反倒是最好的split方式。这种随机的后果是，整个forest的bias通常会略微增大，但是由于结果会求平均，因此，它的variance会降低，会修正bias的增大，从而得到一个更好的模型。
+在随机森林（RF）中，该ensemble方法中的每棵树都基于一个通过可放回抽样（bootstrap）得到的训练集构建。另外，在构建树的过程中，当split一个节点时，split的选择不再是对所有features的最佳选择。相反地，在features的子集中随机进行split反倒是最好的split方式。这种随机的后果是，整个forest的bias通常会略微增大，但是由于结果会求平均，因此，它的variance会降低，会修正偏大的bias，从而得到一个更好的模型。
 
-sklearn的rf实现通过对各分类结果预测求平均得到，而非让每个分类器进行投票（vote）。
+sklearn的随机森林（RF）实现通过对各分类结果预测求平均得到，而非让每个分类器进行投票（vote）。
 
 ## 2.2 Ext-Trees
 
