@@ -23,7 +23,7 @@ sklearn.ensemble通过GBRT提供了分类和回归的功能。
 
 # 2.分类
 
-GradientBoostingClassifier支持二元分类和多元分类。以下的示例展示了如何拟合一个GBC分类器，它使用10个单层决策树作为弱学习器：
+GradientBoostingClassifier支持二元分类和多元分类。以下的示例展示了如何拟合一个GBC分类器，它使用100个单层决策树作为弱学习器：
 
 {% highlight python %}
 
@@ -268,7 +268,6 @@ array([[ 2.46643157,  2.46643157, ...
 - [Partial Dependence Plots](http://scikit-learn.org/stable/auto_examples/ensemble/plot_partial_dependence.html#example-ensemble-plot-partial-dependence-py)
 
 
-
 参考：
 
-[http://scikit-learn.org/stable/modules/ensemble.html](http://scikit-learn.org/stable/modules/ensemble.html)
+1.[http://scikit-learn.org/stable/modules/ensemble.html](http://scikit-learn.org/stable/modules/ensemble.html)
