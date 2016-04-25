@@ -7,12 +7,7 @@ tagline: 介绍
 
 # 前言
 
-大家都知道，我们在小学初中阶段学过：
-
-
-<figure>
-	<a href="http://a.hiphotos.baidu.com/baike/c0%3Dbaike80%2C5%2C5%2C80%2C26/sign=f466b3fd800a19d8df0e8c575293e9ee/a08b87d6277f9e2f3fd1f7441f30e924b999f392.jpg"><img src="http://a.hiphotos.baidu.com/baike/c0%3Dbaike80%2C5%2C5%2C80%2C26/sign=f466b3fd800a19d8df0e8c575293e9ee/a08b87d6277f9e2f3fd1f7441f30e924b999f392.jpg" alt=""></a>
-</figure>
+大家都知道，我们在小学初中阶段学过一种工具，叫螺旋测微器。我们在测一个物品的距离时，可以按0后面的小数位依次调参数。
 
 机器学习中的调参也类似。
 
