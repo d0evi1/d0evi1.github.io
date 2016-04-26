@@ -5,6 +5,7 @@ tagline: 介绍
 ---
 {% include JB/setup %}
 
+# 1.介绍
 
 偏斜类是在我们处理机器学习中常遇到的情况。比如一个二分类问题，样本中class 0的样本数占90%，而class 1的样本数只占10%。当直接使用这样的训练样本进行训练时，如果采用正确率(Accuracy)来衡量，会得到一个很令人满意的分值。但是这个结果基本是不可信的，这种现象被称为“正确率谬论: [Accuracy Paradox](https://en.wikipedia.org/wiki/Accuracy_paradox)”
 
@@ -15,19 +16,21 @@ tagline: 介绍
 
 如何处理这个问题，是机器学习中很重要的一个问题。在machinelearningmastery上，有人做了总结：
 
+# 2.解决方案
+
 有八种方法来处理这样的问题：
 
-1.收集更多的数据（尤其是对于小类）
+1.**收集更多的数据（尤其是对于小类）**
 
-2.尝试其它的性能指标。
+2.尝试其它的性能指标：
 
 - 传统的方式：混淆矩阵、Precision/Recall、F1-Score/F-Score
-- 新的方式：Cohen's Kappa、ROC曲线
+- 新的方式：**Cohen's Kappa、ROC曲线**
 
 3.重新抽样
 
-- 过采样(over-sampling)：增加小类的copy，达到平衡
-- 欠采样(under-sampling)：删除一些大类的实例，达到平衡
+- **过采样(over-sampling)**：增加小类的copy，达到平衡
+- **欠采样(under-sampling)**：删除一些大类的实例，达到平衡
 
 关于概念，可见：[wiki](https://en.wikipedia.org/wiki/Oversampling_and_undersampling_in_data_analysis)
 
@@ -42,7 +45,7 @@ tagline: 介绍
 
 - 比如：在小类中随机抽取实例的features进行构造。
 - 可以考虑使用Naive Bayes对各独立特征进行抽样。
-- 尝试抽样算法：SMOTE（Synthetic Minority Over-sampling Technique：合成少数过采样技术）。
+- 尝试抽样算法：**SMOTE**（Synthetic Minority Over-sampling Technique：合成少数过采样技术）。
 
 SMOTE是一种过采样，通过对小类创建人工合成的样本（非创建copy）。该算法选择两个或多个相似的实例（使用距离计算公式），通过对比近邻实例上的不同属性项，在这个不同属性项范围内，一次只对实例上的一个属性进行扰动（perturbing）。
 
@@ -58,7 +61,7 @@ SMOTE是一种过采样，通过对小类创建人工合成的样本（非创建
 
 决策树通常在偏斜类数据集上表现很好。可以尝试多种：C4.5, C5.0, CART, and Random Forest。
 
-6.使用带惩罚项的模型
+6.使用**带惩罚项的模型**
 
 带罚项的分类在模型训练上引入了一个额外代价，以便减小在训练时对小类的错误分类。这些惩罚项可以让模型的bias对小类更有利。
 
@@ -72,7 +75,7 @@ SMOTE是一种过采样，通过对小类创建人工合成的样本（非创建
 
 有许多领域的学习是专门针对偏斜类数据集的。
 
-你还可以考虑其它两个学习方法是：异常检测（anomaly detection）和变化检测（change detection）。
+你还可以考虑其它两个学习方法是：**异常检测**（anomaly detection）和**变化检测**（change detection）。
 
 [异常检测](https://en.wikipedia.org/wiki/Anomaly_detection)：将小类看到是异常类（outliers class）。
 
