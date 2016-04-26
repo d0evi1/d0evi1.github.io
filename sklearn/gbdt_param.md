@@ -13,7 +13,7 @@ tagline: 介绍
 
 # 如何调参？
 
-参数说明，详见api中。那么在具体的实例中，我们最关心的，应该是如何去进行调参呢？在参考2中，提到了一个示例，展示了如何去处理真实情况下的问题：
+参数说明，详见[api](http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)。那么在具体的实例中，我们最关心的，应该是如何去进行调参呢？在参考2中，提到了一个示例，展示了如何去处理真实情况下的问题：
 
 [数据集](http://www.analyticsvidhya.com/wp-content/uploads/2016/02/Dataset.rar)
 
@@ -231,7 +231,7 @@ gsearch4.grid_scores_, gsearch4.best_params_, gsearch4.best_score_
 	<a href="http://i2.wp.com/www.analyticsvidhya.com/wp-content/uploads/2016/02/6.-gsearch-4.png?w=1036"><img src="http://i2.wp.com/www.analyticsvidhya.com/wp-content/uploads/2016/02/6.-gsearch-4.png?w=1036" alt=""></a>
 </figure>
 
-我们可以发现，最优的值为7, 同样使用的是sqrt平方根。我们的初始值已经得到最佳了。当然，你可能希望尝试下更小的值，我们这里直接从7开始。最终的树参数为：
+我们可以发现，最优的值为7, 刚好为feaatures数(50)的sqrt平方根。我们的初始值已经得到最佳了。当然，你可能希望尝试下更小的值，我们这里直接从7开始。最终的树参数为：
 
 - min_samples_split: 1200
 - min_samples_leaf: 60
