@@ -108,25 +108,25 @@ ratio：在原始的小类中（minority class），抽取各自样本数，：�
 
 ## 3.2 UnderSampling欠采样
 
-1. UnderSampler
+1.UnderSampler
 
 - ratio: 对小类元素采取多少比例的抽样
 
-2. TomekLinks
+2.TomekLinks
 
-3. ClusterCentroids
+3.ClusterCentroids
 
 - ratio: 在小类中，根据各种样本数进行fit的聚类数，N_clusters = int(ratio * N_minority_samples) = N_maj_undersampled
 - kwargs: 传给sklearn KMeans的对象参数
 
-4. NearMiss
+4.NearMiss
 
 - version: 版本：1，2，或3.
 - size_ngh: 近邻(neighbourhood)的size，计算小类样本的平均距离
 - ver3_samp_ngh：NearMiss-3算法以一个resampling开始，该参数与被选中的子集的近邻数有关。
 - kwargs: 传给Nearest Neighbours算法使用。
 
-5. CondensedNearestNeighbour
+5.CondensedNearestNeighbour
 
 - size_ngh：为最小类计算平均距离的近邻的size
 - n_seeds_S：为了构建集合S抽取的样本数
@@ -145,14 +145,14 @@ ratio：在原始的小类中（minority class），抽取各自样本数，：�
 
 ## 3.3 ensemble sampling
 
-1. EasyEnsemble
+1.EasyEnsemble
 
 - ratio: 
 - random_state: 随机seed.
 - replacement: 是否放回抽样
 - n_subsets: 生成的子集数
 
-2. BalanceCascade
+2.BalanceCascade
 
 - ratio:
 - random_state:
