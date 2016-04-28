@@ -92,25 +92,31 @@ SMOTE是一种过采样，通过对小类创建人工合成的样本（非创建
 
 ## 3.1 OverSampling过采样
 
+共有属性：
+
+- method: 'replacement'表示放回抽样；'gaussian-perturbation'表示高斯混合法
+
 1. OverSampler：过采样：
 
 ratio：在原始的小类中（minority class），抽取各自样本数，：如果ratio=0.5，表示新的小类总样本块将会是1.5倍老样本块。
 
 2.SMOTE:
 
-- k: 使用多个是最近邻来构造合成样本（synthetic samples）
-- m: 如果小类样本很小，用来决策最邻最近邻的数目.
-- out_step: 当进行推断时（extrapolating）的step size
-- ratio: 小类样本的块的比例
-- kind: 选项有：regular, borderline1, borderline2, svm
-- verbose: 打印状态信息
+SMOTE首先为每个稀有类样本随机选出几个邻近样本，并且在该样本与这些邻近样本的连线上随机取点，生成无复杂的新的稀有样本。
+
+- k: 缺省为5. 使用多个是最近邻来构造合成样本（synthetic samples）
+- m: 缺省为10. 如果小类样本很小，用来决策最邻最近邻的数目.
+- out_step: 缺省为0.5。当进行推断时（extrapolating）的step size
+- ratio: 缺省为1. 小类样本的块的比例
+- kind: 缺省为regular。选项有：regular, borderline1, borderline2, svm
+- verbose: 缺省为None。打印状态信息
 - kwargs: 额外参数：sklearn SVC对象
 
 ## 3.2 UnderSampling欠采样
 
 1.UnderSampler
 
-- ratio: 对小类元素采取多少比例的抽样
+- ratio: 缺省为1. 对小类元素采取多少比例的抽样
 
 2.TomekLinks
 
