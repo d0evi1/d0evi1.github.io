@@ -88,6 +88,79 @@ SMOTE是一种过采样，通过对小类创建人工合成的样本（非创建
 [reddit上的讨论](https://www.reddit.com/r/MachineLearning/comments/12evgi/classification_when_80_of_my_training_set_is_of/)
 
 
+# 3. UnbalancedDataset介绍
+
+## 3.1 OverSampling过采样
+
+1. OverSampler：过采样：
+
+ratio：在原始的小类中（minority class），抽取各自样本数，：如果ratio=0.5，表示新的小类总样本块将会是1.5倍老样本块。
+
+2.SMOTE:
+
+- k: 使用多个是最近邻来构造合成样本（synthetic samples）
+- m: 如果小类样本很小，用来决策最邻最近邻的数目.
+- out_step: 当进行推断时（extrapolating）的step size
+- ratio: 小类样本的块的比例
+- kind: 选项有：regular, borderline1, borderline2, svm
+- verbose: 打印状态信息
+- kwargs: 额外参数：sklearn SVC对象
+
+## 3.2 UnderSampling欠采样
+
+1. UnderSampler
+
+- ratio: 对小类元素采取多少比例的抽样
+
+2. TomekLinks
+
+3. ClusterCentroids
+
+- ratio: 在小类中，根据各种样本数进行fit的聚类数，N_clusters = int(ratio * N_minority_samples) = N_maj_undersampled
+- kwargs: 传给sklearn KMeans的对象参数
+
+4. NearMiss
+
+- version: 版本：1，2，或3.
+- size_ngh: 近邻(neighbourhood)的size，计算小类样本的平均距离
+- ver3_samp_ngh：NearMiss-3算法以一个resampling开始，该参数与被选中的子集的近邻数有关。
+- kwargs: 传给Nearest Neighbours算法使用。
+
+5. CondensedNearestNeighbour
+
+- size_ngh：为最小类计算平均距离的近邻的size
+- n_seeds_S：为了构建集合S抽取的样本数
+- kwargs：Neareast Neighbours使用的参数
+
+6.OneSidedSelection
+
+- size_ngh：为最小类计算平均距离的近邻的size
+- n_seeds_S：为构建集合S所要抽取的样本数
+- kwargs：Neareast Neighbours的参数
+
+7.NeighbourhoodCleaningRule
+
+- size_ngh: 
+- kwargs: 
+
+## 3.3 ensemble sampling
+
+1. EasyEnsemble
+
+- ratio: 
+- random_state: 随机seed.
+- replacement: 是否放回抽样
+- n_subsets: 生成的子集数
+
+2. BalanceCascade
+
+- ratio:
+- random_state:
+- n_max_subset:
+- classifier:
+- kwargs:
+
+
 参考：
 
 1.[http://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-machine-learning-dataset/](http://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-machine-learning-dataset/)
