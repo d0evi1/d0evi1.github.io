@@ -30,7 +30,7 @@ cart是比较决策树中一个比较经典的算法，具体的算法原理不�
 树的剪枝：
 
 <figure>
-	<a href="http://img.hb.aicdn.com/0d63d4495f9c3ebf1cc23c7804284389f8d453e41fc30-gjvsNP_fw658"><img src="http://img.hb.aicdn.com/0d63d4495f9c3ebf1cc23c7804284389f8d453e41fc30-gjvsNP_fw658" alt=""></a>
+	<a href="http://photo.yupoo.com/wangdren23/FvKiNvsQ/medish.jpg"><img src="http://photo.yupoo.com/wangdren23/FvKiNvsQ/medish.jpg" alt=""></a>
 </figure>
 
 
