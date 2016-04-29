@@ -197,7 +197,7 @@ array([ 0.11,  0.1 ,  0.11,  ...
 下图展示了关于California居住情况的、4个one-way和一个two-way的局部依赖图[示例](http://scikit-learn.org/stable/auto_examples/ensemble/plot_partial_dependence.html)：
 
 <figure>
-	<a href="http://img.hb.aicdn.com/14d3cb02df40fc2a3c90d24482dd7ca0024a62cf847f0-kdVqDi_fw658"><img src="http://img.hb.aicdn.com/14d3cb02df40fc2a3c90d24482dd7ca0024a62cf847f0-kdVqDi_fw658" alt=""></a>
+	<a href="http://photo.yupoo.com/wangdren23/FvKfc8Yb/medish.jpg"><img src="http://photo.yupoo.com/wangdren23/FvKfc8Yb/medish.jpg" alt=""></a>
 </figure>
 
 one-way的PDP图告诉我们，target结果与target特征之间的相互关系（e.g. 线性/非线性）。左上图展示了中等收入（median income）在房价中位数（median house price）上的分布；我们可以看到它们间存在线性关系。
