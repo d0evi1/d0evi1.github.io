@@ -23,7 +23,7 @@ tagline: 介绍
 对于大多数case而说，你可以设计一个使用scoring参数的scorer对象；下面展示了所有可能的值。所有的scorer对象都遵循：高得分，更好效果。如果从mean_absolute_error 和mean_squared_error（它计算了模型与数据间的距离）返回的得分将被忽略。
 
 <figure>
-	<a href="http://img.hb.aicdn.com/20837f9cc8c6411f47a508169c3286d6889df0b043736-RhcTJF_fw658"><img src="http://img.hb.aicdn.com/20837f9cc8c6411f47a508169c3286d6889df0b043736-RhcTJF_fw658" alt=""></a>
+	<a href="http://photo.yupoo.com/wangdren23/FvKhbUh3/medish.jpg"><img src="http://photo.yupoo.com/wangdren23/FvKhbUh3/medish.jpg" alt=""></a>
 </figure>
 
 ## 2.2 从metric函数定义你的scoring策略
