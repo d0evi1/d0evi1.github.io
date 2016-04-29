@@ -24,7 +24,7 @@ cart是比较决策树中一个比较经典的算法，具体的算法原理不�
 
 树的生成（from台大ML课程）：
 <figure>
-	<a href="http://img.hb.aicdn.com/db31bbfef15ef80e0879e111ca0669c270957c8321208-cL8sHu_fw658"><img src="http://img.hb.aicdn.com/db31bbfef15ef80e0879e111ca0669c270957c8321208-cL8sHu_fw658" alt=""></a>
+	<a href="http://photo.yupoo.com/wangdren23/FvKjz6s4/medish.jpg"><img src="http://photo.yupoo.com/wangdren23/FvKjz6s4/medish.jpg" alt=""></a>
 </figure>
 
 树的剪枝：
