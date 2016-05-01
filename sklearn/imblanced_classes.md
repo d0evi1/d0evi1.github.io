@@ -90,6 +90,15 @@ SMOTE是一种过采样，通过对小类创建人工合成的样本（非创建
 
 # 3. UnbalancedDataset介绍
 
+有些paper上称为上采样(up-sampling)和下采样（down-sampling）。
+
+paper上有提到：
+
+虽然重采样在一些数据集上取得了不错的效果 ,但是这类方法也存在一些缺陷. 上采样方法并不增加任何新的数据 ,只是重复一些样本或增加一些人工生成的稀有类样本 ,增加了训练时间. 更危险的是,上采样复制某些稀有类样本 ,或者在它周围生成新的稀有类样本 ,使得分类器过分注重这些样本 ,导致overfitting。
+
+上采样不能从本质上解决稀有类样本的稀缺性和数据表示的不充分性 ,因此有人指出它的性能不如下采样. 但是 Japkowicz 8 ]对人工数据的一项系统研究得到了相反的结论. 下采样在去除大类样本的时候 ,容易去除重要的样本信息. 虽然有些启发式的下采样方法, 只是去除冗余样本和声样本 ,但是多数情况下这类样本只是小部分,因此这种方法能够调整的不平衡度相当有限.
+
+
 ## 3.1 OverSampling过采样
 
 共有属性：
@@ -167,6 +176,32 @@ SMOTE首先为每个稀有类样本随机选出几个邻近样本，并且在该
 - kwargs:
 
 
+# 4. StratifiedKFold
+
+k-fold交叉验证中，有一种交叉验证称为：StratifiedKFold。
+
+<figure>
+	<a href="http://photo.yupoo.com/wangdren23/FvNfSjlQ/medish.jpg"><img src="http://photo.yupoo.com/wangdren23/FvNfSjlQ/medish.jpg" alt=""></a>
+</figure>
+
+
+# 5. XGBoost中的处理
+
+XGBoost中的官方文档大致这么说的：
+
+对于一些case，比如：广告点击日志，数据集极不平衡。这会影响xgboost模型的训练，有两个方法来改进它。
+
+- 如果你关心的预测的ranking order（AUC)：
+-- 通过scale_pos_weight来平衡正负类的权重
+-- 使用AUC进行评估
+
+- 如果你关心的是预测的正确率：
+-- 不能再平衡（re-balance）数据集
+-- 将参数max_delta_step设置到一个有限的数（比如：1）可以获得效果提升.
+
+
 参考：
 
 1.[http://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-machine-learning-dataset/](http://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-machine-learning-dataset/)
+
+2.[http://xgboost.readthedocs.io/en/latest/param_tuning.html](http://xgboost.readthedocs.io/en/latest/param_tuning.html)
