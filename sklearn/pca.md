@@ -119,11 +119,38 @@ RandomizedPCA 的内存占用为：
 
 主成分分析（PCA）的缺点是：通过该方法抽取的主成分具有特有的密度表示（dense expressions），例如：它们具有非零的相关系数（coefficients），可以表示成原始变量的线性组合。这很难解释。在许多情况下，真实的主成分可以想象成稀疏矩阵，例如：面部识别，主成分仅仅是脸部特征。
 
+稀疏的主成分分析更吝啬，更可解释，更强调原始特征在样本差异下的贡献。
 
+下面的示例展示了使用SparsePCA从Olivetti面部数据库中抽取的16个主成分。你可以看到，正则项是如何产生许多个0的. 更进一步，数据的自然结构造成了非零相关系数正交（vertically adjacent）。该模型不能增强这种数学现像：每个主成分是一个向量 <img src="http://www.forkosh.com/mathtex.cgi? h \in \mathbf{R}^{4096}">，不必关心正交，除非在可视化成64x64像素的图象时。这个现像（下面局部展示的主成分受数据本身结构的影响），这使得一些局部模式（local patterns）可以最小化重构误差（minimize reconstruction error）。另外，目前存在着许多sparsity-inducing范式，它们用来解释正交和许多不同类型的结构；详见[Jen09](http://scikit-learn.org/stable/modules/decomposition.html#jen09).
 
+<figure>
+	<a href="http://scikit-learn.org/stable/_images/plot_faces_decomposition_0021.png"><img src="http://scikit-learn.org/stable/_images/plot_faces_decomposition_0021.png" alt=""></a>
+</figure>
+<figure>
+	<a href="http://scikit-learn.org/stable/_images/plot_faces_decomposition_0051.png"><img src="http://scikit-learn.org/stable/_images/plot_faces_decomposition_0051.png" alt=""></a>
+</figure>
+
+注意，Sparse PCA有许多不同的公式。这里实现的方式是基于[Mri09](http://scikit-learn.org/stable/modules/decomposition.html#mrl09)。要解决的优化问题是：PCA问题（字典学习）在各主成分上带有一个<img src="http://www.forkosh.com/mathtex.cgi?\ell_1 ">罚项：
+
+<figure>
+	<a href="http://scikit-learn.org/stable/_images/math/fc84de1d23be724722d5ac285c78f4c77b780b36.png"><img src="http://scikit-learn.org/stable/_images/math/fc84de1d23be724722d5ac285c78f4c77b780b36.png" alt=""></a>
+</figure>
+
+当样本很少时，sparsity-inducing <img src="http://www.forkosh.com/mathtex.cgi?\ell_1 ">范式可以阻止学习到的主成分的噪声。**罚项的度（The degree of penalization：这里指的是稀疏度：sparsity），可以通过超参数alpha进行调整。值越小，正则项因子的力度就越温和，值越大则将会把许多相关系数shrink到0。**
+
+注意：当尝试在线学习算法时，MiniBatchSparsePCA类没有实现partial_fit，因为该算法针对的是features方向，而不是samples方向。
+
+示例：
+
+- [Faces dataset decompositions](http://scikit-learn.org/stable/auto_examples/decomposition/plot_faces_decomposition.html#example-decomposition-plot-faces-decomposition-py)
+
+参考：
+
+[Mrl09](http://www.di.ens.fr/sierra/pdfs/icml09.pdf)
+[Jen09](http://scikit-learn.org/stable/modules/www.di.ens.fr/~fbach/sspca_AISTATS2010.pdf)
 
 
 
 参考：
 
-1.[](http://scikit-learn.org/stable/auto_examples/svm/plot_separating_hyperplane_unbalanced.html)
+1.[http://scikit-learn.org/stable/modules/decomposition.html#pca](http://scikit-learn.org/stable/modules/decomposition.html#pca)
