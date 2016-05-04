@@ -55,7 +55,7 @@ array([ 0.5,  0.5])
 
 [Ridge](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html#sklearn.linear_model.Ridge)回归通过引入对回归系数size的一个惩罚项，解决了最小二乘法存在的一些问题。ridge回归系数的优化目标为：最小化带罚项的残差平方和。
 
-<img src="http://www.forkosh.com/mathtex.cgi?\underset{w}{min\,} {{|| X w - y||_2}^2 + \alpha {||w||_2}^2}">
+<img src="http://www.forkosh.com/mathtex.cgi?\underset{w}{min\,} {|| X w - y||_2}^2 + \alpha {||w||_2}^2}">
 
 这里，<img src="http://www.forkosh.com/mathtex.cgi?\alpha \geq 0">表示复杂度参数，它控制着收缩（shrinkage）的程度：<img src="http://www.forkosh.com/mathtex.cgi?\alpha">越大，shrinkage程度越大，回归系数就越健壮（不容易产生多重共线性）。
 
