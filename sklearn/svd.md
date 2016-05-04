@@ -36,4 +36,4 @@ TruncatedSVD转换器可以在任何（稀疏）特征矩阵上运行，推荐�
 
 参考：
 
-1.[http://scikit-learn.org/stable/modules/decomposition.html#svd](http://scikit-learn.org/stable/modules/decomposition.html#svd)
+1.[http://scikit-learn.org/stable/modules/decomposition.html#lsa](http://scikit-learn.org/stable/modules/decomposition.html#lsa)
