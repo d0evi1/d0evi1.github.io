@@ -109,6 +109,95 @@ RidgeCV(alphas=[0.1, 1.0, 10.0], cv=None, fit_intercept=True, scoring=None,
 
 # 3.Lasso
 
+[Lasso](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html#sklearn.linear_model.Lasso)是一种线性模型，用于估计稀疏的回归系数。在一些情况通常更喜欢使用更少的参数值，这样可以有效地降低变量的数目，使得解决方案独立。由于这个原因，Lasso和它的变种在压缩感知（compressed sensing）领域是基础。在特定条件下，它可以恢复非零权重的完整集合，[详见](http://scikit-learn.org/stable/auto_examples/applications/plot_tomography_l1_reconstruction.html#example-applications-plot-tomography-l1-reconstruction-py)。
+
+数学上，它包含了一个使用<img src="http://www.forkosh.com/mathtex.cgi?\ell_1 ">作为正则项进行训练的线性模型。要最小化的目标函数为：
+
+<img src="http://www.forkosh.com/mathtex.cgi?\underset{w}{min\,} { \frac{1}{2n_{samples}} ||X w - y||_2 ^ 2 + \alpha ||w||_1}">
+
+lasso估计的目标是最小化带罚项<img src="http://www.forkosh.com/mathtex.cgi?\alpha ||w||_1 ">的最小二乘，其中：<img src="http://www.forkosh.com/mathtex.cgi?\alpha">为常数，<img src="http://www.forkosh.com/mathtex.cgi? ||w||_1 ">为参数向量的l1范数。
+
+Lasso的实现使用了坐标下降法（coordinate descent）来拟合回归系数。另外最小角回归提供了另一种实现：
+
+{% highlight python %}
+
+>>> from sklearn import linear_model
+>>> clf = linear_model.Lasso(alpha = 0.1)
+>>> clf.fit([[0, 0], [1, 1]], [0, 1])
+Lasso(alpha=0.1, copy_X=True, fit_intercept=True, max_iter=1000,
+   normalize=False, positive=False, precompute=False, random_state=None,
+   selection='cyclic', tol=0.0001, warm_start=False)
+   
+>>> clf.predict([[1, 1]])
+array([ 0.8])
+
+{% endhighlight %}
+
+对于低级别的任务，函数[lasso_path](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.lasso_path.html#sklearn.linear_model.lasso_path)很有效，它会使用所有可能值来计算回归系数。
+
+
+示例：
+
+- [Lasso and Elastic Net for Sparse Signals](http://scikit-learn.org/stable/auto_examples/linear_model/plot_lasso_and_elasticnet.html#example-linear-model-plot-lasso-and-elasticnet-py)
+- [Compressive sensing: tomography reconstruction with L1 prior (Lasso)](http://scikit-learn.org/stable/auto_examples/applications/plot_tomography_l1_reconstruction.html#example-applications-plot-tomography-l1-reconstruction-py)
+
+**注意：使用Lasso进行特征选择**
+
+Lasso回归产生稀疏的模型，它可以用于执行特征选择，详见[L1-based feature selection](http://scikit-learn.org/stable/modules/feature_selection.html#l1-feature-selection)
+
+**注意：随机稀疏化**
+
+对于特征选择（feature selection）或稀疏求解（sparse recovery），有兴趣的可以使用：[Randomized sparse models.](http://scikit-learn.org/stable/modules/feature_selection.html#randomized-l1)
+
+## 3.1 设置正则化参数
+
+alpha参数控制着要估计的回归系数的稀疏度（degree of sparsity）。
+
+### 使用交叉验证
+
+sklearn提供了一些交叉验证对象来设置Lasso的alpha参数：[LassoCV](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html#sklearn.linear_model.LassoCV) 和 [LassoLarsCV](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsCV.html#sklearn.linear_model.LassoLarsCV)。其中LassoLarsCV基于最小角回归算法。
+
+对于高维数据集可能存在许多共线的回归，LassoCV表现通常很好。然而，LassoLarsCV的优点是，可以开发更多与alpha参数的相关值，如果样本数与观察到的数目相比非常小，通常比LassoCV更快。
+
+图：在每个fold上的最小二乘误差：坐标下降法（训练时间：0.35s）
+
+<figure>
+    <a href="http://scikit-learn.org/stable/_images/plot_lasso_model_selection_0021.png"><img src="http://scikit-learn.org/stable/_images/plot_lasso_model_selection_0021.png" alt=""></a>
+</figure>
+
+图：在每个fold上的最小二乘误差：使用Lars（训练时间：0.17s）
+
+<figure>
+    <a href="http://scikit-learn.org/stable/_images/plot_lasso_model_selection_0021.png"><img src="http://scikit-learn.org/stable/_images/plot_lasso_model_selection_0021.png" alt=""></a>
+</figure>
+
+### 基于模型选择的信息准则
+
+另一种方法：LassoLarsIC使用AIC(Akaike information criterion)和BIC(Bayes Information criterion)。它在寻找alpha的最优值时计算量更小，只需要一次，而当使用k-fold交叉验证时需要k+1次。。。。
+
+# 4.Elastic Net
+
+[ElasticNet](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html#sklearn.linear_model.ElasticNet)是一个线性回归模型，同时使用L1和L2作为正则项。这种结合可以让你像Lasso那样从一个稀疏模型中学到少量非零权重，也能像Ridge模型那样仍然维持着正则化属性。我们使用l1_ratio参数来控制着L1和L2的凸结合。
+
+当许多features彼此相关时，Elastic-net会很有用。Lasso则是从其中随机取一个，而elastic-net则选取所有的。
+
+在Lasso和Ridge之间进行平衡的实际好处是，使得elastic-net可以继承Ridge在rotation上的稳定性。
+
+目标函数如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?\underset{w}{min\,} { \frac{1}{2n_{samples}} ||X w - y||_2 ^ 2 + \alpha \rho ||w||_1 +
+\frac{\alpha(1-\rho)}{2} ||w||_2 ^ 2}">
+
+<figure>
+    <a href="http://scikit-learn.org/stable/_images/plot_lasso_coordinate_descent_path_0011.png"><img src="http://scikit-learn.org/stable/_images/plot_lasso_coordinate_descent_path_0011.png" alt=""></a>
+</figure>
+
+ElasticNetCV可以通过交叉验证来设置alpha参数（<img src="http://www.forkosh.com/mathtex.cgi?\alpha">）和l1_ratio参数（<img src="http://www.forkosh.com/mathtex.cgi?\rho">）。
+
+示例：
+
+- [Lasso and Elastic Net for Sparse Signals](http://scikit-learn.org/stable/auto_examples/linear_model/plot_lasso_and_elasticnet.html#example-linear-model-plot-lasso-and-elasticnet-py)
+- [Lasso and Elastic Net](http://scikit-learn.org/stable/auto_examples/linear_model/plot_lasso_coordinate_descent_path.html#example-linear-model-plot-lasso-coordinate-descent-path-py)
 
 
 参考：
