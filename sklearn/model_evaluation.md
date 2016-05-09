@@ -201,8 +201,15 @@ array([[2, 0, 0],
 
 结果为：
 
+<figure>
+	<a href="http://scikit-learn.org/stable/_images/plot_confusion_matrix_0011.png"><img src="http://scikit-learn.org/stable/_images/plot_confusion_matrix_0011.png" alt=""></a>
+</figure>
 
+示例：
 
+- [Confusion matrix ](http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html#example-model-selection-plot-confusion-matrix-py)
+- [Recognizing hand-written digits](http://scikit-learn.org/stable/auto_examples/classification/plot_digits_classification.html#example-classification-plot-digits-classification-py)
+- [Classification of text documents using sparse features](http://scikit-learn.org/stable/auto_examples/text/document_classification_20newsgroups.html#example-text-document-classification-20newsgroups-py)
 
 ## 3.5 分类报告
 
