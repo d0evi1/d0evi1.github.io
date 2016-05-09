@@ -653,7 +653,13 @@ array([ 0.8 ,  0.4 ,  0.35,  0.1 ])
 
 [coverage_error](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.coverage_error.html#sklearn.metrics.coverage_error)计算了那些必须在最终预测（所有真实的label都会被预测）中包含的labels的平均数目。如果你想知道有多少top高分labels（top-scored-labels）时它会很有用，你必须以平均的方式进行预测，不漏过任何一个真实label。该metrics的最优值是对真实label求平均。
 
-给定一个真实label的二分类指示矩阵，<img src="http://www.forkosh.com/mathtex.cgi? y \in \left\{0, 1\right\}^{n_\text{samples} \times n_\text{labels}}">，以及每个label相关的分值<img src="http://www.forkosh.com/mathtex.cgi?\hat{f} \in \mathbb{R}^{n_\text{samples} \times n_\text{labels}}">，相应的范围误差定义如下：
+给定一个真实label的二分类指示矩阵:
+<img src="http://www.forkosh.com/mathtex.cgi?y \in \left\{0, 1\right\}^{n_\text{samples} \times n_\text{labels}}">
+
+以及每个label相关的分值:
+<img src="http://www.forkosh.com/mathtex.cgi?\hat{f} \in \mathbb{R}^{n_\text{samples} \times n_\text{labels}}">，
+
+相应的范围误差定义如下：
 
 <img src="http://www.forkosh.com/mathtex.cgi?coverage(y, \hat{f}) = \frac{1}{n_{\text{samples}}}
   \sum_{i=0}^{n_{\text{samples}} - 1} \max_{j:y_{ij} = 1} \text{rank}_{ij}">
