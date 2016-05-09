@@ -813,7 +813,9 @@ mean_absolute_error函数将会计算[平均绝对误差](http://en.wikipedia.or
 <img src="http://www.forkosh.com/mathtex.cgi?\text{MAE}(y, \hat{y}) = \frac{1}{n_{\text{samples}}} \sum_{i=0}^{n_{\text{samples}}-1} \left| y_i - \hat{y}_i \right|">
 
 示例：
+
 {% highlight python %}
+
 >>> from sklearn.metrics import mean_absolute_error
 >>> y_true = [3, -0.5, 2, 7]
 >>> y_pred = [2.5, 0.0, 2, 8]
