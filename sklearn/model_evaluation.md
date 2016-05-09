@@ -324,4 +324,131 @@ sklearn提供了一些函数来分析precision, recall and F-measures值：
 - [Precision-Recall](http://scikit-learn.org/stable/auto_examples/model_selection/plot_precision_recall.html#example-model-selection-plot-precision-recall-py)
 - [Sparse recovery: feature selection for sparse linear models](http://scikit-learn.org/stable/auto_examples/linear_model/plot_sparse_recovery.html#example-linear-model-plot-sparse-recovery-py)
 
+## 3.8.1 二分类
+
+在二元分类中，术语“positive”和“negative”指的是分类器的预测类别(expectation)，术语“true”和“false”则指的是预测是否正确（有时也称为：观察observation）。给出如下的定义：
+
+
+|          |           实际类目（observation）           |  |
+|----------|:-------------:|------:|
+|预测类目（expectation）  |  TP(true positive)结果:Correct | FP(false postive)结果：Unexpected |
+|  |        FN(false negative)结果: Missing   |   TN(true negtive)结果：Correct |
+
+在这个上下文中，我们定义了precision, recall和F-measure:
+
+<img src="http://www.forkosh.com/mathtex.cgi?\text{precision} = \frac{tp}{tp + fp}">
+
+<img src="http://www.forkosh.com/mathtex.cgi?\text{recall} = \frac{tp}{tp + fn}">
+
+<img src="http://www.forkosh.com/mathtex.cgi?F_\beta = (1 + \beta^2) \frac{\text{precision} \times \text{recall}}{\beta^2 \text{precision} + \text{recall}}">
+
+这里是一个二元分类的示例：
+
+{% highlight python %}
+
+>>> from sklearn import metrics
+>>> y_pred = [0, 1, 0, 0]
+>>> y_true = [0, 1, 0, 1]
+>>> metrics.precision_score(y_true, y_pred)
+1.0
+>>> metrics.recall_score(y_true, y_pred)
+0.5
+>>> metrics.f1_score(y_true, y_pred)  
+0.66...
+>>> metrics.fbeta_score(y_true, y_pred, beta=0.5)  
+0.83...
+>>> metrics.fbeta_score(y_true, y_pred, beta=1)  
+0.66...
+>>> metrics.fbeta_score(y_true, y_pred, beta=2) 
+0.55...
+>>> metrics.precision_recall_fscore_support(y_true, y_pred, beta=0.5)  
+(array([ 0.66...,  1.        ]), array([ 1. ,  0.5]), array([ 0.71...,  0.83...]), array([2, 2]...))
+
+
+>>> import numpy as np
+>>> from sklearn.metrics import precision_recall_curve
+>>> from sklearn.metrics import average_precision_score
+>>> y_true = np.array([0, 0, 1, 1])
+>>> y_scores = np.array([0.1, 0.4, 0.35, 0.8])
+>>> precision, recall, threshold = precision_recall_curve(y_true, y_scores)
+>>> precision  
+array([ 0.66...,  0.5       ,  1.        ,  1.        ])
+>>> recall
+array([ 1. ,  0.5,  0.5,  0. ])
+>>> threshold
+array([ 0.35,  0.4 ,  0.8 ])
+>>> average_precision_score(y_true, y_scores)  
+0.79...
+
+{% endhighlight %}
+
+## 3.8.2 多元分类和多标签分类
+
+在多分类（Multiclass）和多标签（multilabel）分类问题上，precision, recall, 和 F-measure的概念可以独立应用到每个label上。有一些方法可以综合各标签上的结果，通过指定average_precision_score （只能用在multilabel上）， f1_score, fbeta_score, precision_recall_fscore_support, precision_score 和 recall_score这些函数上的参数average可以做到。
+
+注意：
+
+- “micro”选项：表示在多分类中的对所有label进行micro-averaging产生一个平均precision，recall和F值
+- “weighted”选项：表示会产生一个weighted-averaging的F值。
+
+可以考虑下面的概念：
+
+- y是(sample, label)pairs的预测集
+- <img src="http://www.forkosh.com/mathtex.cgi?\hat{y}">是(sample, label)pairs的真实集
+- L是labels的集
+- S是labels的集
+- <img src="http://www.forkosh.com/mathtex.cgi?\hat{y}">是y的子集，样本s,比如：<img src="http://www.forkosh.com/mathtex.cgi?y_s := \left\{(s', l) \in y | s' = s\right\}">
+- <img src="http://www.forkosh.com/mathtex.cgi?y_l ">表示label l的y子集
+- 同样的，<img src="http://www.forkosh.com/mathtex.cgi?y_s ">和<img src="http://www.forkosh.com/mathtex.cgi?y_l ">都是<img src="http://www.forkosh.com/mathtex.cgi?\hat{y} ">的子集
+- <img src="http://www.forkosh.com/mathtex.cgi?P(A, B) := \frac{\left| A \cap B \right|}{\left|A\right|} ">
+- <img src="http://www.forkosh.com/mathtex.cgi?R(A, B) := \frac{\left| A \cap B \right|}{\left|B\right|} "> 在处理<img src="http://www.forkosh.com/mathtex.cgi?B = \emptyset">时方式更不同；该实现采用<img src="http://www.forkosh.com/mathtex.cgi?R(A, B):=0">，且与P相类似。
+- <img src="http://www.forkosh.com/mathtex.cgi?F_\beta(A, B) := \left(1 + \beta^2\right) \frac{P(A, B) \times R(A, B)}{\beta^2 P(A, B) + R(A, B)} ">
+
+metrics的定义如下：
+
+<figure>
+    <a href="http://photo.yupoo.com/wangdren23/Fxc1ofvk/medish.jpg"><img src="http://photo.yupoo.com/wangdren23/Fxc1ofvk/medish.jpg" alt=""></a>
+</figure>
+
+代码：
+
+{% highlight python %}
+
+>>> from sklearn import metrics
+>>> y_true = [0, 1, 2, 0, 1, 2]
+>>> y_pred = [0, 2, 1, 0, 0, 1]
+>>> metrics.precision_score(y_true, y_pred, average='macro')  
+0.22...
+>>> metrics.recall_score(y_true, y_pred, average='micro')
+... 
+0.33...
+>>> metrics.f1_score(y_true, y_pred, average='weighted')  
+0.26...
+>>> metrics.fbeta_score(y_true, y_pred, average='macro', beta=0.5)  
+0.23...
+>>> metrics.precision_recall_fscore_support(y_true, y_pred, beta=0.5, average=None)
+... 
+(array([ 0.66...,  0.        ,  0.        ]), array([ 1.,  0.,  0.]), array([ 0.71...,  0.        ,  0.        ]), array([2, 2, 2]...))
+
+{% endhighlight %}
+
+对于多分类问题，对于一个“negative class”，有可能会排除一些标签：
+
+{% highlight python %}
+
+>>> metrics.recall_score(y_true, y_pred, labels=[1, 2], average='micro')
+... # excluding 0, no labels were correctly recalled
+0.0
+
+{% endhighlight %}
+
+类似的，在数据集样本中没有出现的label不能用在macro-averaging中。
+
+{% highlight python %}
+
+>>> metrics.precision_score(y_true, y_pred, labels=[0, 1, 2, 3], average='macro')
+... 
+0.166...
+
+{% endhighlight %}
 
