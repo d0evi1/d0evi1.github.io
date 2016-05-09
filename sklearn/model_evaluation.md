@@ -201,7 +201,31 @@ array([[2, 0, 0],
 
 结果为：
 
+# 3.5 分类报告
 
+[classification_report](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.classification_report.html#sklearn.metrics.classification_report)函数构建了一个文本报告，用于展示主要的分类metrics。 下例给出了一个小示例，它使用定制的target_names和对应的label：
+ 
+{% highlight python %}
+ 
+>>> from sklearn.metrics import classification_report
+>>> y_true = [0, 1, 2, 2, 0]
+>>> y_pred = [0, 0, 2, 2, 0]
+>>> target_names = ['class 0', 'class 1', 'class 2']
+>>> print(classification_report(y_true, y_pred, target_names=target_names))
+             precision    recall  f1-score   support
 
+    class 0       0.67      1.00      0.80         2
+    class 1       0.00      0.00      0.00         1
+    class 2       1.00      1.00      1.00         2
+
+avg / total       0.67      0.80      0.72         5
+
+{% endhighlight %}
+ 
+示例：
+ 
+- [识别手写数字示例](http://scikit-learn.org/stable/auto_examples/classification/plot_digits_classification.html#example-classification-plot-digits-classification-py)
+- [使用sparse特征的文本分类](http://scikit-learn.org/stable/auto_examples/text/document_classification_20newsgroups.html#example-text-document-classification-20newsgroups-py)
+- [使用grid search的cross-validation的参数估计](http://scikit-learn.org/stable/auto_examples/model_selection/grid_search_digits.html#example-model-selection-grid-search-digits-py)
 
 
