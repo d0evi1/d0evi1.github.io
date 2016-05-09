@@ -452,3 +452,117 @@ metrics的定义如下：
 
 {% endhighlight %}
 
+## 3.9 Hinge loss
+
+[hinge_loss](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.hinge_loss.html#sklearn.metrics.hinge_loss)函数会使用hinge loss计算模型与数据之间的平均距离。它是一个单边的metric，只在预测错误（prediction erros）时考虑。(Hinge loss被用于最大间隔分类器上：比如SVM)
+
+如果label使用+1和-1进行编码。y为真实值，w为由decision_function结出的预测决策。
+hinge loss的定义如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?L_\text{Hinge}(y, w) = \max\left\{1 - wy, 0\right\} = \left|1 - wy\right|_+">
+
+如果超过两个label，由于[Crammer & Singer](http://jmlr.csail.mit.edu/papers/volume2/crammer01a/crammer01a.pdf)所提到的问题 ，hinge_loss 会使用一个多元分类的变种。
+
+如果<img src="http://www.forkosh.com/mathtex.cgi?y_w">是对于true label的预测判断（predicted decision），<img src="http://www.forkosh.com/mathtex.cgi?y_t ">则是对于其他label的预测判断的最大值，而predicted decisions由多个predicted decision输出，那么多分类的hinge loss定义如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?L_\text{Hinge}(y_w, y_t) = \max\left\{1 + y_t - y_w, 0\right\}">
+
+二分类问题示例：
+
+{% highlight python %}
+
+>>> from sklearn import svm
+>>> from sklearn.metrics import hinge_loss
+>>> X = [[0], [1]]
+>>> y = [-1, 1]
+>>> est = svm.LinearSVC(random_state=0)
+>>> est.fit(X, y)
+LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
+     intercept_scaling=1, loss='squared_hinge', max_iter=1000,
+     multi_class='ovr', penalty='l2', random_state=0, tol=0.0001,
+     verbose=0)
+>>> pred_decision = est.decision_function([[-2], [3], [0.5]])
+>>> pred_decision  
+array([-2.18...,  2.36...,  0.09...])
+>>> hinge_loss([-1, 1, 1], pred_decision)  
+0.3...
+
+{% endhighlight %}
+
+多分类问题示例：
+
+{% highlight python %}
+
+>>> X = np.array([[0], [1], [2], [3]])
+>>> Y = np.array([0, 1, 2, 3])
+>>> labels = np.array([0, 1, 2, 3])
+>>> est = svm.LinearSVC()
+>>> est.fit(X, Y)
+LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
+     intercept_scaling=1, loss='squared_hinge', max_iter=1000,
+     multi_class='ovr', penalty='l2', random_state=None, tol=0.0001,
+     verbose=0)
+>>> pred_decision = est.decision_function([[-1], [2], [3]])
+>>> y_true = [0, 2, 3]
+>>> hinge_loss(y_true, pred_decision, labels)  
+0.56...
+
+{% endhighlight %}
+
+
+## 3.10 Log loss
+
+Log loss也被称为logistic回归loss，或者交叉熵loss(cross-entropy loss)，用于概率估计。它通常用在(multinomial)的LR和神经网络上，以最大期望（EM：expectation-maximization）的变种的方式，用于评估一个分类器的概率输出，而非进行离散预测。
+
+对于二元分类，true label为：<img src="http://www.forkosh.com/mathtex.cgi?y \in \{0,1\}">，概率估计为：<img src="http://www.forkosh.com/mathtex.cgi?p = \operatorname{Pr}(y = 1)">，每个样本的log loss是对分类器给定true label的负值log似然估计(negative log-likelihood)：
+
+<img src="http://www.forkosh.com/mathtex.cgi?L_{\log}(y, p) = -\log \operatorname{Pr}(y|p) = -(y \log (p) + (1 - y) \log (1 - p))">
+
+当扩展到多元分类（multiclass）上时。可以将样本的true label编码成1-of-K个二元指示器矩阵Y，如果从label K集合中取出的样本i，对应的label为k，则<img src="http://www.forkosh.com/mathtex.cgi?y_{i,k} = 1">，P为概率估计矩阵，<img src="http://www.forkosh.com/mathtex.cgi?p_{i,k} = \operatorname{Pr}(t_{i,k} = 1)">。整个集合的log loss表示如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?L_{\log}(Y, P) = -\log \operatorname{Pr}(Y|P) = - \frac{1}{N} \sum_{i=0}^{N-1} \sum_{k=0}^{K-1} y_{i,k} \log p_{i,k}">
+
+我们再看下如何对二分类的log loss进行泛化的，注意，在二分类问题上，<img src="http://www.forkosh.com/mathtex.cgi?p_{i,0} = 1 - p_{i,1} "> 和<img src="http://www.forkosh.com/mathtex.cgi?y_{i,0} = 1 - y_{i,1}">，因而，通过在<img src="http://www.forkosh.com/mathtex.cgi?y_{i,k} \in \{0,1\} ">扩展内部和来给出二分类的log loss。
+
+log_loss函数，通过给定一列真实值label和一个概率矩阵来计算log loss，返回值通过estimator的predict_proba返回。
+
+{% highlight python %}
+
+>>> from sklearn.metrics import log_loss
+>>> y_true = [0, 0, 1, 1]
+>>> y_pred = [[.9, .1], [.8, .2], [.3, .7], [.01, .99]]
+>>> log_loss(y_true, y_pred)    
+0.1738...
+
+{% endhighlight %}
+
+y_pred中的[.9, .1]指的是，第一个样本中90%的概率是label 0。另外，log loss是非负的。
+
+## 3.11 Matthews相关系数
+
+[matthews_corrcoef](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.matthews_corrcoef.html#sklearn.metrics.matthews_corrcoef)函数计算了二元分类的[Matthew’s correlation coefficient (MCC)](http://en.wikipedia.org/wiki/Matthews_correlation_coefficient).
+
+wikipedia是这么说的：
+
+“The Matthews correlation coefficient is used in machine learning as a measure of the quality of binary (two-class) classifications. It takes into account true and false positives and negatives and is generally regarded as a balanced measure which can be used even if the classes are of very different sizes. The MCC is in essence a correlation coefficient value between -1 and +1. A coefficient of +1 represents a perfect prediction, 0 an average random prediction and -1 an inverse prediction. The statistic is also known as the phi coefficient.”
+
+翻译如下：
+
+机器学习中使用的Matthews相关系数，用于度量二分类的质量。它会考虑TP/FP/TN/FP的情况，通常被认为是一个balanced的度量  ，可以用于那些有着不同size的分类中。MCC本质上是一个介于［－1，+1］之间的相关系数值。相关系数为+1，表示是一个完美的预测，0表示是一个平均随机预测（average random prediction），而-1表示是一个逆预测（inverse prediction）。这种统计方法也被称为：phi coefficient。
+
+MCC相应的定义如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?MCC = \frac{tp \times tn - fp \times fn}{\sqrt{(tp + fp)(tp + fn)(tn + fp)(tn + fn)}}.">
+
+这里的示例展示了matthews_corrcoef 函数的使用：
+
+{% highlight python %}
+
+>>> from sklearn.metrics import matthews_corrcoef
+>>> y_true = [+1, +1, +1, -1]
+>>> y_pred = [+1, -1, +1, +1]
+>>> matthews_corrcoef(y_true, y_pred)  
+-0.33...
+
+{% endhighlight %}
+
