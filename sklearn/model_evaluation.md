@@ -263,3 +263,35 @@ avg / total       0.67      0.80      0.72         5
 
 注意：在多分类问题上，Hamming loss与y_true 和 y_pred 间的Hamming距离相关，它与[0-1 loss](http://scikit-learn.org/stable/modules/model_evaluation.html#zero-one-loss)相类似。然而，0-1 loss会对不严格与真实数据集相匹配的预测集进行惩罚。因而，Hamming loss，作为0-1 loss的上界，也在0和1之间；预测一个合适的真实label的子集或超集将会给出一个介于0和1之间的Hamming loss.
 
+# 3.7 Jaccard相似度系数score
+
+[jaccard_similarity_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.jaccard_similarity_score.html#sklearn.metrics.jaccard_similarity_score)函数会计算两对label集之间的Jaccard相似度系数的平均（缺省）或求和。它也被称为Jaccard index.
+
+第i个样本的Jaccard相似度系数（Jaccard similarity coefficient），真实标签集为<img src="http://www.forkosh.com/mathtex.cgi?y_i ">，预测标签集为：<img src="http://www.forkosh.com/mathtex.cgi?\hat{y}_j ">，其定义如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?J(y_i, \hat{y}_i) = \frac{|y_i \cap \hat{y}_i|}{|y_i \cup \hat{y}_i|}.">
+
+在二分类和多分类问题上，Jaccard相似度系数score与分类的正确率（accuracy）相同：
+
+{% highlight python %}
+
+>>> import numpy as np
+>>> from sklearn.metrics import jaccard_similarity_score
+>>> y_pred = [0, 2, 1, 3]
+>>> y_true = [0, 1, 2, 3]
+>>> jaccard_similarity_score(y_true, y_pred)
+0.5
+>>> jaccard_similarity_score(y_true, y_pred, normalize=False)
+2
+
+{% endhighlight %}
+
+在多标签（multilabel）问题上，使用二元标签指示器：
+
+{% highlight python %}
+
+>>> jaccard_similarity_score(np.array([[0, 1], [1, 1]]), np.ones((2, 2)))
+0.75
+
+{% endhighlight %}
+
