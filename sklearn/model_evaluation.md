@@ -295,3 +295,33 @@ avg / total       0.67      0.80      0.72         5
 
 {% endhighlight %}
 
+# 3.8 准确率，召回率与F值
+
+准确率（precision）可以衡量一个样本为负的标签被判成正，召回率（recall）用于衡量所有正例。
+
+F-meature（包括：<img src="http://www.forkosh.com/mathtex.cgi?F_\beta">和<img src="http://www.forkosh.com/mathtex.cgi?F_1">），可以认为是precision和recall的加权调和平均（weighted harmonic mean）。一个<img src="http://www.forkosh.com/mathtex.cgi?F_\beta">值，最佳为1，最差时为0. 如果<img src="http://www.forkosh.com/mathtex.cgi?\beta">=1，那么<img src="http://www.forkosh.com/mathtex.cgi?F_\beta">和<img src="http://www.forkosh.com/mathtex.cgi?F_1">相等，precision和recall的权重相等。
+
+[precision_recall_curve](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_curve.html#sklearn.metrics.precision_recall_curve)会根据预测值和真实值来计算一条precision-recall典线。
+
+[average_precision_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html#sklearn.metrics.average_precision_score)则会预测值的平均准确率（AP: average precision）。该分值对应于precision-recall曲线下的面积。
+
+sklearn提供了一些函数来分析precision, recall and F-measures值：
+
+- average_precision_score：计算预测值的AP
+- f1_score: 计算F1值，也被称为平衡F-score或F-meature
+- fbeta_score: 计算F-beta score
+- precision_recall_curve：计算不同概率阀值的precision-recall对
+- precision_recall_fscore_support：为每个类计算precision, recall, F-measure 和 support
+- precision_score： 计算precision
+- recall_score：    计算recall
+
+**注意：precision_recall_curve只用于二分类中。而average_precision_score可用于二分类或multilabel指示器格式**
+
+示例：
+
+- [使用sparse特性的文档分类](http://scikit-learn.org/stable/auto_examples/text/document_classification_20newsgroups.html#example-text-document-classification-20newsgroups-py)
+- [使用grid search corss-validation的参数估计](http://scikit-learn.org/stable/auto_examples/model_selection/grid_search_digits.html#example-model-selection-grid-search-digits-py)
+- [Precision-Recall](http://scikit-learn.org/stable/auto_examples/model_selection/plot_precision_recall.html#example-model-selection-plot-precision-recall-py)
+- [Sparse recovery: feature selection for sparse linear models](http://scikit-learn.org/stable/auto_examples/linear_model/plot_sparse_recovery.html#example-linear-model-plot-sparse-recovery-py)
+
+
