@@ -773,3 +773,33 @@ r2_score和explained_variance_score 对于multioutput参数还接受另一个额
 
 对于r2_score的缺省值为multioutput='variance_weighted'，向后兼容。后续版本会改成uniform_average。
 
+## 5.1 可释方差值（Explained variance score）
+
+explained_variance_score解释了[explained variance regression score](http://en.wikipedia.org/wiki/Explained_variation)
+
+如果<img src="http://www.forkosh.com/mathtex.cgi?\hat{y} ">是估计的target输出，y为相应的真实(correct)target输出，Var为求方差（variance），即标准差的平方，那么可释方差（explained variance）的估计如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?\texttt{explained\_{}variance}(y, \hat{y}) = 1 - \frac{Var\{ y - \hat{y}\}}{Var\{y\}}">
+
+最好的可能值为1.0，越低表示越差。
+
+示例如下：
+
+{% highlight python %}
+
+>>> from sklearn.metrics import explained_variance_score
+>>> y_true = [3, -0.5, 2, 7]
+>>> y_pred = [2.5, 0.0, 2, 8]
+>>> explained_variance_score(y_true, y_pred)  
+0.957...
+>>> y_true = [[0.5, 1], [-1, 1], [7, -6]]
+>>> y_pred = [[0, 2], [-1, 2], [8, -5]]
+>>> explained_variance_score(y_true, y_pred, multioutput='raw_values')
+... 
+array([ 0.967...,  1.        ])
+>>> explained_variance_score(y_true, y_pred, multioutput=[0.3, 0.7])
+... 
+0.990...
+
+{% endhighlight %}
+
