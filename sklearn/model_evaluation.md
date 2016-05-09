@@ -183,6 +183,24 @@ Kappa score可以用在二分类或多分类问题上，但不适用于多标签
 
 # 3.4 混淆矩阵
 
+[confusion_matrix](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html#sklearn.metrics.confusion_matrix)函数通过计算混淆矩阵，用来计算分类准确率。
+
+缺省的，在混淆矩阵中的i,j指的是观察的数目i，预测为j，示例：
+
+{% highlight python %}
+
+>>> from sklearn.metrics import confusion_matrix
+>>> y_true = [2, 0, 2, 2, 0, 1]
+>>> y_pred = [0, 0, 2, 2, 0, 2]
+>>> confusion_matrix(y_true, y_pred)
+array([[2, 0, 0],
+       [0, 0, 1],
+       [1, 0, 2]])
+
+{% endhighlight %}
+
+结果为：
+
 
 
 
