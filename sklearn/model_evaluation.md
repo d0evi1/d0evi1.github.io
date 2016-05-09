@@ -566,3 +566,101 @@ MCC相应的定义如下：
 
 {% endhighlight %}
 
+## 3.12 ROC
+
+[roc_curve](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html#sklearn.metrics.roc_curve)计算了ROC曲线。Wikipedia如下：
+
+“A receiver operating characteristic (ROC), or simply ROC curve, is a graphical plot which illustrates the performance of a binary classifier system as its discrimination threshold is varied. It is created by plotting the fraction of true positives out of the positives (TPR = true positive rate) vs. the fraction of false positives out of the negatives (FPR = false positive rate), at various threshold settings. TPR is also known as sensitivity, and FPR is one minus the specificity or true negative rate.”
+
+该函数需要二分类的真实值和预测值，它可以是正例的概率估计，置信值，或二分决策值。下例展示了如何使用：
+
+{% highlight python %}
+
+>>> import numpy as np
+>>> from sklearn.metrics import roc_curve
+>>> y = np.array([1, 1, 2, 2])
+>>> scores = np.array([0.1, 0.4, 0.35, 0.8])
+>>> fpr, tpr, thresholds = roc_curve(y, scores, pos_label=2)
+>>> fpr
+array([ 0. ,  0.5,  0.5,  1. ])
+>>> tpr
+array([ 0.5,  0.5,  1. ,  1. ])
+>>> thresholds
+array([ 0.8 ,  0.4 ,  0.35,  0.1 ])
+
+{% endhighlight %}
+
+下图展下了上面的结果：
+
+<figure>
+    <a href="http://scikit-learn.org/stable/_images/plot_roc_0011.png"><img src="http://scikit-learn.org/stable/_images/plot_roc_0011.png" alt=""></a>
+</figure>
+
+[roc_auc_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score)函数计算了ROC曲线下面的面积，它也被称为AUC或AUROC。通过计算下面的面积，曲线信息被归一化到1内。
+
+{% highlight python %}
+
+>>> import numpy as np
+>>> from sklearn.metrics import roc_auc_score
+>>> y_true = np.array([0, 0, 1, 1])
+>>> y_scores = np.array([0.1, 0.4, 0.35, 0.8])
+>>> roc_auc_score(y_true, y_scores)
+0.75
+
+{% endhighlight %}
+
+在多标签（multi-label）分类上，roc_auc_score通过对上面的label进行平均。
+
+对比于其它metrics: accuracy、 Hamming loss、 F1-score, ROC不需要为每个label优化一个阀值。roc_auc_score函数也可以用于多分类（multi-class）问题上。如果预测的输出已经被二值化。
+
+<figure>
+    <a href="http://scikit-learn.org/stable/_images/plot_roc_0021.png"><img src="http://scikit-learn.org/stable/_images/plot_roc_0021.png" alt=""></a>
+</figure>
+
+示例：
+
+- [ Receiver Operating Characteristic (ROC) ](http://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html#example-model-selection-plot-roc-py)
+- [Receiver Operating Characteristic (ROC) with cross validation ](http://scikit-learn.org/stable/auto_examples/model_selection/plot_roc_crossval.html#example-model-selection-plot-roc-crossval-py)
+- [Species distribution modeling ](http://scikit-learn.org/stable/auto_examples/applications/plot_species_distribution_modeling.html#example-applications-plot-species-distribution-modeling-py)
+
+## 3.13 0-1 loss
+
+[zero_one_loss](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.zero_one_loss.html#sklearn.metrics.zero_one_loss)会通过在<img src="http://www.forkosh.com/mathtex.cgi?n_{\text{samples}}">计算0-1分类的<img src="http://www.forkosh.com/mathtex.cgi?L_{0-1}">)的平值或求和。缺省情况下，该函数会对样本进行归一化。为了得到<img src="http://www.forkosh.com/mathtex.cgi?L_{0-1}">的求和，需要将normalize设置为False。
+
+在multilabel分类上，如果一个子集的labels与预测值严格匹配，zero_one_loss会得到1，如果有许多错误，则为0。缺省的，该函数会返回有问题的预测子集(不等)的百分比。为了得到这样的子集数，可以将normalize置为False。
+
+如果<img src="http://www.forkosh.com/mathtex.cgi?\hat{y}_i ">是第i个样本的预测值，
+<img src="http://www.forkosh.com/mathtex.cgi?y_i">是第i个样本的真实值，那么0-1 loss的定义如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?L_{0-1}(y_i, \hat{y}_i) = 1(\hat{y}_i \not= y_i)">
+
+其中1(x)表示的是指示函数。
+
+{% highlight python %}
+
+>>> from sklearn.metrics import zero_one_loss
+>>> y_pred = [1, 2, 3, 4]
+>>> y_true = [2, 2, 3, 4]
+>>> zero_one_loss(y_true, y_pred)
+0.25
+>>> zero_one_loss(y_true, y_pred, normalize=False)
+1
+
+{% endhighlight %}
+
+在多标签的问题上，如果使用二元标签指示器，第一个标签集[0,1]具有一个error:
+
+{% highlight python %}
+
+>>> zero_one_loss(np.array([[0, 1], [1, 1]]), np.ones((2, 2)))
+0.5
+
+>>> zero_one_loss(np.array([[0, 1], [1, 1]]), np.ones((2, 2)),  normalize=False)
+1
+
+{% endhighlight %}
+
+示例：
+
+- [Recursive feature elimination with cross-validation](http://scikit-learn.org/stable/auto_examples/feature_selection/plot_rfe_with_cross_validation.html#example-feature-selection-plot-rfe-with-cross-validation-py)
+
