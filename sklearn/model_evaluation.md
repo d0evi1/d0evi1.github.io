@@ -35,7 +35,7 @@ sklearn.metric提供了一些函数，用来计算真实值与预测值之间的
 
 接下去会讨论多种机器学习当中的metrics。
 
-许多metrics并不出可以在scoring参数中配置的字符名，因为有时你可能需要额外的参数，比如：fbeta_score。这种情况下，你需要生成一个合适的scorer对象。最简单的方法是调用make_scorer来生成scoring对象。该函数将metrics转换成在模型评估中可调用的对象。
+许多metrics并没有给出在scoring参数中可配置的字符名，因为有时你可能需要额外的参数，比如：fbeta_score。这种情况下，你需要生成一个合适的scorer对象。最简单的方法是调用make_scorer来生成scoring对象。该函数将metrics转换成在模型评估中可调用的对象。
 
 第一个典型的用例是，将一个库中已经存在的metrics函数进行包装，使用定制参数，比如对fbeta_score函数中的beta参数进行设置：
 
@@ -53,7 +53,7 @@ sklearn.metric提供了一些函数，用来计算真实值与预测值之间的
 
 - 你可以使用python函数：下例中的my_custom_loss_func
 - python函数是否返回一个score（greater_is_better=True），还是返回一个loss（greater_is_better=False）。如果为loss，python函数的输出将被scorer对象忽略，根据交叉验证的原则，得分越高模型越好。
-- 对于分类的metrics：该函数如果希望处理连续值（needs_threshold=True）。缺省值为False。
+- 对于分类问题的metrics：如果你提供的python函数是否需要对连续值进行决策判断，可以将参数设置为（needs_threshold=True）。缺省值为False。
 - 一些额外的参数：比如f1_score中的bata或labels。
 
 下例使用定制的scorer，使用了greater_is_better参数：
@@ -80,7 +80,7 @@ sklearn.metric提供了一些函数，用来计算真实值与预测值之间的
 
 {% endhighlight %}
 
-# 2.3 实现你自己的scoring对象
+## 2.3 实现你自己的scoring对象
 
 你可以生成更灵活的模型scorer，通过从头构建自己的scoring对象来完成，不需要使用make_scorer工厂函数。对于一个自己实现的scorer来说，它需要遵循两个原则：
 
@@ -123,7 +123,7 @@ sklearn.metrics模块实现了一些loss, score以及一些工具函数来计算
 
 在以下的部分，我们将讨论各个函数。
 
-# 3.1 二分类/多分类/多标签
+## 3.1 二分类/多分类/多标签
 
 对于二分类来说，必须定义一些matrics（f1_score，roc_auc_score）。**在这些case中，缺省只评估正例的label，缺省的正例label被标为1**（可以通过配置pos_label参数来完成）
 
@@ -137,7 +137,7 @@ sklearn.metrics模块实现了一些loss, score以及一些工具函数来计算
 
 多分类（multiclass）数据提供了metric，和二分类类似，是一个label的数组，**而多标签（multilabel）数据则返回一个索引矩阵，当样本i具有label j时，元素[i,j]的值为1，否则为0**.
 
-# 3.2 accuracy_score
+## 3.2 accuracy_score
 
 accuracy_score函数计算了准确率，不管是正确预测的fraction（default），还是count(normalize=False)。
 
@@ -173,7 +173,7 @@ accuracy_score函数计算了准确率，不管是正确预测的fraction（defa
 
 {% endhighlight %}
 
-# 3.3 Cohen’s kappa
+## 3.3 Cohen’s kappa
 
 函数cohen_kappa_score计算了Cohen’s kappa估计。这意味着需要比较通过不同的人工标注（numan annotators）的标签，而非分类器中正确的类。
 
@@ -181,7 +181,7 @@ kappa score是一个介于(-1, 1)之间的数. score>0.8意味着好的分类；
 
 Kappa score可以用在二分类或多分类问题上，但不适用于多标签问题，以及超过两种标注的问题。
 
-# 3.4 混淆矩阵
+## 3.4 混淆矩阵
 
 [confusion_matrix](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html#sklearn.metrics.confusion_matrix)函数通过计算混淆矩阵，用来计算分类准确率。
 
@@ -204,7 +204,7 @@ array([[2, 0, 0],
 
 
 
-# 3.5 分类报告
+## 3.5 分类报告
 
 [classification_report](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.classification_report.html#sklearn.metrics.classification_report)函数构建了一个文本报告，用于展示主要的分类metrics。 下例给出了一个小示例，它使用定制的target_names和对应的label：
  
@@ -231,7 +231,7 @@ avg / total       0.67      0.80      0.72         5
 - [使用sparse特征的文本分类](http://scikit-learn.org/stable/auto_examples/text/document_classification_20newsgroups.html#example-text-document-classification-20newsgroups-py)
 - [使用grid search的cross-validation的参数估计](http://scikit-learn.org/stable/auto_examples/model_selection/grid_search_digits.html#example-model-selection-grid-search-digits-py)
 
-# 3.6 Hamming loss
+## 3.6 Hamming loss
  
 [hamming_loss](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.hamming_loss.html#sklearn.metrics.hamming_loss)计算了在两个样本集里的平均汉明距离或平均Hamming loss。
  
@@ -266,7 +266,7 @@ avg / total       0.67      0.80      0.72         5
 
 注意：在多分类问题上，Hamming loss与y_true 和 y_pred 间的Hamming距离相关，它与[0-1 loss](http://scikit-learn.org/stable/modules/model_evaluation.html#zero-one-loss)相类似。然而，0-1 loss会对不严格与真实数据集相匹配的预测集进行惩罚。因而，Hamming loss，作为0-1 loss的上界，也在0和1之间；预测一个合适的真实label的子集或超集将会给出一个介于0和1之间的Hamming loss.
 
-# 3.7 Jaccard相似度系数score
+## 3.7 Jaccard相似度系数score
 
 [jaccard_similarity_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.jaccard_similarity_score.html#sklearn.metrics.jaccard_similarity_score)函数会计算两对label集之间的Jaccard相似度系数的平均（缺省）或求和。它也被称为Jaccard index.
 
@@ -298,7 +298,7 @@ avg / total       0.67      0.80      0.72         5
 
 {% endhighlight %}
 
-# 3.8 准确率，召回率与F值
+## 3.8 准确率，召回率与F值
 
 准确率（precision）可以衡量一个样本为负的标签被判成正，召回率（recall）用于衡量所有正例。
 
@@ -327,7 +327,7 @@ sklearn提供了一些函数来分析precision, recall and F-measures值：
 - [Precision-Recall](http://scikit-learn.org/stable/auto_examples/model_selection/plot_precision_recall.html#example-model-selection-plot-precision-recall-py)
 - [Sparse recovery: feature selection for sparse linear models](http://scikit-learn.org/stable/auto_examples/linear_model/plot_sparse_recovery.html#example-linear-model-plot-sparse-recovery-py)
 
-## 3.8.1 二分类
+### 3.8.1 二分类
 
 在二元分类中，术语“positive”和“negative”指的是分类器的预测类别(expectation)，术语“true”和“false”则指的是预测是否正确（有时也称为：观察observation）。给出如下的定义：
 
@@ -385,7 +385,7 @@ array([ 0.35,  0.4 ,  0.8 ])
 
 {% endhighlight %}
 
-## 3.8.2 多元分类和多标签分类
+### 3.8.2 多元分类和多标签分类
 
 在多分类（Multiclass）和多标签（multilabel）分类问题上，precision, recall, 和 F-measure的概念可以独立应用到每个label上。有一些方法可以综合各标签上的结果，通过指定average_precision_score （只能用在multilabel上）， f1_score, fbeta_score, precision_recall_fscore_support, precision_score 和 recall_score这些函数上的参数average可以做到。
 
