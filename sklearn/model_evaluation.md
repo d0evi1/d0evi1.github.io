@@ -190,7 +190,7 @@ Kappa score可以用在二分类或多分类问题上，但不适用于多标签
 
 [classification_report](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.classification_report.html#sklearn.metrics.classification_report)函数构建了一个文本报告，用于展示主要的分类metrics。 下例给出了一个小示例，它使用定制的target_names和对应的label：
  
- {% highlight python %}
+{% highlight python %}
  
 >>> from sklearn.metrics import classification_report
 >>> y_true = [0, 1, 2, 2, 0]
@@ -205,13 +205,13 @@ Kappa score可以用在二分类或多分类问题上，但不适用于多标签
 
 avg / total       0.67      0.80      0.72         5
 
- {% endhighlight %}
+{% endhighlight %}
  
- 示例：
+示例：
  
- - [识别手写数字示例](http://scikit-learn.org/stable/auto_examples/classification/plot_digits_classification.html#example-classification-plot-digits-classification-py)
- - [使用sparse特征的文本分类](http://scikit-learn.org/stable/auto_examples/text/document_classification_20newsgroups.html#example-text-document-classification-20newsgroups-py)
- - [使用grid search的cross-validation的参数估计](http://scikit-learn.org/stable/auto_examples/model_selection/grid_search_digits.html#example-model-selection-grid-search-digits-py)
+- [识别手写数字示例](http://scikit-learn.org/stable/auto_examples/classification/plot_digits_classification.html#example-classification-plot-digits-classification-py)
+- [使用sparse特征的文本分类](http://scikit-learn.org/stable/auto_examples/text/document_classification_20newsgroups.html#example-text-document-classification-20newsgroups-py)
+- [使用grid search的cross-validation的参数估计](http://scikit-learn.org/stable/auto_examples/model_selection/grid_search_digits.html#example-model-selection-grid-search-digits-py)
 
 # 3.6 Hamming loss
  
@@ -238,6 +238,7 @@ avg / total       0.67      0.80      0.72         5
 {% endhighlight %}
 
 在多标签（multilabel）的使用二元label指示器的情况：
+
 {% highlight python %}
 
 >>> hamming_loss(np.array([[0, 1], [1, 1]]), np.zeros((2, 2)))
@@ -272,7 +273,9 @@ avg / total       0.67      0.80      0.72         5
 {% endhighlight %}
 
 在多标签（multilabel）问题上，使用二元标签指示器：
+
 {% highlight python %}
+
 >>> jaccard_similarity_score(np.array([[0, 1], [1, 1]]), np.ones((2, 2)))
 0.75
 
@@ -428,6 +431,7 @@ metrics的定义如下：
 类似的，在数据集样本中没有出现的label不能用在macro-averaging中。
 
 {% highlight python %}
+
 >>> metrics.precision_score(y_true, y_pred, labels=[0, 1, 2, 3], average='macro')
 ... 
 0.166...
@@ -557,6 +561,7 @@ MCC相应的定义如下：
 该函数需要二分类的真实值和预测值，它可以是正例的概率估计，置信值，或二分决策值。下例展示了如何使用：
 
 {% highlight python %}
+
 >>> import numpy as np
 >>> from sklearn.metrics import roc_curve
 >>> y = np.array([1, 1, 2, 2])
