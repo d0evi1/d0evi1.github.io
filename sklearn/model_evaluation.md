@@ -664,3 +664,97 @@ array([ 0.8 ,  0.4 ,  0.35,  0.1 ])
 
 - [Recursive feature elimination with cross-validation](http://scikit-learn.org/stable/auto_examples/feature_selection/plot_rfe_with_cross_validation.html#example-feature-selection-plot-rfe-with-cross-validation-py)
 
+# 4. Multilabel的ranking metrics
+
+在多标签学习上，每个样本都具有多个真实值label与它对应。它的目的是，为真实值label得到最高分或者最好的rank。
+
+## 4.1 范围误差（Coverage error）
+
+[coverage_error](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.coverage_error.html#sklearn.metrics.coverage_error)计算了那些必须在最终预测（所有真实的label都会被预测）中包含的labels的平均数目。如果你想知道有多少top高分labels（top-scored-labels）时它会很有用，你必须以平均的方式进行预测，不漏过任何一个真实label。该metrics的最优值是对真实label求平均。
+
+给定一个真实label的二分类指示矩阵:
+<img src="http://www.forkosh.com/mathtex.cgi?y \in \left\{0, 1\right\}^{n_\text{samples} \times n_\text{labels}}">
+
+以及每个label相关的分值:
+<img src="http://www.forkosh.com/mathtex.cgi?\hat{f} \in \mathbb{R}^{n_\text{samples} \times n_\text{labels}}">，
+
+相应的范围误差定义如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?coverage(y, \hat{f}) = \frac{1}{n_{\text{samples}}}
+  \sum_{i=0}^{n_{\text{samples}} - 1} \max_{j:y_{ij} = 1} \text{rank}_{ij}">
+  
+其中：<img src="http://www.forkosh.com/mathtex.cgi? \text{rank}_{ij} = \left|\left\{k: \hat{f}_{ik} \geq \hat{f}_{ij} \right\}\right|">。给定rank定义，通过给出最大的rank，来打破y_scores。
+
+示例如下：
+
+{% highlight python %}
+
+>>> import numpy as np
+>>> from sklearn.metrics import coverage_error
+>>> y_true = np.array([[1, 0, 0], [0, 0, 1]])
+>>> y_score = np.array([[0.75, 0.5, 1], [1, 0.2, 0.1]])
+>>> coverage_error(y_true, y_score)
+2.5
+
+{% endhighlight %}
+
+## 4.2 Label ranking平均准确率
+
+[label_ranking_average_precision_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.label_ranking_average_precision_score.html#sklearn.metrics.label_ranking_average_precision_score)函数实现了Label ranking平均准确率 ：LRAP（label ranking average precision）。该metric与[average_precision_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html#sklearn.metrics.average_precision_score)有关联，但它基于label ranking的概念，而非precision/recall。
+
+LRAP会对每个样本上分配的真实label进行求平均，真实值的比例 vs. 低分值labels的总数。如果你可以为每个样本相关的label给出更好的rank，该指标将产生更好的分值。得到的score通常都会比0大，最佳值为1。如果每个样本都只有一个相关联的label，那么LRAP就与[平均倒数排名:mean reciprocal rank](http://en.wikipedia.org/wiki/Mean_reciprocal_rank)
+
+给定一个true label的二元指示矩阵，<img src="http://www.forkosh.com/mathtex.cgi?y \in \mathcal{R}^{n_\text{samples} \times n_\text{labels}} ">，每个label相对应的分值：<img src="http://www.forkosh.com/mathtex.cgi?\hat{f} \in \mathcal{R}^{n_\text{samples} \times n_\text{labels}}">，平均准确率的定义如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?LRAP(y, \hat{f}) = \frac{1}{n_{\text{samples}}}
+  \sum_{i=0}^{n_{\text{samples}} - 1} \frac{1}{|y_i|}
+  \sum_{j:y_{ij} = 1} \frac{|\mathcal{L}_{ij}|}{\text{rank}_{ij}}">
+  
+其中：
+
+- <img src="http://www.forkosh.com/mathtex.cgi?\mathcal{L}_{ij} = \left\{k: y_{ik} = 1, \hat{f}_{ik} \geq \hat{f}_{ij} \right\}">，
+- <img src="http://www.forkosh.com/mathtex.cgi?\text{rank}_{ij} = \left|\left\{k: \hat{f}_{ik} \geq \hat{f}_{ij} \right\}\right| ">
+- <img src="http://www.forkosh.com/mathtex.cgi?|\cdot|">是l0 范式或是数据集的基数。
+
+该函数的示例：
+
+{% highlight python %}
+
+>>> import numpy as np
+>>> from sklearn.metrics import label_ranking_average_precision_score
+>>> y_true = np.array([[1, 0, 0], [0, 0, 1]])
+>>> y_score = np.array([[0.75, 0.5, 1], [1, 0.2, 0.1]])
+>>> label_ranking_average_precision_score(y_true, y_score) 
+0.416...
+
+{% endhighlight %}
+
+## 4.3 Ranking loss
+
+[label_ranking_loss](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.label_ranking_loss.html#sklearn.metrics.label_ranking_loss)函数用于计算ranking loss，它会对label对没有正确分配的样本进行求平均。例如：true labels的分值比false labels的分值小，或者对true/false label进行了相反的加权。最低的ranking loss为0.
+
+给定一个true labels的二元指示矩阵：<img src="http://www.forkosh.com/mathtex.cgi?y \in \left\{0, 1\right\}^{n_\text{samples} \times n_\text{labels}} ">，每个label相关的分值为：<img src="http://www.forkosh.com/mathtex.cgi?\hat{f} \in \mathbb{R}^{n_\text{samples} \times n_\text{labels}}">，ranking loss的定义如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?\text{ranking\_loss}(y, \hat{f}) =  \frac{1}{n_{\text{samples}}}
+  \sum_{i=0}^{n_{\text{samples}} - 1} \frac{1}{|y_i|(n_\text{labels} - |y_i|)}
+  \left|\left\{(k, l): \hat{f}_{ik} < \hat{f}_{il}, y_{ik} = 1, y_{il} = 0 \right\}\right|">
+
+其中<img src="http://www.forkosh.com/mathtex.cgi?|\cdot|"> 为l0范式或数据集基数。
+
+示例：
+
+{% highlight python %}
+
+>>> import numpy as np
+>>> from sklearn.metrics import label_ranking_loss
+>>> y_true = np.array([[1, 0, 0], [0, 0, 1]])
+>>> y_score = np.array([[0.75, 0.5, 1], [1, 0.2, 0.1]])
+>>> label_ranking_loss(y_true, y_score) 
+0.75...
+
+>>> y_score = np.array([[1.0, 0.1, 0.2], [0.1, 0.2, 0.9]])
+>>> label_ranking_loss(y_true, y_score)
+0.0
+
+{% endhighlight %}
+
