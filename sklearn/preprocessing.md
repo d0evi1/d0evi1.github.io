@@ -162,13 +162,13 @@ array([ 2.,  1.,  2.])
 
 ## 2.3 归一化异常数据
 
-如果你的数据包含许多异常项（outliers），使用均值和方差的效果不会很好。在这种情况下，我们可以使用robust_scale 和 RobustScaler作为替代。它可以在你的中心或者范围内给出健壮的估计。
+如果你的数据包含许多异常项（outliers），使用均值和方差的效果不会很好。**在这种情况下，我们可以使用robust_scale 和 RobustScaler作为替代**。它可以在你给定的中心或者范围内给出健壮的估计。
 
-Scaling vs Whitening
+**Scaling vs Whitening**
 
-对于独自进行中心化和归一化来说有时并不够。因为下游的模型可能会做出在feature的线性独立性做出一些假设。
+对于独自进行中心化和归一化来说有时并不够好。因为下游的模型可能会基于feature的线性独立性做出一些假设。
 
-你可以使用 sklearn.decomposition.PCA 或 sklearn.decomposition.RandomizedPCA，并设置whiten=True以便移除feature之间的线性相关性。
+你可以使用 **sklearn.decomposition.PCA 或 sklearn.decomposition.RandomizedPCA，并设置whiten=True**以便移除feature之间的线性相关性。
 
 ## 2.4 kernel matrics的中心化
 
