@@ -201,6 +201,9 @@ array([[2, 0, 0],
 
 结果为：
 
+
+
+
 # 3.5 分类报告
 
 [classification_report](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.classification_report.html#sklearn.metrics.classification_report)函数构建了一个文本报告，用于展示主要的分类metrics。 下例给出了一个小示例，它使用定制的target_names和对应的label：
@@ -312,8 +315,8 @@ sklearn提供了一些函数来分析precision, recall and F-measures值：
 - fbeta_score: 计算F-beta score
 - precision_recall_curve：计算不同概率阀值的precision-recall对
 - precision_recall_fscore_support：为每个类计算precision, recall, F-measure 和 support
-- precision_score： 计算precision
-- recall_score：    计算recall
+- precision_score：	计算precision
+- recall_score：	计算recall
 
 **注意：precision_recall_curve只用于二分类中。而average_precision_score可用于二分类或multilabel指示器格式**
 
@@ -332,7 +335,7 @@ sklearn提供了一些函数来分析precision, recall and F-measures值：
 |          |           实际类目（observation）           |  |
 |----------|:-------------:|------:|
 |预测类目（expectation）  |  TP(true positive)结果:Correct | FP(false postive)结果：Unexpected |
-|  |        FN(false negative)结果: Missing   |   TN(true negtive)结果：Correct |
+|  |    	FN(false negative)结果: Missing   |   TN(true negtive)结果：Correct |
 
 在这个上下文中，我们定义了precision, recall和F-measure:
 
@@ -407,7 +410,7 @@ array([ 0.35,  0.4 ,  0.8 ])
 metrics的定义如下：
 
 <figure>
-    <a href="http://photo.yupoo.com/wangdren23/Fxc1ofvk/medish.jpg"><img src="http://photo.yupoo.com/wangdren23/Fxc1ofvk/medish.jpg" alt=""></a>
+	<a href="http://photo.yupoo.com/wangdren23/Fxc1ofvk/medish.jpg"><img src="http://photo.yupoo.com/wangdren23/Fxc1ofvk/medish.jpg" alt=""></a>
 </figure>
 
 代码：
@@ -548,7 +551,7 @@ wikipedia是这么说的：
 
 翻译如下：
 
-机器学习中使用的Matthews相关系数，用于度量二分类的质量。它会考虑TP/FP/TN/FP的情况，通常被认为是一个balanced的度量  ，可以用于那些有着不同size的分类中。MCC本质上是一个介于［－1，+1］之间的相关系数值。相关系数为+1，表示是一个完美的预测，0表示是一个平均随机预测（average random prediction），而-1表示是一个逆预测（inverse prediction）。这种统计方法也被称为：phi coefficient。
+机器学习中使用的Matthews相关系数，用于度量二分类的质量。它会考虑TP/FP/TN/FP的情况，通常被认为是一个balanced的度量	，可以用于那些有着不同size的分类中。MCC本质上是一个介于［－1，+1］之间的相关系数值。相关系数为+1，表示是一个完美的预测，0表示是一个平均随机预测（average random prediction），而-1表示是一个逆预测（inverse prediction）。这种统计方法也被称为：phi coefficient。
 
 MCC相应的定义如下：
 
@@ -593,7 +596,7 @@ array([ 0.8 ,  0.4 ,  0.35,  0.1 ])
 下图展下了上面的结果：
 
 <figure>
-    <a href="http://scikit-learn.org/stable/_images/plot_roc_0011.png"><img src="http://scikit-learn.org/stable/_images/plot_roc_0011.png" alt=""></a>
+	<a href="http://scikit-learn.org/stable/_images/plot_roc_0011.png"><img src="http://scikit-learn.org/stable/_images/plot_roc_0011.png" alt=""></a>
 </figure>
 
 [roc_auc_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score)函数计算了ROC曲线下面的面积，它也被称为AUC或AUROC。通过计算下面的面积，曲线信息被归一化到1内。
@@ -614,7 +617,7 @@ array([ 0.8 ,  0.4 ,  0.35,  0.1 ])
 对比于其它metrics: accuracy、 Hamming loss、 F1-score, ROC不需要为每个label优化一个阀值。roc_auc_score函数也可以用于多分类（multi-class）问题上。如果预测的输出已经被二值化。
 
 <figure>
-    <a href="http://scikit-learn.org/stable/_images/plot_roc_0021.png"><img src="http://scikit-learn.org/stable/_images/plot_roc_0021.png" alt=""></a>
+	<a href="http://scikit-learn.org/stable/_images/plot_roc_0021.png"><img src="http://scikit-learn.org/stable/_images/plot_roc_0021.png" alt=""></a>
 </figure>
 
 示例：
@@ -923,4 +926,81 @@ array([ 0.965...,  0.908...])
 示例：
 
 - [Lasso and Elastic Net for Sparse Signals](http://scikit-learn.org/stable/auto_examples/linear_model/plot_lasso_and_elasticnet.html#example-linear-model-plot-lasso-and-elasticnet-py)
+
+# 6.聚类metrics
+
+sklearn.metrics也提供了聚类的metrics。更多细节详见：
+
+- [Clustering performance evaluation](http://scikit-learn.org/stable/modules/clustering.html#clustering-evaluation)
+- [ Biclustering evaluation ](http://scikit-learn.org/stable/modules/biclustering.html#biclustering-evaluation)
+
+# 7. Dummy estimators
+
+当进行监督学习时，一个简单明智的check包括：使用不同的规则比较一个estimator。[DummyClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyClassifier.html#sklearn.dummy.DummyClassifier)实现了三种简单的策略用于分类：
+
+- stratified：根据训练集的分布来生成随机预测
+- most_frequent：在训练集中总是预测最频繁的label
+- prior：总是预测分类最大化分类优先权（比如：most_frequent），predict_proba返回分类优化权
+- uniform：以均匀方式随机生成预测
+- constant：由用户指定，总是预测一个常量的label。该方法的一个最主要动机是：F1-scoring，其中正例是最主要的。
+
+**注意，所有的这些策略中，predict方法会完成忽略输入数据!**
+
+示例，我们首先创建一个imbalanced的数据集：
+
+{% highlight python %}
+
+>>> from sklearn.datasets import load_iris
+>>> from sklearn.cross_validation import train_test_split
+>>> iris = load_iris()
+>>> X, y = iris.data, iris.target
+>>> y[y != 1] = -1
+>>> X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+
+{% endhighlight %}
+
+下一步，比较下SVC的accuary和most_frequent：
+
+{% highlight python %}
+
+>>> from sklearn.dummy import DummyClassifier
+>>> from sklearn.svm import SVC
+>>> clf = SVC(kernel='linear', C=1).fit(X_train, y_train)
+>>> clf.score(X_test, y_test) 
+0.63...
+>>> clf = DummyClassifier(strategy='most_frequent',random_state=0)
+>>> clf.fit(X_train, y_train)
+DummyClassifier(constant=None, random_state=0, strategy='most_frequent')
+>>> clf.score(X_test, y_test)  
+0.57...
+
+{% endhighlight %}
+
+我们可以看到SVC并不比DummyClassifier好很多，接着，我们换下kernel：
+
+{% highlight python %}
+
+>>> clf = SVC(kernel='rbf', C=1).fit(X_train, y_train)
+>>> clf.score(X_test, y_test)  
+0.97...
+
+{% endhighlight %}
+
+我们可以看到，accuracy增强到了几乎100%。如果CPU开销不大，这里建议再做下cross-validation。如果你希望在参数空间进行优化，我们强烈推荐你使用GridSearchCV。
+
+更一般的，分类器的accuracy太接近于随机，这可能意味着有可能会出问题：features没有用，超参数没有被正确设置，分类器所用的数据集imbalance，等等。。。
+
+DummyRegressor也实现了4种简单的方法：
+
+- mean：通常预测训练target的均值。
+- median：通常预测训练target的中值。
+- quantile：预测由用户提供的训练target的分位数
+- constant：常量
+
+在上面的所有策略，predict完全忽略输入数据。
+
+参考：
+
+[http://scikit-learn.org/stable/modules/model_evaluation.html](http://scikit-learn.org/stable/modules/model_evaluation.html)
+
 
