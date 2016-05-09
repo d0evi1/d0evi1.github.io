@@ -228,4 +228,38 @@ avg / total       0.67      0.80      0.72         5
 - [使用sparse特征的文本分类](http://scikit-learn.org/stable/auto_examples/text/document_classification_20newsgroups.html#example-text-document-classification-20newsgroups-py)
 - [使用grid search的cross-validation的参数估计](http://scikit-learn.org/stable/auto_examples/model_selection/grid_search_digits.html#example-model-selection-grid-search-digits-py)
 
+# 3.6 Hamming loss
+ 
+[hamming_loss](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.hamming_loss.html#sklearn.metrics.hamming_loss)计算了在两个样本集里的平均汉明距离或平均Hamming loss。
+ 
+- <img src="http://www.forkosh.com/mathtex.cgi?\hat{y}_j ">是对应第j个label的预测值，
+- <img src="http://www.forkosh.com/mathtex.cgi?y_j ">是对应的真实值
+- <img src="http://www.forkosh.com/mathtex.cgi?n_\text{labels} ">是类目数
+
+那么两个样本间的Hamming loss为<img src="http://www.forkosh.com/mathtex.cgi?L_{Hamming} ">，定义如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?L_{Hamming}(y, \hat{y}) = \frac{1}{n_\text{labels}} \sum_{j=0}^{n_\text{labels} - 1} 1(\hat{y}_j \not= y_j)">
+
+其中：<img src="http://www.forkosh.com/mathtex.cgi?1(x) ">为指示函数。
+
+{% highlight python %}
+
+>>> from sklearn.metrics import hamming_loss
+>>> y_pred = [1, 2, 3, 4]
+>>> y_true = [2, 2, 3, 4]
+>>> hamming_loss(y_true, y_pred)
+0.25
+
+{% endhighlight %}
+
+在多标签（multilabel）的使用二元label指示器的情况：
+
+{% highlight python %}
+
+>>> hamming_loss(np.array([[0, 1], [1, 1]]), np.zeros((2, 2)))
+0.75
+
+{% endhighlight %}
+
+注意：在多分类问题上，Hamming loss与y_true 和 y_pred 间的Hamming距离相关，它与[0-1 loss](http://scikit-learn.org/stable/modules/model_evaluation.html#zero-one-loss)相类似。然而，0-1 loss会对不严格与真实数据集相匹配的预测集进行惩罚。因而，Hamming loss，作为0-1 loss的上界，也在0和1之间；预测一个合适的真实label的子集或超集将会给出一个介于0和1之间的Hamming loss.
 
