@@ -153,9 +153,9 @@ array([ 2.,  1.,  2.])
 
 如果对sparse数据进行中心化，会摧毁数据的稀疏性，十分敏感。我们可以对sparse数据进行特殊的归一化，尤其各种feature以不同的归一化方式进行。
 
-MaxAbsScaler 和 maxabs_scale 是专门处理稀疏数据的，强烈推荐这种方式。然而，scale 和 StandardScaler 可以接受scipy.sparse的metrics作为输入，只要在构造函数中显示传入with_centering=False。否则会抛出ValueError，打断sparsity，并且在执行时由于分配大量内存而经常crash。 RobustScaler 不能对稀疏数据进行fit，但是你可以在稀疏数据输入上使用transform方法。
+**MaxAbsScaler 和 maxabs_scale 是专门处理稀疏数据的**，强烈推荐这种方式。然而，scale 和 StandardScaler 可以接受scipy.sparse的metrics作为输入，只要在构造函数中显示传入with_centering=False。否则会抛出ValueError，打破sparsity，并且在执行时由于分配大量内存而经常crash。 RobustScaler 不能对稀疏数据进行fit，但是你可以在稀疏数据输入上使用transform方法。
 
-注意：scaler接受压缩式稀疏数据行（Compressed Sparse Rows），以及压缩式稀疏数据列（Compressed Sparse Columns），分别参见：scipy.sparse.csr_matrix and scipy.sparse.csc_matrix。其它稀疏输入可以转换成CSR表示。为了避免不必要的内存拷贝，推荐你使用CSR或者CSC表示法。
+注意：scaler接受压缩式稀疏数据行（Compressed Sparse Rows），以及压缩式稀疏数据列（Compressed Sparse Columns），分别参见：scipy.sparse.csr_matrix 和 scipy.sparse.csc_matrix。其它稀疏输入可以转换成CSR表示。**为了避免不必要的内存拷贝，推荐你使用CSR或者CSC表示法**。
 
 最后，如果该中心化后的数据如预期般足够小，可以通过sparse matricses的toarray方法转成一个数组。
 
