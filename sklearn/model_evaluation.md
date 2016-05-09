@@ -758,3 +758,167 @@ LRAP会对每个样本上分配的真实label进行求平均，真实值的比�
 
 {% endhighlight %}
 
+# 5.回归metrics
+
+sklearn.metrics 实现了许多种loss, score，untility函数来测评回归的性能。其中有一些可以作了增加用于处理多输出（multioutput）的情况： 
+
+- [mean_squared_error](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_squared_error.html#sklearn.metrics.mean_squared_error),
+- [mean_absolute_error](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_absolute_error.html#sklearn.metrics.mean_absolute_error)
+- [explained_variance_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.explained_variance_score.html#sklearn.metrics.explained_variance_score)
+- [r2_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html#sklearn.metrics.r2_score)
+
+这些函数具有一个multioutput关键参数，它指定了对于每一个单独的target是否需要对scores/loss进行平均。缺省值为'uniform_average'，它会对结果进行均匀加权平均。如果输出的ndarray的shape为(n_outputs,)，那么它们返回的entries为权重以及相应的平均权重。如果multioutput参数为'raw_values'，那么所有的scores/losses都不改变，以raw的方式返回一个shape为(n_outputs,)的数组。
+
+r2_score和explained_variance_score 对于multioutput参数还接受另一个额外的值：'variance_weighted'。该选项将通过相应target变量的variance产生一个为每个单独的score加权的值。该设置将会对全局捕获的未归一化的variance进行量化。如果target的variance具有不同的规模（scale），那么该score将会把更多的重要性分配到那些更高的variance变量上。
+
+对于r2_score的缺省值为multioutput='variance_weighted'，向后兼容。后续版本会改成uniform_average。
+
+## 5.1 可释方差值（Explained variance score）
+
+explained_variance_score解释了[explained variance regression score](http://en.wikipedia.org/wiki/Explained_variation)
+
+如果<img src="http://www.forkosh.com/mathtex.cgi?\hat{y} ">是估计的target输出，y为相应的真实(correct)target输出，Var为求方差（variance），即标准差的平方，那么可释方差（explained variance）的估计如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?\texttt{explained\_{}variance}(y, \hat{y}) = 1 - \frac{Var\{ y - \hat{y}\}}{Var\{y\}}">
+
+最好的可能值为1.0，越低表示越差。
+
+示例如下：
+
+{% highlight python %}
+
+>>> from sklearn.metrics import explained_variance_score
+>>> y_true = [3, -0.5, 2, 7]
+>>> y_pred = [2.5, 0.0, 2, 8]
+>>> explained_variance_score(y_true, y_pred)  
+0.957...
+>>> y_true = [[0.5, 1], [-1, 1], [7, -6]]
+>>> y_pred = [[0, 2], [-1, 2], [8, -5]]
+>>> explained_variance_score(y_true, y_pred, multioutput='raw_values')
+... 
+array([ 0.967...,  1.        ])
+>>> explained_variance_score(y_true, y_pred, multioutput=[0.3, 0.7])
+... 
+0.990...
+
+{% endhighlight %}
+
+# 5.2 平均绝对误差（Mean absolute error）
+
+
+mean_absolute_error函数将会计算[平均绝对误差](http://en.wikipedia.org/wiki/Mean_absolute_error)，该指标对应于绝对误差loss（absolute error loss）或l1范式loss（l1-norm loss）的期望值。
+
+如果<img src="http://www.forkosh.com/mathtex.cgi?\hat{y}_i ">是第i个样本的预测值，yi是相应的真实值，那么在<img src="http://www.forkosh.com/mathtex.cgi?n_{\text{samples}}  ">上的平均绝对误差（MAE）的定义如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?\text{MAE}(y, \hat{y}) = \frac{1}{n_{\text{samples}}} \sum_{i=0}^{n_{\text{samples}}-1} \left| y_i - \hat{y}_i \right|">
+
+示例：
+{% highlight python %}
+>>> from sklearn.metrics import mean_absolute_error
+>>> y_true = [3, -0.5, 2, 7]
+>>> y_pred = [2.5, 0.0, 2, 8]
+>>> mean_absolute_error(y_true, y_pred)
+0.5
+>>> y_true = [[0.5, 1], [-1, 1], [7, -6]]
+>>> y_pred = [[0, 2], [-1, 2], [8, -5]]
+>>> mean_absolute_error(y_true, y_pred)
+0.75
+>>> mean_absolute_error(y_true, y_pred, multioutput='raw_values')
+array([ 0.5,  1. ])
+>>> mean_absolute_error(y_true, y_pred, multioutput=[0.3, 0.7])
+... 
+0.849...
+
+{% endhighlight %}
+
+## 5.3 均方误差（Mean squared error）
+
+mean_squared_error用于计算[平均平方误差](http://en.wikipedia.org/wiki/Mean_squared_error)，该指标对应于平方（二次方）误差loss（squared (quadratic) error loss）的期望值。
+
+<img src="http://www.forkosh.com/mathtex.cgi?\text{MSE}(y, \hat{y}) = \frac{1}{n_\text{samples}} \sum_{i=0}^{n_\text{samples} - 1} (y_i - \hat{y}_i)^2.">
+
+示例为：
+
+{% highlight python %}
+
+>>> from sklearn.metrics import mean_squared_error
+>>> y_true = [3, -0.5, 2, 7]
+>>> y_pred = [2.5, 0.0, 2, 8]
+>>> mean_squared_error(y_true, y_pred)
+0.375
+>>> y_true = [[0.5, 1], [-1, 1], [7, -6]]
+>>> y_pred = [[0, 2], [-1, 2], [8, -5]]
+>>> mean_squared_error(y_true, y_pred)  
+0.7083...
+
+{% endhighlight %}
+
+示例：
+
+- [ Gradient Boosting regression](http://scikit-learn.org/stable/auto_examples/ensemble/plot_gradient_boosting_regression.html#example-ensemble-plot-gradient-boosting-regression-py)
+
+## 5.4 中值绝对误差（Median absolute error）
+
+median_absolute_error是很令人感兴趣的，它对异类（outliers）的情况是健壮的。该loss函数通过计算target和prediction间的绝对值，然后取中值得到。
+
+MedAE的定义如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?\text{MedAE}(y, \hat{y}) = \text{median}(\mid y_1 - \hat{y}_1 \mid, \ldots, \mid y_n - \hat{y}_n \mid)">
+
+median_absolute_error不支持multioutput。
+
+示例：
+
+{% highlight python %}
+
+>>> from sklearn.metrics import median_absolute_error
+>>> y_true = [3, -0.5, 2, 7]
+>>> y_pred = [2.5, 0.0, 2, 8]
+>>> median_absolute_error(y_true, y_pred)
+0.5
+
+{% endhighlight %}
+
+## 5.5 R方值，确定系数
+
+r2_score函数用于计算R²（[确定系数：coefficient of determination](http://en.wikipedia.org/wiki/Coefficient_of_determination)）。它用来度量未来的样本是否可能通过模型被很好地预测。分值为1表示最好，它可以是负数（因为模型可以很糟糕）。一个恒定的模型总是能预测y的期望值，忽略掉输入的feature，得到一个R^2为0的分值。
+
+R²的定义如下：
+
+<img src="http://www.forkosh.com/mathtex.cgi?R^2(y, \hat{y}) = 1 - \frac{\sum_{i=0}^{n_{\text{samples}} - 1} (y_i - \hat{y}_i)^2}{\sum_{i=0}^{n_\text{samples} - 1} (y_i - \bar{y})^2}">
+
+其中：<img src="http://www.forkosh.com/mathtex.cgi?\bar{y} =  \frac{1}{n_{\text{samples}}} \sum_{i=0}^{n_{\text{samples}} - 1} y_i">
+
+示例：
+
+{% highlight python %}
+
+>>> from sklearn.metrics import r2_score
+>>> y_true = [3, -0.5, 2, 7]
+>>> y_pred = [2.5, 0.0, 2, 8]
+>>> r2_score(y_true, y_pred)  
+0.948...
+>>> y_true = [[0.5, 1], [-1, 1], [7, -6]]
+>>> y_pred = [[0, 2], [-1, 2], [8, -5]]
+>>> r2_score(y_true, y_pred, multioutput='variance_weighted')
+... 
+0.938...
+>>> y_true = [[0.5, 1], [-1, 1], [7, -6]]
+>>> y_pred = [[0, 2], [-1, 2], [8, -5]]
+>>> r2_score(y_true, y_pred, multioutput='uniform_average')
+... 
+0.936...
+>>> r2_score(y_true, y_pred, multioutput='raw_values')
+... 
+array([ 0.965...,  0.908...])
+>>> r2_score(y_true, y_pred, multioutput=[0.3, 0.7])
+... 
+0.925...
+
+
+{% endlighlight %}
+
+示例：
+
+- [Lasso and Elastic Net for Sparse Signals](http://scikit-learn.org/stable/auto_examples/linear_model/plot_lasso_and_elasticnet.html#example-linear-model-plot-lasso-and-elasticnet-py)
+
