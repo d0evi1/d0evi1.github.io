@@ -388,7 +388,7 @@ array([[   1.,    0.,    1.,    2.,    0.,    0.,    2.,    0.],
 
 X的feature可以从(X1,X2,X3)转换成<img src="http://www.forkosh.com/mathtex.cgi?(1, X_1, X_2, X_3, X_1X_2, X_1X_3, X_2X_3, X_1X_2X_3)">
 
-注意：多项式feature只能显示地用在核方法（比如： sklearn.svm.SVC, sklearn.decomposition.KernelPCA）上的多项式核函数（polynomial Kernel functions）上。
+**注意：多项式feature只能显示地用在核方法（比如： sklearn.svm.SVC, sklearn.decomposition.KernelPCA）上的多项式核函数（polynomial Kernel functions）上。**
 
 Ridge regression的多项式内插（Polynomial interpolation）用它来创建多项式feature。
 
