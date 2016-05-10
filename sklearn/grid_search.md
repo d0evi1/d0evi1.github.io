@@ -58,8 +58,8 @@ GridSearchCV实例实现了通用的estimator API: 当在数据集的所有可�
 
 **使用GridSearch进行参数搜索是目前最广泛使用的参数优化方法**，还有另一些方法存在。[RandomizedSearchCV](http://scikit-learn.org/stable/modules/generated/sklearn.grid_search.RandomizedSearchCV.html#sklearn.grid_search.RandomizedSearchCV)实现了在参数上的随机搜索，每个设置都会以可能的参数值分布进行抽样。对比穷举法，它具有两个优势：
 
-1.budget的选择与参数个数和可能的值独立
-2.增加参数不会影响性能，不会降低效果
+- 1.budget的选择与参数个数和可能的值独立
+- 2.增加参数不会影响性能，不会降低效果
 
 参数设定部分和GridSearchCV类似，使用一个字典表来进行参数抽样。另外，计算开销（computation budget）, 抽取的样本数，抽样迭代次数，可以由n_iter来指定。对于每个参数，都可以指定在可能值上的分布，或者是一个离散值列表（它可以被均匀采样）。
 
