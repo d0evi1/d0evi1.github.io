@@ -172,7 +172,7 @@ array([ 2.,  1.,  2.])
 
 ## 2.4 kernel matrics的中心化
 
-如果你有一个kernel为K的kernel矩阵，通过定义函数phi计算在特征空间内的内积（点乘），[KernelCenterer](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.KernelCenterer.html#sklearn.preprocessing.KernelCenterer)可以对kernel矩阵进行转换，以便它能包含由phi定义的特征空间内的内积，通过移除空间的均值。
+如果你有一个kernel为K的kernel矩阵，通过定义函数phi计算在特征空间内的内积（点乘），[KernelCenterer](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.KernelCenterer.html#sklearn.preprocessing.KernelCenterer)可以对kernel矩阵进行转换，以便它在移除空间的均值后，能包含通过phi函数定义的特征空间的内积。
 
 # 3.正态分布化（Normalization）
 
@@ -294,7 +294,9 @@ OneHotEncoder(categorical_features='all', dtype=<... 'float'>,
 array([[ 1.,  0.,  0.,  1.,  0.,  0.,  0.,  0.,  1.]])
 {% endhighlight %}
 
-。。。
+缺省的，每个feature可以取多少值可以从数据集中自动判断。通过使用n_values参数可以显示指定。在我们的数据集中有两个性别（gender），三个可能的大洲（continents），还有4种浏览器（web browser）。我们去拟合该estimator，并进行数据转换。在结果中，头两个数表示性别的编码，接下去的3个数表示大洲的编码，最后4个则用于浏览器。
+
+详见[字典载入feature](http://scikit-learn.org/stable/modules/feature_extraction.html#dict-feature-extraction)
 
 # 6.补充缺失值
 
