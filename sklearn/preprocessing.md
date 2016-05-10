@@ -366,7 +366,7 @@ array([[  1.,   0.,   1.,   0.,   0.,   1.],
        
 {% endhighlight %}
 
-X的feature可以通过(X1, X2) 转换成 (1,X1,X2,X1^2,X1X2,X2^2)
+X的feature可以通过(X1, X2) 转换成 <img src="http://www.forkosh.com/mathtex.cgi?(1, X_1, X_2, X_1^2, X_1X_2, X_2^2)">
 
 在一些情况下，只有feature间的交叉项是必须的（忽略高阶项），可以通过interaction_only=True来实现：
 
@@ -386,7 +386,7 @@ array([[   1.,    0.,    1.,    2.,    0.,    0.,    2.,    0.],
 {% endhighlight %}
 
 
-X的feature可以从(X1,X2,X3)转换成(1,X1,X2,X3,X1X2,X1X3,X2X3,X1X2X3)
+X的feature可以从(X1,X2,X3)转换成<img src="http://www.forkosh.com/mathtex.cgi?(1, X_1, X_2, X_3, X_1X_2, X_1X_3, X_2X_3, X_1X_2X_3)">
 
 注意：多项式feature只能显示地用在核方法（比如： sklearn.svm.SVC, sklearn.decomposition.KernelPCA）上的多项式核函数（polynomial Kernel functions）上。
 
