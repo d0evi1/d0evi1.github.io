@@ -12,10 +12,11 @@ tagline: 介绍
 - 2.[特征选择](http://d0evi1.github.io/sklearn/feature_selection)
 - 3.[模型评估](http://d0evi1.github.io/sklearn/model_evaluation)
 - 4.[学习曲线](http://d0evi1.github.io/sklearn/learning_curve)
-- 5.[imbalanced类](http://d0evi1.github.io/sklearn/imbalanced_classes)
-- 6.[ROC](http://d0evi1.github.io/sklearn/roc)
-- 7.[降维](http://d0evi1.github.io/sklearn/pca)
-- 8.[svd](http://d0evi1.github.io/sklearn/svd)
+- 5.[参数学习](http://d0evi1.github.io/sklearn/grid_search)
+- 6.[imbalanced类](http://d0evi1.github.io/sklearn/imbalanced_classes)
+- 7.[ROC](http://d0evi1.github.io/sklearn/roc)
+- 8.[降维](http://d0evi1.github.io/sklearn/pca)
+- 9.[svd](http://d0evi1.github.io/sklearn/svd)
 
 线性模型
 
