@@ -172,7 +172,7 @@ array([ 2.,  1.,  2.])
 
 ## 2.4 kernel matrics的中心化
 
-如果你有一个kernel为K的kernel矩阵，
+如果你有一个kernel为K的kernel矩阵，通过定义函数phi计算在特征空间内的内积（点乘），[KernelCenterer](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.KernelCenterer.html#sklearn.preprocessing.KernelCenterer)可以对kernel矩阵进行转换，以便它能包含由phi定义的特征空间内的内积，通过移除空间的均值。
 
 # 3.正态分布化（Normalization）
 
