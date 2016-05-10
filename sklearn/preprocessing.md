@@ -342,7 +342,7 @@ Imputer(axis=0, copy=True, missing_values=0, strategy='mean', verbose=0)
 
 注意，缺失值用0编码，并被显式地存于矩阵中。如果缺失值的数目比观测值还要多时，这种格式很合适。
 
-Imputer可以用在Pipeline上，来构建一个组合estimator来
+Imputer可以用在Pipeline上，来构建一个支持插值（imputation）的组合estimator。详见[ Imputing missing values before building an estimator](http://scikit-learn.org/stable/auto_examples/missing_values.html#example-missing-values-py)
 
 
 # 7.生成多项式特征（polynomial features）
