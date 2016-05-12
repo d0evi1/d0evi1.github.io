@@ -48,7 +48,7 @@ array([[0, 1],
 - 为每个feature都使用常用的单变量统计检验（univariate statistical tests）：[SelectFpr](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFpr.html#sklearn.feature_selection.SelectFpr)（FPR: false positive rate，假阳，即负正本判为正），[SelectFdr](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFdr.html#sklearn.feature_selection.SelectFdr)（FDR: false discovery rate，伪发现率），[SelectFwe](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFwe.html#sklearn.feature_selection.SelectFwe)（FWER: family wise error，多重比较谬误）
 - [GenericUnivariateSelect](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.GenericUnivariateSelect.html#sklearn.feature_selection.GenericUnivariateSelect)：可以使用一个可配置的策略来进行单变量特征选择（univariate feature selection）。它允许你在超参数查找中选择最好的单变量选择策略。
 
-示例，我们使用一个卡方检验(\chi^2)来抽取两个最佳特征：
+示例，我们使用一个卡方检验<img src="http://www.forkosh.com/mathtex.cgi?\chi^2"> 来抽取两个最佳特征：
 
 {% highlight python %}
 
@@ -75,6 +75,18 @@ array([[0, 1],
 如果你使用sparse数据（比如：数据表示使用sparse matrics），如果不对它作dense转换，那么只有chi2 适合处理这样的数据。
 
 **注意：如果在分类问题上，使用回归的scoring函数，你将得到无用的结果。
+
+总结：
+
+- f_classif: 在label/feature之间的方差分析(Analysis of Variance:ANOVA) F值，用于分类.
+- chi2: 非负feature的卡方检验, 用于分类.
+- f_regression:  在label/feature之间的F值，用于回归.
+- SelectKBest: 得到k个最高分的feature.
+- SelectFpr: 基于（false positive）
+- SelectFdr: 
+- SelectFwe:
+- GenericUnivariateSelect: 
+
 
 # 4.递归特征淘汰（RFE）
 
