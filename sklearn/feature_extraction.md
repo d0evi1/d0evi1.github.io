@@ -125,7 +125,7 @@ raw_X = (token_features(tok, pos_tagger(tok)) for tok in corpus)
 hasher = FeatureHasher(input_type='string')
 X = hasher.transform(raw_X)
 
-{% highlight python %}
+{% endhighlight %}
 
 来得到一个scipy.sparse稀疏矩阵X。
 
@@ -186,6 +186,7 @@ FeatureHasher使用有符号的32-bit的MurmurHash3变种。因而（由于scipy
 该模块有许多参数，缺省值是相当合理的，[详见](http://scikit-learn.org/stable/modules/classes.html#text-feature-extraction-ref)。
 
 {% highlight python %}
+
 >>> vectorizer = CountVectorizer(min_df=1)
 >>> vectorizer                     
 CountVectorizer(analyzer=...'word', binary=False, decode_error=...'strict',
@@ -558,6 +559,8 @@ True
 - analyzer:
 
 ...
+
+
 
 
 参考：
