@@ -19,7 +19,9 @@ share: true
 
 2.[概率论(台大)](https://class.coursera.org/prob-001/lecture)
 
-3.[微积分基础](https://www.coursera.org/learn/calculus1)
+3.[统计学](https://book.douban.com/subject/1230154/)
+
+4.[微积分基础](https://www.coursera.org/learn/calculus1)
 
 # 二、机器学习
 
@@ -31,7 +33,7 @@ share: true
 
 恩达的课很棒，但一些高级主题都没有讲。
 
-另外：台大的，主要是国语（课程先balalala集中太多太多文字，过于文字化，然后集中讲action实战，个人不是很喜欢这种教学方式）：
+另外：台大的，主要是国语：
 
 4.[机器学习基础（coursera）](https://class.coursera.org/ntumlone-003/lecture)
 
