@@ -27,6 +27,7 @@ tagline: 介绍
 - [直方图（histogram）](http://matplotlib.org/1.2.1/examples/pylab_examples/histogram_demo.html)
 
 两个度量变量间的关系：
+
 - [散点图（scatter plot）](http://matplotlib.org/examples/pylab_examples/scatter_star_poly.html)
 - 时间序列图
 
