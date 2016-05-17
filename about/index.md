@@ -15,9 +15,9 @@ modified: 2016-02-01
 
 如果你打算转载本站的文章，必须以超链接形式在文章开始处注明文章作者及原始出处，以示对我劳动成果的尊重，例如：
 
-- 原载：[http://www.d0evi1.com](http://www.d0evi1.com)
+- 原载：[http://d0evi1.github.io](http://d0evi1.github.io)
 - 作者：d0evi1
-- 原文网址：http://www.d0evi1.com/xxx.htm*
+- 原文网址：http://d0evi1.github.io/xxx.htm*
 
 商业网站请勿复制本站内容。
 
