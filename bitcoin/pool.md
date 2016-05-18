@@ -103,23 +103,18 @@ pool模式允许矿工进行合作来发现区块，根据他们的贡献进行�
 
 在附录中，我们会讨论一个PPS矿池的operator要准备多少准备金，才能让矿池合理运转。准备金越大，可以确保矿池破产的概率越低。
 
-假设没有受到黑客攻击，非法区块链等，operator的财务平衡可以通过Markov来建模：
+假设没有受到黑客攻击，非法区块链等，operator的财务平衡可以通过Markov链来建模：
 
-<img src="http://www.forkosh.com/mathtex.cgi?X_{t+1}-X_{t}=-(1-f)pB+B   ">，其中：w.p. p
-
-<img src="http://www.forkosh.com/mathtex.cgi?X_{t+1}-X_{t}=-(1-f)pB ">，其中：  w.p. 1-p
+<img src="http://www.forkosh.com/mathtex.cgi? X_{t+1}-X_{t}=\{ \begin{aligned} &-(1-f)pB+B & w.p. & & p \\ &-(1-f)pB & w.p. & & 1-p \end{aligned}">
 
 每次提交share可以当成一个step。每次都具有期望<img src="http://www.forkosh.com/mathtex.cgi?fpB">，方差近似为：<img src="http://www.forkosh.com/mathtex.cgi?pB^{2}">，根据中心极限定理，该随机过程的长期行为等价于：
 
-<img src="http://www.forkosh.com/mathtex.cgi?X_{t+1}-X_{t}=+\sqrt{p}B"> 当<img src="http://www.forkosh.com/mathtex.cgi?1+f\sqrt{p}/2">，
+<img src="http://www.forkosh.com/mathtex.cgi? X_{t+1}-X_{t}=\{ \begin{aligned} &+\sqrt{p}B & w.p. & & 1+f\sqrt{p}/2 \\ &-\sqrt{p}B & w.p. & & 1-f\sqrt{p}/2 \end{aligned}">
 
-<img src="http://www.forkosh.com/mathtex.cgi?X_{t+1}-X_{t}=-\sqrt{p}B">当<img src="http://www.forkosh.com/mathtex.cgi?1-f\sqrt{p}/2">
 
 它们具有相同的期望和方差。这等价于：
 
-<img src="http://www.forkosh.com/mathtex.cgi?X_{t+1}-X_{t}=+1">当<img src="http://www.forkosh.com/mathtex.cgi?1+f\sqrt{p}/2">
-
-<img src="http://www.forkosh.com/mathtex.cgi?X_{t+1}-X_{t}=-1">当<img src="http://www.forkosh.com/mathtex.cgi?1-f\sqrt{p}/2">
+<img src="http://www.forkosh.com/mathtex.cgi? X_{t+1}-X_{t}=\{ \begin{aligned} &+1 & w.p. & & 1+f\sqrt{p}/2 \\ &-1 & w.p. & & 1-f\sqrt{p}/2\end{aligned}">
 
 初始条件通过因子进行<img src="http://www.forkosh.com/mathtex.cgi?\sqrt{p}/2">缩放。
 
