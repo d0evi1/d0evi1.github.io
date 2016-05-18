@@ -120,7 +120,7 @@ pool模式允许矿工进行合作来发现区块，根据他们的贡献进行�
 
 <img src="http://www.forkosh.com/mathtex.cgi?a_n">表示，从状态n开始要达到0的概率（表示矿池破产）。我们在第一步得到的条件，表示：<img src="http://www.forkosh.com/mathtex.cgi?q=(1+f\sqrt{p})/2">,
 
-<img src="http://www.forkosh.com/mathtex.cgi?a_n=qa_n+1+(1-q)a_{n-1}">
+<img src="http://www.forkosh.com/mathtex.cgi?a_n=qa_{n+1}+(1-q)a_{n-1}">
 
 这个递归方程的多项式特性是：<img src="http://www.forkosh.com/mathtex.cgi?q\lambda^{2}-\lambda+(1-q)">，
 
