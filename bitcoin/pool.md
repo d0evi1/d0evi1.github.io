@@ -12,7 +12,7 @@ tagline: 介绍
 假设：在块头构建中，协议中的hash函数和伪随机数生成器的量足够，一个给定的计算是否产生一个合法区块可以认为是一个随机事件，任何所有的计算hash彼此相互独立。
 该量（quantity）称为计算难度（difficulty），标为D，由btc网络进行周期性调整，它决定着发现一个合法块的难度。选择的目标值，每个计算hash都会有<img src="http://www.forkosh.com/mathtex.cgi?\frac{1}{2^{32}D}">的概率产生一个合法区块。
 
-一个矿(miner)的hash率（hashrate）为h，挖矿的周期为t，总共计算hash次数为ht，因此，可以平均找到<img src="http://www.forkosh.com/mathtex.cgi?\frac{ht}{2^{32}D}">个块。期望的回报为：<img src="http://www.forkosh.com/mathtex.cgi?\frac{htB}{2^{32}D}">
+一个矿工(miner)的hash率（hashrate）为h，挖矿的周期为t，总共计算hash次数为ht，因此，可以平均找到<img src="http://www.forkosh.com/mathtex.cgi?\frac{ht}{2^{32}D}">个块。期望的回报为：<img src="http://www.forkosh.com/mathtex.cgi?\frac{htB}{2^{32}D}">
 
 示例：Bob买了台专用矿机，它可以执行每秒数10亿次hash计算。h = 1 Ghash/s = 10^9 hash/s.如果一天连续24小时（86400s）挖矿，难度D=1690906，区块回报为B=50BTC，那么他将平均得到<img src="http://www.forkosh.com/mathtex.cgi?(ht)/(2^{32}D)=(10^{9}hash/s*86400s)/(2^{32}*1690906)\approx0.0119 blocks">，换算成btc为：0.0119B=0.595BTC。
 
@@ -24,7 +24,7 @@ solo模式，具有常数的hashrate为：h，这是个泊松过程（Poisson pr
 
 <img src="http://www.forkosh.com/mathtex.cgi?\lambda=\frac{ht}{2^{32}D}">，
 
-该值也是发现的区块链数目的<img src="http://www.forkosh.com/mathtex.cgi?variance^{2}">。
+该值也是发现的区块链数目的variance。
 
 对应回报的方差（variance）为：
 
@@ -109,12 +109,12 @@ pool模式允许矿工进行合作来发现区块，根据他们的贡献进行�
 
 每次提交share可以当成一个step。每次都具有期望<img src="http://www.forkosh.com/mathtex.cgi?fpB">，方差近似为：<img src="http://www.forkosh.com/mathtex.cgi?pB^{2}">，根据中心极限定理，该随机过程的长期行为等价于：
 
-<img src="http://www.forkosh.com/mathtex.cgi? X_{t+1}-X_{t}=\{ \begin{aligned} &+\sqrt{p}B & w.p. & & 1+f\sqrt{p}/2 \\ &-\sqrt{p}B & w.p. & & 1-f\sqrt{p}/2 \end{aligned}">
+<img src="http://www.forkosh.com/mathtex.cgi? X_{t+1}-X_{t}=\{ \begin{aligned} &+\sqrt{p}B & w.p. & & (1+f\sqrt{p})/2 \\ &-\sqrt{p}B & w.p. & & (1-f\sqrt{p})/2 \end{aligned}">
 
 
 它们具有相同的期望和方差。这等价于：
 
-<img src="http://www.forkosh.com/mathtex.cgi? X_{t+1}-X_{t}=\{ \begin{aligned} &+1 & w.p. & & 1+f\sqrt{p}/2 \\ &-1 & w.p. & & 1-f\sqrt{p}/2\end{aligned}">
+<img src="http://www.forkosh.com/mathtex.cgi? X_{t+1}-X_{t}=\{ \begin{aligned} &+1 & w.p. & & (1+f\sqrt{p})/2 \\ &-1 & w.p. & & (1-f\sqrt{p})/2\end{aligned}">
 
 初始条件通过因子进行<img src="http://www.forkosh.com/mathtex.cgi?\sqrt{p}/2">缩放。
 
@@ -122,11 +122,11 @@ pool模式允许矿工进行合作来发现区块，根据他们的贡献进行�
 
 <img src="http://www.forkosh.com/mathtex.cgi?a_n=qa_{n+1}+(1-q)a_{n-1}">
 
-这个递归方程的多项式特性是：<img src="http://www.forkosh.com/mathtex.cgi?q\lambda^{2}-\lambda+(1-q)">，
+这个递归方程的多项式特征方程是：<img src="http://www.forkosh.com/mathtex.cgi?q\lambda^{2}-\lambda+(1-q)">，
 
-因而，它具有通用的解决方法：<img src="http://www.forkosh.com/mathtex.cgi?a_n=A+B((1-q)/q)^{n}">。
+因而，它具有通解：<img src="http://www.forkosh.com/mathtex.cgi?a_n=A+B((1-q)/q)^{n}">。
 
-代入边界条件：<img src="http://www.forkosh.com/mathtex.cgi?a_0=1,a_{\infty}=0">，
+代入初始值（边界条件）：<img src="http://www.forkosh.com/mathtex.cgi?a_0=1,a_{\infty}=0">，
 
 我们具有A=0, B=1，因而：
 
