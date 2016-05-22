@@ -24,12 +24,14 @@ modified: 2016-02-01
 
 # 2.其它声明
 
-本blog采用Jekyll+HPSTR.
+本blog采用Jekyll+HPSTR+github+markdown.
 
 相应主题可以在下面提供的链接下载.
 
 <div markdown="0"> <a href="https://github.com/mmistakes/hpstr-jekyll-theme" class="btn btn-success">Download HPSTR</a></div>
 
-图片存储部分，采用huaban.
+数学公式采用: mathlex。
+
+图片存储部分，采用youpai.
 
 评论部分采用Disqus.
