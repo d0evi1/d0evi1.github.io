@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 深谈统计推断 
-description: ""
+description: 
 modified: 2014-07-21
 tags: [样本估计 假设检验 零假设]
 ---
