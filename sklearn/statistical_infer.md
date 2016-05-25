@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 深谈统计推断 
+title: 统计推断的一些基本概念 
 description: 
 modified: 2014-07-21
 tags: [样本估计 假设检验 零假设]
@@ -24,10 +24,7 @@ tags: [样本估计 假设检验 零假设]
 
 两者的参数：
 
-| 类型   |      均值     |  标准差 | 百分比 |
-|:----------|:------------|:------|:--------|
-| 总体参数(未知) | <img src="http://www.forkosh.com/mathtex.cgi?\mu"> | <img src="http://www.forkosh.com/mathtex.cgi?\sigma"> |   <img src="http://www.forkosh.com/mathtex.cgi?\Pi">     |
-| 样本统计量(已知) |  <img src="http://www.forkosh.com/mathtex.cgi?\overline{x}">   |  s |   P     |
+
 
 
 ## 2 估计
@@ -63,9 +60,11 @@ tags: [样本估计 假设检验 零假设]
 - 样本比例的方差（不重复抽样）：<img src="http://www.forkosh.com/mathtex.cgi?\sigma^{2}=\frac{\pi(1-\pi)}{n}(\frac{N-n}{N-1})">
 
 
-#### 一、总体百分数的置信区间（p=0.975, z=1.96）：
+#### 一、总体百分数的置信区间:
 
 <img src="http://www.forkosh.com/mathtex.cgi?[P-1.96\sqrt\frac{P(100-P)}{n}, P+1.96\：\frac{P(100-P)}{n}]">
+
+（p=0.975, z=1.96）
 
 它的一个可用于快速计算的95%置信区间的近似计算（令P=50）：
 
@@ -189,7 +188,9 @@ tags: [样本估计 假设检验 零假设]
 - 置信区间：给了我们一个参数值的可能范围
 - 假设检验：一个可能值
 
-参考：
+
+
+# 参考：
 
 - 1.<统计学-基本概念和方法>
 - 2.http://zy.swust.net.cn/10/2/tjxyl/kj/6-4-1.htm
