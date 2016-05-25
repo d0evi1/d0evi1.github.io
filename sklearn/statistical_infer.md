@@ -24,7 +24,10 @@ tags: [样本估计 假设检验 零假设]
 
 两者的参数：
 
-
+| 类型   |      均值     |  标准差 | 百分比 |
+|:----------|:------------|:------|:--------|
+| 总体参数(未知) | <img src="http://www.forkosh.com/mathtex.cgi?\mu"> | <img src="http://www.forkosh.com/mathtex.cgi?\sigma"> |   <img src="http://www.forkosh.com/mathtex.cgi?\Pi">     |
+| 样本统计量(已知) |  <img src="http://www.forkosh.com/mathtex.cgi?\overline{x}">   |  s |   P     |
 
 
 ## 2 估计
@@ -45,12 +48,8 @@ tags: [样本估计 假设检验 零假设]
 
 数学表示：
 
-样本个数为n，总体个数为N
-
-1.
-
+- 样本个数为n，总体个数为N
 - 标准正态分布为：<img src="http://www.forkosh.com/mathtex.cgi?Z - N(0,1)">，z值为：z=(x-μ)/σ 
-
 - [标准正态分布表查表](http://static.oschina.net/uploads/img/201509/14164301_5fGD.png)
 
 2.
@@ -60,7 +59,7 @@ tags: [样本估计 假设检验 零假设]
 - 样本比例的方差（不重复抽样）：<img src="http://www.forkosh.com/mathtex.cgi?\sigma^{2}=\frac{\pi(1-\pi)}{n}(\frac{N-n}{N-1})">
 
 
-#### 一、总体百分数的置信区间:
+### 一、总体百分数的置信区间:
 
 <img src="http://www.forkosh.com/mathtex.cgi?[P-1.96\sqrt\frac{P(100-P)}{n}, P+1.96\：\frac{P(100-P)}{n}]">
 
@@ -72,7 +71,7 @@ tags: [样本估计 假设检验 零假设]
 
 为什么大多数样本要求有1200个响应者的原因。（95%置信区间，100/sqrt(n)=3，n=1111）
 
-#### 二、总体均值的置信区间：
+### 二、总体均值的置信区间：
 
 - [t分布](http://baike.baidu.com/link?url=6-_ll1N1LVImC7NPGslgac2snge1iwyLrFhzW59E-O6RHOHiLwpE4XslYRT_DL13l9KX2u4KbTQU0yfYwcc8Ba)
 - [t分布表](http://www.360doc.com/content/12/0307/17/7598058_192529468.shtml)
@@ -91,7 +90,7 @@ tags: [样本估计 假设检验 零假设]
 
 <img src="http://www.forkosh.com/mathtex.cgi?[(P_{1}-P_{2})-1.96\sqrt{\frac{P_{1}(100-P_{1})}{n_{1}}+\frac{P_{2}(100-P_{2})}{n_{2}}}, (P_{1}-P_{2})+1.96\sqrt{\frac{P_{1}(100-P_{1})}{n_{1}}+\frac{P_{2}(100-P_{2})}{n_{2}}}]">
 
-#### 4.两个均值之差的置信区间
+### 4.两个均值之差的置信区间
 
 - 抽样1：n1个观测值，样本均值<img src="http://www.forkosh.com/mathtex.cgi?\overline{x_{1}}">，样本标准差<img src="http://www.forkosh.com/mathtex.cgi?s_{1}">
 - 抽样2：n2个观测值，样本均值<img src="http://www.forkosh.com/mathtex.cgi?\overline{x_{2}}">，样本标准差<img src="http://www.forkosh.com/mathtex.cgi?s_{2}">
