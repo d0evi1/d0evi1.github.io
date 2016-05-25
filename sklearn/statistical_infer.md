@@ -1,8 +1,11 @@
 ---
 layout: page
 title: 统计推断的一些基本概念 
+tagline: 介绍
 tags: [样本估计 假设检验 零假设]
 ---
+{% include JB/setup %}
+
 
 # 1.介绍
 
