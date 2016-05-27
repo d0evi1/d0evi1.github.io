@@ -45,7 +45,10 @@ array([[0, 1],
 
 - [SelectKBest](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectKBest.html#sklearn.feature_selection.SelectKBest)：留下topK高分的features
 - [SelectPercentile](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectPercentile.html#sklearn.feature_selection.SelectPercentile)：留下百分比的top高分features
-- 为每个feature都使用常用的单变量统计检验（univariate statistical tests）：[SelectFpr](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFpr.html#sklearn.feature_selection.SelectFpr)（FPR: false positive rate，假阳，即负正本判为正），[SelectFdr](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFdr.html#sklearn.feature_selection.SelectFdr)（FDR: false discovery rate，伪发现率），[SelectFwe](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFwe.html#sklearn.feature_selection.SelectFwe)（FWER: family wise error，多重比较谬误）
+- 为每个feature都使用常用的单变量统计检验（univariate statistical tests）：
+ - [SelectFpr](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFpr.html#sklearn.feature_selection.SelectFpr)（FPR: false positive rate，假阳，即负正本判为正），
+ - [SelectFdr](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFdr.html#sklearn.feature_selection.SelectFdr)（FDR: false discovery rate，伪发现率），
+ - [SelectFwe](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFwe.html#sklearn.feature_selection.SelectFwe)（FWER: family wise error，多重比较谬误）
 - [GenericUnivariateSelect](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.GenericUnivariateSelect.html#sklearn.feature_selection.GenericUnivariateSelect)：可以使用一个可配置的策略来进行单变量特征选择（univariate feature selection）。它允许你在超参数查找中选择最好的单变量选择策略。
 
 示例，我们使用一个卡方检验<img src="http://www.forkosh.com/mathtex.cgi?\chi^2"> 来抽取两个最佳特征：
