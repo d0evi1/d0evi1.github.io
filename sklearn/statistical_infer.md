@@ -6,6 +6,9 @@ tags: [样本估计 假设检验 零假设]
 ---
 {% include JB/setup %}
 
+观测值=真值+非统计错误+随机性
+
+观测值可以是：百分比、均值之差、数值。
 
 # 1.介绍
 
@@ -164,7 +167,7 @@ tags: [样本估计 假设检验 零假设]
 代入，查表，得到p值，判断是否拒绝零假设。
 
 
-# 3.2 总体比例
+## 3.2 总体比例
 
 总体比例检验：
 
@@ -182,14 +185,163 @@ tags: [样本估计 假设检验 零假设]
 
 得到z值，查找标准正态分布表，得到p值，判断零假设是否正确。
 
-# 3.3 其它
+## 3.3 其它
 
 置信区间与假设检验：
 
 - 置信区间：给了我们一个参数值的可能范围
 - 假设检验：一个可能值
 
+# 4.卡方检验
 
+## 4.1 行-列表资料检验
+
+2x2列联表: 对应现实中的两变量，每个变量有两种取值。
+
+| a   |  b  | a+b |
+|-----|:---:|----:|
+| c   |  d  | c+d |
+| a+c | b+d |   n |
+
+字母a,b,c,d代表每个格子中观测的个数。整个表的总和记作n。
+
+当每个变量只有两个取值时，用<img src="http://www.forkosh.com/mathtex.cgi?\phi">表示两个分类变量的相关性，取值[0,1]。<img src="http://www.forkosh.com/mathtex.cgi?\phi">越大，关系越强。
+
+<img src="http://www.forkosh.com/mathtex.cgi?\phi=\frac{ad-bc}{\sqrt{(a+b)(c+d)(a+c)(b+d)}}">
+
+如果分类变量>=2个，每个分类变量取值>=2个，使用V来度量变量间的相关程度。取值为[0,1]间。
+
+<img src="http://www.forkosh.com/mathtex.cgi?V=\sqrt{\frac{\chi^2}{n(L-1)}}">
+
+其中: n为观测的个数，L是min(行数,列数)。（2行，4列，L=2），V是<img src="http://www.forkosh.com/mathtex.cgi?\phi">的推广。
+
+<img src="http://www.forkosh.com/mathtex.cgi?\chi^2">变量：度量了观测到的频率与期望频率间有多大的差异。
+
+2x2表：<img src="http://www.forkosh.com/mathtex.cgi?\chi^2=n\phi^2">
+
+对于更大的表：<img src="http://www.forkosh.com/mathtex.cgi?\chi^2=\sum_{i=1}^n{\frac{(O_i-E_i)^2}{E_i}}">
+
+其中期望E_i的计算为：期望频率=(对应行总和x对应列总和)/表的总和。
+
+可以利用卡方来计算p-value，这样得到的是一个近似真实的p-value。
+
+自由度（d.f.）用来度量表的大小。
+
+d.f.=(行数-1)x(列数-1)
+
+零假设：两个变量不相关.
+
+
+# 5.回归分析与相关分析
+
+- 回归分析（regression analysis）：是一个或多个自变量的变化是如何影响因变量的一种方法
+- 相关分析（correlation anaysis）：是两个数值变量间关系的强弱
+
+简单回归分析：两个变量的回归分析 => 散点图
+
+- 相关系数r：[-1, 1]  或称为：(线性相关系数，Pearson相关系数,每次积相关系数)
+- 另一个量：<img src="http://www.forkosh.com/mathtex.cgi?r^2">
+
+用直线来度量：
+
+- 回归直线（regression line）
+- 回归方程（regression equation）：y=a+bx
+- 回归系数（regression coefficient）：b
+
+计算回归直线？
+
+- 最小二乘法（least squares）：垂直距离和最小
+
+用回归分析进行预测
+
+- 预测值：把自变量的值代入回归直线的方程，就得到了因变量的预测值
+- <img src="http://www.forkosh.com/mathtex.cgi?\hat{y}=36.1+15.3(4)">
+
+残差的影响：
+
+- 残差变量（residual variable）：除自变量外其他所有变量对因变量的影响的变量
+
+不同的平方和：
+
+- 总平方和（total sum of squares）：<img src="http://www.forkosh.com/mathtex.cgi?TSS=\sum{(y_i-\overline{y})^2}">。即(观测-平均)^2 的求和，度量自变量和残差变量在因变量上的总效应
+- 残差平方和（RSS:residual sum of squares）：<img src="http://www.forkosh.com/mathtex.cgi?RSS=\sum{(y_i-\hat{y})^2}">。即观测点到回归直线的垂直距离的平方和 (也叫误差平方和)
+- 回归平方和（regression sum of squares）：<img src="http://www.forkosh.com/mathtex.cgi?RegrSS=\sum{(\hat{y}_i-\overline{y})^2}">。
+
+- TSS=RegrSS+RSS
+- <img src="http://www.forkosh.com/mathtex.cgi?r^2=\frac{RegrSS}{TSS}">
+- 残差变量占总效应的比例：<img src="http://www.forkosh.com/mathtex.cgi?1-r^2">
+
+(注：有些地方把RSS标成ESS，把RegrSS标成RSS)
+
+观测点离回归直线越近，RSS越小，相关系数r越大
+
+从样本推广到总体
+
+- 总体的回归系数<img src="http://www.forkosh.com/mathtex.cgi?\beta">
+- 可不可信：置信区间 or 假设检验
+
+<img src="http://www.forkosh.com/mathtex.cgi?\beta">的置信区间：
+
+- [<img src="http://www.forkosh.com/mathtex.cgi?b-t^{*}s_b">, <img src="http://www.forkosh.com/mathtex.cgi?b+t^{*}s_b">]
+- <img src="http://www.forkosh.com/mathtex.cgi?s_b=\sqrt{\frac{RSS/(n-2)}{\sum{(x_i-\overline{x})^2}}">
+
+其中b是观测的回归系数，t*是，sb是b的标准误差。
+
+均方
+
+- 均方：对应平方和除以相应的自由度
+- 残差均方（RMS）： RSS/D.F.
+- F比：RMS/RegrMS
+
+使用统计量F，求得p值来检验零假设。（零假设：变量间没有关系）
+
+# 6.方差分析(ANOVA)
+
+## 6.1 方差分析
+
+方差分析（analysis of variance）：在研究分类型自变量对数量型因变量的影响时，用来对比因变量在不同组中的平均值的统计方法。
+
+变量间的对应关系：
+
+a.散点图，方差分析与回归分析的不同：
+
+- 回归分析：水平轴，自变量是数量变量
+- 方差分析：水平轴，自变量是分类变量
+
+b.盒子图：
+
+- 对比中位数
+
+关系有多强：
+
+正规的方差分析中，用的不是中位数，而是每一组观测的均值。方差分析更适合的名字应该是均值分析。
+
+- 分类型自变量平方和：<img src="http://www.forkosh.com/mathtex.cgi?CSS=\sum{n_i(\overline{y}_i-\overline{y})^2}"> 。即：(组均值-总均值)^2 之和
+- 残差平方和：<img src="http://www.forkosh.com/mathtex.cgi?RSS=\sum\sum{(y_{ij}-\overline{y}_i)^2}">(观测-组均值)^2 之和
+- 总平方和：<img src="http://www.forkosh.com/mathtex.cgi?TSS=\sum\sum{(y_{ij}-\overline{y})^2}">。(观测-总均值)^2 之和
+- R方：<img src="http://www.forkosh.com/mathtex.cgi?R^2">=分类型自变量平方和/总平方和
+
+对应的自由度：
+
+- 分类型自变量的自由度：k-1
+- 残差的自由度：n-k
+- 总自由度：n-1
+
+均方：
+
+- 分类型变量的均方：CMS=分类型自变量平方和/(k-1)
+- 残差均方：RMS=残差平方和/(n-k)
+
+F比：
+
+- F=分类型变量的均方/残差均方
+
+查找F分布表对应的p值，判断是否拒绝零假设。
+
+
+## 6.2 配对分析
+
+略。
 
 # 参考：
 
