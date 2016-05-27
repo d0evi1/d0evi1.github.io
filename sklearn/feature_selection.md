@@ -77,7 +77,7 @@ array([[0, 1],
 
 如果你使用sparse数据（比如：数据表示使用sparse matrics），如果不对它作dense转换，那么只有chi2 适合处理这样的数据。
 
-**注意：如果在分类问题上，使用回归的scoring函数，你将得到无用的结果。
+**注意：如果在分类问题上使用回归的scoring函数，你将得到无用的结果。**
 
 总结：
 
@@ -211,4 +211,4 @@ clf.fit(X, y)
 
 参考：
 
-1.[http://scikit-learn.org/stable/modules/feature_extraction.html](http://scikit-learn.org/stable/modules/feature_select.html)
+1.[http://scikit-learn.org/stable/modules/feature_selection.html](http://scikit-learn.org/stable/modules/feature_selection.html)
