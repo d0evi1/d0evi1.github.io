@@ -14,7 +14,7 @@ sklearn.feature_selection模块，用于在样本集中进行特征选择和降�
 
 VarianceThreshold是一个简单的用于特征提取的baseline方法。它将移除所有variance不满足一些阀值的特征。缺省情况下，它会移除所有0-variance的特征（表示该feature下具有相同值）。
 
-下面是一个示例，假设我们具有一个数据集，它具有多个boolean类型的features，我们希望移除这样的features：样本中80%都是1或者都是0（on或者off）的列。boolean的features是Bernoulli随机变量，这些变量的variance为：
+下面是一个示例，假设我们具有一个数据集，它具有多个boolean类型的features，我们希望移除这样的features：样本中80%都是1或者都是0（on或者off）的列。**boolean的features是Bernoulli随机变量**，这些变量的variance为：
 
 <figure>
     <a href="http://scikit-learn.org/stable/_images/math/9dbb4af1af56391f18aa7463719c2a5173920eb4.png"><img src="http://scikit-learn.org/stable/_images/math/9dbb4af1af56391f18aa7463719c2a5173920eb4.png" alt=""></a>
