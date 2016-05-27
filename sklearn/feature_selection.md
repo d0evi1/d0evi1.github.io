@@ -81,14 +81,14 @@ array([[0, 1],
 
 总结：
 
-- f_classif: 在label/feature之间的方差分析(Analysis of Variance:ANOVA) F值，用于分类.
+- f_classif: 在label/feature之间的方差分析(Analysis of Variance:ANOVA) 的F值，用于分类.
 - chi2: 非负feature的卡方检验, 用于分类.
-- f_regression:  在label/feature之间的F值，用于回归.
+- f_regression: 在label/feature之间的F值，用于回归.
 - SelectKBest: 得到k个最高分的feature.
-- SelectFpr: 基于（false positive）
-- SelectFdr: 
-- SelectFwe:
-- GenericUnivariateSelect: 
+- SelectFpr: 基于RPR（false positive rate）检验。
+- SelectFdr: 使用Benjamini-Hochberg过程。选择p值（false discovery rate）。
+- SelectFwe: 
+- GenericUnivariateSelect: 可配置化的单变量特征选择器.
 
 
 # 4.递归特征淘汰（RFE）
