@@ -141,7 +141,7 @@ SelectFromModel是一个元转换器（meta-transformer），可以用在任何�
 
 L1-recovery与压缩感知（compressive sensing）
 
-对于好的alpha选择，只要满足特定条件，Lasso可以通过少量的观察值，就可以完整地恢复非零变量的完整集。特别的，训练样本数可以足够大（sufficiently large），否则L1模型将随机执行，足够大依赖于非零相关系数的数目、features数目的取log、噪声的数量、非零相关系数的最小绝对值、设计矩阵X(design matrix)的结构。另外，设计矩阵必须可以展示特定的属性，比如不能太相关。
+只要满足特定条件，选择好的alpha，可以让Lasso通过少量的观察值就可以完整地恢复非零变量的完整集。特别的，训练样本数可以足够大，否则L1模型将随机执行，足够大依赖于非零系数的数目、features数目的取log、噪声的数量、非零系数的最小绝对值、设计矩阵X(design matrix)的结构。另外，设计矩阵必须可以展示特定的属性，比如不能太相关。
 
 对于非零相关系数的恢复，没有通用规则来选择alpha参数。可以通过交叉验证（LassoCV 或 LassoLarsCV）来设置，尽管这将导致惩罚不够（under-penalized）的模型：包含少量的非相关变量，对于预测结果不利。相反地，BIC（LassoLarsIC）将设置高的alpha值。
 
