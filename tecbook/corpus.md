@@ -15,4 +15,5 @@ share: true
 1.NLP语料
 
 - [bakeoff2005](http://sighan.cs.uchicago.edu/bakeoff2005/)
+- [信息处理用现代汉语分词规范](http://www.docin.com/p-1012629336.html)
 
