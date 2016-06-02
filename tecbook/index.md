@@ -47,12 +47,3 @@ share: true
 ## 五、信息检索
 
 - 1.[信息检索-实现和评价搜索引擎－Stefan Büttcher](http://book.douban.com/subject/7154449/)
-
-# 资料篇
-
-1.NLP语料
-
-- [bakeoff2005](http://sighan.cs.uchicago.edu/bakeoff2005/)
-
-
-
