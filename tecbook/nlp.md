@@ -18,3 +18,4 @@ share: true
 - [信息处理用现代汉语分词规范](http://www.docin.com/p-1012629336.html)
 - [中文分词十年回顾](http://ccl.pku.edu.cn/alcourse/nlp/LectureNotes/Chinese%20Word%20Segmentation%20A%20Decade%20Review(Huang%20Changning).pdf)
 - [中文分词文献列表](http://zhangkaixu.github.io/bibpage/cws.html)
+- [联合国语料](http://conferences.unite.un.org/UNCorpus/en/DownloadOverview)
