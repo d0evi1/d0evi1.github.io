@@ -7,16 +7,17 @@ tagline: 介绍
 
 目录
 
-- 0.[预处理](http://d0evi1.github.io/sklearn/preprocessing)
-- 1.[特征提取](http://d0evi1.github.io/sklearn/feature_extraction)
-- 2.[特征选择](http://d0evi1.github.io/sklearn/feature_selection)
-- 3.[模型评估](http://d0evi1.github.io/sklearn/model_evaluation)
-- 4.[学习曲线](http://d0evi1.github.io/sklearn/learning_curve)
-- 5.[参数学习](http://d0evi1.github.io/sklearn/grid_search)
-- 6.[imbalanced类](http://d0evi1.github.io/sklearn/imbalanced_classes)
-- 7.[ROC](http://d0evi1.github.io/sklearn/roc)
-- 8.[降维](http://d0evi1.github.io/sklearn/pca)
-- 9.[svd](http://d0evi1.github.io/sklearn/svd)
+- 0.[统计推断](http://d0evi1.github.io/sklearn/statistical_infer/)
+- 1.[预处理](http://d0evi1.github.io/sklearn/preprocessing)
+- 2.[特征提取](http://d0evi1.github.io/sklearn/feature_extraction)
+- 3.[特征选择](http://d0evi1.github.io/sklearn/feature_selection)
+- 4.[模型评估](http://d0evi1.github.io/sklearn/model_evaluation)
+- 5.[学习曲线](http://d0evi1.github.io/sklearn/learning_curve)
+- 6.[参数学习](http://d0evi1.github.io/sklearn/grid_search)
+- 7.[imbalanced类](http://d0evi1.github.io/sklearn/imbalanced_classes)
+- 8.[ROC](http://d0evi1.github.io/sklearn/roc)
+- 9.[降维](http://d0evi1.github.io/sklearn/pca)
+- 10.[svd](http://d0evi1.github.io/sklearn/svd)
 
 线性模型
 
