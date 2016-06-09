@@ -34,7 +34,7 @@ tags: [无意义识别 乱语识别 随机串识别 markov链 马尔可夫链]
 为什么不是直接概率，而要使用log呢？
 
 - 由于字典很大，但一些词的出现概率会过小，计算机下溢(undeflow problem)将它们当成0来处理。
-- 我们最后要求的是整个“hello buddy”的概率，即：p = prob(he) * prob(el) * prob(ll) * ... prob(dy)的概率，而使用log可以利用log的性质：log(ab)=log(a)+log(b)
+- 我们最后要求的是整个“hello buddy”的概率，即：p = prob(he) * prob(el) * prob(ll) * ... prob(dy)的概率，这在英文2gram的语言模型，而使用log可以利用log的性质：log(ab)=log(a)+log(b)
 - 最后，再通过e转换回正常概率即可. <img src="http://www.forkosh.com/mathtex.cgi?e^{log(p)}=p">
 
 
@@ -43,7 +43,6 @@ tags: [无意义识别 乱语识别 随机串识别 markov链 马尔可夫链]
 我们可以收集一些乱语（bad），还有一些比较好的短语或语汇(good)。然后分别统计出对应bad以及good的平均转移概率。
 
 平均转移概率=概率/转移次数
-
 
 阀值的选取？
 
