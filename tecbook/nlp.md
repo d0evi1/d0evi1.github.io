@@ -12,9 +12,13 @@ share: true
 相应的语料
 
 
-1.NLP语料
+1.英文NLP语料
 
 - [penn treebank](http://www.cis.upenn.edu/~treebank/)
+- [the Brow corpus](http://www.essex.ac.uk/linguistics/external/clmt/w3c/corpus_ling/content/corpora/list/private/brown/brown.html)
+
+2.中文NLP语料
+
 - [bakeoff2005](http://sighan.cs.uchicago.edu/bakeoff2005/)
 - [信息处理用现代汉语分词规范](http://www.docin.com/p-1012629336.html)
 - [中文分词十年回顾](http://ccl.pku.edu.cn/alcourse/nlp/LectureNotes/Chinese%20Word%20Segmentation%20A%20Decade%20Review(Huang%20Changning).pdf)
