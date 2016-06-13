@@ -47,7 +47,7 @@ click-distance(i) = selects(i) + scrolls(i)   i为item的意思。
 
 ok，计算好了之后。需要对每个用户做menu的调整。调整方式采用的是：垂直提升（vertical promotions）。举个例子，原先如果是三层：根菜单－父菜单-菜单选项。菜单选项提升到父菜单级别，父菜单提升到根菜单级别。别外同级之间的相对位置也会进行调整。
 
-## 3 评测
+## 3 指标评测
 
 - 平均点击距离（是否降低）
 - 平均每个session的平均导航时间（是否降低）
@@ -57,9 +57,4 @@ ok，计算好了之后。需要对每个用户做menu的调整。调整方式�
 参考：
 
 1.personalization techniques and recommender systems, Gulden Uchyigit etc.
-
-
-
-
-
 
