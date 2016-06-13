@@ -34,17 +34,12 @@ click-distance(i) = selects(i) + scrolls(i)   i为item的意思。
 
 然后根据此计算这个用户对每个item的喜好概率. 概率计算：
 
-P(B | A)=(20+10)/(40+100) = 0.214
-
-P(C | A)=(20+90)/(40+100) = 0.786
-
-P(D | A)=P(B|A)P(D|B)=(30/140)(10+5)/(20+10) = 0.107
-
-P(E | A)=P(B|A)P(E|B)=(30/140)(10+5)/(20+10) = 0.107
-
-P(F | A)=P(C|A)P(F|C)=(110/140)(10+80)/(20+90)=0.642
-
-P(G | A)=P(C|A)P(G|C)=(110/140)(10+10)/(20+90)=0.142
+- <img src="http://www.forkosh.com/mathtex.cgi?P(B|A)=(20+10)/(40+100)=0.214">
+- <img src="http://www.forkosh.com/mathtex.cgi?P(C|A)=(20+90)/(40+100)=0.786">
+- <img src="http://www.forkosh.com/mathtex.cgi?P(D|A)=P(B|A)P(D|B)=(30/140)(10+5)/(20+10) = 0.107">
+- <img src="http://www.forkosh.com/mathtex.cgi?P(E|A)=P(B|A)P(E|B)=(30/140)(10+5)/(20+10) = 0.107">
+- <img src="http://www.forkosh.com/mathtex.cgi?P(F|A)=P(C|A)P(F|C)=(110/140)(10+80)/(20+90)=0.642">
+- <img src="http://www.forkosh.com/mathtex.cgi?P(G|A)=P(C|A)P(G|C)=(110/140)(10+10)/(20+90)=0.142">
 
 该用户的喜好排序为：C>F>B>G>D>E
 
