@@ -61,7 +61,7 @@ ok，计算好了之后。需要对每个用户做menu的调整。调整方式�
 
 参考：
 
-1.<personalization techniques and recommender systems>, Gulden Uchyigit etc.
+1.personalization techniques and recommender systems, Gulden Uchyigit etc.
 
 
 
