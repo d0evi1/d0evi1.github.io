@@ -43,7 +43,7 @@ Gradient boosting会迭代训练一系列的决策树。在每次迭代中，算
 注意：N=实例数. <img src="http://www.forkosh.com/mathtex.cgi?y_i">=实例i的label。<img src="http://www.forkosh.com/mathtex.cgi?x_i">=实例i的feature。<img src="http://www.forkosh.com/mathtex.cgi?F(x_i)">=实例i的模型预测label。
 
 | Loss                     | Task | Formula | Description |
-|--------------------------|:----:|:--------:|-------------|
+|:--------------------------|:----|--------|-------------:|
 | Log Loss                 | 分类 |  <img src="http://www.forkosh.com/mathtex.cgi?2\sum_{i=1}^Nlog(1+e^{-2y_iF(x_i)})">       | 两倍二项式负log似然          |
 | 平方误差(Squared Error)  | 回归 | <img src="http://www.forkosh.com/mathtex.cgi?\sum_{i=1}^N(y_i-F(x_i))^2">        | 也称为L2 loss。缺省loss用于回归任务     |
 | 绝对误差(Absolute Error) | 回归 | <img src="http://www.forkosh.com/mathtex.cgi?\sum_{i=1}^N \mid y_i-F(x_i) \mid">        | 也称为L1 loss。对于异常类，它比平方误差更健壮     |
