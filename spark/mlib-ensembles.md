@@ -85,5 +85,3 @@ examples/src/main/scala/org/apache/spark/examples/mllib/GradientBoostingRegressi
 参考：
 
 1.[http://spark.apache.org/docs/latest/mllib-ensembles.html](http://spark.apache.org/docs/latest/mllib-ensembles.html)
-
-3.[http://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/](http://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/)
