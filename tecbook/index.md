@@ -47,3 +47,7 @@ share: true
 ## 五、信息检索
 
 - 1.[信息检索-实现和评价搜索引擎－Stefan Büttcher](http://book.douban.com/subject/7154449/)
+
+## 六、推荐系统
+
+- 1.[推荐系统导论: coursera，明尼苏达大学](https://www.coursera.org/learn/recommender-systems/home/welcome) : 知识系统还算全面，讲得不深，不过里面有好多大牛的interview。推荐一下。
