@@ -9,7 +9,7 @@ tagline: 介绍
 
 spark.mllib中支持两种主要的ensemble算法： GradientBoostedTrees 和 RandomForest。两者都使用决策树作为基础模型。
 
-## GBT vs. RF
+## 一、GBT vs. RF
 
 GBT和RF都是关于树的ensembles学习算法，但是训练过程是不同的。实际使用时有以下的权衡：
 
@@ -20,9 +20,9 @@ GBT和RF都是关于树的ensembles学习算法，但是训练过程是不同的
 
 简单的说，两种算法都很有效，对于特定数据集选择特定算法。
 
-## RF 
+## 二、RF 
 
-## GBT
+## 三、GBT
 
 GBT是决策树的ensembles。GBT迭代训练决策树，为了减小loss function。类似于决策树，GBT可以处理类目型特征（categorical feature），可扩展到多分类（multiclass）设置，不需要进行特征归一化（feature scaling），并且可以捕获非线性和特征交叉。
 
@@ -30,13 +30,13 @@ spark.mllib支持的GBT可以用于二分类(binary classification)和回归，�
 
 注意：GBT目前还不支持多分类。对于多分类问题，可以使用spark的决策树和RF。
 
-### 基本算法 
+### 2.1 基本算法 
 
 Gradient boosting会迭代训练一系列的决策树。在每次迭代中，算法使用当前的ensemble来预测每个训练实例的label，接着将预测label与真实的label进行比较。数据集被重新label，以便使用弱预测对训练实例进行增强。这样，在下次迭代中，决策树将帮助纠正先前的错误。
 
 这种特有的relabeling机制通过定义一个loss function来实现。在每次迭代后，GBT都会进一步的减小在训练数据上的loss function。
 
-### Losses
+### 2.2 Losses
 
 下表列出了spark.mllib中提供的GBT的losses。注意，每个loss都只能应用到某个分类或者某个回归，而非同时支持分类和回归。
 
@@ -48,7 +48,7 @@ Gradient boosting会迭代训练一系列的决策树。在每次迭代中，算
 | 平方误差(Squared Error)  | 回归 | <img src="http://www.forkosh.com/mathtex.cgi?\sum_{i=1}^N(y_i-F(x_i))^2">        | 也称为L2 loss。缺省loss用于回归任务     |
 | 绝对误差(Absolute Error) | 回归 | <img src="http://www.forkosh.com/mathtex.cgi?\sum_{i=1}^N \mid y_i-F(x_i) \mid">        | 也称为L1 loss。对于异常类，它比平方误差更健壮     |
 
-### 使用tips
+### 2.3 使用tips
 
 我们包含了一点使用GBT的参数指南。这里我们忽略掉一些决策树参数，因为已经在决策树中涉及了。
 
@@ -57,13 +57,13 @@ Gradient boosting会迭代训练一系列的决策树。在每次迭代中，算
 - learningRate: 该参数没必要去调整。如果算法行为看起来不稳定，增加它的值可以提升稳定性。
 - algo：该算法或任务（分类/回归）可以使用设置tree[Strategy]参数来实现。
 
-### 训练Validation
+### 2.4 训练Validation
 
 当训练的树过多时，Gradient boosting可能会overfit。为了阻止overfitting，我们在训练时需要做validate。方法runWithValidation可以使用这个选项。它会带上一对RDD作为参数，第一个RDD是训练集，第二个RDD做为验证集。
 
 当在validation error上的提升不再超过一个固定的阀值时（通过BoostingStrategy 的validationTol参数来设定），训练将会终止。实例上，validation error会在开始减小，在最后又会增加。validation error不会单调改变，建议用户设置一个足够大的负tolerance值（negative tolerance），并且使用evaluateEachIteration（它会给出每次迭代的error或loss）来调整迭代次数以检查验证曲线（validation curve）。
 
-### 示例
+### 2.5 示例
 
 分类：
 
