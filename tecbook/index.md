@@ -51,3 +51,9 @@ share: true
 ## 六、推荐系统
 
 - 1.[推荐系统导论: coursera，明尼苏达大学](https://www.coursera.org/learn/recommender-systems/home/welcome) : 知识系统还算全面，讲得不深，不过里面有好多大牛的interview。推荐一下。
+
+
+## 七、计算广告
+
+- 1.刘鹏: [计算广告学](http://study.163.com/course/introduction.htm?courseId=321007#/courseDetail)
+- 2.Andrei Broder: [Introduction to Computational Advertising](http://web.stanford.edu/class/msande239/) 
