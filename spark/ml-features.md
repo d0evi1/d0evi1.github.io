@@ -73,6 +73,8 @@ result.show()
 
 {% endhighlight %}
 
+代码详见：examples/src/main/scala/org/apache/spark/examples/ml/PCAExample.scala。
+
 ## 2.6 PolynomialExpansion
 
 ## 2.7 DCT
@@ -86,7 +88,7 @@ StringIndexer将一列string列的label编码成一列label索引。索引indice
 假设，我们具有以下的DataFrame，具有两列: id和category。
 
  id | category
-----|----------
+:----:|:----------:
  0  | a
  1  | b
  2  | c
@@ -97,7 +99,7 @@ StringIndexer将一列string列的label编码成一列label索引。索引indice
 category有三种label："a", "b"和"c"。使用StringIndexer对category作为输入列，categoryIndex作为输出列，我们可以得到下面的：
 
  id | category | categoryIndex
-----|----------|---------------
+:----:|:----------:|:---------------:
  0  | a        | 0.0
  1  | b        | 2.0
  2  | c        | 1.0
@@ -117,7 +119,7 @@ category有三种label："a", "b"和"c"。使用StringIndexer对category作为�
 回到之前的示例，数据集为：
 
  id | category
-----|----------
+:----:|:----------:
  0  | a
  1  | b
  2  | c
@@ -126,7 +128,7 @@ category有三种label："a", "b"和"c"。使用StringIndexer对category作为�
 如果你没有设置StringIndexer是如何处理未看到的label的，缺省下会抛出异常。然而，如果你调用：setHandleInvalid("skip")，会生成下面的数据集：
 
  id | category | categoryIndex
-----|----------|---------------
+:----:|:----------:|:---------------:
  0  | a        | 0.0
  1  | b        | 2.0
  2  | c        | 1.0
