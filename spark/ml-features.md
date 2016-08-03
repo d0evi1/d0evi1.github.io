@@ -523,8 +523,54 @@ userFeatures
 
 ## 3.3 ChiSqSelector
 
+ChiSqSelector表示使用卡方分布的选择。它也可以在类别型feature的数据集上进行操作。ChiSqSelector会基于[卡方检验](https://en.wikipedia.org/wiki/Chi-squared_test)来排序feature，接着会选择（筛选）出最独立的top features。
+
+示例：
+
+我们具有一个DataFrame，相应的列为：id, features, 和 clicked，它用于我们要预测的target：
+
+id | features              | clicked
+:---:|:-----------------------:|:---------:
+ 7 | [0.0, 0.0, 18.0, 1.0] | 1.0
+ 8 | [0.0, 1.0, 12.0, 0.0] | 0.0
+ 9 | [1.0, 0.0, 15.0, 0.1] | 0.0
 
 
+我们使用ChiSqSelector，设置：numTopFeatures = 1, 接着根据我们的对应clicked的label作为最后一列，它会在features上选择最有用的一列feature：
+
+id | features              | clicked | selectedFeatures
+:---:|:-----------------------:|:---------:|:------------------:
+ 7 | [0.0, 0.0, 18.0, 1.0] | 1.0     | [1.0]
+ 8 | [0.0, 1.0, 12.0, 0.0] | 0.0     | [0.0]
+ 9 | [1.0, 0.0, 15.0, 0.1] | 0.0     | [0.1]
+
+示例代码：
+
+{% highlight scala %}
+
+import org.apache.spark.ml.feature.ChiSqSelector
+import org.apache.spark.ml.linalg.Vectors
+
+val data = Seq(
+  (7, Vectors.dense(0.0, 0.0, 18.0, 1.0), 1.0),
+  (8, Vectors.dense(0.0, 1.0, 12.0, 0.0), 0.0),
+  (9, Vectors.dense(1.0, 0.0, 15.0, 0.1), 0.0)
+)
+
+val df = spark.createDataset(data).toDF("id", "features", "clicked")
+
+val selector = new ChiSqSelector()
+  .setNumTopFeatures(1)
+  .setFeaturesCol("features")
+  .setLabelCol("clicked")
+  .setOutputCol("selectedFeatures")
+
+val result = selector.fit(df).transform(df)
+result.show()
+
+{% endhighlight %}
+
+详见代码：examples/src/main/scala/org/apache/spark/examples/ml/ChiSqSelectorExample.scala
 
 参考：
 
