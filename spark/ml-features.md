@@ -42,7 +42,7 @@ tagline: 介绍
 使用StringIndexer构建的示例，假设我们有以下的DataFrame，具有列：id 和 categoryIndex: 
 
  id | categoryIndex
-----|---------------
+:----:|:---------------:
  0  | 0.0
  1  | 2.0
  2  | 1.0
@@ -53,7 +53,7 @@ tagline: 介绍
 接着，我们使用IndexToString，将categoryIndex为作输入列，originalCategory作为输出列，我们可以检索回我们的原始label：
 
 id | categoryIndex | originalCategory
-----|---------------|-----------------
+:----:|:---------------:|:-----------------:
  0  | 0.0           | a
  1  | 2.0           | b
  2  | 1.0           | c
