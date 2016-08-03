@@ -25,13 +25,132 @@ tagline: 介绍
 
 ## 2.4 Binarizer
 
+Binarization会将数值型特征（numerical features）的阀值压到二元feature中(0/1)。
+
+Binarizer使用公共参数：inputCol 和 outputCol，threshold来进行二值化。Feature的值如果大于threshold，就二值化为1.0；如果值小于等于threshold，就二值化为0.0. inputCol 支持：Vector和Double类型。
+
+{% highlight scala %}
+
+import org.apache.spark.ml.feature.Binarizer
+
+val data = Array((0, 0.1), (1, 0.8), (2, 0.2))
+val dataFrame = spark.createDataFrame(data).toDF("label", "feature")
+
+val binarizer: Binarizer = new Binarizer()
+  .setInputCol("feature")
+  .setOutputCol("binarized_feature")
+  .setThreshold(0.5)
+
+val binarizedDataFrame = binarizer.transform(dataFrame)
+val binarizedFeatures = binarizedDataFrame.select("binarized_feature")
+binarizedFeatures.collect().foreach(println)
+
+{% endhighlight %}
+
 ## 2.5 PCA
+
+PCA是一个统计过程，它使用正交变换，将一个可能相关变量的观察集，转换成一个线性不相关变量的集合，这些个变量集称为主成分(principal components)。PCA类会训练一个模型，会使用PCA技术将向量投影到一个低维空间上。下例展示了，如何将一个5维的features投影到3维的主成分上。
+
+{% highlight scala %}
+
+import org.apache.spark.ml.feature.PCA
+import org.apache.spark.ml.linalg.Vectors
+
+val data = Array(
+  Vectors.sparse(5, Seq((1, 1.0), (3, 7.0))),
+  Vectors.dense(2.0, 0.0, 3.0, 4.0, 5.0),
+  Vectors.dense(4.0, 0.0, 0.0, 6.0, 7.0)
+)
+val df = spark.createDataFrame(data.map(Tuple1.apply)).toDF("features")
+val pca = new PCA()
+  .setInputCol("features")
+  .setOutputCol("pcaFeatures")
+  .setK(3)
+  .fit(df)
+val pcaDF = pca.transform(df)
+val result = pcaDF.select("pcaFeatures")
+result.show()
+
+{% endhighlight %}
 
 ## 2.6 PolynomialExpansion
 
 ## 2.7 DCT
 
 ## 2.8 StringIndexer
+
+StringIndexer将一列string列的label编码成一列label索引。索引indice的值为[0, numLabels)，按label频次排序，最频繁的label会得到index 0，如果输入列是数值型的（numeric），我们可以将它转换成string，并索引string值。当对pipeline组件（比如：Estimator 或 Transformer）进行downstream时，可以利用string-indexed的label，你必须将该组件的输入列设置成string-indexed列名。在许多情况下，你可以使用setInputCol来完成。
+
+示例：
+
+假设，我们具有以下的DataFrame，具有两列: id和category。
+
+ id | category
+----|----------
+ 0  | a
+ 1  | b
+ 2  | c
+ 3  | a
+ 4  | a
+ 5  | c
+
+category有三种label："a", "b"和"c"。使用StringIndexer对category作为输入列，categoryIndex作为输出列，我们可以得到下面的：
+
+ id | category | categoryIndex
+----|----------|---------------
+ 0  | a        | 0.0
+ 1  | b        | 2.0
+ 2  | c        | 1.0
+ 3  | a        | 0.0
+ 4  | a        | 0.0
+ 5  | c        | 1.0
+
+“a”最频繁，所以为index=0，"c"的index为1，而"b"的index为2.
+
+另外，要牢记，当你在一个数据集上使用StringIndexer进行fit，并使用它进行转换时，有两种策略来使用StringIndexer处理看不到的label：
+
+- 抛出一个exception（缺省方式）
+- 跳过包含unseen label的整行
+
+示例：
+
+回到之前的示例，数据集为：
+
+ id | category
+----|----------
+ 0  | a
+ 1  | b
+ 2  | c
+ 3  | d
+
+如果你没有设置StringIndexer是如何处理未看到的label的，缺省下会抛出异常。然而，如果你调用：setHandleInvalid("skip")，会生成下面的数据集：
+
+ id | category | categoryIndex
+----|----------|---------------
+ 0  | a        | 0.0
+ 1  | b        | 2.0
+ 2  | c        | 1.0
+
+注意："d"行未包含其中。
+
+{% highlight scala %}
+
+import org.apache.spark.ml.feature.StringIndexer
+
+val df = spark.createDataFrame(
+  Seq((0, "a"), (1, "b"), (2, "c"), (3, "a"), (4, "a"), (5, "c"))
+).toDF("id", "category")
+
+val indexer = new StringIndexer()
+  .setInputCol("category")
+  .setOutputCol("categoryIndex")
+
+val indexed = indexer.fit(df).transform(df)
+indexed.show()
+
+{% endhighlight %}
+
+
 
 ## 2.9 IndexToString
 
@@ -61,6 +180,35 @@ id | categoryIndex | originalCategory
  4  | 0.0           | a
  5  | 1.0           | c
 
+示例代码：
+
+{% highlight scala %}
+
+import org.apache.spark.ml.feature.{IndexToString, StringIndexer}
+
+val df = spark.createDataFrame(Seq(
+  (0, "a"),
+  (1, "b"),
+  (2, "c"),
+  (3, "a"),
+  (4, "a"),
+  (5, "c")
+)).toDF("id", "category")
+
+val indexer = new StringIndexer()
+  .setInputCol("category")
+  .setOutputCol("categoryIndex")
+  .fit(df)
+val indexed = indexer.transform(df)
+
+val converter = new IndexToString()
+  .setInputCol("categoryIndex")
+  .setOutputCol("originalCategory")
+
+val converted = converter.transform(indexed)
+converted.select("id", "originalCategory").show()
+
+{% endhighlight %}
 
 代码详见：examples/src/main/scala/org/apache/spark/examples/ml/IndexToStringExample.scala
 
