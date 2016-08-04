@@ -490,6 +490,44 @@ transformer.transform(dataFrame).show()
 
 ## 2.19 VectorAssembler
 
+VectorAssembler是一个transformer，它可以将给定的多列转换成单个vector列。这对于将多个raw features、以及由不同的feature transformers生成的features，组合成单个feature vector，以便于训练ML model（比如logistic regression 和决策树）。VectorAssembler接受下面的输入列类型：所有numeric类型，boolean类型，vector类型。在每行中，输入列的值都会被串联成一个指定顺序的vector。
+
+示例：
+
+假设我们具有一个DataFrame，它具有这样的列：id, hour, mobile, userFeatures, and clicked：
+
+ id | hour | mobile | userFeatures     | clicked
+:----:|:------:|:--------:|:------------------:|:---------:
+ 0  | 18   | 1.0    | [0.0, 10.0, 0.5] | 1.0
+
+
+userFeatures是一个vector列，它包含了三个用户特征。我们希望将hour, mobile, userFeatures组合成一个叫做"features"的feature vector，并使用它来预测clicked or not。如果我们将VectorAssembler的输入列设置成hour, mobile, userFeatures，将输出列设置成features，在该转换后，会得到以下的DataFrame: 
+
+ id | hour | mobile | userFeatures     | clicked | features
+:----:|:------:|:--------:|:------------------:|:---------:|:-----------------------------:
+ 0  | 18   | 1.0    | [0.0, 10.0, 0.5] | 1.0     | [18.0, 1.0, 0.0, 10.0, 0.5]
+
+
+示例代码：
+
+{% highlight scala %}
+
+import org.apache.spark.ml.feature.VectorAssembler
+import org.apache.spark.ml.linalg.Vectors
+
+val dataset = spark.createDataFrame(
+  Seq((0, 18, 1.0, Vectors.dense(0.0, 10.0, 0.5), 1.0))
+).toDF("id", "hour", "mobile", "userFeatures", "clicked")
+
+val assembler = new VectorAssembler()
+  .setInputCols(Array("hour", "mobile", "userFeatures"))
+  .setOutputCol("features")
+
+val output = assembler.transform(dataset)
+println(output.select("features", "clicked").first())
+
+{% endhighlight %}
+
 ## 2.20 QuantileDiscretizer
 
 # 三、特征选择
