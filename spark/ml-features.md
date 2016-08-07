@@ -12,6 +12,34 @@ tagline: 介绍
 
 ## 1.2 Word2Vec
 
+Word2Vec是一个Estimator，它接收文档的word序列作为参数，训练一个Word2VecModel，该model会将每个word映射到一个唯一的固定大小的vector中。Word2VecModel将document中的所有word的平均，将每个document转换成一个vector；该vector可以被用在预测中使用的feature，也可用于相似度计算等等。可详见 [MLlib Word2Vec guide](http://spark.apache.org/docs/latest/mllib-feature-extraction.html#word2vec)
+
+下面的代码段中，我们使用一个文档集，每个文档都表示成一个word序列串。对于每个文档，我们将它转换成一个feature vector。该feature vector可以作为参数传给相应的机器学习算法。
+
+{% highlight scala %}
+
+import org.apache.spark.ml.feature.Word2Vec
+
+// Input data: Each row is a bag of words from a sentence or document.
+val documentDF = spark.createDataFrame(Seq(
+  "Hi I heard about Spark".split(" "),
+  "I wish Java could use case classes".split(" "),
+  "Logistic regression models are neat".split(" ")
+).map(Tuple1.apply)).toDF("text")
+
+// Learn a mapping from words to Vectors.
+val word2Vec = new Word2Vec()
+  .setInputCol("text")
+  .setOutputCol("result")
+  .setVectorSize(3)
+  .setMinCount(0)
+val model = word2Vec.fit(documentDF)
+val result = model.transform(documentDF)
+result.select("result").take(3).foreach(println)
+
+{% endhighlight %}
+
+
 ## 1.3 CountVectorizer
 
 # 二、特征转换
