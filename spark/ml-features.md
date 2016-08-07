@@ -530,6 +530,57 @@ println(output.select("features", "clicked").first())
 
 ## 2.20 QuantileDiscretizer
 
+QuantileDiscretizer可以将一列连续型特征作为输入，产生一列二进制型类别型特征（binned categorical features）。二进制的数目通过参数numBuckets进行设定。bin选择的范围，可以使用一个近似算法（详见文档[approxQuantile](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrameStatFunctions)）。这种逼近的precision可以通过relativeError参数进行控制。如果该参数设置为0，会得到精准的分位数（注意：计算精准分位数是一项开销很昂贵的操作）。bin的上下界可以是(-Infinity, +Infinity)，这样可以覆盖整个实数集。
+
+示例：
+
+假设我们具有一个DataFrame，它的列为：id, hour：
+
+ id | hour
+:----:|:------:
+ 0  | 18.0
+----|------
+ 1  | 19.0
+----|------
+ 2  | 8.0
+----|------
+ 3  | 5.0
+----|------
+ 4  | 2.2
+
+hour是一个连续型feature，Double类型。我们希望将连续型feature转换成一个类别型feature。通过设置 numBuckets =3，我们可以得到以下的DataFrame:
+
+id | hour | result
+:----:|:------:|:------:
+ 0  | 18.0 | 2.0
+----|------|------
+ 1  | 19.0 | 2.0
+----|------|------
+ 2  | 8.0  | 1.0
+----|------|------
+ 3  | 5.0  | 1.0
+----|------|------
+ 4  | 2.2  | 0.0
+
+
+{% highlight scala %}
+
+import org.apache.spark.ml.feature.QuantileDiscretizer
+
+val data = Array((0, 18.0), (1, 19.0), (2, 8.0), (3, 5.0), (4, 2.2))
+var df = spark.createDataFrame(data).toDF("id", "hour")
+
+val discretizer = new QuantileDiscretizer()
+  .setInputCol("hour")
+  .setOutputCol("result")
+  .setNumBuckets(3)
+
+val result = discretizer.fit(df).transform(df)
+result.show()
+
+{% endhighlight %}
+
+
 # 三、特征选择
 
 ## 3.1 VectorSlicer
