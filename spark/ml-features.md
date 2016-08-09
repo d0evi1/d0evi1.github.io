@@ -42,6 +42,56 @@ result.select("result").take(3).foreach(println)
 
 ## 1.3 CountVectorizer
 
+CountVectorizer和CountVectorizerModel目标是帮助将一系列文本文档转换成token count的向量。如果不存在一个a-priori字典，可以使用CountVectorizer作为一个Estimator来抽取词汇表，生成一个CountVectorizerModel模型。这个模型会根据词汇表生成文档的稀疏表示，接着可以传到其它算法中（比如LDA）。
+
+在进行fit时，CountVectorizer会选择vocabSize的top个词汇，根据语料上的词频排序。一个可选的参数是minDF，通过指定在词汇表中的单个词汇出现的最小数量的文档数，它也会影响fit过程。另一个可选的二元toggle参数，可以控制输出向量。如果设为true，所有非零的count会被设置为1.这对于一些二进制count的（非整型）离散概率模型来说很有用。
+
+示例：
+
+下面的DataFrame，具有两列：id和texts：
+
+ id | texts
+:----:|:----------:
+ 0  | Array("a", "b", "c")
+ 1  | Array("a", "b", "b", "c", "a")
+
+texts中的每行是一个类型为Array[String]的文档，通过调用CountVectorizer的fit，会生成一个CountVectorizerModel模型，具有词汇表(a,b,c)。接着是转换后的输出列，"vector"：
+
+ id | texts                           | vector
+:----:|:---------------------------------:|:---------------:
+ 0  | Array("a", "b", "c")            | (3,[0,1,2],[1.0,1.0,1.0])
+ 1  | Array("a", "b", "b", "c", "a")  | (3,[0,1,2],[2.0,2.0,1.0])
+
+每个vector表示文档在词汇表中的token count。
+
+{% highlight scala %}
+
+import org.apache.spark.ml.feature.{CountVectorizer, CountVectorizerModel}
+
+val df = spark.createDataFrame(Seq(
+  (0, Array("a", "b", "c")),
+  (1, Array("a", "b", "b", "c", "a"))
+)).toDF("id", "words")
+
+// fit a CountVectorizerModel from the corpus
+val cvModel: CountVectorizerModel = new CountVectorizer()
+  .setInputCol("words")
+  .setOutputCol("features")
+  .setVocabSize(3)
+  .setMinDF(2)
+  .fit(df)
+
+// alternatively, define CountVectorizerModel with a-priori vocabulary
+val cvm = new CountVectorizerModel(Array("a", "b", "c"))
+  .setInputCol("words")
+  .setOutputCol("features")
+
+cvModel.transform(df).select("features").show()
+
+{% endhighlight %}
+
+代码详见：examples/src/main/scala/org/apache/spark/examples/ml/CountVectorizerExample.scala
+
 # 二、特征转换
 
 ## 2.1 Tokenizer 
