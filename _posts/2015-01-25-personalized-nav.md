@@ -1,8 +1,11 @@
 ---
-layout: page
+layout: post
 title: 一种简单的个性化导航实现
-tagline: 介绍
+description: 
+modified: 2015-08-25
+tags: [个性化 机器学习]
 ---
+
 {% include JB/setup %}
 
 移动端时代的挑战：手机屏更小，输入更不便，信息过载问题更严重。
