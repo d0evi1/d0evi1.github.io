@@ -781,6 +781,61 @@ userFeatures
 
 ## 3.2 RFormula
 
+RFormula通过指定一个[R model formula](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/formula.html)选择列。当前，我们支持R操作符的一个限定集，包括：‘~’, ‘.’, ‘:’, ‘+’, 和 ‘-‘。基本操作符是：
+
+- ~: 分隔target和terms
+- +: concat terms，"+ 0"就意味着removing intercept
+- -: 移除一个term，"- 1"意味着removing intercept
+- :: 交互
+- .: 所有列除了target
+
+假设a和b都是double的列，我们可以使用下面的简单示例来展示RFormula的效果：
+
+- y ~ a + b => 表示模型 y ~ w0 + w1 * a + w2 * b，w0是intercept，而w1和w2是coefficients
+- y ~ a + b + a:b -1 => 表示模型：y ~ w1 * a + w2 * b + w3 * a * b，其中，w1, w2, w3是coefficients
+
+RFormula会生成一个vector的feature列，和一个double或string类型的label列。和在R中使用线性回归的formula一样，string类型的input列将会进行one-hot encoded，而numeric列则会被转成double。如果label列是string类型，它将会首先被StringIndexer转换成double。如果label列在DataFrame中不存在，输出的label列将会从formula中指定的响应变量上被创建。
+
+示例：
+
+假设，DataFrame有相应的列：id, country, hour, 和 clicked
+
+id | country | hour | clicked
+:---:|:---------:|:------:|:---------:
+ 7 | "US"    | 18   | 1.0
+ 8 | "CA"    | 12   | 0.0
+ 9 | "NZ"    | 15   | 0.0
+
+如果我们使用RFormula，相应的formula string为：clicked ~ country + hour，这意味着，我们希望基于country和hour去预测clicked，在转换后，我们应该可以得到下面的DataFrame：
+
+id | country | hour | clicked | features         | label
+:---:|:---------:|:------:|:---------:|:------------------:|:-------:
+ 7 | "US"    | 18   | 1.0     | [0.0, 0.0, 18.0] | 1.0
+ 8 | "CA"    | 12   | 0.0     | [0.0, 1.0, 12.0] | 0.0
+ 9 | "NZ"    | 15   | 0.0     | [1.0, 0.0, 15.0] | 0.0
+
+相应的代码如下：
+
+{% highlight scala %}
+
+import org.apache.spark.ml.feature.RFormula
+
+val dataset = spark.createDataFrame(Seq(
+  (7, "US", 18, 1.0),
+  (8, "CA", 12, 0.0),
+  (9, "NZ", 15, 0.0)
+)).toDF("id", "country", "hour", "clicked")
+val formula = new RFormula()
+  .setFormula("clicked ~ country + hour")
+  .setFeaturesCol("features")
+  .setLabelCol("label")
+val output = formula.fit(dataset).transform(dataset)
+output.select("features", "label").show()
+
+{% endhighlight %}
+
+代码：examples/src/main/scala/org/apache/spark/examples/ml/RFormulaExample.scala
+
 ## 3.3 ChiSqSelector
 
 ChiSqSelector表示使用卡方分布的选择。它也可以在类别型feature的数据集上进行操作。ChiSqSelector会基于[卡方检验](https://en.wikipedia.org/wiki/Chi-squared_test)来排序feature，接着会选择（筛选）出最独立的top features。
