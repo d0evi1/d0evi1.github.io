@@ -101,6 +101,8 @@ cvModel.transform(df).select("features").show()
 
 ## 2.3 n-gram
 
+
+
 ## 2.4 Binarizer
 
 Binarization会将数值型特征（numerical features）的阀值压到二元feature中(0/1)。
@@ -153,9 +155,64 @@ result.show()
 
 代码详见：examples/src/main/scala/org/apache/spark/examples/ml/PCAExample.scala。
 
-## 2.6 PolynomialExpansion
+## 2.6 多项式展开（PolynomialExpansion）
 
-## 2.7 DCT
+[多项式展开](http://en.wikipedia.org/wiki/Polynomial_expansion)可以将你的特征展开到一个多项式空间上，它可以将原始维展开到n-degree组合上。PolynomialExpansion类提供了这个功能。下面的示例展示了将你的特征展开到3-degree的多项式空间上。
+
+{% highlight scala %}
+
+import org.apache.spark.ml.feature.PolynomialExpansion
+import org.apache.spark.ml.linalg.Vectors
+
+val data = Array(
+  Vectors.dense(-2.0, 2.3),
+  Vectors.dense(0.0, 0.0),
+  Vectors.dense(0.6, -1.1)
+)
+val df = spark.createDataFrame(data.map(Tuple1.apply)).toDF("features")
+val polynomialExpansion = new PolynomialExpansion()
+  .setInputCol("features")
+  .setOutputCol("polyFeatures")
+  .setDegree(3)
+val polyDF = polynomialExpansion.transform(df)
+polyDF.select("polyFeatures").take(3).foreach(println)
+
+
+{% endhighlight %}
+
+更多代码：examples/src/main/scala/org/apache/spark/examples/ml/PolynomialExpansionExample.scala
+
+## 2.7 离散cosine变换(DCT)
+
+[Discrete Cosine Transform](https://en.wikipedia.org/wiki/Discrete_cosine_transform)可以将在时间域（time domain）上长度为N的实数值序列，转换成另一个在频率域（frequency domain）内长度为N的实数值序列。DCT类提供了这个功能，将实现了[DCT-II](https://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II)并将结果通过<img src="http://www.forkosh.com/mathtex.cgi?
+1/\sqrt_2">进行归一化，以便将变换后的矩阵单元化。不需要在转换序列上进行shift操作（例如：转换序列的第0th位的元素，对应于DCT的第0th coefficient，而非N/2 th）
+
+DCT示例：
+
+{% highlight scala %}
+
+import org.apache.spark.ml.feature.DCT
+import org.apache.spark.ml.linalg.Vectors
+
+val data = Seq(
+  Vectors.dense(0.0, 1.0, -2.0, 3.0),
+  Vectors.dense(-1.0, 2.0, 4.0, -7.0),
+  Vectors.dense(14.0, -2.0, -5.0, 1.0))
+
+val df = spark.createDataFrame(data.map(Tuple1.apply)).toDF("features")
+
+val dct = new DCT()
+  .setInputCol("features")
+  .setOutputCol("featuresDCT")
+  .setInverse(false)
+
+val dctDf = dct.transform(df)
+dctDf.select("featuresDCT").show(3)
+
+{% endhighlight %}
+
+更多代码：examples/src/main/scala/org/apache/spark/examples/ml/DCTExample.scala
+
 
 ## 2.8 StringIndexer
 
