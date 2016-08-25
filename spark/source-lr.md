@@ -7,6 +7,8 @@ tagline: 介绍
 
 org.apache.spark.ml.classification.LogisticRegression
 
+一、LR模型的参数
+
 参数：
 
 - threshold: 如果label 1的概率>threshold，则预测为1，否则为0.
@@ -18,6 +20,23 @@ org.apache.spark.ml.classification.LogisticRegression
 - standardization：在对模型进行fit前，是否对训练特征进行标准化。模型的系数将总是返回到原始的scale上，它对用户是透明的。注意：当不使用正则化时，使用/不使用standardization，模型都应收敛到相同的解决方式上。在R的GLMNET包里，缺省行为也为true。缺省为true。
 - weightCol：如果没设置或空，所有实例为有为1的权重。缺省不设置。
 - treeAggregate：如果特征维度或分区数太大，该参数需要调得更大。缺省为2.
+
+二、L1或L2?
+
+- L2 regularization -> ridge 
+- L1 regularization ->  lasso
+- mix L1 and L2  -> elastic Net
+
+对应到后面的代码里：
+
+{% highlight scala %}
+
+regPram = regParamL1+regParamL2
+val regParamL1 = $(elasticNetParam) * $(regParam)
+val regParamL2 = (1.0 - $(elasticNetParam)) * $(regParam)
+
+{% endhighlight %}
+
 
 MLlib底层的矩阵运算使用了Breeze库，Breeze库提供了Vector/Matrix的实现以及相应计算的接口（Linalg）。
 
