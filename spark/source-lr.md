@@ -293,6 +293,11 @@ ok, 训练过程：
 
 {% endhighlight %}
 
+
+二、LBFGS和OWLQN
+
+
+
 ok，我们知道，模型本身基本上核心代码就落在了这两个方法上：LBFGS和OWLQN。我们再看一下breeze库里的，这两个方法：
 
 - breeze.optimize.LBFGS
@@ -311,4 +316,92 @@ LBFGS对应的代码：https://github.com/scalanlp/breeze/blob/master/math/src/m
 OWLQN对应的代码：https://github.com/scalanlp/breeze/blob/master/math/src/main/scala/breeze/optimize/OWLQN.scala
 
 
-代码：https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/ml/classification/LogisticRegression.scala
+三、成本函数
+
+{% highlight scala %}
+
+/**
+ * LogisticCostFun implements Breeze's DiffFunction[T] for a multinomial (softmax) logistic loss
+ * function, as used in multi-class classification (it is also used in binary logistic regression).
+ * It returns the loss and gradient with L2 regularization at a particular point (coefficients).
+ * It's used in Breeze's convex optimization routines.
+ */
+private class LogisticCostFun(
+    instances: RDD[Instance],
+    numClasses: Int,
+    fitIntercept: Boolean,
+    standardization: Boolean,
+    bcFeaturesStd: Broadcast[Array[Double]],
+    regParamL2: Double,
+    multinomial: Boolean,
+    aggregationDepth: Int) extends DiffFunction[BDV[Double]] {
+
+  override def calculate(coefficients: BDV[Double]): (Double, BDV[Double]) = {
+    val coeffs = Vectors.fromBreeze(coefficients)
+    val bcCoeffs = instances.context.broadcast(coeffs)
+    val featuresStd = bcFeaturesStd.value
+    val numFeatures = featuresStd.length
+
+    val logisticAggregator = {
+      val seqOp = (c: LogisticAggregator, instance: Instance) => c.add(instance)
+      val combOp = (c1: LogisticAggregator, c2: LogisticAggregator) => c1.merge(c2)
+
+      instances.treeAggregate(
+        new LogisticAggregator(bcCoeffs, bcFeaturesStd, numClasses, fitIntercept,
+          multinomial)
+      )(seqOp, combOp, aggregationDepth)
+    }
+
+    val totalGradientArray = logisticAggregator.gradient.toArray
+    // regVal is the sum of coefficients squares excluding intercept for L2 regularization.
+    val regVal = if (regParamL2 == 0.0) {
+      0.0
+    } else {
+      var sum = 0.0
+      coeffs.foreachActive { case (index, value) =>
+        // We do not apply regularization to the intercepts
+        val isIntercept = fitIntercept && ((index + 1) % (numFeatures + 1) == 0)
+        if (!isIntercept) {
+          // The following code will compute the loss of the regularization; also
+          // the gradient of the regularization, and add back to totalGradientArray.
+          sum += {
+            if (standardization) {
+              totalGradientArray(index) += regParamL2 * value
+              value * value
+            } else {
+              val featureIndex = if (fitIntercept) {
+                index % (numFeatures + 1)
+              } else {
+                index % numFeatures
+              }
+              if (featuresStd(featureIndex) != 0.0) {
+                // If `standardization` is false, we still standardize the data
+                // to improve the rate of convergence; as a result, we have to
+                // perform this reverse standardization by penalizing each component
+                // differently to get effectively the same objective function when
+                // the training dataset is not standardized.
+                val temp = value / (featuresStd(featureIndex) * featuresStd(featureIndex))
+                totalGradientArray(index) += regParamL2 * temp
+                value * temp
+              } else {
+                0.0
+              }
+            }
+          }
+        }
+      }
+      0.5 * regParamL2 * sum
+    }
+    bcCoeffs.destroy(blocking = false)
+
+    (logisticAggregator.loss + regVal, new BDV(totalGradientArray))
+  }
+}
+
+{% endhighlight %}
+
+
+
+参考：
+
+1.[LogisticRegression源码](https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/ml/classification/LogisticRegression.scala)
