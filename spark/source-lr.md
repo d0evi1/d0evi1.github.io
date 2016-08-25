@@ -297,11 +297,13 @@ ok, 训练过程：
 二、LBFGS和OWLQN
 
 
-
 ok，我们知道，模型本身基本上核心代码就落在了这两个方法上：LBFGS和OWLQN。我们再看一下breeze库里的，这两个方法：
 
 - breeze.optimize.LBFGS
 - breeze.optimize.OWLQN
+
+L-BFGS: Limited-memory BFGS。其中BFGS代表4个人的名字：broyden–fletcher–goldfarb–shanno
+OWL-QN: (Orthant-Wise Limited-Memory Quasi-Newton)算法。
 
 先来简单看一下breezey库。
 
@@ -311,9 +313,9 @@ breeze库用于数值处理。它的目标是通用、简洁、强大，不需�
 
 相关文档：[https://github.com/scalanlp/breeze/wiki/Quickstart](https://github.com/scalanlp/breeze/wiki/Quickstart)
 
-LBFGS对应的代码：https://github.com/scalanlp/breeze/blob/master/math/src/main/scala/breeze/optimize/LBFGS.scala
+[LBFGS对应的代码](https://github.com/scalanlp/breeze/blob/master/math/src/main/scala/breeze/optimize/LBFGS.scala)
 
-OWLQN对应的代码：https://github.com/scalanlp/breeze/blob/master/math/src/main/scala/breeze/optimize/OWLQN.scala
+[OW-LQN对应的代码](https://github.com/scalanlp/breeze/blob/master/math/src/main/scala/breeze/optimize/OWLQN.scala)
 
 
 三、成本函数
