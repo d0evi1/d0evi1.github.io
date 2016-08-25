@@ -44,16 +44,16 @@ ok, 训练过程：
 	 // 是否持久化
     if (handlePersistence) instances.persist(StorageLevel.MEMORY_AND_DISK)
 
-	 // 模型参数初始化
+    // 模型参数初始化
     val instr = Instrumentation.create(this, instances)
     instr.logParams(regParam, elasticNetParam, standardization, threshold,
       maxIter, tol, fitIntercept)
 
-	 //------------------------------------------------------
-	 // 对数据集进行treeAggregate操作.
-	 // MultiClassSummarizer: 统计label的数量，以及不同label相应的数据量，每个label的weightSum (numClasses, countInvalid, histogram)
-	 // MultivariateOnlineSummarizer: 计算vector的mean， variance, minimum, maximum, counts, and nonzero counts 
-	 //------------------------------------------------------
+    //------------------------------------------------------
+    // 对数据集进行treeAggregate操作.
+    // MultiClassSummarizer: 统计label的数量，以及不同label相应的数据量，每个label的weightSum (numClasses, countInvalid, histogram)
+    // MultivariateOnlineSummarizer: 计算vector的mean， variance, minimum, maximum, counts, and nonzero counts 
+    //------------------------------------------------------
     val (summarizer, labelSummarizer) = {
       val seqOp = (c: (MultivariateOnlineSummarizer, MultiClassSummarizer),
         instance: Instance) =>
@@ -68,7 +68,7 @@ ok, 训练过程：
       )(seqOp, combOp, $(aggregationDepth))
     }
 
-	 // 得到各种统计状态字段
+    // 得到各种统计状态字段
     val histogram = labelSummarizer.histogram
     val numInvalid = labelSummarizer.countInvalid
     val numClasses = histogram.length
@@ -83,7 +83,7 @@ ok, 训练过程：
     instr.logNumClasses(numClasses)
     instr.logNumFeatures(numFeatures)
 
-	 /// main核心代码.
+    /// main核心代码.
     val (coefficients, intercept, objectiveHistory) = {
       
       // 1.分类数合法性校验
@@ -93,10 +93,10 @@ ok, 训练过程：
         logError(msg)
         throw new SparkException(msg)
       }
-
-	   // 2.常量标签.
+      
+      // 2.常量标签.
       val isConstantLabel = histogram.count(_ != 0) == 1
-
+      
       // 3.参数合法性校验
       if (numClasses > 2) {
         val msg = s"LogisticRegression with ElasticNet in ML package only supports " +
@@ -115,16 +115,14 @@ ok, 训练过程：
           s"training is not needed.")
         (Vectors.sparse(numFeatures, Seq()), Double.NegativeInfinity, Array.empty[Double])
       } else {
-      	 // 通过合法性校验.
       
-      
+        // 通过合法性校验.
         if (!$(fitIntercept) && isConstantLabel) {
           logWarning(s"All labels belong to a single class and fitIntercept=false. It's a " +
             s"dangerous ground, so the algorithm may not converge.")
         }
-
-
-		 // 计算部分. 判断feature是否有用,
+        
+        // 计算部分. 判断feature是否有用,
         val featuresMean = summarizer.mean.toArray
         val featuresStd = summarizer.variance.toArray.map(math.sqrt)
 
@@ -134,8 +132,8 @@ ok, 训练过程：
             "constant nonzero column, Spark MLlib outputs zero coefficients for constant " +
             "nonzero columns. This behavior is the same as R glmnet but different from LIBSVM.")
         }
-
-		 // 正则项系数：L1和L2范式. regPram = regParamL1+regParamL2
+        
+        // 正则项系数：L1和L2范式. regPram = regParamL1+regParamL2
         val regParamL1 = $(elasticNetParam) * $(regParam)
         val regParamL2 = (1.0 - $(elasticNetParam)) * $(regParam)
 
@@ -145,9 +143,10 @@ ok, 训练过程：
         // 成本函数costFun
         val costFun = new LogisticCostFun(instances, numClasses, $(fitIntercept),
           $(standardization), bcFeaturesStd, regParamL2, multinomial = false, $(aggregationDepth))
-
-		 // 模型的使用=> optimizer.
-		 // (正则项为0： BreezeLBFGS，否则：BreezeOWLQN)
+          
+          
+        // 模型的使用=> optimizer.
+        // (正则项为0： BreezeLBFGS，否则：BreezeOWLQN)
         val optimizer = if ($(elasticNetParam) == 0.0 || $(regParam) == 0.0) {
           new BreezeLBFGS[BDV[Double]]($(maxIter), 10, $(tol))
         } else {
