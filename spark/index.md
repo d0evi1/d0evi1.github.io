@@ -7,7 +7,7 @@ tagline: 介绍
 
 # 一、ml库
 
-- [1.ml中的feature处理](/spark/ml-feature)
+- [1.ml中的feature处理](/spark/ml-features)
 - [2.ml中的参数tunning](/spark/ml-tuning)
 - [3.ml中的Pipeline](/spark/ml-pipeline)
 - [4.ml中的missing data](/spark/ml-missing-data)
