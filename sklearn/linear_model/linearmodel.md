@@ -63,6 +63,8 @@ array([ 0.5,  0.5])
     <a href="http://scikit-learn.org/stable/_images/plot_ridge_path_0011.png"><img src="http://scikit-learn.org/stable/_images/plot_ridge_path_0011.png" alt=""></a>
 </figure>
 
+上图的每种着色，表示coefficient vector中每个不同的feature，它们在正则化参数函数上进行展示。在相应path的终点，alpha趋向于0，相应的解趋向于普通的最小二乘法，coefficients参数具有强烈的波动。
+
 和其它线性模型一样，Ridge的fit建模后，也会将回归系数存于coef_属性上：
 
 {% highlight python %}
@@ -198,6 +200,22 @@ ElasticNetCV可以通过交叉验证来设置alpha参数（<img src="http://www.
 
 - [Lasso and Elastic Net for Sparse Signals](http://scikit-learn.org/stable/auto_examples/linear_model/plot_lasso_and_elasticnet.html#example-linear-model-plot-lasso-and-elasticnet-py)
 - [Lasso and Elastic Net](http://scikit-learn.org/stable/auto_examples/linear_model/plot_lasso_coordinate_descent_path.html#example-linear-model-plot-lasso-coordinate-descent-path-py)
+
+
+# 11.SGD
+
+
+
+# 12. Perceptron
+
+[Perceptron](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Perceptron.html#sklearn.linear_model.Perceptron)是另一个简单的算法，适用于大规模learning（large scale learning）。缺省的：
+
+- 它不需要一个learning rate.
+- 它没有正则项(不需要penalized)
+- 只在错误时，才更新模型
+
+Perceptron的最后一个特性暗示着，它比使用hinge loss的SGD要略微快一些。它会导致模型更稀疏。
+
 
 
 参考：
