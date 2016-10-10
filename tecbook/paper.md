@@ -14,3 +14,7 @@ share: true
 Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://statweb.stanford.edu/~jhf/ftp/trebst.pdf)
 
 陈天奇 [Introduction to Boosted Trees](http://homes.cs.washington.edu/~tqchen/pdf/BoostedTree.pdf)
+
+2.CTR平滑
+
+[Click-Through Rate Estimation for Rare Events in Online Advertising](http://www.cs.cmu.edu/~xuerui/papers/ctr.pdf)
