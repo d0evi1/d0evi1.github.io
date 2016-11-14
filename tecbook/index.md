@@ -43,6 +43,7 @@ share: true
 
 - 1.宗庆成:[统计自然语言处理](http://book.douban.com/subject/3076996/)
 - 2.Michael Collins:[Natural Language Processing coursera](https://class.coursera.org/nlangp-001/lecture)
+- 3.[深度学习与自然语言处理](http://cs224d.stanford.edu/lectures/)
 
 ## 五、信息检索
 
