@@ -35,8 +35,15 @@ share: true
 - 4.[机器学习基础（coursera）](https://class.coursera.org/ntumlone-003/lecture)
 - 5.[机器学习技法（coursera）](https://class.coursera.org/ntumltwo-002/lecture)
 
+
+上海交大，张志华教授：
+
+- 6.[机器学习导论](http://ocw.sjtu.edu.cn/G2S/OCW/cn/CourseDetails.htm?Id=397)
+- 7.[统计机器学习](http://ocw.sjtu.edu.cn/G2S/OCW/cn/CourseDetails.htm?Id=398)
+
 ## 三、神经网络
 
+- 0.台大李宏毅[1天搞懂深度学习](http://download.csdn.net/download/lb521200200/9689343)
 - 1.大神Geoffrey Hinton：[机器学习中使用的神经网络（coursera）](https://class.coursera.org/neuralnets-2012-001/lecture)
 
 ## 四、NLP
@@ -57,4 +64,8 @@ share: true
 ## 七、计算广告
 
 - 1.刘鹏: [计算广告学](http://study.163.com/course/introduction.htm?courseId=321007#/courseDetail)
-- 2.Andrei Broder: [Introduction to Computational Advertising](http://web.stanford.edu/class/msande239/) 
+- 2.Andrei Broder: [Introduction to Computational Advertising](http://web.stanford.edu/class/msande239/)
+
+## 八、计算机视觉
+
+－ 1.[深度学习与计算机视觉](http://study.163.com/course/introduction.htm?courseId=1003223001#/courseDetail)
