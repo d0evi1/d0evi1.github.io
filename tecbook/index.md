@@ -41,11 +41,12 @@ share: true
 - 6.[机器学习导论](http://ocw.sjtu.edu.cn/G2S/OCW/cn/CourseDetails.htm?Id=397)
 - 7.[统计机器学习](http://ocw.sjtu.edu.cn/G2S/OCW/cn/CourseDetails.htm?Id=398)
 
-## 三、神经网络
+## 三、神经网络/深度学习
 
 - 0.[神经网络简史](http://blog.sina.com.cn/s/blog_71329a960102v1eo.html)
 - 1.台大李宏毅[1天搞懂深度学习](http://download.csdn.net/download/lb521200200/9689343)
-- 2.大神Geoffrey Hinton：[机器学习中使用的神经网络（coursera）](https://class.coursera.org/neuralnets-2012-001/lecture)
+- 2.Udacity [深度学习 from google](https://classroom.udacity.com/courses/ud730/lessons/6370362152/concepts/63798118150923)
+- 3.大神Geoffrey Hinton（略难）：[机器学习中使用的神经网络（coursera）](https://class.coursera.org/neuralnets-2012-001/lecture)
 
 ## 四、NLP
 
