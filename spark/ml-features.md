@@ -134,7 +134,7 @@ tokenized.select("words", "label").take(3).foreach(println)
 val regexTokenized = regexTokenizer.transform(sentenceDataFrame)
 regexTokenized.select("words", "label").take(3).foreach(println)
 
-{% end highlight %}
+{% endhighlight %}
 
 完整代码在：examples/src/main/scala/org/apache/spark/examples/ml/TokenizerExample.scala
 
