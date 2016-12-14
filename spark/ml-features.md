@@ -6,7 +6,16 @@ tagline: 介绍
 {% include JB/setup %}
 
 
-# 一、特征抽取
+* [全文目录](#1)
+
+* [一、特征抽取](#1)
+
+* [二、特征转换](#2)
+
+* [三、特征选择](#3)
+
+
+# 一、<h2 id="1">特征抽取</h2>
 
 ## 1.1 TF-IDF
 
@@ -92,7 +101,7 @@ cvModel.transform(df).select("features").show()
 
 代码详见：examples/src/main/scala/org/apache/spark/examples/ml/CountVectorizerExample.scala
 
-# 二、特征转换
+# <h2 id="2">二、特征转换</h2>
 
 ## 2.1 Tokenizer 
 
@@ -752,7 +761,7 @@ result.show()
 {% endhighlight %}
 
 
-# 三、特征选择
+# <h2 id="3">三、特征选择</h2>
 
 ## 3.1 VectorSlicer
 
