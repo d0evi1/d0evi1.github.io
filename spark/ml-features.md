@@ -109,6 +109,34 @@ cvModel.transform(df).select("features").show()
 
 ## 2.1 Tokenizer 
 
+Tokenization是个文本处理过程，它将句子断成独立的terms（通常为words）。[Tokenizer](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.ml.feature.Tokenizer)提供了该功能。下面的示例展示了如何将句子分割成一串词。
+
+[RegexTokenizer](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.ml.feature.RegexTokenizer)允许更多高级特性的tokenization: 正则表达式匹配. 缺省的，参数"pattern"(regex, default:"\\s+")被用于使用空格分割输入文本。可选的，用户可以设置参数"gaps"=false，这表示正则项"pattern"为"tokens"，而非分割gaps，可以找出所有匹配出现的词作为tokenization的结果。
+
+{% highlight scala %}
+
+import org.apache.spark.ml.feature.{RegexTokenizer, Tokenizer}
+
+val sentenceDataFrame = spark.createDataFrame(Seq(
+  (0, "Hi I heard about Spark"),
+  (1, "I wish Java could use case classes"),
+  (2, "Logistic,regression,models,are,neat")
+)).toDF("label", "sentence")
+
+val tokenizer = new Tokenizer().setInputCol("sentence").setOutputCol("words")
+val regexTokenizer = new RegexTokenizer()
+  .setInputCol("sentence")
+  .setOutputCol("words")
+  .setPattern("\\W") // alternatively .setPattern("\\w+").setGaps(false)
+
+val tokenized = tokenizer.transform(sentenceDataFrame)
+tokenized.select("words", "label").take(3).foreach(println)
+val regexTokenized = regexTokenizer.transform(sentenceDataFrame)
+regexTokenized.select("words", "label").take(3).foreach(println)
+
+{% end highlight %}
+
+完整代码在：examples/src/main/scala/org/apache/spark/examples/ml/TokenizerExample.scala
 
 ## 2.2 StopWordsRemover
 
