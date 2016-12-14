@@ -103,7 +103,9 @@ cvModel.transform(df).select("features").show()
 
 代码详见：examples/src/main/scala/org/apache/spark/examples/ml/CountVectorizerExample.scala
 
-# <h2 id="2">二、特征转换</h2>
+<h2 id="2"></h2>
+
+# 二、特征转换
 
 ## 2.1 Tokenizer 
 
@@ -762,8 +764,9 @@ result.show()
 
 {% endhighlight %}
 
+<h2 id="3"></h2>
 
-# <h2 id="3">三、特征选择</h2>
+# 三、特征选择
 
 ## 3.1 VectorSlicer
 
