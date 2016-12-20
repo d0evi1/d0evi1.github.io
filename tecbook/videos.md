@@ -1,6 +1,6 @@
 ---
 layout: page
-title: 论文篇 
+title: 视频篇 
 description: ""
 image:
   feature: abstract-11.jpg
@@ -13,3 +13,16 @@ share: true
 
 [nvidia无人汽车：NVIDIA Autonomous Car](https://www.youtube.com/watch?v=qhUvQiKec2U)
 
+[CES 2016: NVIDIA DRIVENet Demo - Visualizing a Self-Driving Future (part 5)
+](https://www.youtube.com/watch?v=HJ58dbd5g8g)
+
+[使用ConvNets多数字识别街景门牌号](https://www.youtube.com/watch?v=vGPI_JvLoN0)
+
+
+
+xgboost相关：
+
+
+kaggle相关：
+
+1.[How to (almost) win at Kaggle - Kiri Nichol](https://www.youtube.com/watch?v=JyEm3m7AzkE)
