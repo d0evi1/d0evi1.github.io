@@ -16,7 +16,7 @@ tags: [word2vec+Huffman]
 
 # word2vec的Huffman-Tree实现
 
-为便于word2vec的Huffman-Tree实现，我已经将它单独剥离出来，具体代码托管到github上: [huffman_tree代码](https://github.com/d0evi1/word2vec_insight/blob/master/huffman_tree.cpp)。示例采用的是wikipedia上的字母：
+为便于word2vec的Huffman-Tree实现，我已经将它单独剥离出来，具体代码托管到github上: **[huffman_tree代码](https://github.com/d0evi1/word2vec_insight/blob/master/huffman_tree.cpp)**。示例采用的是wikipedia上的字母：
 
 即：F:2, O:3, R:4, G:4, E:5, T:7 
 
