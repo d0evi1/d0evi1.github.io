@@ -3,7 +3,7 @@ layout: post
 title: word2vec中的Huffman树
 description: 
 modified: 2016-01-23
-tags: [word2vec][Huffman]
+tags: [word2vec Huffman]
 ---
 
 如果你在大学期间学过信息论或数据压缩相关课程，一定会了解Huffman Tree。建议首先在wikipedia上重新温习下Huffman编码与Huffman Tree的基本概念: [Huffman编码](https://zh.wikipedia.org/wiki/%E9%9C%8D%E5%A4%AB%E6%9B%BC%E7%BC%96%E7%A0%81)
@@ -26,7 +26,7 @@ tags: [word2vec][Huffman]
 
 相应的数据结构为：
 
-{% highlight cpp %}
+{% highlight c %}
 
 /**
  * word与Huffman树编码
