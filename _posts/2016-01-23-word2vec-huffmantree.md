@@ -8,7 +8,7 @@ tags: [word2vec+Huffman]
 
 # 介绍
 
-如果你在大学期间学过信息论或数据压缩相关课程，一定会了解Huffman Tree。建议首先在wikipedia上重新温习下Huffman编码与Huffman Tree的基本概念: [Huffman编码](https://zh.wikipedia.org/wiki/%E9%9C%8D%E5%A4%AB%E6%9B%BC%E7%BC%96%E7%A0%81) 
+如果你在大学期间学过信息论或数据压缩相关课程，一定会了解Huffman Tree。建议首先在wikipedia上重新温习下Huffman编码与Huffman Tree的基本概念: [Huffman编码wiki](https://zh.wikipedia.org/wiki/%E9%9C%8D%E5%A4%AB%E6%9B%BC%E7%BC%96%E7%A0%81) 
 
 简单的说（对于文本中的字母或词），Huffman编码会将出现频率较高（也可认为是：权重较大）的字（或词）编码成短码，而将罕见的字(或词)编码成长码。对比长度一致的编码，能大幅提升压缩比例。
 
@@ -16,7 +16,7 @@ tags: [word2vec+Huffman]
 
 # word2vec的Huffman-Tree实现
 
-为便于word2vec的Huffman-Tree实现，我已经将它单独剥离出来，具体代码托管到github上: **[huffman_tree代码](https://github.com/d0evi1/word2vec_insight/blob/master/huffman_tree.cpp)**。示例采用的是wikipedia上的字母：
+为便于word2vec的Huffman-Tree实现，我已经将它单独剥离出来，具体代码托管到github上: **[huffman_tree代码下载](https://github.com/d0evi1/word2vec_insight/blob/master/huffman_tree.cpp)**。示例采用的是wikipedia上的字母：
 
 即：F:2, O:3, R:4, G:4, E:5, T:7 
 
