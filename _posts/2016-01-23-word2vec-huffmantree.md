@@ -3,7 +3,7 @@ layout: post
 title: word2vec中的Huffman树
 description: 
 modified: 2016-01-23
-tags: [word2vec] [Huffman]
+tags: [word2vec+Huffman]
 ---
 
 # 介绍
