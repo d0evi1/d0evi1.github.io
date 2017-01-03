@@ -23,8 +23,9 @@ tags: [word2vec+Huffman]
 这里有两个个注意事项：
 
 - 1.对于单个节点分枝的编码，wikipedia上的1/0分配是定死的：即左为0，右为1。而word2vec采用的方法是，两侧中，哪一侧的值较大则为1，值较小的为0。
+- 2.word2vec会对词汇表中的词汇预先从大到小排好序，然后再去创建Huffman树。在CreateBinaryTree()调用后，会生成最优的带权路径最优的Huffman-Tree。
 
-- 2.word2vec会对词汇表中的词汇预先从大到小排好序，然后再去创建Huffman树。在CreateBinaryTree()调用后，会生成最优的带权路径最优的Huffman-Tree。整个计算过程设计的比较精巧。最终生成的图如下：
+最终生成的图如下：
 
 <img src="http://pic.yupoo.com/wangdren23/G7Fugo2a/medish.jpg">
 
@@ -45,7 +46,6 @@ struct vocab_word {
 
 {% endhighlight %}
 
-
 最后，上面链接代码得到的结果：
 
 	word=T	cn=7	codelen=2	code=10	point=4-3-
@@ -54,6 +54,8 @@ struct vocab_word {
 	word=R	cn=4	codelen=3	code=110	point=4-3-1-
 	word=O	cn=3	codelen=3	code=001	point=4-2-0-
 	word=F	cn=2	codelen=3	code=000	point=4-2-0-
+
+整个计算过程设计的比较精巧。使用了三个数组：count[]/binary[]/parent_node[]，这三个数组构成相应的Huffman二叉树。有vocab_size个叶子节点。最坏情况下，每个节点下都有一个叶子节点，二叉树的总节点数为vocab_size * 2 - 1就够用了。代码使用的是 vocab_size * 2 + 1。
 
 当然，如果你有兴趣关注下整棵树的构建过程的话，也可以留意下这部分输出：
 
