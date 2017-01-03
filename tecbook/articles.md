@@ -13,3 +13,6 @@ share: true
 ](http://www.csdn.net/article/2015-01-16/2823579)
 
 - [An Intuitive Explanation of Convolutional Neural Networks](https://ujjwalkarn.me/2016/08/11/intuitive-explanation-convnets/) 中文翻译版： [神经网络的直观解释](http://www.hackcv.com/index.php/archives/104/?hmsr=toutiao.io&utm_medium=toutiao.io&utm_source=toutiao.io)
+
+- [Deep Learning, NLP, and Representations](http://colah.github.io/posts/2014-07-NLP-RNNs-Representations/) 中文翻译：[深度学习、自然语言处理和表征方法
+](http://dataunion.org/9331.html)
