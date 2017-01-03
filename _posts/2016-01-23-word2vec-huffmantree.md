@@ -26,7 +26,7 @@ tags: [word2vec][Huffman]
 
 相应的数据结构为：
 
-{% highlight c++ %}
+{% highlight cpp %}
 
 /**
  * word与Huffman树编码
