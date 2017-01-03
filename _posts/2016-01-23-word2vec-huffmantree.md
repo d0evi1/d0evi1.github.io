@@ -20,9 +20,11 @@ tags: [word2vec+Huffman]
 
 即：F:2, O:3, R:4, G:4, E:5, T:7 
 
-这里有个注意事项：对于单个节点分枝的编码，wikipedia上的1/0分配是定死的：即左为0，右为1。而word2vec采用的方法是，两侧中，哪一侧的值较大则为1，值较小的为0。
+这里有两个个注意事项：
 
-另外一点，word2vec会对词汇表中的词汇预先从大到小排好序。在CreateBinaryTree()调用后，会生成最优的带权路径最优的Huffman-Tree。整个计算过程设计的比较精巧。最终生成的图如下：
+- 1.对于单个节点分枝的编码，wikipedia上的1/0分配是定死的：即左为0，右为1。而word2vec采用的方法是，两侧中，哪一侧的值较大则为1，值较小的为0。
+
+- 2.word2vec会对词汇表中的词汇预先从大到小排好序，然后再去创建Huffman树。在CreateBinaryTree()调用后，会生成最优的带权路径最优的Huffman-Tree。整个计算过程设计的比较精巧。最终生成的图如下：
 
 <img src="http://pic.yupoo.com/wangdren23/G7Fugo2a/medish.jpg">
 
