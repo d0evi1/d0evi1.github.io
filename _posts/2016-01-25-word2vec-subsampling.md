@@ -27,7 +27,7 @@ f(wi)是wi的词频，t为选中的一个阀值，通常为10^-5周围(0.00001)�
 
 而实际中，采用的是：
 
-<img src="http://www.forkosh.com/mathtex.cgi?P(w_i)=\frac{random}/65535-(\sqrt{\frac{sample}{freq(w_i)}}+\frac{sample}{freq(w_i)})">
+<img src="http://www.forkosh.com/mathtex.cgi?P(w_i)=\frac{random}{65535}-(\sqrt{\frac{sample}{freq(w_i)}}+\frac{sample}{freq(w_i)})">
 
 部分代码：
 
