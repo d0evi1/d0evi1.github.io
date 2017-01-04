@@ -10,11 +10,11 @@ tags: [word2vec]
 
 Mikolov在paper[]()中，提到高频词的subsampling问题：
 
-在非常大的语料中，最高频的词汇，可能出成上百万次（比如：in, the, a这些词）。这样的词汇通常比其它罕见词提供了很少的信息量。例如，当skip-gram模型，通过观察"France"和"Paris"的共现率(co-occurrence)，Skip-gram模型可以从中获益；而"France"和"the"的共现率则贡献很少；而几乎每个词在句子中，都常与"the"共同出现过。该思路也常用在相反的方向上，高频词的向量表示，在上百万样本训练完后不会出现大变化。
+在非常大的语料中，最高频的词汇，可能出现上百万次（比如：in, the, a这些词）。这样的词汇通常比其它罕见词提供了更少的信息量。例如，当skip-gram模型，通过观察"France"和"Paris"的共现率(co-occurrence)，Skip-gram模型可以从中获益；而"France"和"the"的共现率则对模型贡献很少；而几乎每个词都常在句子中与"the"共同出现过。该思路也常用在相反的方向上，高频词的向量表示，在上百万样本训练完后不会出现大变化。
 
 为了度量这种罕见词与高频词间存在不平衡现象，我们使用一个简单的subsampling方法：训练集中的每个词wi，以下面公式计算得到的概率进行抛弃：
 
-<img src="http://www.forkosh.com/mathtex.cgi?P(w_i)=1-sqrt{\frac{t}{f(w_i)}}">
+<img src="http://www.forkosh.com/mathtex.cgi?P(w_i)=1-\sqrt{\frac{t}{f(w_i)}}">
 
 f(wi)是wi的词频，t为选中的一个阀值，通常为10^-5周围(0.00001)。我们之所以选择该subsampling公式，是因为：它可以很大胆的对那些词频大于t的词进行subsampling，并保留词频的排序(ranking of the frequencies)。尽管subsampling公式的选择是拍脑袋出来的（启发式的heuristically），我们发现它在实践中很有效。它加速了学习，并极大改善了罕见词的学习向量的准确率（accuracy）。
 
