@@ -8,7 +8,7 @@ tags: [word2vec]
 
 # 介绍
 
-Mikolov在paper[]()中，提到高频词的subsampling问题：
+Mikolov在paper[Distributed Representations of Words and Phrases and their Compositionality](https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf)中，提到高频词的subsampling问题，以下我对相关节选进行的简单中文翻译：
 
 在非常大的语料中，最高频的词汇，可能出现上百万次（比如：in, the, a这些词）。这样的词汇通常比其它罕见词提供了更少的信息量。例如，当skip-gram模型，通过观察"France"和"Paris"的共现率(co-occurrence)，Skip-gram模型可以从中获益；而"France"和"the"的共现率则对模型贡献很少；而几乎每个词都常在句子中与"the"共同出现过。该思路也常用在相反的方向上，高频词的向量表示，在上百万样本训练完后不会出现大变化。
 
