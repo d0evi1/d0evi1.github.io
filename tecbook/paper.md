@@ -30,9 +30,13 @@ Bidirectional Long Short-Term Memory Networks](https://d3c33hcgiwev3.cloudfront.
 
 V. Dumoulin and F. Visin [深度学习卷积算法指南](https://arxiv.org/pdf/1603.07285v1.pdf)
 
-word2vec:
+# word2vec
 
 - 1.Tomas Mikolov, Kai Chen, Greg Corrado, Jeffrey Dean
  [Efficient Estimation of Word Representations in Vector Space](https://arxiv.org/pdf/1301.3781v3.pdf)
 - 2.Tomas Mikolov, Ilya Sutskever, Kai Chen[Distributed Representations of Words and Phrases and their Compositionality](https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf) 
+
+# Hierarchical Softmax
+
+Andriy Mnih, Geoffrey Hinton [A Scalable Hierarchical Distributed Language Model](http://www.cs.toronto.edu/~amnih/papers/hlbl_final.pdf)
 
