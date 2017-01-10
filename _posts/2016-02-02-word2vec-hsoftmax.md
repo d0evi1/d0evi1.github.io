@@ -27,11 +27,11 @@ NPLM的主要缺点是，这样的相类似模型，训练和测试时间很慢�
 
 当数据集包含上百万的词时，该模型的表现优于基于分类的3-gram，但比paper 6中的NPLM表现差。这种层次化NPLM模型，比普通的NPLM快2个数量级。这种方法的主要限制，主要是用于构建word树的过程。该树可以从WordNet IS-A分类开始，通过结合人工和数据驱动处理，并将它转换成一个二叉树。我们的目标是，将该过程替换成从训练数据中自动构建树，不需要任何专家知识。我们也探索了使用树（里面的词汇至少出现一次）的性能优点。
 
-# log-biliear model
+# log-bilinear model
 
-我们使用log-bilinear语言模型（LBL：Paper 7）作为我们层次化模型的基础，因为它的性能十分出色，并且很简洁。类似于所有神经网络语言模型，LBL模型将每个词表示成一个real-valued的特征向量。我们将词w的特征向量表示成:rw，所有词的特征向量组成矩阵R. 模型的目标：给定上下文w1:n-1，预测下一个词wn。我们将要预测下一个词的的特征向量表示成<img src="http://www.forkosh.com/mathtex.cgi?r_hat">，它可以通过对上下文词汇的特征向量进行线性组合得到：
+我们使用log-bilinear语言模型（LBL：Paper 7）作为我们层次化模型的基础，因为它的性能十分出色，并且很简洁。类似于所有神经网络语言模型，LBL模型将每个词表示成一个real-valued的特征向量。我们将词w的特征向量表示成:rw，所有词的特征向量组成矩阵R. 模型的目标：给定上下文w1:n-1，预测下一个词wn。我们将要预测下一个词的的特征向量表示成<img src="http://www.forkosh.com/mathtex.cgi?\hat{r}">，它可以通过对上下文词汇的特征向量进行线性组合得到：
 
-<img src="http://www.forkosh.com/mathtex.cgi?r_hat=\sum_{i=1}^{n-1}C_{i}r_{w_i}">
+<img src="http://www.forkosh.com/mathtex.cgi?\hat{r}=\sum_{i=1}^{n-1}C_{i}r_{w_i}">
 
 
 
