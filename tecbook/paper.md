@@ -44,5 +44,14 @@ Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://
 
 # 推荐系统
 
-- 1.[Personalized News Recommendation Based on Click Behavior ](https://static.googleusercontent.com/media/research.google.com/zh-CN//pubs/archive/35599.pdf)
-- 2.[Google news personalization: scalable online collaborative filtering](http://wwwconference.org/www2007/papers/paper570.pdf)
+- 1.google news:[Personalized News Recommendation Based on Click Behavior ](https://static.googleusercontent.com/media/research.google.com/zh-CN//pubs/archive/35599.pdf)
+- 2.google news:[Google news personalization: scalable online collaborative filtering](http://wwwconference.org/www2007/papers/paper570.pdf)
+- 3.google news:[ppt: Google News Personalization](http://cseweb.ucsd.edu/~elkan/291spring2008/jerry.pdf)
+- 4.yahoo:[Personalized Recommendation on Dynamic Content Using Predictive Bilinear Models](http://www.wwwconference.org/www2009/proceedings/pdf/p691.pdf)
+- 5.[User profiles for personalized information access](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.86.6516&rep=rep1&type=pdf)
+
+
+- 7.[Interweaving Trend and User Modeling for Personalized News Recommendation](http://fabianabel.de/papers/2011-wis-twitter-trends-web-intelligence_short.pdf)
+- 8.[Analyzing User Modeling on Twitter for Personalized News Recommendations](http://fabianabel.de/papers/2011-wis-twitter-um-umap.pdf)
+
+- 9.[Open user profiles for adaptive news systems: help or harm?](http://www.www2007.org/papers/paper602.pdf)
