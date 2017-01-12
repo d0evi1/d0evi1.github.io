@@ -60,8 +60,8 @@ share: true
 
 ## 六、推荐系统
 
-- 1.[推荐系统导论: coursera，明尼苏达大学](https://www.coursera.org/learn/recommender-systems/home/welcome) : 知识系统还算全面，讲得不深，不过里面有好多大牛的interview。推荐一下。
-
+- 1.Movielens作者:[推荐系统导论: coursera，明尼苏达大学](https://www.coursera.org/learn/recommender-systems/home/welcome) : 知识系统还算全面，讲得不深，不过里面有好多大牛的interview。推荐一下。
+- 2.Netflix-Xavier Amatriain:[Recommender Systems](http://www.slideshare.net/xamat/recommender-systems-machine-learning-summer-school-2014-cmu)
 
 ## 七、计算广告
 
@@ -71,3 +71,10 @@ share: true
 ## 八、计算机视觉
 
 － 1.[深度学习与计算机视觉](http://study.163.com/course/introduction.htm?courseId=1003223001#/courseDetail)
+
+
+
+# 工具篇
+
+转到[工具篇](d0evi1.github.io/tecbook/tools)
+
