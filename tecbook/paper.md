@@ -50,8 +50,13 @@ Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://
 - 4.yahoo:[Personalized Recommendation on Dynamic Content Using Predictive Bilinear Models](http://www.wwwconference.org/www2009/proceedings/pdf/p691.pdf)
 - 5.[User profiles for personalized information access](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.86.6516&rep=rep1&type=pdf)
 
-
 - 7.[Interweaving Trend and User Modeling for Personalized News Recommendation](http://fabianabel.de/papers/2011-wis-twitter-trends-web-intelligence_short.pdf)
 - 8.[Analyzing User Modeling on Twitter for Personalized News Recommendations](http://fabianabel.de/papers/2011-wis-twitter-um-umap.pdf)
 
 - 9.[Open user profiles for adaptive news systems: help or harm?](http://www.www2007.org/papers/paper602.pdf)
+
+- [微软:机器学习驱动下的内容分发和个性化推荐](https://pan.baidu.com/s/1pL2g2hX)
+- [视频:机器学习驱动下的内容分发和个性化推荐](https://pan.baidu.com/s/1jIx6Rky)
+
+- [Applying deep learning to Related Pins](https://engineering.pinterest.com/blog/applying-deep-learning-related-pins)
+
