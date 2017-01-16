@@ -47,11 +47,11 @@ and their Compositionality>.
 Skip-gram模型的训练目标是，为预测一个句子或一个文档中某个词的周围词汇，找到有用的词向量表示。更正式地，通过给定训练词汇w1,w2,w3,...,wT, Skip-gram模型的目标是，最大化平均log概率：
 
 
-<img src="http://www.forkosh.com/mathtex.cgi?\frac{1}{T}\sum_{t=1}^{T}\sum_{-c\leqj\leqc,j\neq0}logp(w_{t+j}|w_t)">  (1)
+<img src="http://www.forkosh.com/mathtex.cgi?\frac{1}{T}\sum_{t=1}^{T}\sum_{-c\leq{j}\leq{c},j\neq0}logp(w_{t+j}|w_t)">  (1)
 
 其中，c是训练上下文的size(wt是中心词)。c越大，会产生更多的训练样本，并产生更高的准确度，训练时间也更长。最基本的skip-gram公式使用softmax函数来计算p(wt+j|wt): 
 
-<img src="http://www.forkosh.com/mathtex.cgi?p(wO|wI)=\frac{exp(v'_{wo}^Tv_{wI}}{\sum_{w=1}{W}exp(v'_{w}^Tv_{wI}}">  (1)
+<img src="http://www.forkosh.com/mathtex.cgi?p(w_O|w_I)=\frac{exp(v'_{w_O}^Tv_{w_I}}){\sum_{w=1}^{W}exp(v'_{w}^Tv_{w_I}})">  (2)
 
 其中，vw和v'w表示w的输入向量和输出向量。W则是词汇表中的词汇数。该公式在实际中不直接采用，因为计算logp(wo|wi)的梯度与W成正比，经常很大(10^5-10^7次方)
 
