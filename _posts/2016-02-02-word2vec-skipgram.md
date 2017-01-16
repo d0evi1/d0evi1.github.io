@@ -1,6 +1,6 @@
 ---
 layout: post
-title: word2vec中的Hierarchical Softmax
+title: word2vec中的Skip-gram
 description: 
 modified: 2016-02-02
 tags: [word2vec+Huffman]
