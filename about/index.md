@@ -30,7 +30,7 @@ modified: 2016-02-01
 
 <div markdown="0"> <a href="https://github.com/mmistakes/hpstr-jekyll-theme" class="btn btn-success">Download HPSTR</a></div>
 
-数学公式采用: mathlex。
+数学公式采用: [mathlex](http://www.forkosh.com), [mathjax](http://detexify.kirelabs.org/symbols.html)。
 
 图片存储部分，采用youpai.
 
