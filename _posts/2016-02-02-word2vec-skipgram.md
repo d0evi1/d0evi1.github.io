@@ -55,7 +55,71 @@ Skip-gram模型的训练目标是，为预测一个句子或一个文档中某�
 
 其中，vw和v'w表示w的输入向量和输出向量。W则是词汇表中的词汇数。该公式在实际中不直接采用，因为计算logp(wo|wi)的梯度与W成正比，经常很大(10^5-10^7次方)
 
+## 2.1 Hierarchical Softmax
 
+略，详见另一篇。
+
+## 2.2 Negative Sampling
+
+## 2.3 高频词的subsampling
+
+# 3.结果
+
+该部分我们评估了Hierarchical Softmax(HS), Noise Contrastive Estimation, Negative Sampling和训练词汇的subsampling。我们使用由Mikolov引入的analogical reasoning task进行评估(8)。该任务包含了类似这样的类比：s“Germany” : “Berlin” :: “France” : ?。通过找到这样的一个向量x，使得在cosine距离上，vec(x)接近于vec("Berlin")-vec("Germany")+vec("France")。如果x是"Paris"，则该特定示例被认为是回答正确的。该任务有两个宽泛的类别：syntactic analogies:句法结果的类比(比如： “quick” : “quickly” :: “slow” : “slowly”)，以及semantic analogies: 语义类比（比如：国家与城市的关系）。
+
+对于训练Skip-gram模型来说，我们已经使用了一个大数据集，它包括许多新文章（内部Google数据集，超过10亿单词）。我们抛弃了训练集中在词汇表中出现次数不足5次的词汇，这样产生的词汇表大小为：692k。在词类比测试中，多种Skip-gram模型的性能如表1。在analogical reasoning task上，该表展示了Negative Sampling的结果比Hierarchical Softmax效果要好，并且它比Noise Contrasitive Estimation的效果也略好。高频词的subsampling提升了好几倍的训练速度，并使得词向量表示更加精准。
+
+仍有争议的是，skip-gram模型使它的向量更适合linear analogical reasoning，但Mikolov的结果(8)也展示了在训练数据量极剧增加时，由标准的sigmoidal RNN(非线性)可以在该任务上获得极大的提升，建议，对于词向量的线性结果，非线性模型同样可以有很好的表现。
+
+# 4.学习短语
+
+在前面的讨论中，许多短语具有特定的意义，它不是单个词的含义的简单组合。为了学习到短语的向量表示，我们首先发现，在一些不常见的上下文中，有些词经常共现。例如，“New York Times”和"Toronto Maple Leafs"在训练数据中，被替换成唯一的token，但另一个bigram:"this is"则保留不做更改。
+
+<img src="http://pic.yupoo.com/wangdren23/G9Kx4Djd/medish.jpg">
+
+表2：短语的analogical reasoning task（完整测试集：3218个示例）。目标是使用前三2上计算第4个短语。在该测试集上最好的模型的准确率为72%
+
+这种方法，我们可以产生许多合理的短语，同时也不需要极大增加词汇的size；理论上，我们可以使用所有n-gram来训练Skip-gram模型，但这样很耗费内存。在文本上标识短语方面，之前已经有许多技术提出。然而，对比比较这些方法超出了该paper范围。我们决定使用一种简单的基于数据驱动的方法，短语的形成基于unigram和bigram的数目，使用：
+
+<img src="http://www.forkosh.com/mathtex.cgi?score(w_i,w_j)=\frac{count(w_iw_j-\delta}{count(w_i) * count(w_j)}">  (6)
+
+其中，delta被用于一个打折系数(discounting coefficient)，它可以阻止产生过多的包含许多不常见词的短语。bigram的score如果比选择的阀值要大，那么则认为该短语成立。通常，我们会不断降低阀值，运行2-4遍的训练数据，以允许形成包含更多词的更长短语。我们使用一个新的关于短语的analogical reasoning task，来评估短语表示的质量。该数据集在网上是公开的。[下载](http://2code.google.com/p/word2vec/source/browse/trunk/questions-phrases.txt)
+
+## 4.1 短语的Skip-Gram结果
+
+我们使用在前面的试验中相同的新闻数据，我们首先基于训练语料来构建短语，接着我们训练了多个Skip-gram模型，它们使用不同的超参数。在这之前，我们使用了300维的向量，上下文size=5。该设置可以在短语数据集上达到很好的效果，我们快速比较Negative Sampling和Hierarchical Softmax，是否采用高频token的subsampling。结果如表3所示：
+
+<img src="http://pic.yupoo.com/wangdren23/G9KQD812/medish.jpg">
+
+表3：Skip-gram在短语类比数据集上的准确率。这些模型在10亿词的新闻数据集上进行训练
+
+为了最大化短语类比任务的准确率，我们增加了训练数据量，使用了另一个包含330亿词汇的数据集。我们使用hierarchical softmax，1000维，上下文为整个句子。模型上的结果，准确率将达到72%。当我们将训练数据集减小到60亿的词汇量时，得到更低的准确率66%，这意味着，数据量的大小是十分重要的。
+
+为了更深理解，不同模型学到的词向量表示的不同，我们人工检查了不同模型下的不常用短语的最近邻词。如表4，我们展示了这样的一个比较样例。前面的结果是一致的，它展示了可以学到的短语最佳向量表示模型是：hierarchical softmax和subsampling。
+
+<img src="http://pic.yupoo.com/wangdren23/G9KXydvz/medium.jpg">
+
+表4：两个模型下，给定短语，与它们最接近的其它条目
+
+# 5.加法组合
+
+我们展示了由Skip-gram模型学到的词和短语向量表示，它们展示出一种线性结构，这使得使用向量运算来执行精准的analogical reasoing成为可能。有意思的是，我们发现，Skip-gram表示法展示出了另一种线性结构，它可以将词向量进行element-wise加法组成。该现象见表5.
+
+<img src="http://pic.yupoo.com/wangdren23/G9L4mp2b/medium.jpg">
+
+表5：使用element-wise加法的向量组合。使用最好的skip-gram模型得到的， 与该向量和接近的4个接近的tokens
+
+向量的加法属性可以通过对训练目标进行检查来解释。该词向量与softmax非线性的输入存在线性关系。训练出的词向量用来预测句子周围的词，这些向量可以被看成是，用来表示一个词在特定上下文出现中的分布。这些值与由输出层计算的概率的对数(logP)相关，两个词向量的和（sum）与两个上下文分布的乘积（product）相关联。这里的该乘积是AND函数：两个词向量中都分配了高概率的词，也会得到高概率，否则会得到低概率。因而，如果“Vloga River”在相同的句子中，与"Russian"和"river"出现的很频繁，那么两个词向量的和将产生这样的特征向量，它们与"Vloga River"很接近。
+
+# 6.目前的词向量表示的比较
+
+之前，有许多作者在基于词向量的神经网络领域工作，并发表了许多模型，可以用于进一步使用和比较：最著名的有Collober和Weston(2), Turian(17)，以及Mnih和Hinton的(10). 我们从网上下载了这些词向量, [下载地址](http://metaoptimize.com/projects/wordreprs/)。Mikolov(8)已经在词类比任务上评估了这些词向量表示，其中，Skip-gram模型达到了最好的性能和效果。
+
+<img src="http://pic.yupoo.com/wangdren23/G9LnNdqi/medish.jpg">
+
+表6：各种模型比较，空意味着词不在词汇表里.
+
+为了更深地理解学到的向量质量的不同之处，我们提供了表6的比较。这些示例中，Skip-gram模型在一个大的语料上进行训练，可以看到，效果比其它模型好。部分原因是因为模型训练的词料词汇超过300亿个词，是其它数据集的3个数量级。有意思的是，尽管训练集更大，Skip-gram的训练时间复杂度比前面的模型还要短。
 
 
 
@@ -64,11 +128,50 @@ Skip-gram模型的训练目标是，为预测一个句子或一个文档中某�
 － 1.[Domain adaptation for large-scale sentiment classi-
 fication: A deep learning approach](http://svn.ucc.asn.au:8080/oxinabox/Uni%20Notes/honours/refTesting/glorot2011domain.pdf)
 
-
-当数据集包含上百万的词时，该模型的表现优于基于分类的3-gram，但比paper 6中的NPLM表现差。这种层次化NPLM模型，比普通的NPLM快2个数量级。这种方法的主要限制，主要是用于构建word树的过程。该树可以从WordNet IS-A分类体系开始，通过结合人工和数据驱动处理，并将它转换成一个二叉树。我们的目标是，将该过程替换成从训练数据中自动构建树，不需要任何专家知识。我们也探索了使用树（里面的词汇至少出现一次）的性能优点。
-公式四：<img src="http://www.forkosh.com/mathtex.cgi?P(d_{i}=1|q_{i},w_{1:n-1})=\delta(\hat{r}^Tq_{i}+b_{i})">
-
-
-## 参考
-
-- 1.[A Scalable Hierarchical Distributed Language Model](http://www.cs.toronto.edu/~amnih/papers/hlbl_final.pdf)
+- 1 Yoshua Bengio, R´ejean Ducharme, Pascal Vincent, and Christian Janvin. A neural probabilistic language
+model. The Journal of Machine Learning Research, 3:1137–1155, 2003.
+- [2] Ronan Collobert and Jason Weston. A unified architecture for natural language processing: deep neural
+networks with multitask learning. In Proceedings of the 25th international conference on Machine
+learning, pages 160–167. ACM, 2008.
+- [3] Xavier Glorot, Antoine Bordes, and Yoshua Bengio. Domain adaptation for large-scale sentiment classi-
+fication: A deep learning approach. In ICML, 513–520, 2011.
+- [4] Michael U Gutmann and Aapo Hyv¨arinen. Noise-contrastive estimation of unnormalized statistical models,
+with applications to natural image statistics. The Journal of Machine Learning Research, 13:307–361,
+2012.
+- [5] Tomas Mikolov, Stefan Kombrink, Lukas Burget, Jan Cernocky, and Sanjeev Khudanpur. Extensions of
+recurrent neural network language model. In Acoustics, Speech and Signal Processing (ICASSP), 2011
+IEEE International Conference on, pages 5528–5531. IEEE, 2011.
+- [6] Tomas Mikolov, Anoop Deoras, Daniel Povey, Lukas Burget and Jan Cernocky. Strategies for Training
+Large Scale Neural Network Language Models. In Proc. Automatic Speech Recognition and Understanding,
+2011.
+- [7] Tomas Mikolov. Statistical Language Models Based on Neural Networks. PhD thesis, PhD Thesis, Brno
+University of Technology, 2012.
+- [8] Tomas Mikolov, Kai Chen, Greg Corrado, and Jeffrey Dean. Efficient estimation of word representations
+in vector space. ICLR Workshop, 2013.
+- [9] Tomas Mikolov, Wen-tau Yih and Geoffrey Zweig. Linguistic Regularities in Continuous Space Word
+Representations. In Proceedings of NAACL HLT, 2013.
+- [10] Andriy Mnih and Geoffrey E Hinton. A scalable hierarchical distributed language model. Advances in
+neural information processing systems, 21:1081–1088, 2009.
+- [11] Andriy Mnih and Yee Whye Teh. A fast and simple algorithm for training neural probabilistic language
+models. arXiv preprint arXiv:1206.6426, 2012.
+- [12] Frederic Morin and Yoshua Bengio. Hierarchical probabilistic neural network language model. In Proceedings
+of the international workshop on artificial intelligence and statistics, pages 246–252, 2005.
+- [13] David E Rumelhart, Geoffrey E Hintont, and Ronald J Williams. Learning representations by backpropagating
+errors. Nature, 323(6088):533–536, 1986.
+- [14] Holger Schwenk. Continuous space language models. Computer Speech and Language, vol. 21, 2007.
+- [15] Richard Socher, Cliff C. Lin, Andrew Y. Ng, and Christopher D. Manning. Parsing natural scenes and
+natural language with recursive neural networks. In Proceedings of the 26th International Conference on
+Machine Learning (ICML), volume 2, 2011.
+- [16] Richard Socher, Brody Huval, Christopher D. Manning, and Andrew Y. Ng. Semantic Compositionality
+Through Recursive Matrix-Vector Spaces. In Proceedings of the 2012 Conference on Empirical Methods
+in Natural Language Processing (EMNLP), 2012.
+- [17] Joseph Turian, Lev Ratinov, and Yoshua Bengio. Word representations: a simple and general method for
+semi-supervised learning. In Proceedings of the 48th Annual Meeting of the Association for Computational
+Linguistics, pages 384–394. Association for Computational Linguistics, 2010.
+- [18] Peter D. Turney and Patrick Pantel. From frequency to meaning: Vector space models of semantics. In
+Journal of Artificial Intelligence Research, 37:141-188, 2010.
+- [19] Peter D. Turney. Distributional semantics beyond words: Supervised learning of analogy and paraphrase.
+In Transactions of the Association for Computational Linguistics (TACL), 353–366, 2013.
+- [20] Jason Weston, Samy Bengio, and Nicolas Usunier. Wsabie: Scaling up to large vocabulary image annotation.
+In Proceedings of the Twenty-Second international joint conference on Artificial Intelligence-Volume
+Volume Three, pages 2764–2770. AAAI Press, 2011.
