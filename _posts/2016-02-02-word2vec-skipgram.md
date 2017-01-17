@@ -51,7 +51,7 @@ Skip-gram模型的训练目标是，为预测一个句子或一个文档中某�
 
 其中，c是训练上下文的size(wt是中心词)。c越大，会产生更多的训练样本，并产生更高的准确度，训练时间也更长。最基本的skip-gram公式使用softmax函数来计算p(wt+j|wt): 
 
-<img src="http://www.forkosh.com/mathtex.cgi?p(w_O|w_I)=\frac{exp(v'_{w_O}^Tv_{w_I}}){\sum_{w=1}^{W}exp(v'_{w}^Tv_{w_I}})">  (2)
+<img src="http://www.forkosh.com/mathtex.cgi?p(w_O|w_I)=\frac{exp(v'_{w_O}^Tv_{w_I})}{\sum_{w=1}^{W}exp(v'_{w}^Tv_{w_I}})">  (2)
 
 其中，vw和v'w表示w的输入向量和输出向量。W则是词汇表中的词汇数。该公式在实际中不直接采用，因为计算logp(wo|wi)的梯度与W成正比，经常很大(10^5-10^7次方)
 
