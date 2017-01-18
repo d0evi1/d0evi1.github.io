@@ -54,13 +54,23 @@ Skip-gram模型的训练目标是，为预测一个句子或一个文档中某�
 <img src="http://www.forkosh.com/mathtex.cgi?p(w_O|w_I)=\frac{exp(v'_{w_O}^T*v_{w_I})}{\sum_{w=1}^{W}exp(v'_{w}^T*v_{w_I})}">  (2)
 
 其中，vw和v'w表示w的输入向量和输出向量。W则是词汇表中的词汇数。该公式在实际中不直接采用，因为计算<img src="http://www.forkosh.com/mathtex.cgi?\nabla
-{logp(w_{O}|w_I)}">的梯度与W成正比，经常很大(10^5-10^7次方)
+{logp(w_{O}|w_I)}">与W成正比，经常很大(10^5-10^7次方)
 
 ## 2.1 Hierarchical Softmax
 
 略，详见另一篇。
 
 ## 2.2 Negative Sampling
+
+Hierarchical Softmax外的另一可选方法是Noise Contrastive Estimation(NCE)，它由Gutmann and Hyvarinen（4）提出，将由Mnih and Teh(11)用于语言建模中。NCE假设，一个好的模型应该能够通过logistic regression从噪声中区分不同的数据。这与Collobert and Weston（2）的hinge loss相类似，他通过将含噪声的数据进行排序来训练模型。
+
+而NCE可以近似最大化softmax的log概率，Skip-gram模型只关注学习高质量的向量表示，因此，我们可以自由地简化NCE，只要向量表示仍能维持它的质量。我们定义了Negative sampling(NEG)的目标函数：
+
+<img src="http://www.forkosh.com/mathtex.cgi?log\sigma{(v'_{w_O}^Tv_{w_I})}+\sum_{i=1}^kE_{w_i}~P_n(w)[log\sigma{(-v'_{w_i}^Tv_{w_I})}]">
+
+在Skip-gram目标函数中，每个<img src="http://www.forkosh.com/mathtex.cgi?P(w_O|w_I)">项都被替换掉。该任务是为了区分目标词wo，以及从使用logistic回归的噪声分布Pn(w)得到的词。其中每个数据样本存在k个negative样本。我们的试验中，对于小的训练数据集，k的值范围(5-20)是合适的；而对于大的数据集，k可以小到2-5。Negative sampling和NCE的最主要区分是，NCE同时需要样本和噪声分布的数值概率，而Negative sampling只使用样本。NCE逼近最大化softmax的log概率时，该特性对于我们的应用不是很重要。
+
+NCE和NEG都有噪声分布Pn(w)作为自由参数。对于Pn(w)我们采用了一些不同选择，在每个任务上使用NCE和NEG，我们尝试包含语言建模（该paper没提及），发现unigram分布U(w)提升到3/4幂（如：<img src="http://www.forkosh.com/mathtex.cgi?U(w)^{2/4}/Z">）时，胜过unigram和uniform分布很多！
 
 ## 2.3 高频词的subsampling
 
