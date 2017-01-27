@@ -39,7 +39,7 @@ Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://
 
 - Andriy Mnih, Geoffrey Hinton [A Scalable Hierarchical Distributed Language Model](http://www.cs.toronto.edu/~amnih/papers/hlbl_final.pdf)
 
-邱锡鹏 [词嵌入与语言模型](https://nndl.github.io/ch10.pdf)
+- 邱锡鹏 [词嵌入与语言模型](https://nndl.github.io/ch10.pdf)
 
 
 # 推荐系统
@@ -60,3 +60,26 @@ Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://
 
 - [Applying deep learning to Related Pins](https://engineering.pinterest.com/blog/applying-deep-learning-related-pins)
 
+- [The Wisdom of the Few:A Collaborative Filtering Approach Based on Expert Opinions from the Web](http://www.nuriaoliver.com/recsys/wisdomFew_sigir09.pdf)
+
+- [Restricted Boltzmann Machines for Collaborative Filtering](http://www.machinelearning.org/proceedings/icml2007/papers/407.pdf) 目前Netflix使用的主要推荐算法之一
+
+- LFM [Factorization Meets the Neighborhood: a Multifaceted Collaborative Filtering Model](http://www.inf.ed.ac.uk/teaching/courses/dme/studpres0910/DME-presentation-final.pdf)
+
+- [Collaborative Filtering with Temporal Dynamics](http://sydney.edu.au/engineering/it/~josiah/lemma/kdd-fp074-koren.pdf)
+
+- [Context-Aware Recommender Systems](http://ids.csom.umn.edu/faculty/gedas/NSFCareer/CARS-chapter-2010.pdf)
+
+- [Toward the next generation of recommender systems](http://pages.stern.nyu.edu/~atuzhili/pdf/TKDE-Paper-as-Printed.pdf)
+
+- [Information Seeking-Convergence of Search, Recommendations and Advertising](http://www.docin.com/p-1428852734.html)
+
+- [Ad Click Prediction: a View from the Trenches](https://www.eecs.tufts.edu/~dsculley/papers/ad-click-prediction.pdf)
+
+- [Performance of Recommender Algorithm on top-n Recommendation Task](https://www.researchgate.net/publication/221141030_Performance_of_recommender_algorithms_on_top-N_recommendation_tasks)
+
+
+
+LambdaMART
+
+- [Learning to Personalize Query Auto-Completion](https://www.microsoft.com/en-us/research/wp-content/uploads/2013/01/SIGIR2013-Shokouhi-PersonalizedQAC.pdf)
