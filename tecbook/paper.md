@@ -9,6 +9,17 @@ image:
 share: true
 ---
 
+L2R
+
+[机器学习及排序学习基础](http://www.icst.pku.edu.cn/lcwm/course/WebDataMining/slides2012/8%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%8F%8A%E6%8E%92%E5%BA%8F%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80.pdf)
+
+
+条件随机场(CRF)
+
+[Conditional Random Fields: Probabilistic Models
+for Segmenting and Labeling Sequence Data](http://repository.upenn.edu/cgi/viewcontent.cgi?article=1162&context=cis_papers)
+
+
 1.GBDT 
 
 Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://statweb.stanford.edu/~jhf/ftp/trebst.pdf)

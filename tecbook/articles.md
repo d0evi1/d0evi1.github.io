@@ -16,3 +16,6 @@ share: true
 
 - [Deep Learning, NLP, and Representations](http://colah.github.io/posts/2014-07-NLP-RNNs-Representations/) 中文翻译：[深度学习、自然语言处理和表征方法
 ](http://dataunion.org/9331.html)
+
+- [Spark性能优化指南——基础篇](http://tech.meituan.com/spark-tuning-basic.html)
+- [Spark性能优化指南——高级篇](http://tech.meituan.com/spark-tuning-pro.html) 
