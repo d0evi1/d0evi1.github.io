@@ -9,6 +9,14 @@ image:
 share: true
 ---
 
+
+
+-[隐马尔可夫模型HMM](http://www.kanungo.com/software/hmmtut.pdf)
+
+-[标注偏置问题](http://blog.csdn.net/zhoubl668/article/details/7787690)
+
+- [百度在NLP领域都做了什么？](http://weibo.com/ttarticle/p/show?id=2309351000224073265025919052)
+
 - [卷积网络训练太慢？Yann LeCun：已解决CIFAR-10，目标 ImageNet
 ](http://www.csdn.net/article/2015-01-16/2823579)
 
