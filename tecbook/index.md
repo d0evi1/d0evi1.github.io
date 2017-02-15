@@ -52,7 +52,8 @@ share: true
 
 - 1.宗庆成:[统计自然语言处理](http://book.douban.com/subject/3076996/)
 - 2.Michael Collins:[Natural Language Processing coursera](https://class.coursera.org/nlangp-001/lecture)
-- 3.[深度学习与自然语言处理](http://cs224d.stanford.edu/lectures/)
+- 3.[CS224D 深度学习与自然语言处理](https://www.youtube.com/watch?v=DJHvaGU9SW8)  [ppt](http://cs224d.stanford.edu/lectures/)
+
 
 ## 五、信息检索
 
@@ -62,6 +63,7 @@ share: true
 
 - 1.Movielens作者:[推荐系统导论: coursera，明尼苏达大学](https://www.coursera.org/learn/recommender-systems/home/welcome) : 知识系统还算全面，讲得不深，不过里面有好多大牛的interview。推荐一下。
 - 2.Netflix-Xavier Amatriain:[Recommender Systems](http://www.slideshare.net/xamat/recommender-systems-machine-learning-summer-school-2014-cmu)
+- 3.Quora-Xavier Amatriain:[Recsys 2016 tutorial: Lessons learned from building real-life recommender systems](http://www.slideshare.net/xamat/recsys-2016-tutorial-lessons-learned-from-building-reallife-recommender-systems)
 
 ## 七、计算广告
 
