@@ -50,6 +50,7 @@ share: true
 
 ## 四、NLP
 
+- 0.[语法分析_陆俭明](http://video.chaoxing.com/serie_400000443.shtml)
 - 1.宗庆成:[统计自然语言处理](http://book.douban.com/subject/3076996/)
 - 2.Michael Collins:[Natural Language Processing coursera](https://class.coursera.org/nlangp-001/lecture)
 - 3.[CS224D 深度学习与自然语言处理](https://www.youtube.com/watch?v=DJHvaGU9SW8)  [ppt](http://cs224d.stanford.edu/lectures/)
