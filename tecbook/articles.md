@@ -9,7 +9,9 @@ image:
 share: true
 ---
 
+- [张俊林：自然语言处理中的Attention Model：是什么及为什么](http://blog.csdn.net/malefactor/article/details/50550211)
 
+- [Tensorflow代码解析（一）](https://mp.weixin.qq.com/s?__biz=MzI1NTE4NTUwOQ==&mid=2650325923&idx=1&sn=da78a25969828712dc9a4f2bb5651b1d&chksm=f235a4a9c5422dbf34f71aacd3615f2dda591444a424fd22b1c9e6a9ba53ef54bb23e07505df&mpshare=1&scene=2&srcid=0220bwgIn2lYqlGfJwM54LWJ&from=timeline&key=e6258e13ab7be6a358c437079ae4b34269d949da9279a6fc476c4172f774ac245ee4a4c1a2eca36c0c3f4f9883229da7b5c0c805387cd46eedcf413b9075ab2450941da9827a6918d8d9337b3bc5140b&ascene=2&uin=MTgwOTU2NjU0MQ%3D%3D&devicetype=android-24&version=26050434&nettype=WIFI&abtest_cookie=AQABAAgAAQBChh4AAAA%3D&pass_ticket=6DuVPnztFAIQpSmZjV9LoPOmcRDsedh7JRBUY0eITVIZV9ksSSN6bVuXpK3mwyKn&wx_header=1)
 
 -[隐马尔可夫模型HMM](http://www.kanungo.com/software/hmmtut.pdf)
 
