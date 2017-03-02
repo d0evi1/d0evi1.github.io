@@ -9,6 +9,15 @@ image:
 share: true
 ---
 
+NLP
+
+1.[基于N-最短路径方法的中文词语粗分模型](http://wenku.baidu.com/link?url=ZF6WHQdnzOGc1why-ke86hU6JQfgsvjHP2s7Vek1AAFeu1aY_QmKPlovF2e7F-L9S96rcd24aEOSdyAadX3wuhM_3oDIlsgKE0jLtnzKVSS)
+
+2.[基于角色标注的中国人名自动识别研究](http://wenku.baidu.com/link?url=xVKmHHk8n7nUg2P8lI1yMx-nk6T-KTYvTiervGhleHNYy341o2LI8tlKD2qGbXdhHmEejdEF3oaMktEBvEFXklyA5JmMZfy7ap9p_Z47pbe)
+
+
+
+
 L2R
 
 [机器学习及排序学习基础](http://www.icst.pku.edu.cn/lcwm/course/WebDataMining/slides2012/8%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%8F%8A%E6%8E%92%E5%BA%8F%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80.pdf)
