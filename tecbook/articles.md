@@ -8,6 +8,7 @@ image:
   creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
 share: true
 ---
+- [TensorFlow: Machine Learning for Everyone](https://www.youtube.com/watch?v=mWl45NkFBOc&list=PLOU2XLYxmsIKGc_NBoIhTn2Qhraji53cv)
 
 - [张俊林：自然语言处理中的Attention Model：是什么及为什么](http://blog.csdn.net/malefactor/article/details/50550211)
 

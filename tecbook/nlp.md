@@ -11,7 +11,6 @@ share: true
 
 相应的语料
 
-
 1.英文NLP语料
 
 - [penn treebank](http://www.cis.upenn.edu/~treebank/)

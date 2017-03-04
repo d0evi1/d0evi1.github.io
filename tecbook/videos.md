@@ -9,6 +9,12 @@ image:
 share: true
 ---
 
+- [TensorFlow Tutorial (Sherry Moore, Google Brain)](https://www.youtube.com/watch?v=Ejec3ID_h0w)
+
+- [Keynote (TensorFlow Dev Summit 2017)](https://www.youtube.com/watch?v=4n1AHvDvVvw&index=3&list=PLOU2XLYxmsIKGc_NBoIhTn2Qhraji53cv)
+
+
+
 深度学习视频：
 
 [nvidia无人汽车：NVIDIA Autonomous Car](https://www.youtube.com/watch?v=qhUvQiKec2U)

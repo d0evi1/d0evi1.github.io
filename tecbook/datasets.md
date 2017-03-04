@@ -1,6 +1,6 @@
 ---
 layout: page
-title: 一些数据集 
+title: 数据集篇 
 description: ""
 image:
   feature: abstract-11.jpg
@@ -9,10 +9,8 @@ image:
 share: true
 ---
 
-相应数据集
+1.[斯坦福大学,SVHN数据集: 门牌号](http://ufldl.stanford.edu/housenumbers/)
 
-learning to rank:
+2.[Alex Krizhevsky, Vinod Nair, and Geoffrey Hinton: cifar-10数据集](http://www.cs.toronto.edu/~kriz/cifar.html)
 
-- LETOR, http://research.microsoft.com/en-us/um/beijing/projects/letor/
-- Microsoft Learning to Rank Dataset, http://research.microsoft.com/en-us/projects/mslr/
-- Yahoo Learning to Rank Challenge, http://webscope.sandbox.yahoo.com/
+3.
