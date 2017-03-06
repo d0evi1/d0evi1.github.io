@@ -9,6 +9,10 @@ image:
 share: true
 ---
 
+- [google brain: magenta自动音乐作曲](https://magenta.tensorflow.org/)
+
+- [tensorflow-dash](https://github.com/ppwwyyxx/dash-docset-tensorflow)
+
 1.[百度paddle平台](http://www.paddlepaddle.org/)
 
 2.[Facebook TorchCraft](https://github.com/TorchCraft/TorchCraft)
