@@ -8,6 +8,14 @@ image:
   creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
 share: true
 ---
+- [skip-gram](https://blog.gslin.org/archives/2013/09/29/3665/skip-gram/)
+
+- [tf.nn.max_pool](http://blog.csdn.net/mao_xiao_feng/article/details/53453926)
+
+- [Truncated normal distribution](https://en.wikipedia.org/wiki/Truncated_normal_distribution)
+
+- [fastText 90种语言训练vectors](https://github.com/facebookresearch/fastText/blob/master/pretrained-vectors.md)
+
 - [TensorFlow: Machine Learning for Everyone](https://www.youtube.com/watch?v=mWl45NkFBOc&list=PLOU2XLYxmsIKGc_NBoIhTn2Qhraji53cv)
 
 - [张俊林：自然语言处理中的Attention Model：是什么及为什么](http://blog.csdn.net/malefactor/article/details/50550211)
