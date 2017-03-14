@@ -47,7 +47,7 @@ share: true
 - 1.台大李宏毅[1天搞懂深度学习](http://download.csdn.net/download/lb521200200/9689343)
 - 2.Udacity [深度学习 from google](https://classroom.udacity.com/courses/ud730/lessons/6370362152/concepts/63798118150923)
 - 3.大神Geoffrey Hinton（略难）：[机器学习中使用的神经网络（coursera）](https://class.coursera.org/neuralnets-2012-001/lecture)
-- 4.[standford tensorflow: CS20SI](https://www.youtube.com/watch?v=g-EvyKpZjmQ&list=PLSPPwKHXGS2110rEaNH7amFGmaD5hsObs&spfreload=10) 
+- 4.[standford tensorflow: CS20SI](https://www.youtube.com/watch?v=g-EvyKpZjmQ&list=PLSPPwKHXGS2110rEaNH7amFGmaD5hsObs&spfreload=10) [配套课件ppt](http://web.stanford.edu/class/cs20si/syllabus.html) 
 
 
 ## 四、NLP
