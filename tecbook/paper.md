@@ -9,6 +9,19 @@ image:
 share: true
 ---
 
+画风迁移
+
+1.[Inceptionism: Going Deeper into Neural Networks](https://research.googleblog.com/2015/06/inceptionism-going-deeper-into-neural.html)
+
+2.[Perceptual Losses for Real-Time Style Transfer and Super-Resolution](https://github.com/jcjohnson/fast-neural-style)
+
+3.[Image Style Transfer using Convolutional Neural Networks](http://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Gatys_Image_Style_Transfer_CVPR_2016_paper.pdf)
+
+
+LSTM
+
+[基于RNN的LSTM架构：解决大词汇量语音识别](http://arxiv.org/pdf/1402.1128v1.pdf)
+
 NLP
 
 1.[基于N-最短路径方法的中文词语粗分模型](http://wenku.baidu.com/link?url=ZF6WHQdnzOGc1why-ke86hU6JQfgsvjHP2s7Vek1AAFeu1aY_QmKPlovF2e7F-L9S96rcd24aEOSdyAadX3wuhM_3oDIlsgKE0jLtnzKVSS)
@@ -50,6 +63,8 @@ Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://
 - 4.V. Dumoulin and F. Visin [深度学习卷积算法指南](https://arxiv.org/pdf/1603.07285v1.pdf)
 
 # word2vec
+
+- [A Closer Look at Skip-gram Modelling ](http://homepages.inf.ed.ac.uk/ballison/pdf/lrec_skipgrams.pdf)
 
 - 1.Tomas Mikolov, Kai Chen, Greg Corrado, Jeffrey Dean
  [Efficient Estimation of Word Representations in Vector Space](https://arxiv.org/pdf/1301.3781v3.pdf)
