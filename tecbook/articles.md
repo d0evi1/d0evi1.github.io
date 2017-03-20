@@ -8,6 +8,9 @@ image:
   creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
 share: true
 ---
+
+- [RNN:莎士比亚体生成器](http://karpathy.github.io/2015/05/21/rnn-effectiveness/)
+
 - [skip-gram](https://blog.gslin.org/archives/2013/09/29/3665/skip-gram/)
 
 - [tf.nn.max_pool](http://blog.csdn.net/mao_xiao_feng/article/details/53453926)
