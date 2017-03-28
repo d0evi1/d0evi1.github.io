@@ -11,6 +11,10 @@ share: true
 
 相应的语料
 
+[中科院自然语言研究组](http://nlp.ict.ac.cn/index_zh.php)
+
+[搜狗实验室语料](http://www.sogou.com/labs/resource/list_yuliao.php)
+
 1.英文NLP语料
 
 - [penn treebank](http://www.cis.upenn.edu/~treebank/)

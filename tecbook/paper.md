@@ -70,6 +70,14 @@ Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://
  [Efficient Estimation of Word Representations in Vector Space](https://arxiv.org/pdf/1301.3781v3.pdf)
 - 2.Tomas Mikolov, Ilya Sutskever, Kai Chen[Distributed Representations of Words and Phrases and their Compositionality](https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf) 
 
+# Sentence2Vec
+
+[From Word Embeddings To Document Distances](http://jmlr.org/proceedings/papers/v37/kusnerb15.pdf)
+
+[Distributed Representations of Sentences and Documents](http://cs.stanford.edu/~quocle/paragraph_vector.pdf)
+
+[Skip-Thought Vectors](https://arxiv.org/pdf/1506.06726v1.pdf)
+
 # Hierarchical Softmax
 
 - Andriy Mnih, Geoffrey Hinton [A Scalable Hierarchical Distributed Language Model](http://www.cs.toronto.edu/~amnih/papers/hlbl_final.pdf)
