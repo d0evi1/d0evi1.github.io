@@ -6,8 +6,9 @@ modified: 2016-12-03
 tags: [深度学习]
 ---
 
+youtube的基于深度学习的推荐系统，主要分成两大部分：
 
-# 候选生成
+# 一、候选生成
 
 将推荐当成是一个多分类问题，预测问题为：视频库V，有上百万的视频，某用户U，在上下文C上，在时间t时的观看行为wt，刚好是某个视频i.
 
@@ -23,13 +24,13 @@ tags: [深度学习]
 
 在提供服务的阶段（serving time），我们需要计算最可能的N个分类（视频），以便选中其中的top N，来展现给用户。对上百w级的item进行打分，会在10ms左右的延迟内完成。之前的Youtube系统靠hashing技术[24]解决，和这里描述的分类器使用相类似的技术。由于在serving time时并不需要对softmax输出层校准(calibrated)likelihoods，打分问题(scoring problem)可以缩减至在点乘空间中的最近邻搜索问题，可以使用[12]中提供的库来完成。我们发现，在最近邻搜索算法上做A/B test效果并不特别明显。
 
-## 模型架构
+## 1.1 模型架构
 
 受语言模型中的CBOW(continuous bag of words)的启发，我们为固定视频库中的每个视频学到了高维emdeddings，并将它们的emdeddings作为输入前馈(feed)给一个前馈神经网络。用户的观看历史，被表示成一个关于稀疏视频id的可变长的序列，通过embeddings，它被映射到一个dense vector表示中。该网络需要固定大小的dense inputs，以及在不同策略中(sum, component-wise max，等)执行的emdeddings的简单平均。最重要的，emdeddings会和其它一些模型参数，通过普通的梯度下降后向传播更新即可学到。特征被级联到一个很宽的第一层上（wide first layer），后面跟着许多层的完全连接的ReLU层[6]。图3展示了整体架构，带有下面将要描述的额外的非视频观看特征（no-video watch features）。
 
 <img src="http://pic.yupoo.com/wangdren23/GkBOhLXy/medish.jpg">
 
-## 多种信号
+## 1.2 多种信号
 
 使用深度神经网络作为普通的矩阵分解，其中一个关键优点是，任何连续的特征和类别特征都可以很方便地加进模型中。搜索历史的处理，可以与观看历史的处理方式相类似 -- 每一个查询(query)可以tokenized化成1-gram和2-gram，每一个token都可被嵌入。一旦求平均，用户的tokenized化的嵌入式query，代表了一个总结型的稠密搜索历史(summarized dense search history)。人口统计学特征（Demographic features），对于新用户的推荐很重要。用户的地域和设备信息(device)，都可以被嵌入和串联。简单的二元特征和连续特征，比如用户性别，登陆态，年龄，都可以归一化到[0,1]上的实数值，直接输入到该网络。
 
@@ -45,7 +46,7 @@ YouTube上，每秒都有许多视频上传上来。推荐这些最新上传的�
 
 图4: 对于一个给定的视频[26]，使用样本age作为特征训练的模型能够精准表示数据的上传时间和与时间相关的流行度间的关系。如果没有该特征，模型将会预测在训练窗口上的近似平均似然(baseline)。
 
-## Label和Context选择
+## 1.3 Label和Context选择
 
 需要重点强调的是，推荐(recommendation)通常涉及到求解一个替找问题（surrogate problem），并将结果转换成一个特殊上下文。一个经典的示例是，如果能准确预测rating，会产生有效的电影推荐[2]。我们已经发现，这种代理学习问题（surrogate learning problem）在A/B testing上很重要，但很难在离线试验中进行衡量。
 
@@ -59,7 +60,7 @@ YouTube上，每秒都有许多视频上传上来。推荐这些最新上传的�
 
 图5: 选择labels和输入上下文给模型，在离线评估时很有挑战性，但对真实的效果有巨大提升。这里，实心事件•表示网络的输入特征，而空心事件◦表示排除在外。我们发现，预测一个将来的观看(5b)，在A/B test中效果更好。在(5b)中，样本的age通过t_max-t_N来表示，其中t_max是训练数据中观察到的最大时间。
 
-## 3.5 特征和深度的试验
+## 1.4 特征和深度的试验
 
 如图6所示，添加特征和深度，可以极大提升在holdout data上的precision。在这些试验中，1M的视频量，和1M的搜索tokens，被嵌入到256个float值上，每个都在一个最大的bag-size：50个最近的watches和50个最近的searches。softmax层输出一个在1M个视频classes、256维的多项分布(可以看成是一个独立的output video emdedding)。这些模型被训练，直接覆盖所有的YouTube用户，对应在数据上的多个epochs上。网络结构按一个公共的"tower"模式，在网络的底部是最宽的，每个后继的隐层，将单元数二等分（与图3相同）。深度为0的网络，是一个有效的线性因式分解模型，它的效果与以往的系统很相似。宽度（width）和深度（depth），被添加，直到增量的效果越来越小，覆盖率越来越难：
 
@@ -71,7 +72,7 @@ YouTube上，每秒都有许多视频上传上来。推荐这些最新上传的�
 
 <img src="http://pic.yupoo.com/wangdren23/GkHGYqVO/medish.jpg">
 
-# 4.Ranking
+# 二、Ranking
 
 Ranking的主要作用是，使用隐式数据为特征的UI来指定和校正候选预测（candidate predictions）。例如，用户通常会观看一个probability值较高的视频，但不大可能去点击指定的主页上缩略图的暴光。在Ranking时，我们会访问许多描述视频的特征、以及视频与用户关系的特征，因为在候选集生成阶段，只有一小部分的视频被打过分，而非上百w的视频。Ranking对于聚合不同的候选源很重要，因为每个源的得分不能直接对比。
 
@@ -82,7 +83,7 @@ Ranking的主要作用是，使用隐式数据为特征的UI来指定和校正�
 图7: 深度ranking网络架构，描绘了嵌入的类别特征（单值和多值类别都存在），与归一化的连续特征的embeddings和powers共享。所有的层都是完全连接的。惯例上，成百上千的特征都可以输入到网络中。
 
 
-## 4.1 特征表示
+## 2.1 特征表示
 
 我们的特征，与传统的类别特征分类，以及连续型/普通特征相互隔离。类别型特征，在基数上变化多样--一些是二元的（比如：用户是否登陆），而其它可能具上百w可能的值（比如：用户最新的搜索query）。特征会进一步分割，根据它们是否贡献单值（“univalent”），或者多值集合(“multivalent”)。关于单值类别特征的一个示例是：暴光的视频id被打过分；而相应的多值特征可能是一个关于最新N个用户观看过的视频id包。我们也将特征进行分类，根据它们是否描述了item的属性("impression")或者user/context的属性（"query"）。Query特征在每次请求时会被计算一次，而impression特征则会为每个item计算。
 
@@ -106,13 +107,13 @@ Ranking的主要作用是，使用隐式数据为特征的UI来指定和校正�
 
 另外，原始的归一化特征<img src="http://www.forkosh.com/mathtex.cgi?hat_{x}">，我们也输入<img src="http://www.forkosh.com/mathtex.cgi?hat_{x}^2">和<img src="http://www.forkosh.com/mathtex.cgi?\sqrt{hat_x}">，给网络更多有表现力的阶，通过允许它，很容易形成特征的super-linear和sub-linear function。我们发现：输入连续特征的阶，可以提升离线的accuracy。
 
-## 4.2 建模期望的Watch Time
+## 2.2 建模期望的Watch Time
 
 我们的目标是，给定训练样本：包含正例（暴光的视频被点击）和负例（暴光的视频没被点击），来预测期望的观看时间。正例可以解释成：该用户花费观看该视频的时间量。为了预测期望的观看时间，我们出于该目的，开发并使用加权logistic regression技术。
 
 该模型的训练通过logistic regression和cross-entropy loss进行（图7）。然而，正例（被点的）的暴光，会由视频所观察到的观看时间进行加权。所有负例（未点击）的暴光，都使用单位加权。这种方式下，通过logistic regression学到的差异（odds）是：<img src="http://www.forkosh.com/mathtex.cgi?\frac{\sum{T_i}}{N-k}">，其中N是训练样本的数目，k是正例暴光的数目，Ti是第i个暴光的观看时间。假设，正例暴光很小（真实情况就这样），学到的差异(odds)近似为：<img src="http://www.forkosh.com/mathtex.cgi?E[T](1+P)">，其中P是点击概率，而E[T]是该暴光所期望的观看时间。由于P很小，该乘积近似为E[T]。为便于推理，我们使用指数函数e^x作为最终的激活函数，来产成这些odds，来近似估计期望的观看时长。
 
-## 4.3 隐层的试验
+## 2.3 隐层的试验
 
 表1展示了，我们在下一天的holdout数据上，使用不同的隐层配置所获得的结果。Value展示了每个配置（"加权，每用户的loss"），包括正例和负例，暴光展示给单个页内的某个用户。我们首先使用我们的模型对两种暴光进行打分。如果负例的暴光接受到更高的分值，那么我们会认为，正例的观看时长为：误预测的观看时长（mispredicted watch time）。加权的每用户loss，就是误预测的观看时间的总量，作为一个分数，在heldout暴光pair上的一个总观看时长。
 
@@ -126,4 +127,4 @@ Ranking的主要作用是，使用隐式数据为特征的UI来指定和校正�
 
 # 参考
 
-－ 1.[Deep Neural Networks for YouTube Recommendations](https://static.googleusercontent.com/media/research.google.com/zh-CN//pubs/archive/45530.pdf)
+－ 0.[Deep Neural Networks for YouTube Recommendations](https://static.googleusercontent.com/media/research.google.com/zh-CN//pubs/archive/45530.pdf)
