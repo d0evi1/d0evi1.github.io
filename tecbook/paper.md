@@ -119,10 +119,13 @@ Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://
 
 - [Ad Click Prediction: a View from the Trenches](https://www.eecs.tufts.edu/~dsculley/papers/ad-click-prediction.pdf)
 
+- [Practical Lessons from Predicting Clicks on Ads at Facebook](https://pdfs.semanticscholar.org/daf9/ed5dc6c6bad5367d7fd8561527da30e9b8dd.pdf)
+
 - [Performance of Recommender Algorithm on top-n Recommendation Task](https://www.researchgate.net/publication/221141030_Performance_of_recommender_algorithms_on_top-N_recommendation_tasks)
 
 - google:[youtube 2016: Deep Neural Networks for YouTube Recommendations](https://static.googleusercontent.com/media/research.google.com/zh-CN//pubs/archive/45530.pdf) 中文：[YouTube基于深度神经网络的推荐系统](http://mp.weixin.qq.com/s?__biz=MzA5NzkxMzg1Nw==&mid=2653160648&idx=1&sn=9dc76c587452f6e13ef835bed48cde4a&scene=0)
 - google:[Label Partitioning For Sublinear Ranking](http://www.thespermwhale.com/jaseweston/papers/label_partitioner.pdf)
+
 
 
 
