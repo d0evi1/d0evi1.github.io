@@ -62,7 +62,7 @@ YouTube上，每秒都有许多视频上传上来。推荐这些最新上传的�
 
 ## 1.4 特征和深度的试验
 
-如图6所示，添加特征和深度，可以极大提升在holdout data上的precision。在这些试验中，1M的视频量，和1M的搜索tokens，被嵌入到256个float值上，每个都在一个最大的bag-size：50个最近的watches和50个最近的searches。softmax层输出一个在1M个视频classes、256维的多项分布(可以看成是一个独立的output video emdedding)。这些模型被训练，直接覆盖所有的YouTube用户，对应在数据上的多个epochs上。网络结构按一个公共的"tower"模式，在网络的底部是最宽的，每个后继的隐层，将单元数二等分（与图3相同）。深度为0的网络，是一个有效的线性因式分解模型，它的效果与以往的系统很相似。宽度（width）和深度（depth），被添加，直到增量的效果越来越小，覆盖率越来越难：
+如图6所示，添加特征和深度，可以极大提升在holdout data上的precision。在这些试验中，1M的视频量，和1M的搜索tokens，被嵌入到256个float值上，每个都在一个最大的bag-size：50个最近的watches和50个最近的searches。softmax层输出一个在1M个视频classes、256维的多项分布(可以看成是一个独立的output video emdedding)。这些模型被训练，直接覆盖所有的YouTube用户，对应在数据上的多个epochs上。网络结构按一个公共的"tower"模式，在网络的底部是最宽的，每个后继的隐层，将单元数二等分（与图3相同）。深度为0的网络，是一个有效的线性因式分解模型，它的效果与以往的系统很相似。增加宽度（width）和深度（depth），直到增量的效果越来越小，收敛越来越难：
 
 - Depth 0: 一个线性层，可简单地将串联层转换成与softmax相匹配的256维.
 - Depth 1: 256 ReLU
