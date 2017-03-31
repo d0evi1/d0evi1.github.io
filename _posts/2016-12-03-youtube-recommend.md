@@ -103,9 +103,9 @@ Ranking的主要作用是，使用隐式数据为特征的UI来指定和校正�
 
 **归一化连续特征(Normalizing Continuous Features)**
 
-众所周知，神经网络对于输入的归一化和分布是很敏感的[9]，其它方法（比如：决策树ensembles）对于独立特征的缩放(scaling)是稳定的。我们发现，对连续特征进行合理的归一化，对于收敛来说很重要。连续特征x，具有分布f，被转换成x^，通过对值进行归一化，比如：特征平均地分布在[0,1)上使用累积分布，<img src="http://www.forkosh.com/mathtex.cgi?\hat_{x}=\int_{-\infty}^{x}df">。该积分与特征值的分位数的线性插值相近似，在训练开始这，在所有数据上的单个pass中计算。
+众所周知，神经网络对于输入的归一化和分布是很敏感的[9]，其它方法（比如：决策树ensembles）对于独立特征的缩放(scaling)是稳定的。我们发现，对连续特征进行合理的归一化，对于收敛来说很重要。连续特征x，具有分布f，被转换成x^，通过对值进行归一化，比如：特征平均地分布在[0,1)上使用累积分布，<img src="http://www.forkosh.com/mathtex.cgi?\hat{x}=\int_{-\infty}^{x}df">。该积分与特征值的分位数的线性插值相近似，在训练开始这，在所有数据上的单个pass中计算。
 
-另外，原始的归一化特征<img src="http://www.forkosh.com/mathtex.cgi?\hat_{x}">，我们也输入<img src="http://www.forkosh.com/mathtex.cgi?\hat_{x}^2">和<img src="http://www.forkosh.com/mathtex.cgi?\sqrt{\hat_x}">，给网络更多有表现力的阶，通过允许它，很容易形成特征的super-linear和sub-linear function。我们发现：输入连续特征的阶，可以提升离线的accuracy。
+另外，原始的归一化特征<img src="http://www.forkosh.com/mathtex.cgi?\hat{x}">，我们也输入<img src="http://www.forkosh.com/mathtex.cgi?\hat{x}^2">和<img src="http://www.forkosh.com/mathtex.cgi?\sqrt{\hat{x}}">，给网络更多有表现力的阶，通过允许它，很容易形成特征的super-linear和sub-linear function。我们发现：输入连续特征的阶，可以提升离线的accuracy。
 
 ## 2.2 对期望的观看时长建模
 
