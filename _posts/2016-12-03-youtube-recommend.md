@@ -107,7 +107,7 @@ Ranking的主要作用是，使用隐式数据为特征的UI来指定和校正�
 
 另外，原始的归一化特征<img src="http://www.forkosh.com/mathtex.cgi?\hat_{x}">，我们也输入<img src="http://www.forkosh.com/mathtex.cgi?\hat_{x}^2">和<img src="http://www.forkosh.com/mathtex.cgi?\sqrt{\hat_x}">，给网络更多有表现力的阶，通过允许它，很容易形成特征的super-linear和sub-linear function。我们发现：输入连续特征的阶，可以提升离线的accuracy。
 
-## 2.2 建模期望的Watch Time
+## 2.2 对期望的观看时长建模
 
 我们的目标是，给定训练样本：包含正例（曝光的视频被点击）和负例（曝光的视频没被点击），来预测期望的观看时间。正例可以解释成：该用户花费观看该视频的时间量。为了预测期望的观看时间，我们出于该目的，开发并使用加权logistic regression技术。
 
