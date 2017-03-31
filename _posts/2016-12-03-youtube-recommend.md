@@ -2,7 +2,7 @@
 layout: post
 title: youtube基于深度学习的推荐
 description: 
-modified: 2016-02-02
+modified: 2016-12-03
 tags: [深度学习]
 ---
 
