@@ -26,3 +26,9 @@ share: true
 6.google [DeepMind Lab](https://github.com/deepmind/lab)
 
 7.[darts-java: 双数组trie树实现](https://github.com/komiya-atsushi/darts-java)
+
+[word2vec](https://code.google.com/archive/p/word2vec/)
+
+[paragraph2vec:PVDM](https://github.com/JonathanRaiman/PVDM)
+
+[gensim](http://radimrehurek.com/gensim/)
