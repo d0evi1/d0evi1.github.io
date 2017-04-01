@@ -1,10 +1,12 @@
 ---
 layout: post
-title: word2vec中的Skip-gram
+title: paragraph2vec介绍
 description: 
 modified: 2016-03-05
 tags: [sentence2vec]
 ---
+
+paragraph2vec在[1]有详细介绍，我们先来看下具体的概念：
 
 ## 1.PV-DM:(Paragraph Vector:Distributed Memory model) 
  
