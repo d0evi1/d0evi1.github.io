@@ -29,6 +29,6 @@ share: true
 
 [word2vec](https://code.google.com/archive/p/word2vec/)
 
-[paragraph2vec:PVDM](https://github.com/JonathanRaiman/PVDM)
+[paragraph2vec: PV-DM, PV-DBOW](https://github.com/JonathanRaiman/PVDM)
 
 [gensim](http://radimrehurek.com/gensim/)
