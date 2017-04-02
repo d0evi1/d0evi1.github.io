@@ -62,6 +62,9 @@ Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://
 
 - 4.V. Dumoulin and F. Visin [深度学习卷积算法指南](https://arxiv.org/pdf/1603.07285v1.pdf)
 
+
+- [facebook: modout](http://www.uoguelph.ca/~gwtaylor/publications/modout.pdf)
+
 # word2vec
 
 - [A Closer Look at Skip-gram Modelling ](http://homepages.inf.ed.ac.uk/ballison/pdf/lrec_skipgrams.pdf)
