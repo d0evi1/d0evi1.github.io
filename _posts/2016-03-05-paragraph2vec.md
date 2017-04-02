@@ -6,35 +6,38 @@ modified: 2016-03-05
 tags: [sentence2vec]
 ---
 
-paragraph2vec在[1]有详细介绍，我们先来看下具体的概念：
+我们都清楚word2vec，这是Deep NLP最基本的任务。对于词有词向量，对于句子，或者是段落，也一样可以生成相应的向量（注意：两者的向量空间是不一样，不能合在一个空间中）。paragraph2vec在[1]有详细介绍，我们先来看下具体的概念：
 
 ## 1.PV-DM:(Paragraph Vector:Distributed Memory model) 
  
-学习段落向量(paragraph vector)的方法，受词向量(word vector)方法的启发。词向量会被用于预测句子中的下一个词。因此，尽管实际上，词向量的初始化是随机的，它们仍可以捕获语义，作为预测任务的间接结果。我们在paragraph vector中使用相类似的方式。从段落中抽样获得多个上下文，paragraph vector也同样可以用来预测下一个词。
+受词向量(word vector)方法的启发，我们也学习到段落向量(paragraph vector)。词向量会被用于预测句子中的下一个词。因此，尽管实际上词向量的初始化是随机的，它们仍可以捕获语义，作为预测任务的间接结果。我们在paragraph vector中使用相类似的方式。在给定从段落中抽样获取多个上下文的情况下，也可使用paragraph vector来预测下一个词。
 
 在我们的Paragraph Vector框架中(见图2), 每个段落（paragraph）都被映射到一个唯一的vector中，表示成矩阵D中的某一列；每个词(word)都映射到一个某一个向量中，表示成矩阵W中的某一列。对paragraph vector和word vector求平均，或者级联(concatenated)起来，以预测在上下文中的下一个词。在该试验中，我们使用级联(concatenation)作为组合向量的方法。
 
 <img src="http://pic.yupoo.com/wangdren23/Gl206Ip6/medish.jpg">
 
-图2: 学习paragraph vector的框架。该框架与word2vec的框架相似；唯一的区别了，会将额外的paragraph token通过矩阵D映射到一个vector中。在该模型中，级联或对该向量求平均，再带上一个三个词的上下文，用来预测第4个词。paragraph vector表示从当前上下文缺失的信息，可以看成是paragraph主题的记忆单元。
+图2: 学习paragraph vector的框架。该框架与word2vec的框架相似；唯一的区别是：会有额外的paragraph token通过矩阵D映射到一个vector中。在该模型中，对该向量以及再带上一个三个词的上下文，对它们进行级联或者求平均，用来预测第4个词。paragraph vector表示从当前上下文缺失的信息，可以看成是关于该段落(paragraph)的主题(topic)的记忆单元。
 
 更正式的，在模型中与词向量框架的唯一变化是，h是从W和D中构建的。
 
-paragraph的token可以认为是另一个词。它扮演的角色是，作为一个记忆单元，记住当前上下文--或者paragraph的主题。出于该原因，我们经常称该模型为Paragraph Vector分布式记忆模型（PV-DM）。
+**paragraph的token可以认为是另一个词**。它扮演的角色是，作为一个记忆单元，可以记住当前上下文所缺失的东西--或者段落（paragraph）的主题。出于该原因，我们经常称该模型为Paragraph Vector分布式记忆模型（PV-DM：Distributed Memory Model of Paragraph Vectors）。
 
-上下文是固定长度的，从沿paragraph滑动的一个滑动窗口中采样。所有相同paragraph生成的上下文，共享着paragraph vector。不同的paragraphs间，共享着相同的词向量矩阵W，比如，单词"powerful"的向量，对于所有paragraphs是相同的。
+上下文是固定长度的，从沿段落（paragraph）滑动的一个滑动窗口中采样。**所有在相同段落（paragraph）上生成的上下文，共享着相同的paragraph vector。在不同的段落（paragraphs）间，则共享着相同的词向量矩阵W**，比如，单词"powerful"的向量，对于所有段落（paragraphs）是相同的。
 
-paragraph vectors和word vectors都使用SGD进行训练，梯度通过backpropagation算法求得。在SGD的每一步，你可以从一个随机paragraph中抽样一个固定长度的上下文，计算error的梯度，更新模型参数。
+Paragraph Vectors和Word Vectors都使用SGD进行训练，梯度通过backpropagation算法求得。在SGD的每一步，你可以从一个随机paragraph中抽样一个固定长度的上下文，计算error的梯度，更新模型参数。
 
-在预测阶段，对于一个新的paragraph，需要执行一个推断步骤(inference)来计算paragraph vector。这也可以通过梯度下降法获取。在该步骤时，对于模型其余部分的参数，word vectors W以及softmax weights，是固定的。
+在预测阶段，对于一个全新的段落（paragraph），需要执行一个推断步骤(inference)来计算paragraph vector。这也可以通过梯度下降法获取。在该步骤时，对于模型其余部分的参数，word vectors:W以及softmax的权重，是固定的。
 
-假设在语料中有N个段落（paragraph），词汇表中有M个词，我们希望学到paragraph vectors，每个paragraph都被映射到p维上，每个word被映射到q维上，接着该模型具有总共N x p + M x q 个参数（将softmax参数排除在外）。尽管当N很大时，参数的数目会很大，在训练期间的更新通常是稀疏的，并且很有效。
+假设在语料中有N个段落（paragraph），词汇表中有M个词，我们希望学到paragraph vectors，每个paragraph都被映射到p维上，每个word被映射到q维上，接着该模型具有总共**N x p + M x q** 个参数（将softmax参数排除在外）。尽管当N很大时，参数的数目会很大，在训练期间的更新通常是稀疏的，并且很有效。
 
-在训练之后，paragraph vectors可以当成是该paragraph的特征(例如：代替bow或作为bow的额外附加)。我们可以将这些features直接输入到常用的机器学习技术（LR, SVM或者K-means）中。
+在训练之后，paragraph vectors可以当成是该段落（paragraph）的特征（例如：代替bow或作为bow的额外附加）。我们可以将这些features直接输入到常用的机器学习技术（LR, SVM或者K-means）中。
 
-总之，算法本身有两个关键步骤：1) 在training阶段：在已知的paragraphs上，获取词向量W，softmax的权重(U,b)以及paragraph向量D. 2)在inference阶段，保持W,U,b固定不变，通过增加D中的更多列，在D上进行梯度下降，为新的paragraph（未曾见过的）获取paragraph vectors D。我们使用D来做预测关于更多的特定labels。
+总之，算法本身有两个关键步骤：
 
-**paragraph vectors的优点**：paragraph vectors的一个重要优点是，它们可以从未标记的数据（unlabeld data）中学到，在没有足够多带标记的数据（labeled data）上仍工作良好。
+- 1) 在训练（training）阶段：在已知的段落（paragraphs）上，获取词向量W，softmax的权重(U,b)以及paragraph vector: D. 
+- 2) 在推断（inference）阶段：保持W,U,b固定不变，通过增加D中的更多列，在D上进行梯度下降，为新未曾见过的的段落(paragraph)获取paragraph vectors: D。我们使用D来做预测关于更多的特定labels。
+
+**paragraph vectors的优点**：paragraph vectors的一个重要优点是，它们可以从未标记的数据（unlabeled data）中学到，在没有足够多带标记的数据（labeled data）上仍工作良好。
 
 Paragraph vectors也抛出了一些BOW模型所具有的核心缺点。首先，它们继承了词向量的一个重要特性：词的语义（sematics）。在该空间中，比起"Paris"， "powerful"与"strong"更接近。Paragraph vector的第二个优点是：它们会考虑词顺序，至少在某个小上下文上，相同方式下，n-gram模型则有一个大的n。另一个重要点，因为n-gram模型保留着一部分paragraph的信息，包括词顺序。也就是说，我们的模型可能优于一个bag-of-n-gram模型，因为一个bag-of-n-gram模型可能创建出一个高维表示，这很难泛化。
 
