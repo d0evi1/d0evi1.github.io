@@ -39,7 +39,7 @@ Paragraph Vectors和Word Vectors都使用SGD进行训练，梯度通过backpropa
 
 **paragraph vectors的优点**：paragraph vectors的一个重要优点是，它们可以从未标记的数据（unlabeled data）中学到，在没有足够多带标记的数据（labeled data）上仍工作良好。
 
-Paragraph vectors也抛出了一些BOW模型所具有的核心缺点。首先，它们继承了词向量的一个重要特性：词的语义（sematics）。在该空间中，比起"Paris"， "powerful"与"strong"更接近。Paragraph vector的第二个优点是：它们会考虑词顺序，至少在某个小上下文上，相同方式下，n-gram模型则有一个大的n。另一个重要点，因为n-gram模型保留着一部分paragraph的信息，包括词顺序。也就是说，我们的模型可能优于一个bag-of-n-gram模型，因为一个bag-of-n-gram模型可能创建出一个高维表示，这很难泛化。
+Paragraph vectors也抛出了一些BOW模型所具有的核心缺点。首先，它们继承了词向量的一个重要特性：词的语义（sematics）。在该空间中，对比"Paris"与"strong"，"powerful"与"strong"更接近。Paragraph vector的第二个优点是：它们会考虑词顺序（至少在某个小上下文上会考虑），与n-gram模型(有一个大的n)的方式相同。这十分重要，因为n-gram模型保留着一部分段落(paragraph)的信息，包括词顺序。也就是说，我们的模型可能优于一个bag-of-n-gram模型，因为一个bag-of-n-gram模型可以创建出一个高维表示，这很难泛化。
 
 ## 2.PV-DBOW: (无词序的Paragraph Vector: Distributed BOW)
 
