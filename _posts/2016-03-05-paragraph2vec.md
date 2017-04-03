@@ -43,18 +43,121 @@ Paragraph vectors也抛出了一些BOW模型所具有的核心缺点。首先，
 
 ## 2.PV-DBOW: (无词序的Paragraph Vector: Distributed BOW)
 
-上面的方法使用的是，在一个文本窗口中，paragraph vector的串联模式，以及词向量来预测下一个词。另一种方法则是忽略掉输入中的上下文词汇，强制模型去预测从paragraph中随机抽样出的词作为输出。在实际上，这意味着，在SGD的每次迭代中，我们可以抽样一个文本窗口，接着从该文本窗口中抽样一个随机词汇，去构建这样一个分类器任务来获取Paragraph Vector。该技术如图3所示。我们将该版本称为：PV-DBOW (Distributed
+上面的方法会将paragraph vector和词向量串联起来来预测一个文本窗口中的下一个词。接下来的另一种方法则是忽略掉输入中的上下文词汇，强制模型去预测从段落(paragraph)中随机抽样出的词作为输出。在实际上，这意味着，在SGD的每次迭代中，我们可以抽样一个文本窗口，接着从该文本窗口中抽样一个随机词汇，去构建这样一个分类器任务来获取Paragraph Vector。该技术如图3所示。我们将该版本称为：PV-DBOW (Distributed
 Bag of Words version of Paragraph Vector)
 
 <img src="http://pic.yupoo.com/wangdren23/Gl3kipIb/medish.jpg">
 
 图3: PV-DBOW.在该版本中，训练该paramgraph vector以预测在一个小窗口中的词汇.
 
-除了概念简单，该模型存储的数据更少。我们只需要存储softmax的权重，而PV-DM则需要存储softmax权得以及词向量。该模型与word2vec中的skip-gram模型相类似。
+除了概念简单之外，该模型存储的数据也更少。**我们只需要存储softmax的权重，而PV-DM则需要存储softmax权重以及词向量**。该模型与word2vec中的skip-gram模型相类似。
 
-在我们的试验中，每个paragraph vector是一个两种向量的组合：一个标准PV-DM模型由学到，另一个PV-DBOW模型学到的。对于大多数任务PV-DM单独工作也能达到很好的效果（state-of-art），如果与PV-DBOW组合在一起使用，在许多不同任务上可以更一致，强烈推荐使用组合方式。
+在我们的试验中，每个paragraph vector是一个两种向量的组合：一个标准PV-DM模型由学到，另一个PV-DBOW模型学到的。对于大多数任务PV-DM单独工作也能达到很好的效果（state-of-art），**如果与PV-DBOW组合在一起使用，在许多不同任务上可以更一致，强烈推荐使用组合方式**。
 
-## 3.实现
+## 3.实验
+
+我们会对paragraph vectors的表现进行实验。
+
+对于语义分析，我们使用两个数据集：Stanford sentiment
+treebank dataset 以及 IMDB dataset。这些数据集中的文档在长度上区别很大：Stanford数据集是单句，而IMDB则包含着多句。
+
+我们也在一个信息检索任务上测试我们的方法，目标是：给定一个query，一个文档是否该被索引出。
+
+### 3.1 基于sentiment-treebank数据集的Sentiment Analysis
+
+数据集：该数据集首先在2005年提出，随后在2013进行扩展，是sentiment analysis的一个benchmark。它包含了11855个句子，从烂蕃茄（Rotten Tomatoes）的电影评论中获取。
+
+该数据集包含了三个集合：8544个句子用于训练(training)，2210个句子用于测试(test)，1101个句子用于验证(validation)。
+
+数据集中的每个句子都有一个label，表示极性的正负程度，从0.0到1.0.label由亚马逊的众包（Amazon Mechanical Turk）人工标注完成。
+
+该数据集对于句子有详细的label，子句（subphrases）同样也需要。为了达成该目标，Socker et al.(2013b)使用Stanford Parser(Klein & Manning,2003)来将每个句子解析成子短语(subphrases)。子短语接着以相同的方式被人口标注。目前该数据集总共有239232个带标记的句子。数据集下载地址：[https://nlp.stanford.edu/sentiment/](https://nlp.stanford.edu/sentiment/)
+
+任务以及Baselines: 在(Socker et al.,2013b)中，作者提出了两种benchmarking的方法。首先，可以考虑5-way细粒度分类任务，对应的label为：{Very Negative, Negative, Neutral, Positive, Very Positive}或一个2-way的粗粒度分类：{Negative, Positive}。另外，可以分为：是对整句，或者子短语的划分。本工作主要针对完整句子的labeling.
+
+**在该数据集中，Socher应用许多方法，并发现Recursive Neutral Tensor Network比BOW模型更好！** 这里仍有争议，因为电影评论应常很短，语义合成性（compositionality）在决定评论极性时扮演着重要角色。对于这个小训练集，也提定了词语间的相似度。
+
+试验协定：我们按照(Socher et al.2013b)所描述的实验约定。为了充分利用带标记数据，在我们的模型中，每个子句，都被当成是一个独立的句子，我们将为训练集中所有的子句学习它的向量表示。
+
+在学习到训练句子和它们的子句的向量表示之后，我们将它们输入到一个logistic regression中来学习电影评分的预测。
+
+在测试时，我们确定每个词的向量表示，使用梯度下降学到句子的向量表示。一旦学到测试句子的向量表示，我们将它们输入到logistic regression中来预测电影评分。
+
+在我们的试验中，我们使用验证集做window size的交叉验证，可选的window size为8. 该分类器的向量表示是两个向量的串联：一个来自PV-DBOW，另一个来自PV-DM。在PV-DBOW中，学到的段落向量表示为400维。在PV-DM中，学到的词向量和段落向量表示均为400维。为了预测第8个房屋中，我们将paragraph vectors和7个word vectors相串联。**我们将特征字符“,.!?”这些看成是一个普通词。如果该段落（paragraph）少于9个词，我们会预补上（pre-pad）一个特殊的NULL符号（NULL word symbol）。**
+
+结果：如表1所示。我们上报了不同方式的错误率。该表中高度部分是BOW或者是bag-of-n-gram模型(NB, SVM, NiNB)的效果很差。对词向量求平均（以BOW的方式）不会提升结果。因为BOW模型不会考虑句子是如何构成的（比如：词顺序），因此在识别许多复杂语义现象时（例如：反讽:sarcasm）会失败。结果也展示了更多的高级方法（比如：Socher.2013b的RNN），它需要parsing以及会对语义合成性做理解，效果更好。
+
+<img src="http://pic.yupoo.com/wangdren23/Gll3HMbd/medium.jpg">
+
+我们的方法比所有的这些baselines都要好，尽管实际上不需要parsing。在粗粒度分类任务上，我们的方法在error-rates上有2.4%的提升。相对提升16%!
+
+### 3.2 多句：IMDB数据集的Sentiment Analysis
+
+前面的技术只应用在单句上，而非带有多句的段落或者文档上。例如：RNN会基于在每个句子上进行parsing，而对于多个句子上的表示的组合是不清楚的。这种技术只限制在句子上，而不能用在段落或者文档上。
+
+我们的方法不需要parsing，它可以对于一个包含多句的长文档生成一个表示。这个优点使人们的方法比其它方法更通用。下面的试验在IMDB数据集上展示了该优点。
+
+数据集：IMDB数据集，首先由Maas et al., 2011提出作为sentiment analysis的一个benchmark. 该数据集包含来自IMDB的10W的电影评论。该数据集的一个关键点是，每个电影评论都有多句话。
+
+10w的电影评论被分成三个数据集：2.5W带标记的训练实例，2.5W带标记的测试实例，5W未标记的训练实例。有两类label: 正向（Positive），负向（Negative）。这些label对于训练集和测试集是均衡的(balanced)。数据集下载：[http://ai.stanford.edu/~amaas/data/sentiment/](http://ai.stanford.edu/~amaas/data/sentiment/)
+
+实验约定：我们会使用7.5W的训练文档（2.5W已经标注的实例，5W未标注的实例）来学到word vectors和paragraph vectors。对于2.5W已标注实例的paragraph vectors，接着会输入(feed)到一个单层的、含50个单元神经网络中，以及一个logistic分类器来预测语义。
+
+在测试时，给定一个测试语句，我们再次固定网络的其余部分，通过梯度下降学到测试评论中段落向量（paragraph vectors）。当学到向量时，我们将它们输入到神经网络中来预测评论的sentiment。
+
+我们的paragraph vector模型的超参数，和先前的任务相同。特别的，我们交叉验证了window size，最优的window size为10个词。输入到分类器的向量表示，是两个向量的串联，一个是PV-DBOW，另一个是PV-DM。在PV-DBOW中，学到的向量表示具有400维。在PV-DM中，为words和documents学到的向量表示都有400维。为了预测第10个词，我们将paragraph vectors和word vectors相串联。特殊词：",.!?"被看成是一个普通词来对街。如果文档比9个词少。我们会使用一个特殊的NULL词符号进行以预补足（pre-pad）。
+
+结果：Paragraph Vectors的结果和其它baselines如表2所示。对于长文档，BOW模型执行很好，很难在它们之上使用词向量进行提升。最大的提升发生在2012年(Dahl et al.2012)，它将一个RBM模型与BOW相组合。两种模型的组合在error-rates上有1.5%的提升。
+
+另一个大提升来自(Wang & Manning,2012)。他们使用了许多变种，在bigram特征上使用NBSVM，效果最好，在error-rates上有2%的提升。
+
+在该paper上描述的方法，超出了10%的error-rate提升。它达到了7.42%，比上面最好的模型有1.3%的绝对提升(相对提升有15%)
+
+<img src="http://pic.yupoo.com/wangdren23/GlluSRb1/medium.jpg">
+
+表2: IMDB的Paragraph vector的效果对比.
+
+### 3.3 使用PV的IR
+
+我们在IR任务中，使用固定长度的paragraph表示。
+
+这里，我们有一个段落数据集，给定100W的最流行搜索，返回有10个结果。这些段落的线一个都被称为片段“snippet”，它是一个网页的内容摘要，以及一个网页是如何匹配query的。
+
+从这些collection中，我们派生了一个新的数据集作为测试集的paragraph向量表示。两个段落（paragraph）是对于相同的query的结果，第三个段落(paragraph）是从该collection的其它部分随机抽样得到的paragraph（作为一个不同的query得到的结果返回）。我们的目标是，确认这三个paragraph中哪些是相同query返回的结果。为了达到该目的，我们使用paragraph vectors，并计算paragraphs间的距离(distance)。也就是说：相同查询的段落对的距离的距离小，以及不同查询的段落对(paragraphs pairs)间的距离大。
+
+这里有关于三个段落的一个样本，第一个段落更接近于第二个段落（比第三个）：
+
+- 段落1: calls from ( 000 ) 000 - 0000 . 3913
+calls reported from this number . according to 4 reports the identity of this caller is american airlines .
+- 段落2: do you want to find out who called you
+from +1 000 - 000 - 0000 , +1 0000000000 or ( 000
+) 000 - 0000 ? see reports and share information you
+have about this caller
+- 段落3: allina health clinic patients for your
+convenience , you can pay your allina health clinic
+bill online . pay your clinic bill now , question and
+answers...
+
+该三联体(triplets)被划分为三个数据集：80%训练，10%验证，10%测试。任何方法都需要在训练集上学习，而超参数的选择则在验证集上选择。
+
+我们对4种方法做benchmark，并计算段落的特征：bag-of-words, bag-of-bigrams, 对词向量求平均，对Paragraph Vector求平均。为了提升bag-of-bigrams，我们也学到了一个加权的martix：前2个的距离最小化，第1个和第3个段落的距离最大化（两个losses间的加权因子是个hyperparameter）
+
+当每个方法中，两个段落的距离越来越小，第一个和第三个段落的距离越来越大时，我们记录了对应的时间数。如果方法不生成期望的结果，会出来一个error。
+
+Paragraph Vector的结果和其它baseline如表3所示。在该任务中，我们发现，TF-IDF的加权效果比raw counts要好，因此，我们只上报了TF-IDF weighting方法。
+
+结果展示了Paragraph Vector工作良好，在error-rate给出了一个32%的相对提升。实际上，paragraph-vector的方法好于bag-of-words以及bag-of-bigrams。
+
+<img src="http://pic.yupoo.com/wangdren23/GllFt7Cy/medium.jpg">
+
+### 3.4 一些进一步观察
+
+- PV-DM比PV-DBOW的一致性要好。单独使用PV-DM达到的效果与本paper中的许多结果相接近（见表2）。例如，在IMDB上，PV-DM只达到了7.63%。PV-DM与PV-DBOW合一起更好一些（7.42%），因而推荐使用。
+- 在PV-DM中使用串联(concatenation)，通常比求和(sum)更好。
+- 对window-size进行cross-validate更好。许多应用的window size在：5-12之间.
+- Paragraph Vector的计算开销大，但可以在测试时并行完成。平均的，我们的实现花了30分钟来计算IMDB测试集的paragraph vector，使用16-core机器(2.5W文档，每个文档平均230个词)
+
+## 4.实现
 
 gensim的models.doc2vec实现了该模型。
 
