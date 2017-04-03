@@ -52,7 +52,7 @@ Bag of Words version of Paragraph Vector)
 
 除了概念简单之外，该模型存储的数据也更少。**我们只需要存储softmax的权重，而PV-DM则需要存储softmax权重以及词向量**。该模型与word2vec中的skip-gram模型相类似。
 
-在我们的试验中，每个paragraph vector是一个两种向量的组合：一个标准PV-DM模型由学到，另一个PV-DBOW模型学到的。对于大多数任务PV-DM单独工作也能达到很好的效果（state-of-art），**如果与PV-DBOW组合在一起使用，在许多不同任务上可以更一致，强烈推荐使用组合方式**。
+在我们的试验中，每个paragraph vector是一个两种向量的组合：一个向量由标准PV-DM模型学到，另一个向量由PV-DBOW模型学到的。对于大多数任务PV-DM单独工作也能达到很好的效果（state-of-art），**如果与PV-DBOW组合在一起使用，在许多不同任务上可以更一致，强烈推荐使用组合方式**。
 
 ## 3.实验
 
