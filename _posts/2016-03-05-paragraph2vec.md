@@ -75,15 +75,15 @@ treebank dataset 以及 IMDB dataset。这些数据集中的文档在长度上�
 
 任务以及Baselines: 在(Socker et al.,2013b)中，作者提出了两种benchmarking的方法。首先，可以考虑5-way细粒度分类任务，对应的label为：{Very Negative, Negative, Neutral, Positive, Very Positive}或一个2-way的粗粒度分类：{Negative, Positive}。另外，可以分为：是对整句，或者子句的划分。本工作主要针对完整句子的labeling.
 
-**在该数据集中，Socher应用许多方法，并发现Recursive Neutral Tensor Network比BOW模型更好！** 这里仍有争议，因为电影评论应常很短，语义合成性（compositionality）在决定评论极性时扮演着重要角色。对于这个小训练集，也提定了词语间的相似度。
+**在该数据集中，Socher应用许多方法，并发现Recursive Neutral Tensor Network比BOW模型更好！** 这里仍有争议，因为电影评论通常很短，语义合成性（compositionality）在决定评论极性正负时扮演着重要角色。对于这个小训练集，对词语间的相似度也同样很重要。
 
-试验协定：我们按照(Socher et al.2013b)所描述的实验约定。为了充分利用带标记数据，在我们的模型中，每个子句，都被当成是一个独立的句子，我们将为训练集中所有的子句学习它的向量表示。
+试验约定：我们按照(Socher et al.2013b)所描述的实验约定。为了充分利用带标记数据，在我们的模型中，每个子句，都被当成是一个独立的句子，我们将为训练集中所有的子句学到它的向量表示。
 
 在学习到训练句子和它们的子句的向量表示之后，我们将它们输入到一个logistic regression中来学习电影评分的预测。
 
 在测试时，我们确定每个词的向量表示，使用梯度下降学到句子的向量表示。一旦学到测试句子的向量表示，我们将它们输入到logistic regression中来预测电影评分。
 
-在我们的试验中，我们使用验证集做window size的交叉验证，可选的window size为8. 该分类器的向量表示是两个向量的串联：一个来自PV-DBOW，另一个来自PV-DM。在PV-DBOW中，学到的段落向量表示为400维。在PV-DM中，学到的词向量和段落向量表示均为400维。为了预测第8个房屋中，我们将paragraph vectors和7个word vectors相串联。**我们将特征字符“,.!?”这些看成是一个普通词。如果该段落（paragraph）少于9个词，我们会预补上（pre-pad）一个特殊的NULL符号（NULL word symbol）。**
+在我们的试验中，我们使用验证集对window size交叉验证，可选的window size为8。该分类器的向量表示是两个向量的串联：一个来自PV-DBOW，另一个来自PV-DM。在PV-DBOW中，学到的段落向量表示为400维。在PV-DM中，学到的词向量和段落向量表示均为400维。为了预测第8个房屋中，我们将paragraph vectors和7个word vectors相串联。**我们将特征字符“,.!?”这些看成是一个普通词。如果该段落（paragraph）少于9个词，我们会预补上（pre-pad）一个特殊的NULL符号（NULL word symbol）。**
 
 结果：如表1所示。我们上报了不同方式的错误率。该表中高度部分是BOW或者是bag-of-n-gram模型(NB, SVM, NiNB)的效果很差。对词向量求平均（以BOW的方式）不会提升结果。因为BOW模型不会考虑句子是如何构成的（比如：词顺序），因此在识别许多复杂语义现象时（例如：反讽:sarcasm）会失败。结果也展示了更多的高级方法（比如：Socher.2013b的RNN），它需要parsing以及会对语义合成性做理解，效果更好。
 
@@ -97,7 +97,7 @@ treebank dataset 以及 IMDB dataset。这些数据集中的文档在长度上�
 
 我们的方法不需要parsing，它可以对于一个包含多句的长文档生成一个表示。这个优点使人们的方法比其它方法更通用。下面的试验在IMDB数据集上展示了该优点。
 
-数据集：IMDB数据集，首先由Maas et al., 2011提出作为sentiment analysis的一个benchmark. 该数据集包含来自IMDB的10W的电影评论。该数据集的一个关键点是，每个电影评论都有多句话。
+数据集：IMDB数据集，首先由Maas et al., 2011提出作为sentiment analysis的一个benchmark. 该数据集包含来自IMDB的10W的电影评论。该数据集的一个关键点是，每个电影评论都有多句话组成。
 
 10w的电影评论被分成三个数据集：2.5W带标记的训练实例，2.5W带标记的测试实例，5W未标记的训练实例。有两类label: 正向（Positive），负向（Negative）。这些label对于训练集和测试集是均衡的(balanced)。数据集下载：[http://ai.stanford.edu/~amaas/data/sentiment/](http://ai.stanford.edu/~amaas/data/sentiment/)
 
@@ -159,6 +159,8 @@ Paragraph Vector的结果和其它baseline如表3所示。在该任务中，我�
 
 ## 4.实现
 
+# 4.1 gensim实现
+
 gensim的models.doc2vec实现了该模型。
 
 {% highlight python %}
@@ -202,6 +204,18 @@ class gensim.models.doc2vec.Doc2Vec(documents=None,
 
 - [doc2vec-IMDB](https://github.com/RaRe-Technologies/gensim/blob/develop/docs/notebooks/doc2vec-IMDB.ipynb)  
 - [test-doc2vec](https://github.com/RaRe-Technologies/gensim/blob/develop/gensim/test/test_doc2vec.py)
+
+
+## 二、Tomas Mikolov的c实现
+
+Tomas Mikolov在[https://groups.google.com/forum/#!msg/word2vec-toolkit/Q49FIrNOQRo/J6KG8mUj45sJ](https://groups.google.com/forum/#!msg/word2vec-toolkit/Q49FIrNOQRo/J6KG8mUj45sJ)处提供了他的sentence2vec的实现。
+
+## 三、其它实现
+
+[https://github.com/zseymour/phrase2vec](https://github.com/zseymour/phrase2vec)
+
+
+
 
 
 # 参考
