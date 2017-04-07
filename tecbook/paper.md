@@ -126,6 +126,7 @@ Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://
 
 - [Performance of Recommender Algorithm on top-n Recommendation Task](https://www.researchgate.net/publication/221141030_Performance_of_recommender_algorithms_on_top-N_recommendation_tasks)
 
+- google:[Improving User Topic Interest Profiles by Behavior Factorization](http://www.www2015.it/documents/proceedings/proceedings/p1406.pdf)
 - google:[youtube 2016: Deep Neural Networks for YouTube Recommendations](https://static.googleusercontent.com/media/research.google.com/zh-CN//pubs/archive/45530.pdf) 中文：[YouTube基于深度神经网络的推荐系统](http://mp.weixin.qq.com/s?__biz=MzA5NzkxMzg1Nw==&mid=2653160648&idx=1&sn=9dc76c587452f6e13ef835bed48cde4a&scene=0)
 - google:[Label Partitioning For Sublinear Ranking](http://www.thespermwhale.com/jaseweston/papers/label_partitioner.pdf)
 
