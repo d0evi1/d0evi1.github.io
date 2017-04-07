@@ -9,6 +9,9 @@ image:
 share: true
 ---
 
+- [google知识图谱：Introducing the Knowledge Graph: things, not strings
+](https://googleblog.blogspot.com/2012/05/introducing-knowledge-graph-things-not.html?hl=zh_CN)
+
 - [RNN:莎士比亚体生成器](http://karpathy.github.io/2015/05/21/rnn-effectiveness/)
 
 - [skip-gram](https://blog.gslin.org/archives/2013/09/29/3665/skip-gram/)
@@ -41,6 +44,7 @@ share: true
 
 - [Spark性能优化指南——基础篇](http://tech.meituan.com/spark-tuning-basic.html)
 - [Spark性能优化指南——高级篇](http://tech.meituan.com/spark-tuning-pro.html)
+
 
 
 - [2011 新浪微博用户兴趣建模系统架构](https://mp.weixin.qq.com/s?__biz=MzI3NDExNDY3Nw==&mid=2649764841&idx=1&sn=97401c7c3da224fe9a5c79fb448ee71f&mpshare=1&scene=23&srcid=0329BE9MRGDIXvL1rk1Ef1uX&key=c9492367ab57709f0dda13eb48f8cd4737263ee404ee8610602c4769cd7deebc24c95f4a2f040addf4d608c613651fed2a2d6d8f4d1dfdbd98a6a38456bf80a2f5d389198953d9b0a4ba57985a17098f&ascene=0&uin=Mjc4OTc3NDM1&devicetype=iMac+MacBookPro11%2C1+OSX+OSX+10.12.3+build(16D32)&version=11020201&pass_ticket=AQARqvCPIeOsMt3RTYtYXAV3tAK5%2FwOPJ5PUUTPOUAiG%2BhquPHvH29P8VAF3w9KG)
