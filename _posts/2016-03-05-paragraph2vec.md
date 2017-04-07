@@ -200,6 +200,13 @@ class gensim.models.doc2vec.Doc2Vec(documents=None,
 - dbow_words: 如果设置为1, 则会训练word-vectors(以skip-gram的方式)，同时训练DBOW的doc-vector；缺省为0(只训练doc-vectors训练会更快）
 - trim_rule: 词汇表剪枝规则，指定了特定的词是否应保留在词汇表中，是否被削剪掉，或者使用缺省方式处理（如果词的count<min_count，直接抛弃）. 可以置为None(即使用min_count)，或者使用一个回调，使用参数(word,count,min_count)，返回下述值：util.RULE_DISCARD, util.RULE_KEEP or util.RULE_DEFAULT. 注意：如果给定该规则，会使用它在build_vocab()期间来剪枝词汇表，不会被当成是模型的一部分进行保存。
 
+另几个比较重要的函数：
+
+- delete_temporary_training_data(keep_doctags_vectors=True, keep_inference=True)
+
+抛弃在训练时和评分时用到的参数。如果你确认模型训练完了，就可以使用它。keep_doctags_vectors=False，不会保存doctags向量，这种情况下，不可以使用most_similar进行相似度判断。keep_inference=False表示，你不希望保存用于infer_vector的参数.
+
+
 相应的示例代码，可以参见: 
 
 - [doc2vec-IMDB](https://github.com/RaRe-Technologies/gensim/blob/develop/docs/notebooks/doc2vec-IMDB.ipynb)  
@@ -209,6 +216,9 @@ class gensim.models.doc2vec.Doc2Vec(documents=None,
 ## 二、Tomas Mikolov的c实现
 
 Tomas Mikolov在[https://groups.google.com/forum/#!msg/word2vec-toolkit/Q49FIrNOQRo/J6KG8mUj45sJ](https://groups.google.com/forum/#!msg/word2vec-toolkit/Q49FIrNOQRo/J6KG8mUj45sJ)处提供了他的sentence2vec的实现。
+
+- cbow=0: 表示PV-DBOW.
+
 
 ## 三、其它实现
 
