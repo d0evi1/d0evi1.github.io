@@ -108,6 +108,8 @@ val sameModel = DistributedLDAModel.load(sc,
 
 {% endhighlight %}
 
+关于更详细的说明，详见代码。这是spark mllib的一个通病（文档不够细，示例不够全）。
+
 
 参考：
 
