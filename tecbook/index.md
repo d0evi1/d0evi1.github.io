@@ -35,6 +35,10 @@ share: true
 - 4.[机器学习基础（coursera）](https://class.coursera.org/ntumlone-003/lecture)
 - 5.[机器学习技法（coursera）](https://class.coursera.org/ntumltwo-002/lecture)
 
+另一位，台大，李宏毅(下面的深度学习课程也有他)：
+
+- [NTUEE ML 2016](https://www.youtube.com/watch?v=fegAeph9UaA)
+
 
 上海交大，张志华教授：
 
