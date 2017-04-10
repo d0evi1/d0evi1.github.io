@@ -46,7 +46,7 @@ share: true
 - 0.[神经网络简史](http://blog.sina.com.cn/s/blog_71329a960102v1eo.html)
 - 1.台大李宏毅[1天搞懂深度学习](http://download.csdn.net/download/lb521200200/9689343)
 - 2.Udacity [深度学习 from google](https://classroom.udacity.com/courses/ud730/lessons/6370362152/concepts/63798118150923)
-- 3.台大李宏毅[NTUEE MLDS](https://www.youtube.com/playlist?list=PLJV_el3uVTsPMxPbjeX7PicgWbY7F8wW9)
+- 3.台大李宏毅[NTUEE MLDS:youtube](https://www.youtube.com/playlist?list=PLJV_el3uVTsPMxPbjeX7PicgWbY7F8wW9) [bilibili](http://space.bilibili.com/23852932/#!/channel/detail?cid=11583)
 - 4.大神Geoffrey Hinton（略难）：[机器学习中使用的神经网络（coursera）](https://class.coursera.org/neuralnets-2012-001/lecture)
 - 5.[standford tensorflow: CS20SI](https://www.youtube.com/watch?v=g-EvyKpZjmQ&list=PLSPPwKHXGS2110rEaNH7amFGmaD5hsObs&spfreload=10) [配套课件ppt](http://web.stanford.edu/class/cs20si/syllabus.html) 
 
