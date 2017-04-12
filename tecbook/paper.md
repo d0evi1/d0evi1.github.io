@@ -9,20 +9,20 @@ image:
 share: true
 ---
 
-画风迁移
+# 画风迁移
 
-1.[Inceptionism: Going Deeper into Neural Networks](https://research.googleblog.com/2015/06/inceptionism-going-deeper-into-neural.html)
+- 1.[Inceptionism: Going Deeper into Neural Networks](https://research.googleblog.com/2015/06/inceptionism-going-deeper-into-neural.html)
 
-2.[Perceptual Losses for Real-Time Style Transfer and Super-Resolution](https://github.com/jcjohnson/fast-neural-style)
+- 2.[Perceptual Losses for Real-Time Style Transfer and Super-Resolution](https://github.com/jcjohnson/fast-neural-style)
 
-3.[Image Style Transfer using Convolutional Neural Networks](http://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Gatys_Image_Style_Transfer_CVPR_2016_paper.pdf)
+- 3.[Image Style Transfer using Convolutional Neural Networks](http://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Gatys_Image_Style_Transfer_CVPR_2016_paper.pdf)
 
 
-LSTM
+# LSTM
 
 [基于RNN的LSTM架构：解决大词汇量语音识别](http://arxiv.org/pdf/1402.1128v1.pdf)
 
-NLP
+# NLP
 
 1.[基于N-最短路径方法的中文词语粗分模型](http://wenku.baidu.com/link?url=ZF6WHQdnzOGc1why-ke86hU6JQfgsvjHP2s7Vek1AAFeu1aY_QmKPlovF2e7F-L9S96rcd24aEOSdyAadX3wuhM_3oDIlsgKE0jLtnzKVSS)
 
@@ -31,18 +31,18 @@ NLP
 
 
 
-L2R
+# L2R
 
 [机器学习及排序学习基础](http://www.icst.pku.edu.cn/lcwm/course/WebDataMining/slides2012/8%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%8F%8A%E6%8E%92%E5%BA%8F%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80.pdf)
 
 
-条件随机场(CRF)
+# 条件随机场(CRF)
 
 [Conditional Random Fields: Probabilistic Models
 for Segmenting and Labeling Sequence Data](http://repository.upenn.edu/cgi/viewcontent.cgi?article=1162&context=cis_papers)
 
 
-1.GBDT 
+# 1.GBDT 
 
 Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://statweb.stanford.edu/~jhf/ftp/trebst.pdf)
 
@@ -52,7 +52,7 @@ Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://
 
 [Click-Through Rate Estimation for Rare Events in Online Advertising](http://www.cs.cmu.edu/~xuerui/papers/ctr.pdf)
 
-3.神经网络
+# 3.神经网络
 
 - 1.Yann LeCun[Gradient-based learning applied to document recognition](https://d3c33hcgiwev3.cloudfront.net/_d4267aa84a9339a0a646b0ce1bbcdbb7_Gradient-based-learning-applied-to-document-recognition.pdf?Expires=1479427200&Signature=j1yj7~V-O8jOKYUqwI7eMpHrvBLtGvuf7Zm4GiN53xuZIazcv~be8p1U35CdJfcSE-VnuOSSkRBmaMe7PDuDxSdVZQ4SVF4YNpsMfbNN-qgVOgVTxRjDRabRY3o3lidiqC8PMxHRWAwt2qwfKsAgBHIGItjkM3uc~J40sw6hCkY_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A)
 
@@ -86,6 +86,11 @@ Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://
 - Andriy Mnih, Geoffrey Hinton [A Scalable Hierarchical Distributed Language Model](http://www.cs.toronto.edu/~amnih/papers/hlbl_final.pdf)
 
 - 邱锡鹏 [词嵌入与语言模型](https://nndl.github.io/ch10.pdf)
+
+# LDA
+
+- [Parameter estimation for text analysis](http://www.arbylon.net/publications/text-est.pdf)
+- [Blei:Latent Dirichlet Allocation](http://www.cs.columbia.edu/~blei/papers/BleiNgJordan2003.pdf)
 
 
 # 推荐系统
