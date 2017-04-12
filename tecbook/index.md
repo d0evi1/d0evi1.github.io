@@ -45,7 +45,9 @@ share: true
 
 - 0.[神经网络简史](http://blog.sina.com.cn/s/blog_71329a960102v1eo.html)
 
-- 2.Udacity [深度学习 from google](https://classroom.udacity.com/courses/ud730/lessons/6370362152/concepts/63798118150923)
+Udacity google 
+
+- [深度学习 from google](https://classroom.udacity.com/courses/ud730/lessons/6370362152/concepts/63798118150923)
 
 另一位，台大，李宏毅(下面的深度学习课程也有他)：
 
@@ -54,9 +56,14 @@ share: true
 - [NTUEE MLDS:youtube](https://www.youtube.com/playlist?list=PLJV_el3uVTsPMxPbjeX7PicgWbY7F8wW9) [bilibili](http://space.bilibili.com/23852932/#!/channel/detail?cid=11583)
 
 
-- 4.大神Geoffrey Hinton（略难）：[机器学习中使用的神经网络（coursera）](https://class.coursera.org/neuralnets-2012-001/lecture)
+大神Geoffrey Hinton（略难，案例多）：
 
-- 5.[standford tensorflow: CS20SI](https://www.youtube.com/watch?v=g-EvyKpZjmQ&list=PLSPPwKHXGS2110rEaNH7amFGmaD5hsObs&spfreload=10) [配套课件ppt](http://web.stanford.edu/class/cs20si/syllabus.html) 
+- [机器学习中使用的神经网络（coursera）](https://class.coursera.org/neuralnets-2012-001/lecture)
+
+
+tensorflow：
+
+- [standford tensorflow: CS20SI](https://www.youtube.com/watch?v=g-EvyKpZjmQ&list=PLSPPwKHXGS2110rEaNH7amFGmaD5hsObs&spfreload=10) [配套课件ppt](http://web.stanford.edu/class/cs20si/syllabus.html) 
 
 
 ## 四、NLP
