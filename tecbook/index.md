@@ -83,6 +83,13 @@ share: true
 － 1.[深度学习与计算机视觉](http://study.163.com/course/introduction.htm?courseId=1003223001#/courseDetail)
 
 
+==========================================================
+
+并行计算篇
+
+1.[Stanford CUDA](https://www.youtube.com/watch?v=3mjRwd7qVbM&index=1&list=PL3ZuCUakLElUfLVRoyFKl_FeeYcIOLm0p)
+
+
 
 # 工具篇
 
