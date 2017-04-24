@@ -17,6 +17,8 @@ share: true
 
 深度学习视频：
 
+[deep neural networks are easily fooled](https://www.youtube.com/watch?v=M2IebCN9Ht4)
+
 [nvidia无人汽车：NVIDIA Autonomous Car](https://www.youtube.com/watch?v=qhUvQiKec2U)
 
 [CES 2016: NVIDIA DRIVENet Demo - Visualizing a Self-Driving Future (part 5)
