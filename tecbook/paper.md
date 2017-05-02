@@ -48,6 +48,8 @@ Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://
 
 陈天奇 [Introduction to Boosted Trees](http://homes.cs.washington.edu/~tqchen/pdf/BoostedTree.pdf)
 
+[kdd2016: XGBoost: A Scalable Tree Boosting System](http://www.kdd.org/kdd2016/papers/files/rfp0697-chenAemb.pdf)
+
 2.CTR平滑
 
 [Click-Through Rate Estimation for Rare Events in Online Advertising](http://www.cs.cmu.edu/~xuerui/papers/ctr.pdf)
