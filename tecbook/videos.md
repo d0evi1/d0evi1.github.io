@@ -28,8 +28,11 @@ share: true
 
 
 
-xgboost相关：
+xgboost/gbdt相关：
 
+- [kdd 2016:paper 697](https://www.youtube.com/watch?v=sVrzJ-zL_h0)
+- [kdd 2016: XGBoost: A Scalable Tree Boosting System](https://www.youtube.com/watch?v=8Y-droPeKu8)
+- [Peter Prettenhofer - Gradient Boosted Regression Trees in scikit-learn](https://www.youtube.com/watch?v=IXZKgIsZRm0)
 
 kaggle相关：
 
