@@ -1,6 +1,6 @@
 ---
 layout: page
-title: ml pipelines
+title: ml中的分类与回归
 tagline: 介绍
 ---
 {% include JB/setup %}
