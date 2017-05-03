@@ -9,13 +9,15 @@ image:
 share: true
 ---
 
+# tensorflow
+
 - [TensorFlow Tutorial (Sherry Moore, Google Brain)](https://www.youtube.com/watch?v=Ejec3ID_h0w)
 
 - [Keynote (TensorFlow Dev Summit 2017)](https://www.youtube.com/watch?v=4n1AHvDvVvw&index=3&list=PLOU2XLYxmsIKGc_NBoIhTn2Qhraji53cv)
 
 
 
-深度学习视频：
+# 深度学习视频
 
 [deep neural networks are easily fooled](https://www.youtube.com/watch?v=M2IebCN9Ht4)
 
@@ -28,12 +30,14 @@ share: true
 
 
 
-xgboost/gbdt相关：
+# xgboost/gbdt相关：
 
 - [kdd 2016:paper 697](https://www.youtube.com/watch?v=sVrzJ-zL_h0)
 - [kdd 2016: XGBoost: A Scalable Tree Boosting System](https://www.youtube.com/watch?v=8Y-droPeKu8)
 - [Peter Prettenhofer - Gradient Boosted Regression Trees in scikit-learn](https://www.youtube.com/watch?v=IXZKgIsZRm0)
 
-kaggle相关：
+# kaggle相关：
 
 1.[How to (almost) win at Kaggle - Kiri Nichol](https://www.youtube.com/watch?v=JyEm3m7AzkE)
+
+# 

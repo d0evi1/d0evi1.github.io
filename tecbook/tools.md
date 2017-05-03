@@ -9,6 +9,8 @@ image:
 share: true
 ---
 
+- [spark liblinear](http://www.csie.ntu.edu.tw/~cjlin/libsvmtools/distributed-liblinear/)
+
 - [google brain: magenta自动音乐作曲](https://magenta.tensorflow.org/)
 
 - [tensorflow-dash](https://github.com/ppwwyyxx/dash-docset-tensorflow)
