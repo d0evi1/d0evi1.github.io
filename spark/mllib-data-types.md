@@ -214,3 +214,7 @@ val ata = matA.transpose.multiply(matA)
 [mllib-data-types](https://spark.apache.org/docs/1.6.1/mllib-data-types.html)
 
 1.[http://spark.apache.org/docs/latest/mllib-ensembles.html](http://spark.apache.org/docs/latest/mllib-ensembles.html)
+
+2.[SCIPY CSC格式](http://www.scipy-lectures.org/advanced/scipy_sparse/csc_matrix.html)
+
+3.[CSC格式](http://www.cs.colostate.edu/~mcrob/toolbox/c++/sparseMatrix/sparse_matrix_compression.html)
