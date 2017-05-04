@@ -72,7 +72,7 @@ val examples: RDD[LabeledPoint] = MLUtils.loadLibSVMFile(sc, "data/mllib/sample_
 
 # Local matrix
 
-local matrix可以是整数型的行和列索引(indices)，以及浮点型的值(values)，存储在单机上。MLlib支持dense matrices，它的条目值存储在单个double array上，以列为主（column-major）的顺序。而sparse matrices，它是非零条目值以压缩稀疏列(CSC: Compressed Sparse Column)的格式存储，以列为主（column-major）的顺序。例如，下面的dense matrix：
+local matrix由整数型的行索引、列索引(indices)，以及浮点型的值(values)组成，存储在单机上。MLlib支持dense matrices，它的条目值存储在单个double array上，以列为主（column-major）的顺序。而sparse matrices，它是非零条目值以压缩稀疏列(CSC: Compressed Sparse Column)的格式存储，以列为主（column-major）的顺序。例如，下面的dense matrix：
 
 <img src="http://www.forkosh.com/mathtex.cgi?\[ \begin{pmatrix} 1.0 & 2.0 \\ 3.0 & 4.0 \\ 5.0 & 6.0 \end{pmatrix} \] ">
 
