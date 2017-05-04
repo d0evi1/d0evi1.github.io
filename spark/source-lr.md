@@ -53,7 +53,425 @@ l(model)为cross-entropy；l(reg)为正则项。
 
 <img src="http://pic.yupoo.com/wangdren23/Gq5HxC0o/medish.jpg">
 
-# 三、L1或L2?
+# 三、loss与gradient
+
+主要在LogisticCostFun类中，具体见代码，这里仅把核心代码及注释帖出来。可以对应于上面的公式。
+
+{% highlight scala %}
+private class LogisticCostFun(
+    instances: RDD[Instance],
+    numClasses: Int,
+    fitIntercept: Boolean,
+    standardization: Boolean,
+    featuresStd: Array[Double],
+    featuresMean: Array[Double],
+    regParamL2: Double) extends DiffFunction[BDV[Double]] {
+
+  override def calculate(coefficients: BDV[Double]): (Double, BDV[Double]) = {
+    val numFeatures = featuresStd.length
+    val coeffs = Vectors.fromBreeze(coefficients)
+
+    // step 1: cost部分.
+    val logisticAggregator = {
+      val seqOp = (c: LogisticAggregator, instance: Instance) => c.add(instance)
+      val combOp = (c1: LogisticAggregator, c2: LogisticAggregator) => c1.merge(c2)
+
+      // 先在rdd的每个分区上应用seqOp函数，做add操作(计算每个样本的loss／gradient)
+      // 再在driver上应用comOp函数，做merge操作(求得总的loss/gradient)
+      instances.treeAggregate(
+        new LogisticAggregator(coeffs, numClasses, fitIntercept, featuresStd, featuresMean)
+      )(seqOp, combOp)
+    }
+
+    // 求得总的gradientArray.
+    val totalGradientArray = logisticAggregator.gradient.toArray
+
+    // step 2: L2正则项部分 => regVal. 
+    //  reg = lambda * ∑ regParamL2/2 wi^2 + (1-regParamL2) |wi| 
+    // regVal is the sum of coefficients squares excluding intercept for L2 regularization.
+    val regVal = if (regParamL2 == 0.0) {
+      0.0
+    } else {
+      var sum = 0.0
+      
+      coeffs.foreachActive { (index, value) =>
+        // If `fitIntercept` is true, the last term which is intercept doesn't
+        // contribute to the regularization.
+        if (index != numFeatures) {
+          // The following code will compute the loss of the regularization; also
+          // the gradient of the regularization, and add back to totalGradientArray.
+          // gradientArray:  costFun项的梯度 + 正则项的梯度
+          // sum: L2正则
+          sum += {
+             
+            if (standardization) {
+              
+              totalGradientArray(index) += regParamL2 * value
+              value * value
+            } else {
+              // 
+              if (featuresStd(index) != 0.0) {
+                // If `standardization` is false, we still standardize the data
+                // to improve the rate of convergence; as a result, we have to
+                // perform this reverse standardization by penalizing each component
+                // differently to get effectively the same objective function when
+                // the training dataset is not standardized.
+                val temp = value / (featuresStd(index) * featuresStd(index))
+                totalGradientArray(index) += regParamL2 * temp
+                value * temp
+              } else {
+                0.0
+              }
+            }
+          }
+        }
+      }
+
+      0.5 * regParamL2 * sum
+    }
+
+    // 返回带L2正则的loss，以及带L2正则的梯度.
+    (logisticAggregator.loss + regVal, new BDV(totalGradientArray))
+  }
+}
+
+{% endhighlight %}
+
+里面会涉及到另一个类：LogisticAggregator。它的作用，相当于做map/reduce运算，计算loss/gradient。
+
+{% highlight scala %}
+
+private class LogisticAggregator(
+    coefficients: Vector,
+    numClasses: Int,
+    fitIntercept: Boolean,
+    featuresStd: Array[Double],
+    featuresMean: Array[Double]) extends Serializable {
+
+  private var weightSum = 0.0
+  private var lossSum = 0.0
+
+  // coefficients => coefficientsArray 数组.
+  private val coefficientsArray = coefficients match {
+    case dv: DenseVector => dv.values
+    case _ =>
+      throw new IllegalArgumentException(
+        s"coefficients only supports dense vector but got type ${coefficients.getClass}.")
+  }
+
+  // 总的维度.
+  private val dim = if (fitIntercept) coefficientsArray.length - 1 else coefficientsArray.length
+
+  //gradientSumArray.
+  private val gradientSumArray = Array.ofDim[Double](coefficientsArray.length)
+
+  /**
+   * 将一个训练样本添加到LogisticAggregator, 并更新目标函数的loss和gradient.
+   * 
+   * Add a new training instance to this LogisticAggregator, and update the loss and gradient
+   * of the objective function.
+   *
+   * @param instance The instance of data point to be added.
+   * @return This LogisticAggregator object.
+   */
+  def add(instance: Instance): this.type = {
+    instance match { case Instance(label, weight, features) =>
+      require(dim == features.size, s"Dimensions mismatch when adding new instance." +
+        s" Expecting $dim but got ${features.size}.")
+      require(weight >= 0.0, s"instance weight, $weight has to be >= 0.0")
+
+      if (weight == 0.0) return this
+
+      val localCoefficientsArray = coefficientsArray
+      val localGradientSumArray = gradientSumArray
+
+      numClasses match {
+        case 2 =>
+          // For Binary Logistic Regression.
+          // step 1: 二分类，求得 z = ∑ w*x + b，取负号.
+          val margin = - {
+            var sum = 0.0
+
+            // a.每个特征号上，单独做求和运算.  ∑ w*x + b
+            // 此处是做 ∑ w*x 运算. (是否做了归一化)
+            features.foreachActive { (index, value) =>
+              if (featuresStd(index) != 0.0 && value != 0.0) {
+                sum += localCoefficientsArray(index) * (value / featuresStd(index))
+              }
+            }
+
+            // 此处是 + b的运算.
+            sum + {
+              if (fitIntercept) localCoefficientsArray(dim) else 0.0
+            }
+          }
+
+          // 这里的label采用的是(1,0).
+          // step 2: 乘以该样本所带的unbalanced weight(样本所占比重, 缺省weight=1).
+          val multiplier = weight * (1.0 / (1.0 + math.exp(margin)) - label)
+
+          // step 3: 更新localGradient.
+          // gradient = 1/n ∑ multiplier * x
+          features.foreachActive { (index, value) =>
+            if (featuresStd(index) != 0.0 && value != 0.0) {
+              localGradientSumArray(index) += multiplier * (value / featuresStd(index))
+            }
+          }
+
+          if (fitIntercept) {
+            localGradientSumArray(dim) += multiplier
+          }
+
+          // step 4: 如果label为正例, loss为cross-entropy: 1/n * ∑ ln(1+exp(-y*wx))
+          // lossSum.
+          if (label > 0) {
+            // The following is equivalent to log(1 + exp(margin)) but more numerically stable.
+            lossSum += weight * MLUtils.log1pExp(margin)
+          } else {
+            lossSum += weight * (MLUtils.log1pExp(margin) - margin)
+          }
+        case _ =>
+          new NotImplementedError("LogisticRegression with ElasticNet in ML package " +
+            "only supports binary classification for now.")
+      }
+
+      // 
+      weightSum += weight
+      this
+    }
+  }
+
+  /**
+   * 进行merge: 方便分布式计算.
+   *
+   * Merge another LogisticAggregator, and update the loss and gradient
+   * of the objective function.
+   * (Note that it's in place merging; as a result, `this` object will be modified.)
+   *
+   * @param other The other LogisticAggregator to be merged.
+   * @return This LogisticAggregator object.
+   */
+  def merge(other: LogisticAggregator): this.type = {
+    require(dim == other.dim, s"Dimensions mismatch when merging with another " +
+      s"LeastSquaresAggregator. Expecting $dim but got ${other.dim}.")
+
+    if (other.weightSum != 0.0) {
+      weightSum += other.weightSum
+      lossSum += other.lossSum
+
+      var i = 0
+      val localThisGradientSumArray = this.gradientSumArray
+      val localOtherGradientSumArray = other.gradientSumArray
+      val len = localThisGradientSumArray.length
+
+      // 以local为准. 每列coff所对应梯度进行叠加.
+      while (i < len) {
+        localThisGradientSumArray(i) += localOtherGradientSumArray(i)
+        i += 1
+      }
+    }
+    this
+  }
+
+  // 求得最终loss.
+  def loss: Double = {
+    require(weightSum > 0.0, s"The effective number of instances should be " +
+      s"greater than 0.0, but $weightSum.")
+    lossSum / weightSum
+  }
+
+  // 求得最终gradient.
+  def gradient: Vector = {
+    require(weightSum > 0.0, s"The effective number of instances should be " +
+      s"greater than 0.0, but $weightSum.")
+    val result = Vectors.dense(gradientSumArray.clone())
+    scal(1.0 / weightSum, result)
+    result
+  }
+}
+
+{% endhighlight %}
+
+# 四、训练过程
+
+{% highlight scala %}
+
+  override protected def train(dataset: DataFrame): LogisticRegressionModel = {
+    // 从数据集抽取列. 如果数据集是persisted，不需要persist oldDataset.  
+    // Extract columns from data.  If dataset is persisted, do not persist oldDataset.
+    val w = if ($(weightCol).isEmpty) lit(1.0) else col($(weightCol))
+
+    // 选取labelCol, weightCol, featuresCol作为row
+    val instances: RDD[Instance] = dataset.select(col($(labelCol)), w, col($(featuresCol))).map {
+      case Row(label: Double, weight: Double, features: Vector) =>
+        Instance(label, weight, features)
+    }
+
+    // 是否持久化. 如果持久化，将训练样本进行cache. （MEMORY_AND_DISK，如果内存不够，会存成disk）
+    // 这里有可能影响性能.
+    val handlePersistence = dataset.rdd.getStorageLevel == StorageLevel.NONE
+    if (handlePersistence) instances.persist(StorageLevel.MEMORY_AND_DISK)
+
+    // 统计.
+    val (summarizer, labelSummarizer) = {
+      val seqOp = (c: (MultivariateOnlineSummarizer, MultiClassSummarizer),
+        instance: Instance) =>
+          (c._1.add(instance.features, instance.weight), c._2.add(instance.label, instance.weight))
+
+      val combOp = (c1: (MultivariateOnlineSummarizer, MultiClassSummarizer),
+        c2: (MultivariateOnlineSummarizer, MultiClassSummarizer)) =>
+          (c1._1.merge(c2._1), c1._2.merge(c2._2))
+
+      instances.treeAggregate(
+        new MultivariateOnlineSummarizer, new MultiClassSummarizer)(seqOp, combOp)
+    }
+
+    val histogram = labelSummarizer.histogram
+    val numInvalid = labelSummarizer.countInvalid
+    val numClasses = histogram.length
+    val numFeatures = summarizer.mean.size
+
+    if (numInvalid != 0) {
+      val msg = s"Classification labels should be in {0 to ${numClasses - 1} " +
+        s"Found $numInvalid invalid labels."
+      logError(msg)
+      throw new SparkException(msg)
+    }
+
+    if (numClasses > 2) {
+      val msg = s"Currently, LogisticRegression with ElasticNet in ML package only supports " +
+        s"binary classification. Found $numClasses in the input dataset."
+      logError(msg)
+      throw new SparkException(msg)
+    }
+
+    // 特征的mean和std.
+    val featuresMean = summarizer.mean.toArray
+    val featuresStd = summarizer.variance.toArray.map(math.sqrt)
+
+    // L1, L2
+    val regParamL1 = $(elasticNetParam) * $(regParam)
+    val regParamL2 = (1.0 - $(elasticNetParam)) * $(regParam)
+
+    // costFun.
+    val costFun = new LogisticCostFun(instances, numClasses, $(fitIntercept), $(standardization),
+      featuresStd, featuresMean, regParamL2)
+
+    // optimizer: 优化器.
+    // 如果 elasticNetParam = 0, 或者 regParam=0. 即使用L2正则，或者没有正则项. => 使用LBFGS.
+    // 否则，L1+L2正则，以及L1正则 => 使用OWLQN
+    val optimizer = if ($(elasticNetParam) == 0.0 || $(regParam) == 0.0) {
+      new BreezeLBFGS[BDV[Double]]($(maxIter), 10, $(tol))
+    } else {
+      def regParamL1Fun = (index: Int) => {
+        // Remove the L1 penalization on the intercept
+        if (index == numFeatures) {
+          0.0
+        } else {
+          if ($(standardization)) {
+            regParamL1
+          } else {
+            // If `standardization` is false, we still standardize the data
+            // to improve the rate of convergence; as a result, we have to
+            // perform this reverse standardization by penalizing each component
+            // differently to get effectively the same objective function when
+            // the training dataset is not standardized.
+            if (featuresStd(index) != 0.0) regParamL1 / featuresStd(index) else 0.0
+          }
+        }
+      }
+      new BreezeOWLQN[Int, BDV[Double]]($(maxIter), 10, regParamL1Fun, $(tol))
+    }
+
+    // 初始化cofficients为0.
+    val initialCoefficientsWithIntercept =
+      Vectors.zeros(if ($(fitIntercept)) numFeatures + 1 else numFeatures)
+
+    // 对于二分类，当将coefficients初始化为0时，如果根据label的分布对intercept进行初始化，收敛会更快.
+    // b = log(P(1)/P(0))
+    if ($(fitIntercept)) {
+      /*
+         For binary logistic regression, when we initialize the coefficients as zeros,
+         it will converge faster if we initialize the intercept such that
+         it follows the distribution of the labels.
+
+         {{{
+         P(0) = 1 / (1 + \exp(b)), and
+         P(1) = \exp(b) / (1 + \exp(b))
+         }}}, hence
+         {{{
+         b = \log{P(1) / P(0)} = \log{count_1 / count_0}
+         }}}
+       */
+      initialCoefficientsWithIntercept.toArray(numFeatures)
+        = math.log(histogram(1) / histogram(0))
+    }
+
+    // 开始迭代.
+    val states = optimizer.iterations(new CachedDiffFunction(costFun),
+      initialCoefficientsWithIntercept.toBreeze.toDenseVector)
+
+    // 获取迭代的结果.
+    val (coefficients, intercept, objectiveHistory) = {
+      /*
+         Note that in Logistic Regression, the objective history (loss + regularization)
+         is log-likelihood which is invariance under feature standardization. As a result,
+         the objective history from optimizer is the same as the one in the original space.
+       */
+      val arrayBuilder = mutable.ArrayBuilder.make[Double]
+      var state: optimizer.State = null
+      while (states.hasNext) {
+        state = states.next()
+        arrayBuilder += state.adjustedValue
+      }
+
+      if (state == null) {
+        val msg = s"${optimizer.getClass.getName} failed."
+        logError(msg)
+        throw new SparkException(msg)
+      }
+
+      // 当权重coefficients在归一化空间中训练时，我们需要将它们转回到原始空间.
+      // 注意，归一化空间的intercept，和原始空间是一样的，不需要归一化.
+      /*
+         The coefficients are trained in the scaled space; we're converting them back to
+         the original space.
+         Note that the intercept in scaled space and original space is the same;
+         as a result, no scaling is needed.
+       */
+      val rawCoefficients = state.x.toArray.clone()
+      var i = 0
+      while (i < numFeatures) {
+        rawCoefficients(i) *= { if (featuresStd(i) != 0.0) 1.0 / featuresStd(i) else 0.0 }
+        i += 1
+      }
+
+      // 
+      if ($(fitIntercept)) {
+        (Vectors.dense(rawCoefficients.dropRight(1)).compressed, rawCoefficients.last,
+          arrayBuilder.result())
+      } else {
+        (Vectors.dense(rawCoefficients).compressed, 0.0, arrayBuilder.result())
+      }
+    }
+
+    if (handlePersistence) instances.unpersist()
+
+    // 统计状态.
+    val model = copyValues(new LogisticRegressionModel(uid, coefficients, intercept))
+    val logRegSummary = new BinaryLogisticRegressionTrainingSummary(
+      model.transform(dataset),
+      $(probabilityCol),
+      $(labelCol),
+      $(featuresCol),
+      objectiveHistory)
+    model.setSummary(logRegSummary)
+  }
+
+{% endhighlight %}
+
+
+# 四、正则
 
 - L2 regularization -> ridge 
 - L1 regularization ->  lasso
@@ -69,286 +487,12 @@ val regParamL2 = (1.0 - $(elasticNetParam)) * $(regParam)
 
 {% endhighlight %}
 
-
-
-
 两种正则化方法L1和L2。L2正则化假设模型参数服从高斯分布，L2正则化函数比L1更光滑，所以更容易计算；L1假设模型参数服从拉普拉斯分布，L1正则化具备产生稀疏解的功能，从而具备Feature Selection的能力。
 
-ok, 训练过程：
 
-{% highlight scala %}
+## LBFGS和OWLQN
 
-  protected[spark] def train(dataset: Dataset[_], handlePersistence: Boolean):
-      LogisticRegressionModel = {
-      
-    // 获取权重列表w，默认为1  => w
-    val w = if (!isDefined(weightCol) || $(weightCol).isEmpty) lit(1.0) else col($(weightCol))
-    
-    // 选取数据集上的labelCol、featuresCol、w  => instances
-    val instances: RDD[Instance] =
-      dataset.select(col($(labelCol)).cast(DoubleType), w, col($(featuresCol))).rdd.map {
-        case Row(label: Double, weight: Double, features: Vector) =>
-          Instance(label, weight, features)
-      }
-
-
-	 // 是否持久化
-    if (handlePersistence) instances.persist(StorageLevel.MEMORY_AND_DISK)
-
-    // 模型参数初始化
-    val instr = Instrumentation.create(this, instances)
-    instr.logParams(regParam, elasticNetParam, standardization, threshold,
-      maxIter, tol, fitIntercept)
-
-    //------------------------------------------------------
-    // 对数据集进行treeAggregate操作.
-    // MultiClassSummarizer: 统计label的数量，以及不同label相应的数据量，每个label的weightSum (numClasses, countInvalid, histogram)
-    // MultivariateOnlineSummarizer: 计算vector的mean， variance, minimum, maximum, counts, and nonzero counts 
-    //------------------------------------------------------
-    val (summarizer, labelSummarizer) = {
-      val seqOp = (c: (MultivariateOnlineSummarizer, MultiClassSummarizer),
-        instance: Instance) =>
-          (c._1.add(instance.features, instance.weight), c._2.add(instance.label, instance.weight))
-
-      val combOp = (c1: (MultivariateOnlineSummarizer, MultiClassSummarizer),
-        c2: (MultivariateOnlineSummarizer, MultiClassSummarizer)) =>
-          (c1._1.merge(c2._1), c1._2.merge(c2._2))
-
-      instances.treeAggregate(
-        new MultivariateOnlineSummarizer, new MultiClassSummarizer
-      )(seqOp, combOp, $(aggregationDepth))
-    }
-
-    // 得到各种统计状态字段
-    val histogram = labelSummarizer.histogram
-    val numInvalid = labelSummarizer.countInvalid
-    val numClasses = histogram.length
-    val numFeatures = summarizer.mean.size
-
-    if (isDefined(thresholds)) {
-      require($(thresholds).length == numClasses, this.getClass.getSimpleName +
-        ".train() called with non-matching numClasses and thresholds.length." +
-        s" numClasses=$numClasses, but thresholds has length ${$(thresholds).length}")
-    }
-
-    instr.logNumClasses(numClasses)
-    instr.logNumFeatures(numFeatures)
-
-    /// main核心代码.
-    val (coefficients, intercept, objectiveHistory) = {
-      
-      // 1.分类数合法性校验
-      if (numInvalid != 0) {
-        val msg = s"Classification labels should be in [0 to ${numClasses - 1}]. " +
-          s"Found $numInvalid invalid labels."
-        logError(msg)
-        throw new SparkException(msg)
-      }
-      
-      // 2.常量标签.
-      val isConstantLabel = histogram.count(_ != 0) == 1
-      
-      // 3.参数合法性校验
-      if (numClasses > 2) {
-        val msg = s"LogisticRegression with ElasticNet in ML package only supports " +
-          s"binary classification. Found $numClasses in the input dataset. Consider using " +
-          s"MultinomialLogisticRegression instead."
-        logError(msg)
-        throw new SparkException(msg)
-      } else if ($(fitIntercept) && numClasses == 2 && isConstantLabel) {
-        logWarning(s"All labels are one and fitIntercept=true, so the coefficients will be " +
-          s"zeros and the intercept will be positive infinity; as a result, " +
-          s"training is not needed.")
-        (Vectors.sparse(numFeatures, Seq()), Double.PositiveInfinity, Array.empty[Double])
-      } else if ($(fitIntercept) && numClasses == 1) {
-        logWarning(s"All labels are zero and fitIntercept=true, so the coefficients will be " +
-          s"zeros and the intercept will be negative infinity; as a result, " +
-          s"training is not needed.")
-        (Vectors.sparse(numFeatures, Seq()), Double.NegativeInfinity, Array.empty[Double])
-      } else {
-      
-        // 通过合法性校验.
-        if (!$(fitIntercept) && isConstantLabel) {
-          logWarning(s"All labels belong to a single class and fitIntercept=false. It's a " +
-            s"dangerous ground, so the algorithm may not converge.")
-        }
-        
-        // 计算部分. 判断feature是否有用,
-        val featuresMean = summarizer.mean.toArray
-        val featuresStd = summarizer.variance.toArray.map(math.sqrt)
-
-        if (!$(fitIntercept) && (0 until numFeatures).exists { i =>
-          featuresStd(i) == 0.0 && featuresMean(i) != 0.0 }) {
-          logWarning("Fitting LogisticRegressionModel without intercept on dataset with " +
-            "constant nonzero column, Spark MLlib outputs zero coefficients for constant " +
-            "nonzero columns. This behavior is the same as R glmnet but different from LIBSVM.")
-        }
-        
-        // 正则项系数：L1和L2范式. regPram = regParamL1+regParamL2
-        val regParamL1 = $(elasticNetParam) * $(regParam)
-        val regParamL2 = (1.0 - $(elasticNetParam)) * $(regParam)
-
-		  
-        val bcFeaturesStd = instances.context.broadcast(featuresStd)
-        
-        // 成本函数costFun
-        val costFun = new LogisticCostFun(instances, numClasses, $(fitIntercept),
-          $(standardization), bcFeaturesStd, regParamL2, multinomial = false, $(aggregationDepth))
-          
-          
-        // 模型的使用=> optimizer.
-        // (正则项为0： BreezeLBFGS，否则：BreezeOWLQN)
-        val optimizer = if ($(elasticNetParam) == 0.0 || $(regParam) == 0.0) {
-          new BreezeLBFGS[BDV[Double]]($(maxIter), 10, $(tol))
-        } else {
-        
-   
-        	// 标准化参数
-          val standardizationParam = $(standardization)
-          
-          // L1正则
-          def regParamL1Fun = (index: Int) => {
-            // Remove the L1 penalization on the intercept
-            if (index == numFeatures) {
-              0.0
-            } else {
-              if (standardizationParam) {
-                regParamL1
-              } else {
-                // If `standardization` is false, we still standardize the data
-                // to improve the rate of convergence; as a result, we have to
-                // perform this reverse standardization by penalizing each component
-                // differently to get effectively the same objective function when
-                // the training dataset is not standardized.
-                if (featuresStd(index) != 0.0) regParamL1 / featuresStd(index) else 0.0
-              }
-            }
-          }
-          
-          // 
-          new BreezeOWLQN[Int, BDV[Double]]($(maxIter), 10, regParamL1Fun, $(tol))
-        }
-
-		 // 
-        val initialCoefficientsWithIntercept =
-          Vectors.zeros(if ($(fitIntercept)) numFeatures + 1 else numFeatures)
-
-        if (optInitialModel.isDefined && optInitialModel.get.coefficients.size != numFeatures) {
-          val vecSize = optInitialModel.get.coefficients.size
-          logWarning(
-            s"Initial coefficients will be ignored!! As its size $vecSize did not match the " +
-            s"expected size $numFeatures")
-        }
-
-        if (optInitialModel.isDefined && optInitialModel.get.coefficients.size == numFeatures) {
-          val initialCoefficientsWithInterceptArray = initialCoefficientsWithIntercept.toArray
-          optInitialModel.get.coefficients.foreachActive { case (index, value) =>
-            initialCoefficientsWithInterceptArray(index) = value
-          }
-          if ($(fitIntercept)) {
-            initialCoefficientsWithInterceptArray(numFeatures) == optInitialModel.get.intercept
-          }
-        } else if ($(fitIntercept)) {
-          /*
-             For binary logistic regression, when we initialize the coefficients as zeros,
-             it will converge faster if we initialize the intercept such that
-             it follows the distribution of the labels.
-             
-               P(0) = 1 / (1 + \exp(b)), and
-               P(1) = \exp(b) / (1 + \exp(b))
-             , hence
-             
-               b = \log{P(1) / P(0)} = \log{count_1 / count_0}
-             
-           */
-          initialCoefficientsWithIntercept.toArray(numFeatures) = math.log(
-            histogram(1) / histogram(0))
-        }
-
-
-		  // 开始模型迭代计算，返回相应的模型状态 => states
-        val states = optimizer.iterations(new CachedDiffFunction(costFun),
-          initialCoefficientsWithIntercept.asBreeze.toDenseVector)
-
-
-		  // 下面这段翻译：注意，在LR模型中，每次迭代的目标函数：
-		  // objectiveHistory=(loss+ regularization) 是log似然的，
-		  // 它在feature归一化后是不会变的。作为结果，optimizer的目标函数
-		  // 与原始空间相同
-        /*
-           Note that in Logistic Regression, the objective history (loss + regularization)
-           is log-likelihood which is invariant under feature standardization. As a result,
-           the objective history from optimizer is the same as the one in the original space.
-         */
-        val arrayBuilder = mutable.ArrayBuilder.make[Double]
-        var state: optimizer.State = null
-        while (states.hasNext) {
-          state = states.next()
-          arrayBuilder += state.adjustedValue
-        }
-
-        if (state == null) {
-          val msg = s"${optimizer.getClass.getName} failed."
-          logError(msg)
-          throw new SparkException(msg)
-        }
-
-		  // 翻译：参数数组在被归一化后的空间中进行训练。我们需要将它们转换成原始参数空间上
-		  // 注意：归一化空间中的intercept与原始空间上相同，不需要归一化
-        /*
-           The coefficients are trained in the scaled space; we're converting them back to
-           the original space.
-           Note that the intercept in scaled space and original space is the same;
-           as a result, no scaling is needed.
-         */
-        val rawCoefficients = state.x.toArray.clone()
-        var i = 0
-        while (i < numFeatures) {
-          rawCoefficients(i) *= { if (featuresStd(i) != 0.0) 1.0 / featuresStd(i) else 0.0 }
-          i += 1
-        }
-        bcFeaturesStd.destroy(blocking = false)
-
-        if ($(fitIntercept)) {
-          (Vectors.dense(rawCoefficients.dropRight(1)).compressed, rawCoefficients.last,
-            arrayBuilder.result())
-        } else {
-          (Vectors.dense(rawCoefficients).compressed, 0.0, arrayBuilder.result())
-        }
-      }
-    }
-
-	 // 解除持久化
-    if (handlePersistence) instances.unpersist()
-
-	 // 生成model
-    val model = copyValues(new LogisticRegressionModel(uid, coefficients, intercept))
-    
-    // 
-    val (summaryModel, probabilityColName) = model.findSummaryModelAndProbabilityCol()
-    
-    // 得到对应的Summary. 
-    val logRegSummary = new BinaryLogisticRegressionTrainingSummary(
-      summaryModel.transform(dataset),
-      probabilityColName,
-      $(labelCol),
-      $(featuresCol),
-      objectiveHistory)
-      
-    // 返回m.
-    val m = model.setSummary(logRegSummary)
-    instr.logSuccess(m)
-    m
-  }
-
-
-{% endhighlight %}
-
-
-二、LBFGS和OWLQN
-
-
-ok，我们知道，模型本身基本上核心代码就落在了这两个方法上：LBFGS和OWLQN。我们再看一下breeze库里的，这两个方法：
+ok，我们知道，模型本身基本上核心代码就落在了这两个方法上：LBFGS和OWLQN。如果你有兴趣想深究下数学实现。可以再看一下breeze库里的这两个方法：
 
 - breeze.optimize.LBFGS
 - breeze.optimize.OWLQN
@@ -368,92 +512,13 @@ breeze库用于数值处理。它的目标是通用、简洁、强大，不需�
 
 [OW-LQN对应的代码](https://github.com/scalanlp/breeze/blob/master/math/src/main/scala/breeze/optimize/OWLQN.scala)
 
+# 总结
 
-三、成本函数
+整个过程基本都ok了。L1还是L2的选择，看你的具体调参。另外再提一些注意事项。
 
-{% highlight scala %}
-
-/**
- * LogisticCostFun implements Breeze's DiffFunction[T] for a multinomial (softmax) logistic loss
- * function, as used in multi-class classification (it is also used in binary logistic regression).
- * It returns the loss and gradient with L2 regularization at a particular point (coefficients).
- * It's used in Breeze's convex optimization routines.
- */
-private class LogisticCostFun(
-    instances: RDD[Instance],
-    numClasses: Int,
-    fitIntercept: Boolean,
-    standardization: Boolean,
-    bcFeaturesStd: Broadcast[Array[Double]],
-    regParamL2: Double,
-    multinomial: Boolean,
-    aggregationDepth: Int) extends DiffFunction[BDV[Double]] {
-
-  override def calculate(coefficients: BDV[Double]): (Double, BDV[Double]) = {
-    val coeffs = Vectors.fromBreeze(coefficients)
-    val bcCoeffs = instances.context.broadcast(coeffs)
-    val featuresStd = bcFeaturesStd.value
-    val numFeatures = featuresStd.length
-
-    val logisticAggregator = {
-      val seqOp = (c: LogisticAggregator, instance: Instance) => c.add(instance)
-      val combOp = (c1: LogisticAggregator, c2: LogisticAggregator) => c1.merge(c2)
-
-      instances.treeAggregate(
-        new LogisticAggregator(bcCoeffs, bcFeaturesStd, numClasses, fitIntercept,
-          multinomial)
-      )(seqOp, combOp, aggregationDepth)
-    }
-
-    val totalGradientArray = logisticAggregator.gradient.toArray
-    // regVal is the sum of coefficients squares excluding intercept for L2 regularization.
-    val regVal = if (regParamL2 == 0.0) {
-      0.0
-    } else {
-      var sum = 0.0
-      coeffs.foreachActive { case (index, value) =>
-        // We do not apply regularization to the intercepts
-        val isIntercept = fitIntercept && ((index + 1) % (numFeatures + 1) == 0)
-        if (!isIntercept) {
-          // The following code will compute the loss of the regularization; also
-          // the gradient of the regularization, and add back to totalGradientArray.
-          sum += {
-            if (standardization) {
-              totalGradientArray(index) += regParamL2 * value
-              value * value
-            } else {
-              val featureIndex = if (fitIntercept) {
-                index % (numFeatures + 1)
-              } else {
-                index % numFeatures
-              }
-              if (featuresStd(featureIndex) != 0.0) {
-                // If `standardization` is false, we still standardize the data
-                // to improve the rate of convergence; as a result, we have to
-                // perform this reverse standardization by penalizing each component
-                // differently to get effectively the same objective function when
-                // the training dataset is not standardized.
-                val temp = value / (featuresStd(featureIndex) * featuresStd(featureIndex))
-                totalGradientArray(index) += regParamL2 * temp
-                value * temp
-              } else {
-                0.0
-              }
-            }
-          }
-        }
-      }
-      0.5 * regParamL2 * sum
-    }
-    bcCoeffs.destroy(blocking = false)
-
-    (logisticAggregator.loss + regVal, new BDV(totalGradientArray))
-  }
-}
-
-{% endhighlight %}
-
-
+- 缺省会对特征做归一化，对于一些场景（比如推荐），离散化的特征，归一化没啥意义。反倒可能会影响结果好坏。
+- 对于截距b，会使用正负样本比例，进行log(P(1)/P(0))初始化。收敛会更快。
+- cache机制(StorageLevel.MEMORY_AND_DISK)。当内存不够用，可能会影响性能，这一点不好。
 
 参考：
 
