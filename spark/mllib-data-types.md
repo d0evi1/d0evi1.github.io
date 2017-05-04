@@ -5,11 +5,11 @@ tagline: 介绍
 ---
 {% include JB/setup %}
 
-# 介绍
+# 1.介绍
 
 MLLib支持存储在单机上的local vectors和metrices，也支持分布式的matrics（背后通过一或多个RDD实现）。local vectors和local matrices都是简单数据类型，作为公共接口使用。底层的线性算法操作则由Breeze和jblas来实现。MLlib中，监督学习的一个训练样本，被称为“labeled point”。
 
-# Local vector
+# 2.Local vector
 
 存储在单机上的local vector，由一个整数类型的从0开始的索引(indice)，double类型的值(value)组成。MLlib支持两种类型的local vectors: dense和sparse。dense vector 背后通过一个double array来表示它的条目值，而sparse vector则由两个并列数组实现：索引(indices)和值(values)。例如，一个vector(1.0, 0.0, 3.0)，可以表示成dense格式：[1.0, 0.0, 3.0]，也可以表示成sparse格式：(3, [0, 2], [1.0, 3.0])，其中，3就是vector的size。
 
@@ -30,7 +30,7 @@ val sv2: Vector = Vectors.sparse(3, Seq((0, 1.0), (2, 3.0)))
 
 注意：scala 缺省会import scala.collection.immutable.Vector，你必须显式使用MLlib的Vector: import org.apache.spark.mllib.linalg.Vector。
 
-# Labeled point
+# 3.Labeled point
 
 labeled point是一个local vector，可以是dense或sparse，它与一个label/response相关联。在MLlib中，labeled points被用于见监督学习算法。我们使用一个double来存储一个label，因此，它可以同时用于分类和回归。对于二分类，一个label可以是0（negative）或1(positive). 对于多分类，label可以从0开始：0, 1, 2, ...
 
@@ -70,7 +70,7 @@ val examples: RDD[LabeledPoint] = MLUtils.loadLibSVMFile(sc, "data/mllib/sample_
 
 {% endhighlight %}
 
-# Local matrix
+# 4.Local matrix
 
 local matrix由整数型的行索引、列索引(indices)，以及浮点型的值(values)组成，存储在单机上。MLlib支持dense matrices，它的条目值存储在单个double array上，以列为主（column-major）的顺序。而sparse matrices，它是非零条目值以压缩稀疏列(CSC: Compressed Sparse Column)的格式存储，以列为主（column-major）的顺序。例如，下面的dense matrix：
 
@@ -93,7 +93,7 @@ val sm: Matrix = Matrices.sparse(3, 2, Array(0, 1, 3), Array(0, 2, 1), Array(9, 
 {% endhighlight %}
 
 
-# Distributed matrix
+# 5.Distributed matrix
 
 distributed matrix具有long型的行索引和列索引，以及double型的值，以一或多个RDD的方式分布式存储。**选择合适的格式来存储分布式大矩阵相当重要。**将一个分布式矩阵转换成一个不同的格式，可以需要一个全局的shuffle，计算代价高昂！至今支持三种类型的分布式矩阵。
 
