@@ -11,7 +11,7 @@ MLLib支持存储在单机上的local vectors和metrices，也支持分布式的
 
 # Local vector
 
-存储在单机上的local vector，可以是一个整数类型的从0开始的索引(indice)，double类型的值(value)。MLlib支持两种类型的local vectors: dense和sparse. dense vector 背后通过一个double array来表示它的条目值，而sparse vector则由两个并行数组实现：索引(indices)和值(values)。例如，一个vector(1.0, 0.0, 3.0)，可以表示成dense格式：[1.0, 0.0, 3.0]，也可以表示成sparse格式：(3, [0, 2], [1.0, 3.0])，其中，3就是vector的size。
+存储在单机上的local vector，由一个整数类型的从0开始的索引(indice)，double类型的值(value)组成。MLlib支持两种类型的local vectors: dense和sparse。dense vector 背后通过一个double array来表示它的条目值，而sparse vector则由两个并列数组实现：索引(indices)和值(values)。例如，一个vector(1.0, 0.0, 3.0)，可以表示成dense格式：[1.0, 0.0, 3.0]，也可以表示成sparse格式：(3, [0, 2], [1.0, 3.0])，其中，3就是vector的size。
 
 示例：
 
