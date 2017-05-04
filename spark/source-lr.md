@@ -5,23 +5,50 @@ tagline: 介绍
 ---
 {% include JB/setup %}
 
-org.apache.spark.ml.classification.LogisticRegression
+# 介绍
 
-一、LR模型的参数
+ml的logistic回归，代码在org.apache.spark.ml.classification.LogisticRegression中实现。在详见代码之前，我们先简单地看下LR可调节的参数.
+
+# 一、LR模型的参数
 
 参数：
 
 - threshold: 如果label 1的概率>threshold，则预测为1，否则为0.
-- regParam：正则项参数
-- elasticNetParam：ElasticNet混合参数。如果alpha = 0, 惩罚项是一个L2罚项。如果alpha = 1，它是一个L1 penalty。如果0 < alpha < 1，则是L1和L2的结果。缺省为0.0，为L2罚项。
+- regParam：正则项参数(相当于lambda)
+- elasticNetParam：ElasticNet混合参数。如果alpha = 0, 惩罚项是一个L2 penalty。如果alpha = 1，它是一个L1 penalty。如果0 < alpha < 1，则是L1和L2的结果。缺省为0.0，为L2罚项。
 - maxIter: 缺省100次。
 - tol：迭代收敛的容忍度。值越小，会得到更高精度，同时迭代次数开销也大。缺省为1E-6.
 - fitIntercept: 是否要拟合截距项(intercept term)，缺省为true.
-- standardization：在对模型进行fit前，是否对训练特征进行标准化。模型的系数将总是返回到原始的scale上，它对用户是透明的。注意：当不使用正则化时，使用/不使用standardization，模型都应收敛到相同的解决方式上。在R的GLMNET包里，缺省行为也为true。缺省为true。
-- weightCol：如果没设置或空，所有实例为有为1的权重。缺省不设置。
+- standardization：在对模型进行fit前，是否对训练特征进行标准化(归一化)。模型的系数将总是返回到原始的scale上，它对用户是透明的。注意：当不使用正则化时，使用/不使用standardization，模型都应收敛到相同的解决方式上。在R的GLMNET包里，缺省行为也为true。缺省为true。
+- weightCol：如果没设置或空，所有实例为有为1的权重。如果设置，则相当于对unbalanced data设置不同的权重。缺省不设置。
 - treeAggregate：如果特征维度或分区数太大，该参数需要调得更大。缺省为2.
 
-二、L1或L2?
+# 二、原理
+
+logistic回归的原理，这里不详述。简单地写：y = logit(∑wx + b)
+
+<img src="http://www.forkosh.com/mathtex.cgi?l_{total}(\vec{w}, \vec{x})=l_{model}(\vec{w}, \vec{x})+l_{reg}(\vec{w})">
+
+<img src="http://www.forkosh.com/mathtex.cgi? \vec{G}(\vec{w}, \vec{x})_{total}= \vec{G}(\vec{w}, \vec{x})_{model}+ \vec{G}(\vec{w})_{reg}">
+
+l(model)为cross-entropy；l(reg)为正则项。
+
+对于第一部分l(model)的计算，依赖于训练数据；对于第二部分正则项，它不依赖于训练数据。因而这两部分在实现时是独立计算的。
+
+每个训练样本的loss和gradient是独立的。
+
+样本i的梯度：
+
+<img src="http://www.forkosh.com/mathtex.cgi?(\vec{G}(\vec{w}, \vec{x})_{model})_i= G_i(\vec{w}, \vec{x})= \frac{\partial{l(\vec{w}, \vec{x})}}{\partial{w_i}}=\sum_{k=1}^{N}y_{k} x_{ki} - \frac{exp(\vec{x}_{k} \vec{w}}{1+exp(\vec{x}_k,w)}x_{ki}">
+
+样本的loss: 
+
+<img src="http://www.forkosh.com/mathtex.cgi?l(\vec{w}, \vec{x})_{model}=-\sum_{k=1}^{N}y_{k} \vec{x}_{k} \vec{w} - log(1+exp(\vec{x_k} \vec{w}))">
+
+对于spark来说，ml的logistic回归实现通过treeAggregate来完成，训练集RDD分散在不同的节点上。
+
+
+# 三、L1或L2?
 
 - L2 regularization -> ridge 
 - L1 regularization ->  lasso
@@ -261,7 +288,7 @@ ok, 训练过程：
           throw new SparkException(msg)
         }
 
-		  // 翻译：系数在被归一化后的空间中进行训练。我们需要将它们转换成原始参数空间上
+		  // 翻译：参数数组在被归一化后的空间中进行训练。我们需要将它们转换成原始参数空间上
 		  // 注意：归一化空间中的intercept与原始空间上相同，不需要归一化
         /*
            The coefficients are trained in the scaled space; we're converting them back to
