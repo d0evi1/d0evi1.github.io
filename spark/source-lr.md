@@ -7,7 +7,7 @@ tagline: 介绍
 
 # 介绍
 
-ml的logistic回归，代码在org.apache.spark.ml.classification.LogisticRegression中实现。在详见代码之前，我们先简单地看下LR可调节的参数.
+ml的logistic回归，代码在org.apache.spark.ml.classification.LogisticRegression中实现。在详见代码之前，我们先简单地看下LR可调节的参数. [暂时修正至以1.6.1代码为参考.]
 
 # 一、LR模型的参数
 
@@ -45,8 +45,13 @@ l(model)为cross-entropy；l(reg)为正则项。
 
 <img src="http://www.forkosh.com/mathtex.cgi?l(\vec{w}, \vec{x})_{model}=-\sum_{k=1}^{N}y_{k} \vec{x}_{k} \vec{w} - log(1+exp(\vec{x}_k \vec{w}))">
 
-对于spark来说，ml的logistic回归实现通过treeAggregate来完成，训练集RDD分散在不同的节点上。
+对于spark来说，ml的logistic回归实现通过treeAggregate来完成，训练集RDD分散在不同的节点上。在executors/workers上计算loss和gradient；在driver/controller上将它们进行reduce进行所有训练样本的求和，得到lossSum和gradientSum。
 
+在单机的driver上完成Optimization; L1正则由OWLQN optimizer处理。L2由L-BFGS处理。这两个优化器都由Breeze库提供(Breeze库提供了Vector/Matrix的实现以及相应计算的接口Linalg）。
+
+整个过程如图所示：
+
+<src img="http://pic.yupoo.com/wangdren23/Gq5HxC0o/medish.jpg">
 
 # 三、L1或L2?
 
@@ -65,7 +70,7 @@ val regParamL2 = (1.0 - $(elasticNetParam)) * $(regParam)
 {% endhighlight %}
 
 
-MLlib底层的矩阵运算使用了Breeze库，Breeze库提供了Vector/Matrix的实现以及相应计算的接口（Linalg）。
+
 
 两种正则化方法L1和L2。L2正则化假设模型参数服从高斯分布，L2正则化函数比L1更光滑，所以更容易计算；L1假设模型参数服从拉普拉斯分布，L1正则化具备产生稀疏解的功能，从而具备Feature Selection的能力。
 
