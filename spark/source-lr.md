@@ -58,6 +58,7 @@ l(model)为cross-entropy；l(reg)为正则项。
 主要在LogisticCostFun类中，具体见代码，这里仅把核心代码及注释帖出来。可以对应于上面的公式。
 
 {% highlight scala %}
+
 private class LogisticCostFun(
     instances: RDD[Instance],
     numClasses: Int,
