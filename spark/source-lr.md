@@ -51,7 +51,7 @@ l(model)为cross-entropy；l(reg)为正则项。
 
 整个过程如图所示：
 
-<src img="http://pic.yupoo.com/wangdren23/Gq5HxC0o/medish.jpg">
+<img src="http://pic.yupoo.com/wangdren23/Gq5HxC0o/medish.jpg">
 
 # 三、L1或L2?
 
