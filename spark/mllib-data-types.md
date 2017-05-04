@@ -87,7 +87,9 @@ import org.apache.spark.mllib.linalg.{Matrix, Matrices}
 // Create a dense matrix ((1.0, 2.0), (3.0, 4.0), (5.0, 6.0))
 val dm: Matrix = Matrices.dense(3, 2, Array(1.0, 3.0, 5.0, 2.0, 4.0, 6.0))
 
+// https://spark.apache.org/docs/1.6.1/api/scala/index.html#org.apache.spark.mllib.linalg.Matrices$
 // Create a sparse matrix ((9.0, 0.0), (0.0, 8.0), (0.0, 6.0))
+// colPtrs: Array[Int], rowIndices: Array[Int]
 val sm: Matrix = Matrices.sparse(3, 2, Array(0, 1, 3), Array(0, 2, 1), Array(9, 6, 8))
 
 {% endhighlight %}
@@ -95,7 +97,7 @@ val sm: Matrix = Matrices.sparse(3, 2, Array(0, 1, 3), Array(0, 2, 1), Array(9, 
 
 # 5.Distributed matrix
 
-distributed matrix具有long型的行索引和列索引，以及double型的值，以一或多个RDD的方式分布式存储。**选择合适的格式来存储分布式大矩阵相当重要。**将一个分布式矩阵转换成一个不同的格式，可以需要一个全局的shuffle，计算代价高昂！至今支持三种类型的分布式矩阵。
+distributed matrix由long型的行索引和列索引，以及double型的值组成，以一或多个RDD的方式分布式存储。**选择合适的格式来存储分布式大矩阵相当重要。**将一个分布式矩阵转换成一个不同的格式，可能需要一个全局的shuffle，计算代价高昂！至今支持三种类型的分布式矩阵。
 
 基本类型被称为RowMatrix。
 
