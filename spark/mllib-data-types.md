@@ -5,6 +5,7 @@ tagline: 介绍
 ---
 {% include JB/setup %}
 
+# 介绍
 
 MLLib支持存储在单机上的local vectors和metrices，也支持分布式的matrics（背后通过一或多个RDD实现）。local vectors和local matrices都是简单数据类型，作为公共接口使用。底层的线性算法操作则由Breeze和jblas来实现。MLlib中，监督学习的一个训练样本，被称为“labeled point”。
 
