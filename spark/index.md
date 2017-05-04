@@ -14,7 +14,7 @@ tagline: 介绍
 - [5.ml中的分类与回归](/spark/ml-classification-regression)
 
 # 二、mllib库
-
+- [0.mllib基础类型](/spark/mllib-data-types)
 - [1.mllib中的决策树](/spark/mllib-decision-tree)
 - [2.mllib中的ensembles](/spark/mllib-ensemble)
 - [3.mllib中的metrics](/spark/mllib-evaluation-metrics)
