@@ -39,11 +39,11 @@ l(model)为cross-entropy；l(reg)为正则项。
 
 样本i的梯度：
 
-<img src="http://www.forkosh.com/mathtex.cgi?(\vec{G}(\vec{w}, \vec{x})_{model})_i= G_i(\vec{w}, \vec{x})= \frac{\partial{l(\vec{w}, \vec{x})}}{\partial{w_i}}=\sum_{k=1}^{N}y_{k} x_{ki} - \frac{exp(\vec{x}_{k} \vec{w}}{1+exp(\vec{x}_k,w)}x_{ki}">
+<img src="http://www.forkosh.com/mathtex.cgi?(\vec{G}(\vec{w}, \vec{x})_{model})_i= G_i(\vec{w}, \vec{x})= \frac{\partial{l(\vec{w}, \vec{x})}}{\partial{w_i}}=\sum_{k=1}^{N}y_{k} x_{ki} - \frac{exp(\vec{x}_{k} \vec{w})}{1+exp(\vec{x}_k,\vec{w})}x_{ki}">
 
 样本的loss: 
 
-<img src="http://www.forkosh.com/mathtex.cgi?l(\vec{w}, \vec{x})_{model}=-\sum_{k=1}^{N}y_{k} \vec{x}_{k} \vec{w} - log(1+exp(\vec{x_k} \vec{w}))">
+<img src="http://www.forkosh.com/mathtex.cgi?l(\vec{w}, \vec{x})_{model}=-\sum_{k=1}^{N}y_{k} \vec{x}_{k} \vec{w} - log(1+exp(\vec{x}_k \vec{w}))">
 
 对于spark来说，ml的logistic回归实现通过treeAggregate来完成，训练集RDD分散在不同的节点上。
 
