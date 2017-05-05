@@ -501,25 +501,21 @@ val regParamL2 = (1.0 - $(elasticNetParam)) * $(regParam)
 
 ## LBFGS和OWLQN
 
-ok，我们知道，模型本身基本上核心代码就落在了这两个方法上：LBFGS和OWLQN。如果你有兴趣想深究下数学实现。可以再看一下breeze库里的这两个方法：
+ok，我们知道，模型本身基本上核心代码就落在了这两个方法上：LBFGS和OWLQN。两者都是牛顿法的变种，核心思想是：
 
-- breeze.optimize.LBFGS
-- breeze.optimize.OWLQN
+<img src="http://www.forkosh.com/mathtex.cgi?\vec{w_{n+1}}=\vec{n}-H^{-1}\vec{G}">
+
+关于Hessian矩阵的计算，此处不做过多解释，如果你有兴趣想深究下数学实现。也可以再看一下breeze库里的这两个方法实现：
+
+- [breeze.optimize.LBFGS](https://github.com/scalanlp/breeze/blob/master/math/src/main/scala/breeze/optimize/LBFGS.scala)
+- [breeze.optimize.OWLQN](https://github.com/scalanlp/breeze/blob/master/math/src/main/scala/breeze/optimize/OWLQN.scala)
 
 L-BFGS: Limited-memory BFGS。其中BFGS代表4个人的名字：broyden–fletcher–goldfarb–shanno
 OWL-QN: (Orthant-Wise Limited-Memory Quasi-Newton)算法。
 
-先来简单看一下breezey库。
+关于breezey库，这里再简单提一下：
 
-breeze库：[https://github.com/scalanlp/breeze](https://github.com/scalanlp/breeze)
-
-breeze库用于数值处理。它的目标是通用、简洁、强大，不需要牺牲太多性能。当前版本0.12。我们所熟悉的spark中的MLlib（经常见到的线性算法库：breeze.linalg、最优化算法库：breeze.optimize）就是在它的基础上构建的。另外它还提供了图绘制的功能（breeze.plot）
-
-相关文档：[https://github.com/scalanlp/breeze/wiki/Quickstart](https://github.com/scalanlp/breeze/wiki/Quickstart)
-
-[LBFGS对应的代码](https://github.com/scalanlp/breeze/blob/master/math/src/main/scala/breeze/optimize/LBFGS.scala)
-
-[OW-LQN对应的代码](https://github.com/scalanlp/breeze/blob/master/math/src/main/scala/breeze/optimize/OWLQN.scala)
+breeze库用于数值处理。它的目标是通用、简洁、强大，不需要牺牲太多性能。当前版本0.12。我们所熟悉的spark中的MLlib（经常见到的线性算法库：breeze.linalg、最优化算法库：breeze.optimize）就是在它的基础上构建的。另外它还提供了图绘制的功能（breeze.plot）。
 
 # 总结
 
@@ -532,3 +528,5 @@ breeze库用于数值处理。它的目标是通用、简洁、强大，不需�
 参考：
 
 1.[LogisticRegression源码](https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/ml/classification/LogisticRegression.scala)
+2.[breeze](https://github.com/scalanlp/breeze)
+3.[breeze文档](https://github.com/scalanlp/breeze/wiki/Quickstart)
