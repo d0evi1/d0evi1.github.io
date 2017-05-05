@@ -25,7 +25,7 @@ ml的logistic回归，代码在org.apache.spark.ml.classification.LogisticRegres
 
 # 二、原理
 
-logistic回归的原理，这里不详述。简单地写：y = logit(∑wx + b)
+logistic回归的原理，这里不详述。简单地写：y = logit(∑wx + b)。相应的loss和梯度如下所示（箭头表示向量）：
 
 <img src="http://www.forkosh.com/mathtex.cgi?l_{total}(\vec{w}, \vec{x})=l_{model}(\vec{w}, \vec{x})+l_{reg}(\vec{w})">
 
@@ -45,7 +45,7 @@ l(model)为cross-entropy；l(reg)为正则项。
 
 <img src="http://www.forkosh.com/mathtex.cgi?l(\vec{w}, \vec{x})_{model}=-\sum_{k=1}^{N}y_{k} \vec{x}_{k} \vec{w} - log(1+exp(\vec{x}_k \vec{w}))">
 
-对于spark来说，ml的logistic回归实现通过treeAggregate来完成，训练集RDD分散在不同的节点上。在executors/workers上计算loss和gradient；在driver/controller上将它们进行reduce进行所有训练样本的求和，得到lossSum和gradientSum。
+对于spark来说，ml的logistic回归实现通过treeAggregate来完成。在executors/workers上计算各RDD上的loss和gradient；在driver/controller上将它们进行reduce进行所有训练样本的求和，得到lossSum和gradientSum。
 
 在单机的driver上完成Optimization; L1正则由OWLQN optimizer处理。L2由L-BFGS处理。这两个优化器都由Breeze库提供(Breeze库提供了Vector/Matrix的实现以及相应计算的接口Linalg）。
 
@@ -477,6 +477,14 @@ private class LogisticAggregator(
 - L2 regularization -> ridge 
 - L1 regularization ->  lasso
 - mix L1 and L2  -> elastic Net
+
+相应的公式：
+
+<img src="http://www.forkosh.com/mathtex.cgi?l_{reg}(\vec{w})=\lambda\sum_{i=1}^{N}{w_{i}}^2">
+
+<img src="http://www.forkosh.com/mathtex.cgi?l_{reg}(\vec{w})=\lambda\sum_{i=1}^{N}\abs{w_i}">
+
+<img src="http://www.forkosh.com/mathtex.cgi?l_{reg}(\vec{w})=\lambda\sum_{i=1}^{N}(\frac{\alpha}{2}{w_i}^2+(1-\alpha)\abs{w_i})">
 
 对应到后面的代码里：
 
