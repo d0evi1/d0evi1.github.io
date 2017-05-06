@@ -40,4 +40,6 @@ share: true
 
 1.[How to (almost) win at Kaggle - Kiri Nichol](https://www.youtube.com/watch?v=JyEm3m7AzkE)
 
-# 
+# LDA
+
+[Prof. David Blei - Probabilistic Topic Models and User Behavior](https://www.youtube.com/watch?v=FkckgwMHP2s&list=PLe0J3_6vYq7t609hIPH_JzhLzy2srhAwX) 
