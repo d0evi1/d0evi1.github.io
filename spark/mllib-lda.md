@@ -1,11 +1,13 @@
 ---
 layout: page
-title: spark中的lDA
+title: spark中的LDA
 tagline: 介绍
 ---
 {% include JB/setup %}
 
 # 前言
+
+spark mllib主要是根据paper: [Online Learning for Latent Dirichlet Allocation](http://www.cs.columbia.edu/~blei/papers/HoffmanBleiBach2010b.pdf)开发完成的。
 
 LDA是一个主题模型，它可以从文本文档中推断出相应的主题。LDA被认为是一种聚类算法，因为：
 
@@ -64,7 +66,7 @@ EMLDAOptimizer 会产生一个 DistributedLDAModel, 它不只存储要推断的�
 
 此外，OnlineLDAOptimizer 接收下列参数：
 
-- miniBatchFraction: 每次迭代使用的语料库抽样比例
+- miniBatchFraction: 每次迭代使用的语料库抽样比例。缺省为0.05,通常要满足：maxIterations * miniBatchFraction >= 1
 - optimizeDocConcentration: 如果设置为true，每次minibatch 之后会对超参数docConcentration (也称为alpha) 执行最大似然估计，在返回的LocalLDAModel使用优化过的docConcentration。
 - tau0和kappa: 用作学习率衰减，用 (τ0+iter)^−k 计算，其中iter为当前的迭代次数
 
