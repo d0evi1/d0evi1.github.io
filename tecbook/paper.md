@@ -93,7 +93,7 @@ Friedman [<Greedy Function Approximation: A Gradient Boosting Machine>](https://
 
 - [Parameter estimation for text analysis](http://www.arbylon.net/publications/text-est.pdf)
 - [Blei:Latent Dirichlet Allocation](http://www.cs.columbia.edu/~blei/papers/BleiNgJordan2003.pdf)
-
+- [Blei:Online learning for LDA](http://www.cs.columbia.edu/~blei/papers/HoffmanBleiBach2010b.pdf)
 
 # 推荐系统
 
