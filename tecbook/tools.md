@@ -34,3 +34,8 @@ share: true
 [paragraph2vec: PV-DM, PV-DBOW](https://github.com/JonathanRaiman/PVDM)
 
 [gensim](http://radimrehurek.com/gensim/)
+
+
+LDA:
+
+[pyLDAvis](https://pyldavis.readthedocs.io/en/latest/readme.html#usage)
