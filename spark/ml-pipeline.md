@@ -9,11 +9,11 @@ tagline: 介绍
 
 MLlib为机器学习算法提供了标准API，使得它们很容易将多个算法相互组合到一个pipeline中，或者workflow中。该部分覆盖了Pipeline API的关键概念，pipeline的概念中的大多数灵感主要来自于sklearn项目。
 
-- DataFrame: 该ML API使用Spark SQL的DataFrame作为ML的数据集，它可以存储许多类型的数据。比如：一个DataFrame可以具有不同列的存储文本，特征向量，true labels以及predictions。
-- Transformer: 一个Transformer是这样一个算法：它可以将一个DataFrame转换成另一个DataFrame。比如：一个ML的model就是一个Transformer，它将一个带有features的DataFrame转换成一个带有predictions的DataFrame。
-- Estimator：一个Estimator是这样的一个算法：它可以在一个DataFrame进行fit操作，生成一个Transformer。比如：一个学习算法就是一个Estimator，它可以在一个DataFrame里进行训练，生成一个model。
-- Pipeline：Pipeline可以将多个Transformer和Estimator进行链式串联在一起，形成一个ML workflow。
-- Parameter: 所有的Transformer和Estimator现在都共享一个公共的API来指定参数。
+- **DataFrame**: 该ML API使用Spark SQL的DataFrame作为ML的数据集，它可以存储许多类型的数据。比如：一个DataFrame可以具有不同列的存储文本，特征向量，true labels以及predictions。
+- **Transformer**: 一个Transformer是这样一个算法：它可以将一个DataFrame转换成另一个DataFrame。比如：一个ML的model就是一个Transformer，它将一个带有features的DataFrame转换成一个带有predictions的DataFrame。
+- **Estimator**：一个Estimator是这样的一个算法：它可以在一个DataFrame进行fit操作，生成一个Transformer。比如：一个学习算法就是一个Estimator，它可以在一个DataFrame里进行训练，生成一个model。
+- **Pipeline**：Pipeline可以将多个Transformer和Estimator进行链式串联在一起，形成一个ML workflow。
+- **Parameter**: 所有的Transformer和Estimator现在都共享一个公共的API来指定参数。
 
 # 2.DataFrame
 

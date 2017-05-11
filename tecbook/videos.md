@@ -28,6 +28,9 @@ share: true
 
 [使用ConvNets多数字识别街景门牌号](https://www.youtube.com/watch?v=vGPI_JvLoN0)
 
+# spark 
+
+[A Deeper Understanding of Spark Internals - Aaron Davidson (Databricks)](https://www.youtube.com/watch?v=dmL0N3qfSc8)
 
 
 # xgboost/gbdt相关：
@@ -42,4 +45,5 @@ share: true
 
 # LDA
 
-[Prof. David Blei - Probabilistic Topic Models and User Behavior](https://www.youtube.com/watch?v=FkckgwMHP2s&list=PLe0J3_6vYq7t609hIPH_JzhLzy2srhAwX) 
+- [Prof. David Blei - Probabilistic Topic Models and User Behavior](https://www.youtube.com/watch?v=FkckgwMHP2s&list=PLe0J3_6vYq7t609hIPH_JzhLzy2srhAwX)
+- [Visualizing Topic Models](https://www.youtube.com/watch?v=tGxW2BzC_DU&index=4&list=PLykRMO7ZuHwP5cWnbEmP_mUIVgzd5DZgH)  
