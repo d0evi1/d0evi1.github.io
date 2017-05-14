@@ -39,8 +39,8 @@ bing_verify:
 timezone:    America/New_York
 future:      true
 highlighter: rouge
-markdown:    kramdown
-#markdown:   maruku
+#markdown:    kramdown
+markdown:   maruku
 gems:
   - jekyll-sitemap
   - jekyll-paginate
