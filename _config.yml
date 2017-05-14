@@ -14,6 +14,7 @@ owner:
   bio:            "愉快地干好一件事情~"
   email:          wangjunle23@gmail.com
   # Social networking links used in footer. Update and remove as you like.
+  weibo:          weibo.com/wangjunle23
   twitter:        
   facebook:       
   github:         
@@ -38,7 +39,8 @@ bing_verify:
 timezone:    America/New_York
 future:      true
 highlighter: rouge
-markdown:    kramdown
+#markdown:    kramdown
+markdown:   maruku
 gems:
   - jekyll-sitemap
   - jekyll-paginate
