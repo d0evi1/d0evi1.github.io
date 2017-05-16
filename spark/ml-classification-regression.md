@@ -13,21 +13,28 @@ Logistic回归是一个很流行的预测二分类的方法。它是Generallized
 
 Logistic回归提供了一个线性方法：
 
-<img src="http://www.forkosh.com/mathtex.cgi?f(w):=\lambda R(w) + \frac{1}{n}\sum_{i=1}^{n}L(w;x_i,y_i)">
+$$
+f(w):=\lambda R(w) + \frac{1}{n}\sum_{i=1}^{n}L(w;x_i,y_i)
+$$
 
-优化目标：<img src="http://www.forkosh.com/mathtex.cgi?argmin_{w}f(w)">
+
+优化目标 \$ argmin_{w}f(w) \$
 
 loss function为logistic loss：
 
-<img src="http://www.forkosh.com/mathtex.cgi?L(w;x_i,y_i):=log(1+exp(-yw^Tx))">
+$$
+L(w;x_i,y_i):=log(1+exp(-yw^Tx))
+$$
 
 对于二分类问题，算法输出一个二元logistic 回归模型。对于一个给定的数据点x，模型使用logistic function作出预测：
 
-<img src="http://www.forkosh.com/mathtex.cgi?f(z)=\frac{1}{1+e^{-z}}">
+$$
+f(z)=\frac{1}{1+e^{-z}}
+$$
 
-其中<img src="http://www.forkosh.com/mathtex.cgi?z=w^Tx">
+其中\$ z=w^Tx \$
 
-缺省的，如果<img src="http://www.forkosh.com/mathtex.cgi?f(w^Tx)">>0.5，则结果为正例，否则为负例，这不同于线性SVM，logistic回归模型的原始输出，f(z)，是一个概率解释。（比如：刚才的概率为正例）
+缺省的，如果\$ f(w^Tx)>>0.5 \$，则结果为正例，否则为负例，这不同于线性SVM，logistic回归模型的原始输出，f(z)，是一个概率解释。（比如：刚才的概率为正例）
 
 binary logistic回归可以泛化到multinomial logistic回归上，来解决多分类问题。
 
@@ -38,7 +45,7 @@ spark.ml的lr当前实现只支持二分类。将来会考虑支持多分类。
 
 示例：
 
-下例展示了使用lr、elastic net正则项的模型。elasticNetParam对应于<img src="http://www.forkosh.com/mathtex.cgi?\alpha">，而regParam则对应于<img src="http://www.forkosh.com/mathtex.cgi?\lambda">。
+下例展示了使用lr、elastic net正则项的模型。elasticNetParam对应于\$\alpha \$，而regParam则对应于\$ \lambda \$。
 
 {% highlight scala %}
 
