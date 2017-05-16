@@ -398,7 +398,7 @@ println("label\tfpr")
 
 println(fprs.map {case (label, fpr) => label + "\t" + fpr}.mkString("\n"))
 
-{% end highlight %}
+{% endhighlight %}
 
 完整代码详见：examples/src/main/scala/org/apache/spark/examples/ml/OneVsRestExample.scala
 
