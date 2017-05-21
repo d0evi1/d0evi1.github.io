@@ -16,6 +16,6 @@ tagline: 介绍
 # 二、mllib库
 - [0.mllib基础类型](/spark/mllib-data-types)
 - [1.mllib中的决策树](/spark/mllib-decision-tree)
-- [2.mllib中的ensembles](/spark/mllib-ensemble)
+- [2.mllib中的ensembles](/spark/mllib-ensembles)
 - [3.mllib中的metrics](/spark/mllib-evaluation-metrics)
 - [4.mllib中的cf](/spark/mllib-cf)
