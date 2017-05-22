@@ -13,7 +13,7 @@ youtube的基于深度学习的推荐系统，主要分成两大部分：
 将推荐当成是一个多分类问题，预测问题为：视频库V，有上百万的视频，某用户U，在上下文C上，在时间t时的观看行为\$w_t\$，刚好是某个视频i.
 
 $$
-P(w_t =i|U,C)=\frac{e^{v_{i} u}}{\sum_{j\inV}{e^{v_{j} u}}}
+P(w_t =i|U,C)=\frac{e^{v_{i} u}}{\sum_{j \in V}{e^{v_{j} u}}}
 $$
 
 其中u表示一个高维的(user,context)pair的“embedding”， v表示每个候选视频的emdedding。在该假设中，一个emdedding可以简化成一个稀疏实体的映射（视频，用户等各有一个），映射到一个N维的dense vector中。深度神经网络的任务是：学到user embeddings: u，作为用户历史和上下文的函数，使用一个softmax分类器，用于判别视频。
