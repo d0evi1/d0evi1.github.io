@@ -10,9 +10,11 @@ youtube的基于深度学习的推荐系统，主要分成两大部分：
 
 # 一、候选生成
 
-将推荐当成是一个多分类问题，预测问题为：视频库V，有上百万的视频，某用户U，在上下文C上，在时间t时的观看行为wt，刚好是某个视频i.
+将推荐当成是一个多分类问题，预测问题为：视频库V，有上百万的视频，某用户U，在上下文C上，在时间t时的观看行为\$w_t\$，刚好是某个视频i.
 
-<img src="http://www.forkosh.com/mathtex.cgi?P(w_t =i|U,C)=\frac{e^{v_{i} u}}{\sum_{j\inV}{e^{v_{j} u}}}">
+$$
+P(w_t =i|U,C)=\frac{e^{v_{i} u}}{\sum_{j\inV}{e^{v_{j} u}}}
+$$
 
 其中u表示一个高维的(user,context)pair的“embedding”， v表示每个候选视频的emdedding。在该假设中，一个emdedding可以简化成一个稀疏实体的映射（视频，用户等各有一个），映射到一个N维的dense vector中。深度神经网络的任务是：学到user embeddings: u，作为用户历史和上下文的函数，使用一个softmax分类器，用于判别视频。
 
@@ -95,9 +97,9 @@ Ranking的主要作用是，针对指定的UI，使用曝光数据来特化和�
 
 描述过往视频曝光的频率的特征，对于在推荐中引入“搅动（churn）”很重要（连续的请求不会返回相同的列表）。如果一个用户最近被推荐了某个视频，但没有观看它，接着模型将自然地在下一页加载时降级该曝光（impression）。Serving即时曝光和观看历史，是一项工程壮举，超出了本paper的范围，对于产生响应式推荐至关重要。
 
-**嵌入类别特征 （emdedding categorical features**
+**类别特征embedding （embedding categorical features)**
 
-与候选生成阶段相类似，我们使用emdeddings，将稀疏的类别型特征映射到dense表征上，更适合于神经网络。每个唯一的ID空间(视频库:"vocabulary") 都具有一个单独学到的emdedding，它维度的递增与唯一值的数目的log成比例。这些库是简单的look-up table，在训练前由整个数据一次构建。非常大的基数ID空间（视频ID或者搜索query terms）被截断，通过只包含topN，在基于点击曝光的频率排序之后。Out-of-vocabulary的值，可以简单地映射到零嵌入上（zero embdding）。正如在候选生成阶段，多值类别特征的embeddings是被平均化的，在被输入到网络之前。
+与候选生成阶段相类似，我们使用embeddings，将稀疏的类别型特征映射到dense表征上，更适合于神经网络。每个唯一的ID空间(视频库:"vocabulary") 都具有一个单独学到的emdedding，它维度的递增与唯一值的数目的log成比例。这些库是简单的look-up table，在训练前由整个数据一次构建。非常大的基数ID空间（视频ID或者搜索query terms）被截断，通过只包含topN，在基于点击曝光的频率排序之后。Out-of-vocabulary的值，可以简单地映射到零嵌入上（zero embdding）。正如在候选生成阶段，多值类别特征的embeddings是被平均化的，在被输入到网络之前。
 
 重要的是，相同ID空间的类别型特征，也共享着底层的embeddbings。例如，存着单个关于视频ID的全局embedding，供许多不同的特征使用（曝光的视频ID，该用户观看的最近视频ID，作为推荐系统"种子"的视频ID等等）。尽管共享emdedding，每个特征独自输入到网络中，因此，上面的层可以学到每个特征的特定表征(representation)。共享嵌入（sharing emdeddings）对于提升泛化、加速训练、及减小内存等相当重要。绝大多数模型参数都是在这些高基数(high-cardinality)的embedding空间中 - 例如，100w的ID，嵌入到32维的空间上，与2048个单元的宽完全连接层多7倍多的参数。
 
@@ -105,13 +107,13 @@ Ranking的主要作用是，针对指定的UI，使用曝光数据来特化和�
 
 众所周知，神经网络对于输入的归一化和分布是很敏感的[9]，其它方法（比如：决策树ensembles）对于独立特征的缩放(scaling)是稳定的。我们发现，对连续特征进行合理的归一化，对于收敛来说很重要。连续特征x，具有分布f，被转换成x^，通过对值进行归一化，比如：特征平均地分布在[0,1)上使用累积分布，<img src="http://www.forkosh.com/mathtex.cgi?\hat{x}=\int_{-\infty}^{x}df">。该积分与特征值的分位数的线性插值相近似，在训练开始这，在所有数据上的单个pass中计算。
 
-另外，原始的归一化特征<img src="http://www.forkosh.com/mathtex.cgi?\hat{x}">，我们也输入<img src="http://www.forkosh.com/mathtex.cgi?\hat{x}^2">和<img src="http://www.forkosh.com/mathtex.cgi?\sqrt{\hat{x}}">，给网络更多有表现力的阶，通过允许它，很容易形成特征的super-linear和sub-linear function。我们发现：输入连续特征的阶，可以提升离线的accuracy。
+另外，原始的归一化特征\$ \hat{x} \$，我们也输入\$ \hat{x}^2 \$和\$ \sqrt{\hat{x}} \$，给网络更多有表现力的阶，通过允许它，很容易形成特征的super-linear和sub-linear function。我们发现：输入连续特征的阶，可以提升离线的accuracy。
 
 ## 2.2 对期望的观看时长建模
 
 我们的目标是，给定训练样本：包含正例（曝光的视频被点击）和负例（曝光的视频没被点击），来预测期望的观看时间。正例可以解释成：该用户花费观看该视频的时间量。为了预测期望的观看时间，我们出于该目的，开发并使用加权logistic regression技术。
 
-该模型的训练通过logistic regression和cross-entropy loss进行（图7）。然而，正例（被点的）的曝光，会由视频所观察到的观看时间进行加权。所有负例（未点击）的曝光，都使用单位加权。这种方式下，通过logistic regression学到的差异（odds）是：<img src="http://www.forkosh.com/mathtex.cgi?\frac{\sum{T_i}}{N-k}">，其中N是训练样本的数目，k是正例曝光的数目，Ti是第i个曝光的观看时间。假设，正例曝光很小（真实情况就这样），学到的差异(odds)近似为：<img src="http://www.forkosh.com/mathtex.cgi?E[T](1+P)">，其中P是点击概率，而E[T]是该曝光所期望的观看时间。由于P很小，该乘积近似为E[T]。为便于推理，我们使用指数函数e^x作为最终的激活函数，来产成这些odds，来近似估计期望的观看时长。
+该模型的训练通过logistic regression和cross-entropy loss进行（图7）。然而，正例（被点的）的曝光，会由视频所观察到的观看时间进行加权。所有负例（未点击）的曝光，都使用单位加权。这种方式下，通过logistic regression学到的差异（odds）是：\$ \frac{\sum{T_i}}{N-k} \$，其中N是训练样本的数目，k是正例曝光的数目，Ti是第i个曝光的观看时间。假设，正例曝光很小（真实情况就这样），学到的差异(odds)近似为：\$ E[T](1+P) \$，其中P是点击概率，而E[T]是该曝光所期望的观看时间。由于P很小，该乘积近似为E[T]。为便于推理，我们使用指数函数e^x作为最终的激活函数，来产成这些odds，来近似估计期望的观看时长。
 
 ## 2.3 隐层的试验
 
