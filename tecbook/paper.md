@@ -9,6 +9,10 @@ image:
 share: true
 ---
 
+# 分布式
+
+google DistBelief：[Large Scale Distributed Deep Networks](https://static.googleusercontent.com/media/research.google.com/zh-CN//archive/large_deep_networks_nips2012.pdf)
+
 # 画风迁移
 
 - 1.[Inceptionism: Going Deeper into Neural Networks](https://research.googleblog.com/2015/06/inceptionism-going-deeper-into-neural.html)
