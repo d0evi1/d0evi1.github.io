@@ -707,7 +707,7 @@ coverage(y, \hat{f}) = \frac{1}{n_{\text{samples}}}
   \sum_{i=0}^{n_{\text{samples}} - 1} \max_{j:y_{ij} = 1} \text{rank}_{ij}
 $$  
   
-其中：\$ \text{rank}_{ij} = \left|\left\{k: \hat{f}_{ik} \geq \hat{f}_{ij} \right\}\right| \$。给定rank定义，通过给出最大的rank，来打破y_scores。
+其中：\$ \text{rank}_{ij} = \left\|\left\{k: \hat{f}_{ik} \geq \hat{f}_{ij} \right\}\right\| \$。给定rank定义，通过给出最大的rank，来打破y_scores。
 
 示例如下：
 
@@ -739,8 +739,8 @@ $$
 其中：
 
 - \$ \mathcal{L}_{ij} = \left\{k: y_{ik} = 1, \hat{f}_{ik} \geq \hat{f}_{ij} \right\}  \$，
-- \$ \text{rank}_{ij} = \left|\left\{k: \hat{f}_{ik} \geq \hat{f}_{ij} \right\}\right| \$
-- \$ |\cdot| \$是l0 范式或是数据集的基数。
+- \$ \text{rank}_{ij} = \left\|\left\{k: \hat{f}_{ik} \geq \hat{f}_{ij} \right\}\right\| \$
+- \$ \| \cdot \| \$是l0 范式或是数据集的基数。
 
 该函数的示例：
 
@@ -763,11 +763,11 @@ $$
 
 $$
 \text{ranking\_loss}(y, \hat{f}) =  \frac{1}{n_{\text{samples}}}
-  \sum_{i=0}^{n_{\text{samples}} - 1} \frac{1}{|y_i|(n_\text{labels} - |y_i|)}
-  \left|\left\{(k, l): \hat{f}_{ik} < \hat{f}_{il}, y_{ik} = 1, y_{il} = 0 \right\}\right|
+  \sum_{i=0}^{n_{\text{samples}} - 1} \frac{1}{\|y_i\|(n_\text{labels} - |y_i|)}
+  \left\|\left\{(k, l): \hat{f}_{ik} < \hat{f}_{il}, y_{ik} = 1, y_{il} = 0 \right\}\right\|
 $$
 
-其中\$ |\cdot| \$ 为l0范式或数据集基数。
+其中\$ \| \cdot \| \$ 为l0范式或数据集基数。
 
 示例：
 
