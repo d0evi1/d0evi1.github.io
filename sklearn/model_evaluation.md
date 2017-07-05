@@ -631,7 +631,7 @@ array([ 0.8 ,  0.4 ,  0.35,  0.1 ])
 
 对比于其它metrics: accuracy、 Hamming loss、 F1-score, ROC不需要为每个label优化一个阀值。roc_auc_score函数也可以用于多分类（multi-class）问题上。如果预测的输出已经被二值化。
 
-<img src="http://scikit-learn.org/stable/_images/sphx_glr_plot_roc_0011.png">
+<img src="http://scikit-learn.org/stable/_images/sphx_glr_plot_roc_001.png">
 
 示例：
 
