@@ -528,11 +528,11 @@ LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
 
 ## 3.10 Log loss
 
-Log loss也被称为logistic回归loss，或者交叉熵loss(cross-entropy loss)，用于概率估计。它通常用在(multinomial)的LR和神经网络上，以最大期望（EM：expectation-maximization）的变种的方式，用于评估一个分类器的概率输出，而非进行离散预测。
+**Log loss也被称为logistic回归loss，或者交叉熵loss(cross-entropy loss)，用于概率估计**。它通常用在(multinomial)的LR和神经网络上，以最大期望（EM：expectation-maximization）的变种的方式，用于评估一个分类器的概率输出，而非进行离散预测。
 
 对于二元分类，true label为：\$ y \in \{0,1\} \$，概率估计为：\$ p = \operatorname{Pr}(y = 1) \$，每个样本的log loss是对分类器给定true label的负值log似然估计(negative log-likelihood)：
 
-\$ L_{\log}(y, p) = -\log \operatorname{Pr}(y|p) = -(y \log (p) + (1 - y) \log (1 - p)) \$
+\$ L_{\log}(y, p) = -\log \operatorname{Pr}(y\|p) = -(y \log (p) + (1 - y) \log (1 - p)) \$
 
 当扩展到多元分类（multiclass）上时。可以将样本的true label编码成1-of-K个二元指示器矩阵Y，如果从label K集合中取出的样本i，对应的label为k，则\$ y_{i,k} = 1 \$，P为概率估计矩阵，\$ p_{i,k} = \operatorname{Pr}(t_{i,k} = 1) \$。整个集合的log loss表示如下：
 
