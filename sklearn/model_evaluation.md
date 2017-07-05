@@ -413,7 +413,7 @@ array([ 0.35,  0.4 ,  0.8 ])
 - \$ \hat{y} \$是(sample, label)pairs的真实集
 - L是labels的集
 - S是labels的集
-- \$ \hat{y} \$是y的子集，样本s,比如：\$ y_s :=  \left{(s', l) \in y \| s' = s \right} \$
+- \$ \hat{y} \$是y的子集，样本s,比如：\$ y_s :=  \left\{(s', l) \in y \| s' = s \right\} \$
 - \$ y_l \$表示label l的y子集
 - 同样的，\$ y_s \$和\$ y_l \$都是\$ \hat{y} \$的子集
 - \$ P(A, B) := \frac{\left \| A \cap B \right \|}{\left \|A \right \|} \$
