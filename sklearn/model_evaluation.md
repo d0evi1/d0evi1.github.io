@@ -22,9 +22,7 @@ tagline: 介绍
 
 对于大多数case而说，你可以设计一个使用scoring参数的scorer对象；下面展示了所有可能的值。所有的scorer对象都遵循：高得分，更好效果。如果从mean_absolute_error 和mean_squared_error（它计算了模型与数据间的距离）返回的得分将被忽略。
 
-<figure>
-	<a href="http://photo.yupoo.com/wangdren23/FvKhbUh3/medish.jpg"><img src="http://photo.yupoo.com/wangdren23/FvKhbUh3/medish.jpg" alt=""></a>
-</figure>
+<img src="http://photo.yupoo.com/wangdren23/FvKhbUh3/medish.jpg">
 
 ## 2.2 从metric函数定义你的scoring策略
 
@@ -145,10 +143,7 @@ accuracy_score函数计算了准确率，不管是正确预测的fraction（defa
 
 预测值与真实值的准确率，在n个样本下的计算公式如下：
 
-<figure>
-	<a href="http://scikit-learn.org/stable/_images/math/27e20bf0b2786124f8df6383493b347e6ce8586d.png"><img src="http://scikit-learn.org/stable/_images/math/27e20bf0b2786124f8df6383493b347e6ce8586d.png" alt=""></a>
-</figure>
-
+<img src="http://scikit-learn.org/stable/_images/math/27e20bf0b2786124f8df6383493b347e6ce8586d.png">
 1(x)为指示函数。
 
 {% highlight python %}
@@ -201,9 +196,7 @@ array([[2, 0, 0],
 
 结果为：
 
-<figure>
-	<a href="http://scikit-learn.org/stable/_images/plot_confusion_matrix_0011.png"><img src="http://scikit-learn.org/stable/_images/plot_confusion_matrix_0011.png" alt=""></a>
-</figure>
+<img src="http://scikit-learn.org/stable/_images/plot_confusion_matrix_0011.png">
 
 示例：
 
@@ -242,15 +235,17 @@ avg / total       0.67      0.80      0.72         5
  
 [hamming_loss](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.hamming_loss.html#sklearn.metrics.hamming_loss)计算了在两个样本集里的平均汉明距离或平均Hamming loss。
  
-- <img src="http://www.forkosh.com/mathtex.cgi?\hat{y}_j ">是对应第j个label的预测值，
-- <img src="http://www.forkosh.com/mathtex.cgi?y_j ">是对应的真实值
-- <img src="http://www.forkosh.com/mathtex.cgi?n_\text{labels} ">是类目数
+- \$ \hat{y}_j \$是对应第j个label的预测值，
+- \$ y_j \$是对应的真实值
+- \$ n_\text{labels} \$是类目数
 
-那么两个样本间的Hamming loss为<img src="http://www.forkosh.com/mathtex.cgi?L_{Hamming} ">，定义如下：
+那么两个样本间的Hamming loss为\$ L_{Hamming} \$，定义如下：
 
-<img src="http://www.forkosh.com/mathtex.cgi?L_{Hamming}(y, \hat{y}) = \frac{1}{n_\text{labels}} \sum_{j=0}^{n_\text{labels} - 1} 1(\hat{y}_j \not= y_j)">
+$$ 
+L_{Hamming}(y, \hat{y}) = \frac{1}{n_\text{labels}} \sum_{j=0}^{n_\text{labels} - 1} 1(\hat{y}_j \not= y_j) 
+$$
 
-其中：<img src="http://www.forkosh.com/mathtex.cgi?1(x) ">为指示函数。
+其中：\$ 1(x) \$为指示函数。
 
 {% highlight python %}
 
@@ -277,9 +272,11 @@ avg / total       0.67      0.80      0.72         5
 
 [jaccard_similarity_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.jaccard_similarity_score.html#sklearn.metrics.jaccard_similarity_score)函数会计算两对label集之间的Jaccard相似度系数的平均（缺省）或求和。它也被称为Jaccard index.
 
-第i个样本的Jaccard相似度系数（Jaccard similarity coefficient），真实标签集为<img src="http://www.forkosh.com/mathtex.cgi?y_i ">，预测标签集为：<img src="http://www.forkosh.com/mathtex.cgi?\hat{y}_j ">，其定义如下：
+第i个样本的Jaccard相似度系数（Jaccard similarity coefficient），真实标签集为\$ y_i \$，预测标签集为：\$ \hat{y}_j \$，其定义如下：
 
-<img src="http://www.forkosh.com/mathtex.cgi?J(y_i, \hat{y}_i) = \frac{|y_i \cap \hat{y}_i|}{|y_i \cup \hat{y}_i|}.">
+$$ 
+J(y_i, \hat{y}_i) = \frac{|y_i \cap \hat{y}_i|}{|y_i \cup \hat{y}_i|}. 
+$$
 
 在二分类和多分类问题上，Jaccard相似度系数score与分类的正确率（accuracy）相同：
 
@@ -309,7 +306,7 @@ avg / total       0.67      0.80      0.72         5
 
 准确率（precision）可以衡量一个样本为负的标签被判成正，召回率（recall）用于衡量所有正例。
 
-F-meature（包括：<img src="http://www.forkosh.com/mathtex.cgi?F_\beta">和<img src="http://www.forkosh.com/mathtex.cgi?F_1">），可以认为是precision和recall的加权调和平均（weighted harmonic mean）。一个<img src="http://www.forkosh.com/mathtex.cgi?F_\beta">值，最佳为1，最差时为0. 如果<img src="http://www.forkosh.com/mathtex.cgi?\beta">=1，那么<img src="http://www.forkosh.com/mathtex.cgi?F_\beta">和<img src="http://www.forkosh.com/mathtex.cgi?F_1">相等，precision和recall的权重相等。
+F-meature（包括：\$F_\beta\$和\$F_1"\$），可以认为是precision和recall的加权调和平均（weighted harmonic mean）。一个\$ F_\beta \$值，最佳为1，最差时为0. 如果\$ \beta=1\$，那么\$ F_\beta \$和\$ F_1 \$相等，precision和recall的权重相等。
 
 [precision_recall_curve](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_curve.html#sklearn.metrics.precision_recall_curve)会根据预测值和真实值来计算一条precision-recall典线。
 
@@ -346,11 +343,17 @@ sklearn提供了一些函数来分析precision, recall and F-measures值：
 
 在这个上下文中，我们定义了precision, recall和F-measure:
 
-<img src="http://www.forkosh.com/mathtex.cgi?\text{precision} = \frac{tp}{tp + fp}">
+$$
+\text{precision} = \frac{tp}{tp + fp}
+$$
 
-<img src="http://www.forkosh.com/mathtex.cgi?\text{recall} = \frac{tp}{tp + fn}">
+$$
+\text{recall} = \frac{tp}{tp + fn}
+$$
 
-<img src="http://www.forkosh.com/mathtex.cgi?F_\beta = (1 + \beta^2) \frac{\text{precision} \times \text{recall}}{\beta^2 \text{precision} + \text{recall}}">
+$$
+F_\beta = (1 + \beta^2) \frac{\text{precision} \times \text{recall}}{\beta^2 \text{precision} + \text{recall}}
+$$
 
 这里是一个二元分类的示例：
 
@@ -404,21 +407,19 @@ array([ 0.35,  0.4 ,  0.8 ])
 可以考虑下面的概念：
 
 - y是(sample, label)pairs的预测集
-- <img src="http://www.forkosh.com/mathtex.cgi?\hat{y}">是(sample, label)pairs的真实集
+- \$ \hat{y} \$是(sample, label)pairs的真实集
 - L是labels的集
 - S是labels的集
-- <img src="http://www.forkosh.com/mathtex.cgi?\hat{y}">是y的子集，样本s,比如：<img src="http://www.forkosh.com/mathtex.cgi?y_s := \left\{(s', l) \in y | s' = s\right\}">
-- <img src="http://www.forkosh.com/mathtex.cgi?y_l ">表示label l的y子集
-- 同样的，<img src="http://www.forkosh.com/mathtex.cgi?y_s ">和<img src="http://www.forkosh.com/mathtex.cgi?y_l ">都是<img src="http://www.forkosh.com/mathtex.cgi?\hat{y} ">的子集
-- <img src="http://www.forkosh.com/mathtex.cgi?P(A, B) := \frac{\left| A \cap B \right|}{\left|A\right|} ">
-- <img src="http://www.forkosh.com/mathtex.cgi?R(A, B) := \frac{\left| A \cap B \right|}{\left|B\right|} "> 在处理<img src="http://www.forkosh.com/mathtex.cgi?B = \emptyset">时方式更不同；该实现采用<img src="http://www.forkosh.com/mathtex.cgi?R(A, B):=0">，且与P相类似。
-- <img src="http://www.forkosh.com/mathtex.cgi?F_\beta(A, B) := \left(1 + \beta^2\right) \frac{P(A, B) \times R(A, B)}{\beta^2 P(A, B) + R(A, B)} ">
+- \$ \hat{y} \$是y的子集，样本s,比如：\$ y_s := \left\{(s', l) \in y | s' = s\right\} \$
+- \$ y_l \$表示label l的y子集
+- 同样的，\$ y_s \$和\$ y_l \$都是\$ \hat{y} \$的子集
+- \$ P(A, B) := \frac{\left| A \cap B \right|}{\left|A\right|} \$
+- \$ R(A, B) := \frac{\left| A \cap B \right|}{\left|B\right|} \$ 在处理\$ B = \emptyset \$时方式更不同；该实现采用\$ R(A, B):=0 \$，且与P相类似。
+- \$ F_\beta(A, B) := \left(1 + \beta^2\right) \frac{P(A, B) \times R(A, B)}{\beta^2 P(A, B) + R(A, B)} \$
 
 metrics的定义如下：
 
-<figure>
-	<a href="http://photo.yupoo.com/wangdren23/Fxc1ofvk/medish.jpg"><img src="http://photo.yupoo.com/wangdren23/Fxc1ofvk/medish.jpg" alt=""></a>
-</figure>
+<img src="http://photo.yupoo.com/wangdren23/Fxc1ofvk/medish.jpg">
 
 代码：
 
@@ -469,13 +470,15 @@ metrics的定义如下：
 如果label使用+1和-1进行编码。y为真实值，w为由decision_function结出的预测决策。
 hinge loss的定义如下：
 
-<img src="http://www.forkosh.com/mathtex.cgi?L_\text{Hinge}(y, w) = \max\left\{1 - wy, 0\right\} = \left|1 - wy\right|_+">
+$$
+L_\text{Hinge}(y, w) = \max\left\{1 - wy, 0\right\} = \left|1 - wy\right|_+
+$$
 
 如果超过两个label，由于[Crammer & Singer](http://jmlr.csail.mit.edu/papers/volume2/crammer01a/crammer01a.pdf)所提到的问题 ，hinge_loss 会使用一个多元分类的变种。
 
-如果<img src="http://www.forkosh.com/mathtex.cgi?y_w">是对于true label的预测判断（predicted decision），<img src="http://www.forkosh.com/mathtex.cgi?y_t ">则是对于其他label的预测判断的最大值，而predicted decisions由多个predicted decision输出，那么多分类的hinge loss定义如下：
+如果\$ y_w \$是对于true label的预测判断（predicted decision），\$ y_t \$则是对于其他label的预测判断的最大值，而predicted decisions由多个predicted decision输出，那么多分类的hinge loss定义如下：
 
-<img src="http://www.forkosh.com/mathtex.cgi?L_\text{Hinge}(y_w, y_t) = \max\left\{1 + y_t - y_w, 0\right\}">
+\$ L_\text{Hinge}(y_w, y_t) = \max\left\{1 + y_t - y_w, 0\right\} \$
 
 二分类问题示例：
 
@@ -524,15 +527,17 @@ LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
 
 Log loss也被称为logistic回归loss，或者交叉熵loss(cross-entropy loss)，用于概率估计。它通常用在(multinomial)的LR和神经网络上，以最大期望（EM：expectation-maximization）的变种的方式，用于评估一个分类器的概率输出，而非进行离散预测。
 
-对于二元分类，true label为：<img src="http://www.forkosh.com/mathtex.cgi?y \in \{0,1\}">，概率估计为：<img src="http://www.forkosh.com/mathtex.cgi?p = \operatorname{Pr}(y = 1)">，每个样本的log loss是对分类器给定true label的负值log似然估计(negative log-likelihood)：
+对于二元分类，true label为：\$ y \in \{0,1\} \$，概率估计为：\$ p = \operatorname{Pr}(y = 1) \$，每个样本的log loss是对分类器给定true label的负值log似然估计(negative log-likelihood)：
 
-<img src="http://www.forkosh.com/mathtex.cgi?L_{\log}(y, p) = -\log \operatorname{Pr}(y|p) = -(y \log (p) + (1 - y) \log (1 - p))">
+\$ L_{\log}(y, p) = -\log \operatorname{Pr}(y|p) = -(y \log (p) + (1 - y) \log (1 - p)) \$
 
-当扩展到多元分类（multiclass）上时。可以将样本的true label编码成1-of-K个二元指示器矩阵Y，如果从label K集合中取出的样本i，对应的label为k，则<img src="http://www.forkosh.com/mathtex.cgi?y_{i,k} = 1">，P为概率估计矩阵，<img src="http://www.forkosh.com/mathtex.cgi?p_{i,k} = \operatorname{Pr}(t_{i,k} = 1)">。整个集合的log loss表示如下：
+当扩展到多元分类（multiclass）上时。可以将样本的true label编码成1-of-K个二元指示器矩阵Y，如果从label K集合中取出的样本i，对应的label为k，则\$ y_{i,k} = 1 \$，P为概率估计矩阵，\$ p_{i,k} = \operatorname{Pr}(t_{i,k} = 1) \$。整个集合的log loss表示如下：
 
-<img src="http://www.forkosh.com/mathtex.cgi?L_{\log}(Y, P) = -\log \operatorname{Pr}(Y|P) = - \frac{1}{N} \sum_{i=0}^{N-1} \sum_{k=0}^{K-1} y_{i,k} \log p_{i,k}">
+$$
+L_{\log}(Y, P) = -\log \operatorname{Pr}(Y|P) = - \frac{1}{N} \sum_{i=0}^{N-1} \sum_{k=0}^{K-1} y_{i,k} \log p_{i,k}
+$$
 
-我们再看下如何对二分类的log loss进行泛化的，注意，在二分类问题上，<img src="http://www.forkosh.com/mathtex.cgi?p_{i,0} = 1 - p_{i,1} "> 和<img src="http://www.forkosh.com/mathtex.cgi?y_{i,0} = 1 - y_{i,1}">，因而，通过在<img src="http://www.forkosh.com/mathtex.cgi?y_{i,k} \in \{0,1\} ">扩展内部和来给出二分类的log loss。
+我们再看下如何对二分类的log loss进行泛化的，注意，在二分类问题上，\$ p_{i,0} = 1 - p_{i,1} \$ 和\$ y_{i,0} = 1 - y_{i,1} \$，因而，通过在\$ y_{i,k} \in \{0,1\} \$扩展内部和来给出二分类的log loss。
 
 log_loss函数，通过给定一列真实值label和一个概率矩阵来计算log loss，返回值通过estimator的predict_proba返回。
 
@@ -562,7 +567,9 @@ wikipedia是这么说的：
 
 MCC相应的定义如下：
 
-<img src="http://www.forkosh.com/mathtex.cgi?MCC = \frac{tp \times tn - fp \times fn}{\sqrt{(tp + fp)(tp + fn)(tn + fp)(tn + fn)}}.">
+$$
+MCC = \frac{tp \times tn - fp \times fn}{\sqrt{(tp + fp)(tp + fn)(tn + fp)(tn + fn)}}.
+$$
 
 这里的示例展示了matthews_corrcoef 函数的使用：
 
@@ -602,9 +609,7 @@ array([ 0.8 ,  0.4 ,  0.35,  0.1 ])
 
 下图展下了上面的结果：
 
-<figure>
-	<a href="http://scikit-learn.org/stable/_images/plot_roc_0011.png"><img src="http://scikit-learn.org/stable/_images/plot_roc_0011.png" alt=""></a>
-</figure>
+<img src="http://scikit-learn.org/stable/_images/plot_roc_0011.png">
 
 [roc_auc_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score)函数计算了ROC曲线下面的面积，它也被称为AUC或AUROC。通过计算下面的面积，曲线信息被归一化到1内。
 
@@ -623,9 +628,7 @@ array([ 0.8 ,  0.4 ,  0.35,  0.1 ])
 
 对比于其它metrics: accuracy、 Hamming loss、 F1-score, ROC不需要为每个label优化一个阀值。roc_auc_score函数也可以用于多分类（multi-class）问题上。如果预测的输出已经被二值化。
 
-<figure>
-	<a href="http://scikit-learn.org/stable/_images/plot_roc_0021.png"><img src="http://scikit-learn.org/stable/_images/plot_roc_0021.png" alt=""></a>
-</figure>
+<img src="http://scikit-learn.org/stable/_images/plot_roc_0021.png">
 
 示例：
 
@@ -635,14 +638,14 @@ array([ 0.8 ,  0.4 ,  0.35,  0.1 ])
 
 ## 3.13 0-1 loss
 
-[zero_one_loss](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.zero_one_loss.html#sklearn.metrics.zero_one_loss)会通过在<img src="http://www.forkosh.com/mathtex.cgi?n_{\text{samples}}">计算0-1分类的<img src="http://www.forkosh.com/mathtex.cgi?L_{0-1}">)的平值或求和。缺省情况下，该函数会对样本进行归一化。为了得到<img src="http://www.forkosh.com/mathtex.cgi?L_{0-1}">的求和，需要将normalize设置为False。
+[zero_one_loss](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.zero_one_loss.html#sklearn.metrics.zero_one_loss)会通过在\$ n_{\text{samples}} \$计算0-1分类的\$ L_{0-1}\$)的平值或求和。缺省情况下，该函数会对样本进行归一化。为了得到\$ L_{0-1} \$的求和，需要将normalize设置为False。
 
 在multilabel分类上，如果一个子集的labels与预测值严格匹配，zero_one_loss会得到1，如果有许多错误，则为0。缺省的，该函数会返回有问题的预测子集(不等)的百分比。为了得到这样的子集数，可以将normalize置为False。
 
-如果<img src="http://www.forkosh.com/mathtex.cgi?\hat{y}_i ">是第i个样本的预测值，
-<img src="http://www.forkosh.com/mathtex.cgi?y_i">是第i个样本的真实值，那么0-1 loss的定义如下：
+如果\$ \hat{y}_i \$是第i个样本的预测值，
+\$ y_i \$是第i个样本的真实值，那么0-1 loss的定义如下：
 
-<img src="http://www.forkosh.com/mathtex.cgi?L_{0-1}(y_i, \hat{y}_i) = 1(\hat{y}_i \not= y_i)">
+\$ L_{0-1}(y_i, \hat{y}_i) = 1(\hat{y}_i \not= y_i) \$
 
 其中1(x)表示的是指示函数。
 
@@ -683,17 +686,25 @@ array([ 0.8 ,  0.4 ,  0.35,  0.1 ])
 [coverage_error](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.coverage_error.html#sklearn.metrics.coverage_error)计算了那些必须在最终预测（所有真实的label都会被预测）中包含的labels的平均数目。如果你想知道有多少top高分labels（top-scored-labels）时它会很有用，你必须以平均的方式进行预测，不漏过任何一个真实label。该metrics的最优值是对真实label求平均。
 
 给定一个真实label的二分类指示矩阵:
-<img src="http://www.forkosh.com/mathtex.cgi?y \in \left\{0, 1\right\}^{n_\text{samples} \times n_\text{labels}}">
+
+$$ 
+y \in \left\{0, 1\right\}^{n_\text{samples} \times n_\text{labels}}
+$$
 
 以及每个label相关的分值:
-<img src="http://www.forkosh.com/mathtex.cgi?\hat{f} \in \mathbb{R}^{n_\text{samples} \times n_\text{labels}}">，
+
+$$
+http://www.forkosh.com/mathtex.cgi?\hat{f} \in \mathbb{R}^{n_\text{samples} \times n_\text{labels}}
+$$
 
 相应的范围误差定义如下：
 
-<img src="http://www.forkosh.com/mathtex.cgi?coverage(y, \hat{f}) = \frac{1}{n_{\text{samples}}}
-  \sum_{i=0}^{n_{\text{samples}} - 1} \max_{j:y_{ij} = 1} \text{rank}_{ij}">
+$$
+coverage(y, \hat{f}) = \frac{1}{n_{\text{samples}}}
+  \sum_{i=0}^{n_{\text{samples}} - 1} \max_{j:y_{ij} = 1} \text{rank}_{ij}
+$$  
   
-其中：<img src="http://www.forkosh.com/mathtex.cgi? \text{rank}_{ij} = \left|\left\{k: \hat{f}_{ik} \geq \hat{f}_{ij} \right\}\right|">。给定rank定义，通过给出最大的rank，来打破y_scores。
+其中：\$ \text{rank}_{ij} = \left|\left\{k: \hat{f}_{ik} \geq \hat{f}_{ij} \right\}\right| \$。给定rank定义，通过给出最大的rank，来打破y_scores。
 
 示例如下：
 
@@ -714,17 +725,19 @@ array([ 0.8 ,  0.4 ,  0.35,  0.1 ])
 
 LRAP会对每个样本上分配的真实label进行求平均，真实值的比例 vs. 低分值labels的总数。如果你可以为每个样本相关的label给出更好的rank，该指标将产生更好的分值。得到的score通常都会比0大，最佳值为1。如果每个样本都只有一个相关联的label，那么LRAP就与[平均倒数排名:mean reciprocal rank](http://en.wikipedia.org/wiki/Mean_reciprocal_rank)
 
-给定一个true label的二元指示矩阵，<img src="http://www.forkosh.com/mathtex.cgi?y \in \mathcal{R}^{n_\text{samples} \times n_\text{labels}} ">，每个label相对应的分值：<img src="http://www.forkosh.com/mathtex.cgi?\hat{f} \in \mathcal{R}^{n_\text{samples} \times n_\text{labels}}">，平均准确率的定义如下：
+给定一个true label的二元指示矩阵，\$ y \in \mathcal{R}^{n_\text{samples} \times n_\text{labels}} \$，每个label相对应的分值：\$ \hat{f} \in \mathcal{R}^{n_\text{samples} \times n_\text{labels}} \$，平均准确率的定义如下：
 
-<img src="http://www.forkosh.com/mathtex.cgi?LRAP(y, \hat{f}) = \frac{1}{n_{\text{samples}}}
+$$
+LRAP(y, \hat{f}) = \frac{1}{n_{\text{samples}}}
   \sum_{i=0}^{n_{\text{samples}} - 1} \frac{1}{|y_i|}
-  \sum_{j:y_{ij} = 1} \frac{|\mathcal{L}_{ij}|}{\text{rank}_{ij}}">
+  \sum_{j:y_{ij} = 1} \frac{|\mathcal{L}_{ij}|}{\text{rank}_{ij}}
+$$
   
 其中：
 
-- <img src="http://www.forkosh.com/mathtex.cgi?\mathcal{L}_{ij} = \left\{k: y_{ik} = 1, \hat{f}_{ik} \geq \hat{f}_{ij} \right\}">，
-- <img src="http://www.forkosh.com/mathtex.cgi?\text{rank}_{ij} = \left|\left\{k: \hat{f}_{ik} \geq \hat{f}_{ij} \right\}\right| ">
-- <img src="http://www.forkosh.com/mathtex.cgi?|\cdot|">是l0 范式或是数据集的基数。
+- \$ \mathcal{L}_{ij} = \left\{k: y_{ik} = 1, \hat{f}_{ik} \geq \hat{f}_{ij} \right\}  \$，
+- \$ \text{rank}_{ij} = \left|\left\{k: \hat{f}_{ik} \geq \hat{f}_{ij} \right\}\right| \$
+- \$ |\cdot| \$是l0 范式或是数据集的基数。
 
 该函数的示例：
 
@@ -743,13 +756,15 @@ LRAP会对每个样本上分配的真实label进行求平均，真实值的比�
 
 [label_ranking_loss](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.label_ranking_loss.html#sklearn.metrics.label_ranking_loss)函数用于计算ranking loss，它会对label对没有正确分配的样本进行求平均。例如：true labels的分值比false labels的分值小，或者对true/false label进行了相反的加权。最低的ranking loss为0.
 
-给定一个true labels的二元指示矩阵：<img src="http://www.forkosh.com/mathtex.cgi?y \in \left\{0, 1\right\}^{n_\text{samples} \times n_\text{labels}} ">，每个label相关的分值为：<img src="http://www.forkosh.com/mathtex.cgi?\hat{f} \in \mathbb{R}^{n_\text{samples} \times n_\text{labels}}">，ranking loss的定义如下：
+给定一个true labels的二元指示矩阵：\$ y \in \left\{0, 1\right\}^{n_\text{samples} \times n_\text{labels}} \$，每个label相关的分值为：\$ \hat{f} \in \mathbb{R}^{n_\text{samples} \times n_\text{labels}} \$，ranking loss的定义如下：
 
-<img src="http://www.forkosh.com/mathtex.cgi?\text{ranking\_loss}(y, \hat{f}) =  \frac{1}{n_{\text{samples}}}
+$$
+\text{ranking\_loss}(y, \hat{f}) =  \frac{1}{n_{\text{samples}}}
   \sum_{i=0}^{n_{\text{samples}} - 1} \frac{1}{|y_i|(n_\text{labels} - |y_i|)}
-  \left|\left\{(k, l): \hat{f}_{ik} < \hat{f}_{il}, y_{ik} = 1, y_{il} = 0 \right\}\right|">
+  \left|\left\{(k, l): \hat{f}_{ik} < \hat{f}_{il}, y_{ik} = 1, y_{il} = 0 \right\}\right|
+$$
 
-其中<img src="http://www.forkosh.com/mathtex.cgi?|\cdot|"> 为l0范式或数据集基数。
+其中\$ |\cdot| \$ 为l0范式或数据集基数。
 
 示例：
 
@@ -789,7 +804,9 @@ explained_variance_score解释了[explained variance regression score](http://en
 
 如果<img src="http://www.forkosh.com/mathtex.cgi?\hat{y} ">是估计的target输出，y为相应的真实(correct)target输出，Var为求方差（variance），即标准差的平方，那么可释方差（explained variance）的估计如下：
 
-<img src="http://www.forkosh.com/mathtex.cgi?\texttt{explained\_{}variance}(y, \hat{y}) = 1 - \frac{Var\{ y - \hat{y}\}}{Var\{y\}}">
+$$
+\texttt{explained\_{}variance}(y, \hat{y}) = 1 - \frac{Var\{ y - \hat{y}\}}{Var\{y\}}
+$$
 
 最好的可能值为1.0，越低表示越差。
 
@@ -818,9 +835,11 @@ array([ 0.967...,  1.        ])
 
 mean_absolute_error函数将会计算[平均绝对误差](http://en.wikipedia.org/wiki/Mean_absolute_error)，该指标对应于绝对误差loss（absolute error loss）或l1范式loss（l1-norm loss）的期望值。
 
-如果<img src="http://www.forkosh.com/mathtex.cgi?\hat{y}_i ">是第i个样本的预测值，yi是相应的真实值，那么在<img src="http://www.forkosh.com/mathtex.cgi?n_{\text{samples}}  ">上的平均绝对误差（MAE）的定义如下：
+如果<img src="http://www.forkosh.com/mathtex.cgi?\hat{y}_i ">是第i个样本的预测值，yi是相应的真实值，那么在\$ n_{\text{samples}} \$上的平均绝对误差（MAE）的定义如下：
 
-<img src="http://www.forkosh.com/mathtex.cgi?\text{MAE}(y, \hat{y}) = \frac{1}{n_{\text{samples}}} \sum_{i=0}^{n_{\text{samples}}-1} \left| y_i - \hat{y}_i \right|">
+$$
+\text{MAE}(y, \hat{y}) = \frac{1}{n_{\text{samples}}} \sum_{i=0}^{n_{\text{samples}}-1} \left| y_i - \hat{y}_i \right|
+$$
 
 示例：
 
@@ -847,7 +866,9 @@ array([ 0.5,  1. ])
 
 mean_squared_error用于计算[平均平方误差](http://en.wikipedia.org/wiki/Mean_squared_error)，该指标对应于平方（二次方）误差loss（squared (quadratic) error loss）的期望值。
 
-<img src="http://www.forkosh.com/mathtex.cgi?\text{MSE}(y, \hat{y}) = \frac{1}{n_\text{samples}} \sum_{i=0}^{n_\text{samples} - 1} (y_i - \hat{y}_i)^2.">
+$$
+\text{MSE}(y, \hat{y}) = \frac{1}{n_\text{samples}} \sum_{i=0}^{n_\text{samples} - 1} (y_i - \hat{y}_i)^2.
+$$
 
 示例为：
 
@@ -875,7 +896,9 @@ median_absolute_error是很令人感兴趣的，它对异类（outliers）的情
 
 MedAE的定义如下：
 
-<img src="http://www.forkosh.com/mathtex.cgi?\text{MedAE}(y, \hat{y}) = \text{median}(\mid y_1 - \hat{y}_1 \mid, \ldots, \mid y_n - \hat{y}_n \mid)">
+$$
+\text{MedAE}(y, \hat{y}) = \text{median}(\mid y_1 - \hat{y}_1 \mid, \ldots, \mid y_n - \hat{y}_n \mid)
+$$
 
 median_absolute_error不支持multioutput。
 
@@ -897,9 +920,11 @@ r2_score函数用于计算R²（[确定系数：coefficient of determination](ht
 
 R²的定义如下：
 
-<img src="http://www.forkosh.com/mathtex.cgi?R^2(y, \hat{y}) = 1 - \frac{\sum_{i=0}^{n_{\text{samples}} - 1} (y_i - \hat{y}_i)^2}{\sum_{i=0}^{n_\text{samples} - 1} (y_i - \bar{y})^2}">
+$$
+R^2(y, \hat{y}) = 1 - \frac{\sum_{i=0}^{n_{\text{samples}} - 1} (y_i - \hat{y}_i)^2}{\sum_{i=0}^{n_\text{samples} - 1} (y_i - \bar{y})^2}
+$$
 
-其中：<img src="http://www.forkosh.com/mathtex.cgi?\bar{y} =  \frac{1}{n_{\text{samples}}} \sum_{i=0}^{n_{\text{samples}} - 1} y_i">
+其中：\$ \bar{y} =  \frac{1}{n_{\text{samples}}} \sum_{i=0}^{n_{\text{samples}} - 1} y_i \$
 
 示例：
 
