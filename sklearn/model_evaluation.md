@@ -694,7 +694,7 @@ $$
 以及每个label相关的分值:
 
 $$
-http://www.forkosh.com/mathtex.cgi?\hat{f} \in \mathbb{R}^{n_\text{samples} \times n_\text{labels}}
+\hat{f} \in \mathbb{R}^{n_\text{samples} \times n_\text{labels}}
 $$
 
 相应的范围误差定义如下：
@@ -802,7 +802,7 @@ r2_score和explained_variance_score 对于multioutput参数还接受另一个额
 
 explained_variance_score解释了[explained variance regression score](http://en.wikipedia.org/wiki/Explained_variation)
 
-如果<img src="http://www.forkosh.com/mathtex.cgi?\hat{y} ">是估计的target输出，y为相应的真实(correct)target输出，Var为求方差（variance），即标准差的平方，那么可释方差（explained variance）的估计如下：
+如果\$ \hat{y} \$是估计的target输出，y为相应的真实(correct)target输出，Var为求方差（variance），即标准差的平方，那么可释方差（explained variance）的估计如下：
 
 $$
 \texttt{explained\_{}variance}(y, \hat{y}) = 1 - \frac{Var\{ y - \hat{y}\}}{Var\{y\}}
@@ -835,7 +835,7 @@ array([ 0.967...,  1.        ])
 
 mean_absolute_error函数将会计算[平均绝对误差](http://en.wikipedia.org/wiki/Mean_absolute_error)，该指标对应于绝对误差loss（absolute error loss）或l1范式loss（l1-norm loss）的期望值。
 
-如果<img src="http://www.forkosh.com/mathtex.cgi?\hat{y}_i ">是第i个样本的预测值，yi是相应的真实值，那么在\$ n_{\text{samples}} \$上的平均绝对误差（MAE）的定义如下：
+如果\$ \hat{y}_i \$是第i个样本的预测值，yi是相应的真实值，那么在\$ n_{\text{samples}} \$上的平均绝对误差（MAE）的定义如下：
 
 $$
 \text{MAE}(y, \hat{y}) = \frac{1}{n_{\text{samples}}} \sum_{i=0}^{n_{\text{samples}}-1} \left| y_i - \hat{y}_i \right|
