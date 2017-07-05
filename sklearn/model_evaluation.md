@@ -413,11 +413,11 @@ array([ 0.35,  0.4 ,  0.8 ])
 - \$ \hat{y} \$是(sample, label)pairs的真实集
 - L是labels的集
 - S是labels的集
-- \$ \hat{y} \$是y的子集，样本s,比如：\$ y_s := \left\{(s', l) \in y | s' = s\right\} \$
+- \$ \hat{y} \$是y的子集，样本s,比如：\$ y_s := \left \{(s', l) \in y \| s' = s\right \} \$
 - \$ y_l \$表示label l的y子集
 - 同样的，\$ y_s \$和\$ y_l \$都是\$ \hat{y} \$的子集
-- \$ P(A, B) := \frac{\left| A \cap B \right|}{\left|A\right|} \$
-- \$ R(A, B) := \frac{\left| A \cap B \right|}{\left|B\right|} \$ 在处理\$ B = \emptyset \$时方式更不同；该实现采用\$ R(A, B):=0 \$，且与P相类似。
+- \$ P(A, B) := \frac{\left \| A \cap B \right \|}{\left \|A \right \|} \$
+- \$ R(A, B) := \frac{\left \| A \cap B \right \|}{\left \|B \right \|} \$ 在处理\$ B = \emptyset \$时方式更不同；该实现采用\$ R(A, B):=0 \$，且与P相类似。
 - \$ F_\beta(A, B) := \left(1 + \beta^2\right) \frac{P(A, B) \times R(A, B)}{\beta^2 P(A, B) + R(A, B)} \$
 
 metrics的定义如下：
