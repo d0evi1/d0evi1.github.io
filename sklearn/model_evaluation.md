@@ -144,7 +144,7 @@ accuracy_score函数计算了准确率，不管是正确预测的fraction（defa
 预测值与真实值的准确率，在n个样本下的计算公式如下：
 
 $$
-accuracy(y,\hat{y}) = \frac{1}{n_{samples}}\sum_{i=0}{n_{samples}-1}l(\hat{y}_i=y_i)
+accuracy(y,\hat{y}) = \frac{1}{n_{samples}} \sum_{i=0}^{n_{samples}-1}l(\hat{y}_i=y_i)
 $$
 
 1(x)为指示函数。
