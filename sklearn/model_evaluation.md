@@ -143,7 +143,10 @@ accuracy_score函数计算了准确率，不管是正确预测的fraction（defa
 
 预测值与真实值的准确率，在n个样本下的计算公式如下：
 
-<img src="http://scikit-learn.org/stable/_images/math/27e20bf0b2786124f8df6383493b347e6ce8586d.png">
+$$
+accuracy(y,\hat{y}) = \frac{1}{n_{samples}}\sum_{i=0}{n_{samples}-1}l(\hat{y}_i=y_i)
+$$
+
 1(x)为指示函数。
 
 {% highlight python %}
@@ -196,7 +199,7 @@ array([[2, 0, 0],
 
 结果为：
 
-<img src="http://scikit-learn.org/stable/_images/plot_confusion_matrix_0011.png">
+<img src="http://scikit-learn.org/stable/_images/sphx_glr_plot_confusion_matrix_0011.png">
 
 示例：
 
@@ -628,7 +631,7 @@ array([ 0.8 ,  0.4 ,  0.35,  0.1 ])
 
 对比于其它metrics: accuracy、 Hamming loss、 F1-score, ROC不需要为每个label优化一个阀值。roc_auc_score函数也可以用于多分类（multi-class）问题上。如果预测的输出已经被二值化。
 
-<img src="http://scikit-learn.org/stable/_images/plot_roc_0021.png">
+<img src="http://scikit-learn.org/stable/_images/sphx_glr_plot_roc_0011.png">
 
 示例：
 
