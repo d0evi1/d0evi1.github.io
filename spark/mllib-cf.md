@@ -9,7 +9,7 @@ tagline: 介绍
 
 协同过滤（CF）常用于推荐系统。这种技术的目的是，填充user-item关联矩阵中的缺失项。spark.mllib当前支持基于model的协同过滤，用户和产品通过一个小的潜因子集合进行描述，用来预测缺失项。spark.mllib使用交替最小二乘(ALS)算法来学习这些潜因子（latent factors）。spark.mllib具有以下的参数：
 
-- numBlocks: 用于并列化计算的块的数目（设为-1表示自动配置）
+- numBlocks: 用于并行化计算的块的数目（设为-1表示自动配置）
 - rank: 模型中潜因子的数目
 - iterations: 迭代因子
 - lambda: ALS中的正则化参数
