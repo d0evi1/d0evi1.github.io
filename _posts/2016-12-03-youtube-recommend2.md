@@ -16,7 +16,7 @@ $$
 P(w_t =i|U,C)=\frac{e^{v_{i} u}}{\sum_{j \in V}{e^{v_{j} u}}}
 $$
 
-其中u表示一个高维的(user,context)pair的“embedding”， v表示每个候选视频的emdedding。在该假设中，一个emdedding可以简化成一个稀疏实体的映射（视频，用户等各有一个），映射到一个N维的dense vector中。深度神经网络的任务是：学到user embeddings: u，作为用户历史和上下文的函数，使用一个softmax分类器，用于判别视频。
+其中u表示一个高维的(user,context)pair的“embedding”， v表示每个候选视频的emdedding。在该假设中，一个emdedding可以简化成一个稀疏实体的映射（视频，用户等各有一个），映射到一个N维的dense vector中。深度神经网络的任务是：学到user embeddings: u，作为用户历史和上下文的函数，这在使用一个softmax分类器对视频进行判别时有用。
 
 使用隐式反馈（观看行为）来训练模型，其中，用户完成一个视频可以认为是一个正例。
 
@@ -56,11 +56,11 @@ YouTube上，每秒都有许多视频上传上来。推荐这些最新上传的�
 
 一定程度上这与我们的直觉相反，必须注意：为防止模型利用网站布局，以及代理问题的过拟合，**不要告诉分类器信息(withhold information from the classifier)**。可以考虑将一个样本看成是用户已经发起的一个查询query： “taylor swift”。由于我们的问题是预测下一个要看的视频。通过给定该信息，分类器将会预测要观看的最可能的视频，是那些出现在相应搜索结果页中关于"taylor swift"的视频。一点也不惊奇的是，如果重新生成用户最新的搜索页作为主页推荐，效果会很差。通过抛弃顺序信息，使用无顺序的词袋(bag of tokens)表示搜索query，该分类器不再直接认识到label的来源。
 
-视频的自然消费模式，通常会导致非常不对称的co-watch概率。插话式的剧集（Episodic series）通常被按顺序观看，用户经常发现，对于同一个流派(genre)中的艺术家们(artists)，在关注更小众的之前，会从最广为流行的开始。因此我们发现对于预测用户的下一次观看行为上有着更好的效果，而非去预测一个随机held-out观看(a randomly held-out watch)（见图5）。许多协同过滤系统隐式地选择标签和上下文，通过hold-out一个随机item，然后通过用户历史观看中的其它item来预测它(5a)。这会泄露将来的信息(future information)，并忽略任何不对称的消费模式(asymmetric consumption patterns)。相反的，我们通过选择一个随机观看(a random watch)，然后“回滚(rollback)"一个用户的历史，只输入用户在hold-out label的watch之前(5b)的动作。
+视频的自然消费模式，通常会导致非常不对称的co-watch概率。连播电视剧（Episodic series）通常被按顺序观看，用户经常发现，对于同一个流派(genre)中的艺术家们(artists)，在关注更小众的之前，会从最广为流行的开始。因此我们发现对于预测用户的下一次观看行为上有着更好的效果，而非去预测一个随机held-out观看(a randomly held-out watch)（见图5）。许多协同过滤系统隐式地选择标签和上下文，通过hold-out一个随机item，然后通过用户历史观看中的其它item来预测它(5a)。这会泄露将来的信息(future information)，并忽略任何不对称的消费模式(asymmetric consumption patterns)。相反的，我们通过选择一个随机观看(a random watch)，然后“回滚(rollback)"一个用户的历史，只输入用户在hold-out label的watch之前(5b)的动作。
 
 <img src="http://pic.yupoo.com/wangdren23/GkHBAolH/medish.jpg">
 
-图5: 选择labels和输入上下文给模型，在离线评估时很有挑战性，但对真实的效果有巨大提升。这里，实心事件•表示网络的输入特征，而空心事件◦表示排除在外。我们发现，预测一个将来的观看(5b)，在A/B test中效果更好。在(5b)中，样本的age通过t_max-t_N来表示，其中t_max是训练数据中观察到的最大时间。
+图5: 选择labels和输入上下文给模型，在离线评估时很有挑战性，但对真实的效果有巨大提升。这里，实心事件•表示网络的输入特征，而空心事件◦表示排除在外。我们发现，预测一个将来的观看(5b)，在A/B test中效果更好。在(5b)中，样本的age通过\$ t_{max}-t_N \$来表示，其中t_max是训练数据中观察到的最大时间。
 
 ## 1.4 特征和深度的试验
 
