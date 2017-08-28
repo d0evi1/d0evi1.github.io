@@ -28,7 +28,7 @@ $$
 
 ## 1.1 模型架构
 
-受语言模型中的CBOW(continuous bag of words)的启发，我们为固定视频库中的每个视频学到了高维emdeddings，并将它们的emdeddings作为输入前馈(feed)给一个前馈神经网络。用户的观看历史，被表示成一个关于稀疏视频id的可变长的序列，通过embeddings，它被映射到一个dense vector表示中。该网络需要固定大小的dense inputs，以及在不同策略中(sum, component-wise max，等)执行的emdeddings的简单平均。最重要的，emdeddings会和其它一些模型参数，通过普通的梯度下降后向传播更新即可学到。特征被级联到一个很宽的第一层上（wide first layer），后面跟着许多层的完全连接的ReLU层[6]。图3展示了整体架构，带有下面将要描述的额外的非视频观看特征（no-video watch features）。
+受语言模型中的CBOW(continuous bag of words)的启发，我们为固定视频库中的每个视频学到了高维emdeddings，并将它们的emdeddings作为输入前馈(feed)给一个前馈神经网络。用户的观看历史，被表示成一个关于稀疏视频id的可变长的序列，这些id通过embeddings技术被映射到一个dense vector表示中。该网络需要固定大小的dense inputs，在不同策略中(sum, component-wise max，等)，对emdeddings的简单平均(simply averaging)效果最好。最重要的，emdeddings会和其它一些模型参数，通过普通的梯度下降后向传播更新即可学到。特征被级联到一个很宽的第一层上（wide first layer），后面跟着许多层的完全连接的ReLU层[6]。图3展示了整体架构，带有下面将要描述的额外的非视频观看特征（no-video watch features）。
 
 <img src="http://pic.yupoo.com/wangdren23/GkBOhLXy/medish.jpg">
 
