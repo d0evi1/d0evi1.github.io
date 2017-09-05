@@ -12,7 +12,7 @@ tags: [ ctr ]
 
 Fackbook提出的gbdt+LR来预测广告点击，本文简单重温下相应的paper。
 
-在付费搜索广告领域(sponsored search advertising)，用户query被用于检索候选广告（candidate ads），这些广告可以显式或隐式与query相匹配。在Facebook上，广告不与query相关联，但可以通过人口统计学(demographic)和兴趣（interest）来定向(targeting)。因而，当一个用户访问Facebook时，适合展示的广告容量（the volume of ads），比付费搜索中的要大。
+在付费搜索广告领域(sponsored search advertising)，用户query被用于检索候选广告（candidate ads），这些广告可以显式或隐式与query相匹配。**在Facebook上，广告不与query相关联，但可以通过人口统计学(demographic)和兴趣（interest）来定向(targeting)**。因而，当一个用户访问Facebook时，适合展示的广告容量（the volume of ads），比付费搜索中的要大。
 
 为了应付每个请求上非常大量的候选广告，当用户访问Facobook时触发广告请求，我们会首先构建一连串的分类器，它们会增加计算开销。在本文中主要放在点击预测模型上，它会对最终的候选广告产生预测。
 
@@ -27,7 +27,8 @@ NE，或者更准确地被称为NCE：**归一化的Cross-Entropy**，等价于�
 $$
 NE=\frac{-\frac{1}{N}\sum_{i=1}^{n}(\frac{1+y_i}{2}log(p_i)+\frac{1-y_i}{2}log(1-p_i))}{-(p*log(p)+(1-p)*log(1-p))}
 $$
-  --（1)
+
+......（1)
 
 NE是一个必需单元，用于计算相关的信息增益(RIG: Relative Information Gain). RIG=1-NE
 
@@ -49,7 +50,9 @@ Calibration(校准)是一个关于平均估计CTR和期望CTR的比值。该比�
 
 $$
 s(y,x,w)=y*w^Tx=y\sum_{j=1}{n}w_{j,i_j}
-$$ --(2)
+$$ 
+
+......(2)
 
 其中w是线性点击分值的weight vector。
 
@@ -61,7 +64,7 @@ $$
 
 
 $$
-p(w)=\prod_{i=1}^{N}N(w_k;\mu_{k},\sigma_{k}^2
+p(w)=\prod_{i=1}^{N}N(w_k;\mu_{k},\sigma_{k}^2)
 $$
 
 ## 3.1 决策树特征转换
@@ -70,13 +73,13 @@ $$
 
 第二个简单但有效地转换包含在构建tuple型输入特征中。对于类别型特征，在笛卡尔积中采用的暴力搜索方法，比如，创建一个新的类别型特征，将它看成是原始特征的所有可能值。并不是所有的组合都有用，那些不管用的可以对其进行剪枝。如果输入特征是连续的，可以做联合二值化（joint binning），使用k-d tree。
 
-我们发现boosted决策树很强大，非常便于实现非线性和上面这种tuple型转换。我们将每棵树看成是一个类别型特征，它把值看成是将叶子的索引。对于这种类型的特征，我们使用1-of-K的编码。例如，考虑图1中的boosted tree模型，有2棵子树，其中第1棵子树具有3个叶子，第2棵具有2个叶子。如果一个实例在第1棵子树的叶节点2上结束，在第2棵子树的叶节点1上结束，那么整体的输入到线性分类器上的二元向量为：[0,1,0,1,0]，其中前3个实体对应于第1棵子树的叶子，后2个对应于第2棵子树。我们使用的boosted决策树为：Gradient Boosting Machine(GBM)[5]，使用的是经典的L2-TreeBoost算法。在每个学习迭代中，会对前面树的残差进行建模创建一棵新树。我们可以将基于变换的boosted决策树理解成一个监督型特征编码（supervised feature encoding），它将一个实数值向量(real-valued vector)转换成一个压缩的二值向量(binary-valued vector)。从根节点到某一叶子节点的路径，表示在特定特征上的一个规则。在该二值向量上，再fit一个线性分类器，可以本质上学到这些规则的权重。Boosted决策树以batch方式进行训练。
+我们发现boosted决策树很强大，非常便于实现非线性和上面这种tuple型转换。**我们将每棵树看成是一个类别型特征，它把值看成是将叶子的索引。对于这种类型的特征，我们使用1-of-K的编码**。例如，考虑图1中的boosted tree模型，有2棵子树，其中第1棵子树具有3个叶子，第2棵具有2个叶子。如果一个实例在第1棵子树的叶节点2上结束，在第2棵子树的叶节点1上结束，那么整体的输入到线性分类器上的二元向量为：[0,1,0,1,0]，其中前3个实体对应于第1棵子树的叶子，后2个对应于第2棵子树。我们使用的boosted决策树为：Gradient Boosting Machine(GBM)[5]，使用的是经典的**L2-TreeBoost算法**。在每个学习迭代中，会对前面树的残差进行建模创建一棵新树。**我们可以将基于变换的boosted决策树理解成一个监督型特征编码（supervised feature encoding），它将一个实数值向量(real-valued vector)转换成一个压缩的二值向量(binary-valued vector)**。从根节点到某一叶子节点的路径，表示在特定特征上的一个规则。**在该二值向量上，再fit一个线性分类器，可以本质上学到这些规则的权重**。Boosted决策树以batch方式进行训练。
 
 我们开展实验来展示将tree features作为线性模型的效果。在该实验中，我们比较了两个logistic regression模型，一个使用tree feature转换，另一个使用普通的(未转换)特征。我们也加了一个单独的boosted决策树模型作为对比。所表1所示：
 
 <img src="http://pic.yupoo.com/wangdren23/GkTbV98f/medium.jpg">
 
-相对于非没有树特征转换的模型，树特征变换可以帮助减小3.4%的NE。这是非常大的相对提升。作为参考，一个典型的特征工程实验，可减小20-30%左右的相对NE。LR和树模型以独立方式运行下的比较也很有意思（LR的预测accuracy更好一点点），但它们组合起来会有大幅提升。预测acuracy的增益是很大；作为参考，特征工程的好坏可以影响NE更多。
+相对于没有树特征转换的模型，树特征变换可以帮助减小3.4%的NE。这是非常大的相对提升。作为参考，一个典型的特征工程实验，可减小20-30%左右的相对NE。LR和树模型以独立方式运行下的比较也很有意思（LR的预测accuracy更好一点点），但它们组合起来会有大幅提升。预测acuracy的增益是很大；作为参考，特征工程的好坏可以影响NE更多。
 
 ## 3.2 数据新鲜度
 
