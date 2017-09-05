@@ -12,13 +12,13 @@ tags: [ ctr ]
 
 Fackbook提出的gbdt+LR来预测广告点击，本文简单重温下相应的paper。
 
-在付费搜索广告领域(sponsored search advertising)，用户query被用于检索候选广告（candidate ads），它可以显式或隐式与query相匹配。在Facebook上，广告不与query相关联，但可以通过人口统计学(demographic)和兴趣（interest）来定向(targeting)。作为结果，当一个用户访问Facebook时，适合展示的广告的量（the volume of ads），比付费搜索中的要大。
+在付费搜索广告领域(sponsored search advertising)，用户query被用于检索候选广告（candidate ads），这些广告可以显式或隐式与query相匹配。在Facebook上，广告不与query相关联，但可以通过人口统计学(demographic)和兴趣（interest）来定向(targeting)。因而，当一个用户访问Facebook时，适合展示的广告容量（the volume of ads），比付费搜索中的要大。
 
 为了应付每个请求上非常大量的候选广告，当用户访问Facobook时触发广告请求，我们会首先构建一连串的分类器，它们会增加计算开销。在本文中主要放在点击预测模型上，它会对最终的候选广告产生预测。
 
 # 2.实验Setup
 
-2013年第4季度，某一个周的数据。为了在不同条件下维护相同的训练／测试数据，我们准备了离线训练数据，它与上线观测到的数据相似。我们将这些保存下来的离线数据划分成：训练数据和测试数据，并使用它们来模拟在线训练和预测的streaming数据。
+取2013年第4季度，某一个周的数据。为了在不同条件下维护相同的训练／测试数据，我们准备了离线训练数据，它与线上观测到的数据相似。我们将这些保存下来的离线数据划分成：训练数据和测试数据，并使用它们来模拟在线训练和预测的streaming数据。
 
 评估的metrics: 使用预测的accuracy，而非利润和回报。我们使用**归一化熵（NE: Normalized Entropy）**作为主要的评测指标。
 
