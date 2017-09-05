@@ -10,7 +10,7 @@ tags: [ ctr ]
 
 # 1.介绍
 
-Fackbook提出的gbdt+LR来预测广告点击，具体看起来有点像两层的，第一层可以认为是feature transform层，第二层lr，整体组合在一起，类似于linear blending，本文简单重温下相应的paper。
+Fackbook提出的gbdt+LR来预测广告点击，本文简单重温下相应的paper。
 
 在付费搜索广告领域(sponsored search advertising)，用户query被用于检索候选广告（candidate ads），它可以显式或隐式与query相匹配。在Facebook上，广告不与query相关联，但可以通过人口统计学(demographic)和兴趣（interest）来定向(targeting)。作为结果，当一个用户访问Facebook时，适合展示的广告的量（the volume of ads），比付费搜索中的要大。
 
