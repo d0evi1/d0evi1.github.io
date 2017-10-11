@@ -314,6 +314,6 @@ INFO:tensorflow:Loss for final step: 27.1674.
 {% endhighlight %}
 
 
+# 参考
 
-
-[input_fn](https://www.tensorflow.org/get_started/input_fn)
+[tensorflow input_fn](https://www.tensorflow.org/get_started/input_fn)
