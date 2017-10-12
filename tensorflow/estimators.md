@@ -255,7 +255,7 @@ model_fn接受3个参数：
 
 ## 3.4 使用tf.feature_column和tf.layers来配置一个NN
 
-构建一个神经网络必须创建和连接input layer，hidden layers，output layer。
+构建一个神经网络必须**创建和连接input layer/hidden layers/output layer**。
 
 input layer是一系列节点（模型中每个特征一个节点），它们接受被传给model_fn的features参数所指定的feature数据。如果features包含了一个n维的Tensor，包含所有的特征数据，那么你可以将它看成是input layer。如果features包含了一个通过一个input function传给模型的feature columns字典，你可以使用tf.feature_column.input_layer函数来将它转化成一个input-layer Tensor：
 
@@ -268,12 +268,12 @@ input_layer = tf.feature_column.input_layer(
 
 如上所述，input_layer()会采用两个必须的参数：
 
-- features：从string keys到Tensors的映射，包含了相对应的feature数据。它与model_fn中的features参数相同.
-- feature_columns：在模型中的所有FeatureColumns的列表—— age, height, weight。
+- **features**：从string keys到Tensors的映射，包含了相对应的feature数据。它与model_fn中的features参数相同.
+- **feature_columns**：在模型中的所有FeatureColumns的列表—— age, height, weight。
 
-NN的input layer，接着必须通过一个activation function（它会对前一层执行一个非线性变换）被连接到一或多个hidden layers。最后一层的hidden layer接着连接到output layer上。tf.layers提供了tf.layers.dense函数来构建fully connected layers。该activation通过activation参数进行控制。activation参数可选的一些选项为：
+**NN的input layer，接着必须通过一个activation function（它会对前一层执行一个非线性变换）被连接到一或多个hidden layers**。最后一层的hidden layer接着连接到output layer上。tf.layers提供了tf.layers.dense函数来构建fully connected layers。该activation通过activation参数进行控制。activation参数可选的一些选项为：
 
-- tf.nn.relu：下面的代码创建了一层units节点，它会使用一个ReLU激活函数，与前一层的input_layer完全连接：
+- **tf.nn.relu**：下面的代码创建了一层units节点，它会使用一个ReLU激活函数，与前一层的input_layer完全连接：
 
 {% highlight python %}
 
@@ -281,7 +281,7 @@ hidden_layer = tf.layers.dense( inputs=input_layer, units=10, activation=tf.nn.r
 
 {% endhighlight %}
 
-- tf.nn.relu6: 下面的代码创建一层units节点，它们使用一个ReLU 6的激活函数与前一层的hidden_layer完全连接
+- **tf.nn.relu6**: 下面的代码创建一层units节点，它们使用一个ReLU 6的激活函数与前一层的hidden_layer完全连接
 
 {% highlight python %}
 
@@ -289,7 +289,7 @@ second_hidden_layer = tf.layers.dense( inputs=hidden_layer, units=20, activation
 
 {% endhighlight %}
 
-- None：以下的代码创建了一个units节点的层，它与前一层的second_hidden_layer完全连接，不使用activation函数，只是一个线性变换：
+- **None**：以下的代码创建了一个units节点的层，它与前一层的second_hidden_layer完全连接，不使用activation函数，只是一个线性变换：
 
 {% highlight python %}
 
@@ -297,7 +297,7 @@ output_layer = tf.layers.dense( inputs=second_hidden_layer, units=3, activation=
 
 {% endhighlight %}
 
-其它的activation函数也是可能的，例如：
+**其它的activation函数(比如sigmoid)**也是可能的，例如：
 
 {% highlight python %}
 
@@ -307,7 +307,7 @@ output_layer = tf.layers.dense(inputs=second_hidden_layer,
 
 {% endhighlight %}
 
-上述代码创建了神经网络层：output_layer, 它与second_hidden_layer通过一个sigmoid激活函数（tf.sigmoid）完全连接，对于预定义的activation，可参见[API docs](https://www.tensorflow.org/api_guides/python/nn#activation_functions)
+上述代码创建了神经网络层：output_layer, 它与second_hidden_layer通过一个sigmoid激活函数（tf.sigmoid）完全连接，**对于预定义的activation，可参见[API docs](https://www.tensorflow.org/api_guides/python/nn#activation_functions)**
 
 完整的预测器代码如下：
 
@@ -340,9 +340,9 @@ def model_fn(features, labels, mode, params):
 
 通过model_fn返回的EstimatorSpec必须包含loss：一个Tensor代表loss值，它可以量化模型的predict value在训练和评测期间与label value间的优化。tf.losses模块提供了很方便的函数来计算loss：
 
-- absolute_difference(labels, predictions): 使用 absolute-difference formula（L1 loss）来计算loss
-- log_loss(labels, predictions)：使用 logistic loss forumula来计算loss（通常在LR中）
-- mean_squared_error(labels, predictions)：使用MSE（即L2 loss）来计算loss
+- **absolute_difference(labels, predictions)**: 使用 absolute-difference formula（L1 loss）来计算loss
+- **log_loss(labels, predictions)**：使用 logistic loss forumula来计算loss（通常在LR中）
+- **mean_squared_error(labels, predictions)**：使用MSE（即L2 loss）来计算loss
 
 下面的示例，为model_fn添加了一个loss的定义，它使用mean_squared_error():
 
@@ -372,11 +372,11 @@ def model_fn(features, labels, mode, params):
 
 {% endhighlight %}
 
-evaluation的metrics可以被添加到一个eval_metric_ops字典中。下面的代码定义了一个rmse metrics，它会为模型预测计算root mean squared error。
+**evaluation的metrics可以被添加到一个eval_metric_ops字典中**。下面的代码定义了一个rmse metrics，它会为模型预测计算root mean squared error。
 
 ## 3.6 为模型定义training op
 
-training op定义了当对训练数据进行fit模型的所用的优化算法。通常当训练时，目标是最小化loss。一种简单的方法是，创建training op来实例化一个tf.train.Optimizer子类，并调用minimize方法。
+**training op定义了当对训练数据进行fit模型的所用的优化算法**。通常当训练时，目标是最小化loss。一种简单的方法是，创建training op来实例化一个tf.train.Optimizer子类，并调用minimize方法。
 
 下面的代码为model_fn定义了一个training op，使用上述计算的loss value，在params中传给的learning rate，gradient descent optimizer，对于global_step，函数 tf.train.get_global_step会小心的生成一个整型变量：
 
@@ -393,7 +393,7 @@ train_op = optimizer.minimize(
 
 ## 3.7 完整的model_fn
 
-这里给出了最终完整的model_fn。下面的代码配轩了NN；定义了loss和training op；并返回一个包含mode，predictions_dict, loss, 和 train_op的EstimatorSpec对象。
+这里给出了最终完整的model_fn。下面的代码配置了NN；**定义了loss和training op；并返回一个包含mode，predictions_dict, loss, 和 train_op的EstimatorSpec对象**。
 
 {% highlight python %}
 
