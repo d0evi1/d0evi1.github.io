@@ -183,7 +183,7 @@ nn = tf.estimator.Estimator(model_fn=model_fn, params=model_params)
 - model_fn: 一个函数对象，它包含了所有前面提到的逻辑：支持training, evaluation, prediction。你只负责实现功能。下面会讲述所何构建model_fn。
 - params：一个可选的超参数字典（例如：learning_rate，dropout），它们会被传给model_fn。
 
-** 注意：正如tf.estimator预定义的regressors和classifiers，Estimator的initializer也接受通用的配置参数：model_dir 和 config。 **
+**注意：正如tf.estimator预定义的regressors和classifiers，Estimator的initializer也接受通用的配置参数：model_dir 和 config。**
 
 对于鲍鱼年龄预测器，该模型会接受一个超参数：learning rate。可以在你的代码初始位置将LEARNING_RATE定义为一个常数。
 
@@ -196,7 +196,7 @@ LEARNING_RATE = 0.001
 
 {% endhighlight %}
 
-** 注意：这里LEARNING_RATE设为0.001, 你可以随需调整该值来在模型训练期间达到最好的结果。 **
+**注意：这里LEARNING_RATE设为0.001, 你可以随需调整该值来在模型训练期间达到最好的结果。**
 
 接着，添加下面的代码到main()中，创建model_params字典，它包含了learning rate，用它来实例化Estimator:
 
@@ -473,7 +473,7 @@ print("Root Mean Squared Error: %s" % ev["rmse"])
 
 {% endhighlight %}
 
-*** 注意：上述代码使用input function（对于training (train_input_fn) ， 对于evaluation (test_input_fn)），来将 feature(x)和label(y) Tensors feed给模型，更多input fun的定义详见input_fn***
+**注意：上述代码使用input function（对于training (train_input_fn) ， 对于evaluation (test_input_fn)），来将 feature(x)和label(y) Tensors feed给模型，更多input fun的定义详见input_fn.**
 
 运行代码可以看到：
 
