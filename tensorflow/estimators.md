@@ -18,7 +18,7 @@ tf.estimator框架可以很方便地通过高级Estimator API来构建和训练�
 
 如果tf.estimator预定义的模型不能满足你的需求时，该怎么办？可能你需要更多关于模型的细粒度控制，比如：定制自己的loss function进行优化，或者为每个layer指定不同的activation function。或者你要实现一个排序系统或推荐系统，上述的classifier和regressor不适合这样的预测。
 
-本文描述了如何使用tf.estimator来创建你自己的Estimator，用来基于生理特征来预测鲍鱼（abalones）的年龄:
+本文描述了如何使用tf.estimator来**创建你自己的Estimator**，基于生理特征来预测鲍鱼（abalones）的年龄:
 
 - 实例化一个Estimator
 - 构建一个定制的model function
@@ -37,7 +37,9 @@ tf.estimator框架可以很方便地通过高级Estimator API来构建和训练�
 
 # 2.鲍鱼年龄预测
 
-通常估计鲍鱼的年龄通过贝壳的环数来确定。然而，由于该任务需要: 切割、染色、通过显微器观看贝壳，去发现其它的预测年龄的方法还是很有必要的。
+**通常估计鲍鱼的年龄通过贝壳的环数来确定**。然而，由于该任务需要: 切割、染色、通过显微器观看贝壳。因而去发现预测年龄的其它方法还是很有必要的。
+
+鲍鱼的生理特征：
 
 - Length: 鲍鱼的长度(最长方向上；单位：mm)
 - Diameter：鲍鱼的直径（长度的垂直测量，单位：mm）
@@ -168,7 +170,7 @@ my_nn = tf.estimator.DNNClassifier(feature_columns=[age, height, weight],
                  optimizer="Adam")
 {% endhighlight %}
 
-你不需要编写额外的代来来指导tensorflow来如何训练模型，计算loss以及返回预测；该logic已经被整合到DNNClassifier中了。
+你不需要编写额外的代码来指示tensorflow来如何训练模型，计算loss以及返回预测；该logic已经被整合到DNNClassifier中了。
 
 当你要从头创建自己的estimator时，构造函数会接受两个高级参数进行模型配置，model_fn和params。
 
@@ -228,14 +230,14 @@ def model_fn(features, labels, mode, params):
 
 model_fn接受3个参数：
 
-- features：一个字典（dict），它包含的特征会通过input_fn传给模型
-- labels：一个Tensor，它包含的labels会通过input_fn传给模型。对于predict()的调用该labels会为空，该模型会infer出这些值。
-- mode: tf.estimator.ModeKeys的其中一种字符串值，可以表示model_fn会被哪种上下文所调用：
+- **features**：一个字典（dict），它包含的特征会通过input_fn传给模型
+- **labels**：一个Tensor，它包含的labels会通过input_fn传给模型。对于predict()的调用该labels会为空，该模型会infer出这些值。
+- **mode**: tf.estimator.ModeKeys的其中一种字符串值，可以表示model_fn会被哪种上下文所调用：
 	- tf.estimator.ModeKeys.TRAIN： model_fn将在training模式下通过一个train()被调用
 	- tf.estimator.ModeKeys.EVAL： model_fn将在evaluation模式下通过一个evaluate()被调用
 	- tf.estimator.ModeKeys.PREDICT：model_fn将在predict模式下通过一个predict()被调用
 
-model_fn也接受一个params参数，它包含了一个用于训练的超参数字典（所上所述）
+**model_fn也接受一个params参数**，它包含了一个用于训练的超参数字典（所上所述）
 
 该函数体会执行下面的任务：
 
@@ -243,13 +245,13 @@ model_fn也接受一个params参数，它包含了一个用于训练的超参数
 - 定义loss function：来计算模型的预测与target值有多接近
 - 定义training操作：指定了optimizer算法来通过loss function最小化loss。
 
-model_fn必须返回一个tf.estimator.EstimatorSpec对象，它包含了以下的值：
+**model_fn必须返回一个tf.estimator.EstimatorSpec对象**，它包含了以下的值：
 
-- mode(必须)。该模型以何种模式运行。通常，这里你将返回model_fn的mode参数
-- predictions（在PREDICT模式下必须）。它是一个字典，包含了所选Tensor（它包含了模型预测）的key names，例如：predictions = {"results": tensor_of_predictions}。在PREDICT模式下，你在EstimatorSpec中返回的该字典，会接着被predict()返回。因此，你可以你喜欢的格式来构建它
-- loss（在EVAL 和 TRAIN模式下必须）。一个Tensor包含了一个标量的loss值：模型的loss function的输出（将在下面详细说明）。在TRAIN模式下用于error handling和logging，在EVAL模式下自动当成是一个metric。
-- train_op（在TRAIN模式下必须）。一个Op，它可以运行训练的一个step。
-- eval_metric_ops（可选参数）。一个name/value pairs的字典，它指定了在EVAL模式下模型运行的metrics。其中，name是一个你要选择的metrics的标签，值就是你的metric计算的结果。tf.metrics 模块提供了一些常用metrics的预定义函数。下面的eval_metric_ops包含了一个“accuracy” metric，使用tf.metrics.accuracy进行计算：eval_metric_ops = { "accuracy": tf.metrics.accuracy(labels, predictions) }。如果你不指定eval_metric_ops，loss只会在evaluation期间被计算。
+- **mode(必须)**。该模型以何种模式运行。通常，这里你将返回model_fn的mode参数
+- **predictions（在PREDICT模式下必须）**。它是一个字典，包含了所选Tensor（它包含了模型预测）的key names，例如：predictions = {"results": tensor_of_predictions}。在PREDICT模式下，你在EstimatorSpec中返回的该字典，会接着被predict()返回。因此，你可以你喜欢的格式来构建它
+- **loss（在EVAL 和 TRAIN模式下必须）**。一个Tensor包含了一个标量的loss值：模型的loss function的输出（将在下面详细说明）。在TRAIN模式下用于error handling和logging，在EVAL模式下自动当成是一个metric。
+- **train_op（在TRAIN模式下必须）**。一个Op，它可以运行训练的一个step。
+- **eval_metric_ops（可选参数）**。一个name/value pairs的字典，它指定了在EVAL模式下模型运行的metrics。其中，name是一个你要选择的metrics的标签，值就是你的metric计算的结果。tf.metrics 模块提供了一些常用metrics的预定义函数。下面的eval_metric_ops包含了一个“accuracy” metric，使用tf.metrics.accuracy进行计算：eval_metric_ops = { "accuracy": tf.metrics.accuracy(labels, predictions) }。如果你不指定eval_metric_ops，loss只会在evaluation期间被计算。
 
 ## 3.4 使用tf.feature_column和tf.layers来配置一个NN
 
