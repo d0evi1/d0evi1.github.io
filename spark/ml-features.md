@@ -140,7 +140,52 @@ regexTokenized.select("words", "label").take(3).foreach(println)
 
 ## 2.2 StopWordsRemover
 
+停留词（stop words）指的是那些需要从输入排除在外的词，通常是因为这些词出现很频繁，并且没啥含义。
+
+StopWordsRemover，允许一串字符串作为输入（比如：Tokenizer的输出），并从输入的序列中抛弃掉停留词。停留词列表由stopWords参数来指定。我们缺省提供了一个[stop words的列表](http://ir.dcs.gla.ac.uk/resources/linguistic_utils/stop_words)，可以通过在一个刚初始化的StopWordsRemover实例上调用getStopWrods来获取。caseSensitive参数表示是否大小写敏感（缺省为false）。
+
+示例：
+
+假设我们具有以下的DataFrame，具有两列（id和raw）：
+
+ id | raw
+----|----------
+ 0  | [I, saw, the, red, baloon]
+ 1  | [Mary, had, a, little, lamb]
+
+使用StopWordsRemover，输入为raw，输出为filtered，我们可以获得以下的结果：
+
+ id | raw                         | filtered
+----|-----------------------------|--------------------
+ 0  | [I, saw, the, red, baloon]  |  [saw, red, baloon]
+ 1  | [Mary, had, a, little, lamb]|[Mary, little, lamb]
+
+
+在filtered列，停留词“I”, “the”, “had”, 和 “a” 都已经被过滤掉了。
+
+{% highlight scala %}
+
+import org.apache.spark.ml.feature.StopWordsRemover
+
+val remover = new StopWordsRemover()
+  .setInputCol("raw")
+  .setOutputCol("filtered")
+
+val dataSet = sqlContext.createDataFrame(Seq(
+  (0, Seq("I", "saw", "the", "red", "baloon")),
+  (1, Seq("Mary", "had", "a", "little", "lamb"))
+)).toDF("id", "raw")
+
+remover.transform(dataSet).show()
+
+{% endhighlight %}
+
+
 ## 2.3 n-gram
+
+n-gram是一个tokens序列，n为整数。NGram可以用于将输入特征转换成n-gram。
+
+
 
 
 
@@ -537,11 +582,11 @@ MinMaxScaler会计算在数据集上的汇总统计，并产生一个MinMaxScale
 
 归一化(rescale)计算如下：
 
-<img src="http://www.forkosh.com/mathtex.cgi?
-Rescaled(e_i)=\frac{e_i-E_{min}}{E_{max}-E_{min}}*(max-min)+min">
+$$
+Rescaled(e_i)=\frac{e_i-E_{min}}{E_{max}-E_{min}}*(max-min)+min
+$$
 
-如果：<img src="http://www.forkosh.com/mathtex.cgi?
-E_{max}==E_{min}">，那么: <img src="http://www.forkosh.com/mathtex.cgi?Rescaled(e_i)=0.5*(max+min)">
+如果：\$ E_{max}==E_{min} \$，那么:  \$\Rescaled(e_i)=0.5*(max+min) \$
 
 注意：由于零值可能被转换成非零值，对于sparse的输入，转换器的输出也必须是DenseVector。
 
