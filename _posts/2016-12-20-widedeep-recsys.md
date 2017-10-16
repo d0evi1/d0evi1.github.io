@@ -80,7 +80,7 @@ $$
 
 ...(3)
 
-其中Y是二分类的label，\$ \sigma(·) \$是sigmoid function， \$ phi(x) \$是对原始特征x做cross product transformations，b是bias项。\$w_{wide}\$是所有wide模型权重向量，\$w_{deep}\$是应用在最终激活函数\$a^{(l_f)}\$上的权重。
+其中Y是二分类的label，\$ \sigma(·) \$是sigmoid function， \$ \phi(x) \$是对原始特征x做cross product transformations，b是bias项。\$w_{wide}\$是所有wide模型权重向量，\$w_{deep}\$是应用在最终激活函数\$a^{(l_f)}\$上的权重。
 
 # 4.系统实现
 
