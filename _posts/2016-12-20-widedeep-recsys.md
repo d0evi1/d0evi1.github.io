@@ -14,7 +14,7 @@ tags: [深度学习]
 
 推荐系统与常见的搜索排序问题相同的一个挑战是，**同时满足Memorization和Generalization**。Memorization可以宽泛地定义成学到items或features的共现率，并利用（exploiting）这种在历史数据中的相关关系（correlation）。Generalization则基于相关关系的转移，并探索（explores）在过往很少或从不出现的新的特征组合。基于Memorization的推荐系统通常更**局部化(topical)**，将items与执行相应动作的users直接相关。而基于Generalization的推荐则更趋向于推荐**多样化**的items。在本papers中，我们主要关注Google Play Stores的推荐问题，方法本身可用于其它场景。
 
-对于工业界大规模的在线推荐和排序系统，常用的线性模型（比如：logistic regression）被广泛使用，因为它的简单性、可扩展性以及可解释性。模型通常在使用one-hot编码的二值化的稀疏特征上。例如，二值化特征"user_installed_app=netflix"，如果用户安装了Netflix，则具有特征值1. 通过在稀疏特征上使用**cross-product transformation**可以有效地达到Memorization，比如AND(user_installed_app=netflix, impression_app=pandora)，如果用户安装了Netflix，接着曝光了Pandora，那么它的值是1. 这可以解释一个特征对（feature pair）的共现率与目标label相关关系。Generalization可以通过使用更少的粒度来进行添加，例如：AND(user_installed_category=video,
+对于工业界大规模的在线推荐和排序系统，常用的线性模型（比如：logistic regression）被广泛使用，因为它的简单性、可扩展性以及可解释性。模型通常在使用one-hot编码的二值化的稀疏特征上。例如，二值化特征"user_installed_app=netflix"，如果用户安装了Netflix，则具有特征值1. **通过在稀疏特征上使用cross-product transformation可以有效地达到Memorization**，比如AND(user_installed_app=netflix, impression_app=pandora)，如果用户安装了Netflix，接着曝光了Pandora，那么它的值是1. 这可以解释一个特征对（feature pair）的共现率与目标label相关关系。Generalization可以通过使用更少的粒度来进行添加，例如：AND(user_installed_category=video,
 impression_category=music)，但人工的特征工程通常是必需的。cross-product transformation的一个限制是，不能泛化到那些在训练数据上没有出现过的query-item特征对。
 
 而**Embedding-based的模型，比如因子分解机（FM）或深度神经网络，可以泛化到之前未见过的query-item特征对**，它会为每个query和item特征，学到到一个低维的dense embedding vector，只需要很少的特征工程。然而，当底层的query-item矩阵很稀疏和高秩（high-rank）时（比如，用户具有特殊偏好或很少出现的items），对于为query和item学到有效的低维表示是很难的。在这种情况下，大多数query-item pairs之间不应有交互，但对于所有query-item pairs来说，dense embeddings会导致非零的预测，这样会过拟合（over-generalize），并生成不相关的推荐。另一方面，使用交叉特征转换（cross-product features transformations）的线性模型可以使用相当少的参数就能记住（memorize）这些“异常规则（exception rules）”。
@@ -38,7 +38,7 @@ app推荐系统如图二所示。一个query，它包含着许多用户和上下
 
 <img src="http://pic.yupoo.com/wangdren23/GGEh8hv2/medish.jpg">
 
-由于在数据库中有超过百万的app，对于在serving延迟条件之内（通常为O(10)ms）的每一个query，尽可能得对每一个app进行评分是相当困难。因此，上述第一步收到一个query的过程是检索（retrieval）。检索系统会返回一个最匹配query的item的短列表，通常使用机器学习模型和人工定义规则来达到。在数量减至候选池后，排序系统（ranking system）会通过它们的得分对所有items进行排序。得分通常是\$ P(y\|x) \$，对于给定的特征x，一个用户的动作标签y，包括用户特征（比如：国家，语言，人口属性信息），上下文特征（比如：设备，天的小时，周的天），曝光特征（比如：app age, app的历史统计信息）。在本文中，我们只关注在排序系统中使用Wide & Deep 学习框架。
+由于在数据库中有超过百万的app，对于在serving延迟条件之内（通常为O(10)ms）的每一个query，尽可能得对每一个app进行评分是相当困难。因此，上述第一步收到一个query的过程是检索（retrieval）。**检索系统会返回一个最匹配query的item的短列表，通常使用机器学习模型和人工定义规则来达到**。在数量减至候选池后，排序系统（ranking system）会通过它们的得分对所有items进行排序。得分通常是\$ P(y\|x) \$，对于给定的特征x，一个用户的动作标签y，包括用户特征（比如：国家，语言，人口属性信息），上下文特征（比如：设备，天的小时，周的天），曝光特征（比如：app age, app的历史统计信息）。在本文中，我们只关注在排序系统中使用Wide & Deep 学习框架。
 
 # 3. Wide & Deep Learning
 
@@ -56,7 +56,7 @@ $$
 
 ## 3.2 Deep组件
 
-Deep组件是一个前馈神经网络(feed-forward NN)，如图1(右）所示。对于类别型特征，原始的输入是特征字符串（比如："language=en”）。这些稀疏的，高维的类别型特征会首先被转换成一个低维的、denese的、real-valued的向量，通常叫做“embedding vector”。embedding的维度通常是O(10)到O(100)的阶。该embedding vectors被随机初始化，接着最小化最终的loss的方式训练得到该值。这些低维的dense embedding vectors接着通过前向传递被feed给神经网络的隐层。特别地，每个隐层都会执行以下的计算：
+Deep组件是一个前馈神经网络(feed-forward NN)，如图1(右）所示。对于类别型特征，原始的输入是特征字符串（比如："language=en”）。这些稀疏的，高维的类别型特征会首先被转换成一个低维的、dense的、real-valued的向量，通常叫做“embedding vector”。embedding的维度通常是O(10)到O(100)的阶。该embedding vectors被随机初始化，接着最小化最终的loss的方式训练得到该值。这些低维的dense embedding vectors接着通过前向传递被feed给神经网络的隐层。特别地，每个隐层都会执行以下的计算：
 
 $$
 a^{l+1} = f(W^{(l)} a^{(l)} + b^{(l)})
@@ -142,5 +142,5 @@ Serving时具有高的吞吐率（throughout）和低延时是很有挑战性的
 
 # 参考
 
-－ 0.[Wide & Deep Learning for Recommender Systems](https://arxiv.org/pdf/1606.07792.pdf)
+- 0.[Wide & Deep Learning for Recommender Systems](https://arxiv.org/pdf/1606.07792.pdf)
 - 1.[TensorFlow Wide & Deep Learning Tutorial](https://www.tensorflow.org/tutorials/wide_and_deep)
