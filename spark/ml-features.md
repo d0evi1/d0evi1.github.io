@@ -586,7 +586,7 @@ $$
 Rescaled(e_i)=\frac{e_i-E_{min}}{E_{max}-E_{min}}*(max-min)+min
 $$
 
-如果：\$ E_{max}==E_{min} \$，那么:  \$\Rescaled(e_i)=0.5*(max+min) \$
+如果：\$ E_{max}==E_{min} \$，那么:  \$Rescaled(e_i)=0.5*(max+min) \$
 
 注意：由于零值可能被转换成非零值，对于sparse的输入，转换器的输出也必须是DenseVector。
 
