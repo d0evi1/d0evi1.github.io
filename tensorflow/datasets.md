@@ -8,15 +8,15 @@ tagline:
 
 # 数据导入
 
-Dataset API可以使你从简单可复用地构建复杂的Input Pipeline。例如：一个图片模型的Pipeline可能会聚合在一个分布式文件系统中的多个文件，对每个图片进行随机扰动（random perturbations），接着合并随机选择的图片到一个training batch中。一个文本模型的Pipeline可能涉及到：从原始文本数据中抽取特征，将它们通过一个lookup table转换成embedding identifiers，然后将不同的长度序列batch在一起。Dataset API可以很方便地处理大量的数据，不同的数据格式，以及复杂的转换。
+Dataset API可以让你以简单可复用的方式构建复杂的Input Pipeline。例如：一个图片模型的Pipeline可能会聚合在一个分布式文件系统中的多个文件，对每个图片进行随机扰动（random perturbations），接着将随机选中的图片合并到一个training batch中。一个文本模型的Pipeline可能涉及到：从原始文本数据中抽取特征，将它们通过一个lookup table转换成embedding identifiers，然后将不同的长度序列batch在一起。Dataset API可以很方便地以不同的数据格式处理大量的数据，以及处理复杂的转换。
 
-Dataset API引入了两个新的抽象到Tensorflow中：
+Dataset API引入了两个新的抽象类到Tensorflow中：
 
-- tf.contrib.data.Dataset：表示一串元素，其中每个元素包含了一或多个Tensor对象。例如：在一个图片pipeline中，一个元素可以是单个训练样本，它们带有一个表示图片数据的tensors和一个label组成的pair。有两种不同的方式创建一个dataset：
-	- 创建一个**source** (例如：Dataset.from_tensor_slices())
+- **tf.contrib.data.Dataset**：表示一串元素（elements），其中每个元素包含了一或多个Tensor对象。例如：在一个图片pipeline中，一个元素可以是单个训练样本，它们带有一个表示图片数据的tensors和一个label组成的pair。**有两种不同的方式创建一个dataset**：
+	- 创建一个**source** (例如：Dataset.from_tensor_slices())，
 从一或多个tf.Tensor对象中构建一个dataset
-	- 应用一个**transformation**（例如：Dataset.batch()）来从一或多个tf.contrib.data.Dataset对象上构建一个dataset
-- tf.contrib.data.Iterator：它提供了主要的方式来从一个dataset中抽取元素。通过Iterator.get_next() 返回的该操作会yields出Datasets中的下一个元素，作为输入pipeline和模型间的接口使用。最简单的iterator是一个“one-shot iterator”，它与一个批定的Dataset相关联，通过它来进行迭代。对于更复杂的使用，Iterator.initializer操作可以使用不同的datasets重新初始化（reinitialize）和参数化（parameterize）一个iterator ，例如，在同一个程序中通过training和validation data迭代多次。
+	- 应用一个**transformation**（例如：Dataset.batch()），从一或多个tf.contrib.data.Dataset对象上构建一个dataset
+- **tf.contrib.data.Iterator**：它提供了主要的方式来从一个dataset中抽取元素。通过Iterator.get_next() 返回的该操作会yields出Datasets中的下一个元素，作为输入pipeline和模型间的接口使用。最简单的iterator是一个“one-shot iterator”，它与一个批定的Dataset相关联，通过它来进行迭代。对于更复杂的使用，Iterator.initializer操作可以使用不同的datasets重新初始化（reinitialize）和参数化（parameterize）一个iterator ，例如，在同一个程序中通过training和validation data迭代多次。
 
 # 基本机制
 
