@@ -31,7 +31,7 @@ Dataset API引入了两个新的抽象类到Tensorflow中：
 
 ## 2.1 Dataset结构
 
-一个dataset由元素组成，它们每个具有相同的结构。一个元素包含了一或多个tf.Tensor对象，称为“components“。每个component都具有一个tf.DType：它表示在tensor中的元素的类型；以及一个tf.TensorShape：它表示每个元素的静态shape。Dataset.output_types 和 Dataset.output_shapes 属性允许你观察到一个dataset元素的每个component内省的types和shapes。这些属性的这种嵌套式结构（nested structure），映射到一个元素（它可以是单个tensor、一个tensors的tuple、一个tensors的嵌套式tuple）的结构上。例如：
+**一个dataset由element组成，它们每个都具有相同的结构。一个元素包含了一或多个tf.Tensor对象，称为“components“**。每个component都具有一个**tf.DType**：它表示在tensor中的元素的类型；以及一个**tf.TensorShape**：它表示每个元素的静态shape。Dataset.output_types 和 Dataset.output_shapes 属性允许你观察到一个dataset元素的每个component内省的types和shapes。这些属性的这种嵌套式结构（nested structure），映射到一个元素（它可以是单个tensor、一个tensors的tuple、一个tensors的嵌套式tuple）的结构上。例如：
 
 
 {% highlight python %}
