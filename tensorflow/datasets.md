@@ -6,7 +6,7 @@ tagline:
 {% include JB/setup %}
 
 
-# 数据导入
+# 1.数据导入
 
 Dataset API可以让你以简单可复用的方式构建复杂的Input Pipeline。例如：一个图片模型的Pipeline可能会聚合在一个分布式文件系统中的多个文件，对每个图片进行随机扰动（random perturbations），接着将随机选中的图片合并到一个training batch中。一个文本模型的Pipeline可能涉及到：从原始文本数据中抽取特征，将它们通过一个lookup table转换成embedding identifiers，然后将不同的长度序列batch在一起。Dataset API可以很方便地以不同的数据格式处理大量的数据，以及处理复杂的转换。
 
@@ -16,15 +16,15 @@ Dataset API引入了两个新的抽象类到Tensorflow中：
 	- 创建一个**source** (例如：Dataset.from_tensor_slices())，
 从一或多个tf.Tensor对象中构建一个dataset
 	- 应用一个**transformation**（例如：Dataset.batch()），从一或多个tf.contrib.data.Dataset对象上构建一个dataset
-- **tf.contrib.data.Iterator**：它提供了主要的方式来从一个dataset中抽取元素。通过Iterator.get_next() 返回的该操作会yields出Datasets中的下一个元素，作为输入pipeline和模型间的接口使用。最简单的iterator是一个“one-shot iterator”，它与一个批定的Dataset相关联，通过它来进行迭代。对于更复杂的使用，Iterator.initializer操作可以使用不同的datasets重新初始化（reinitialize）和参数化（parameterize）一个iterator ，例如，在同一个程序中通过training和validation data迭代多次。
+- **tf.contrib.data.Iterator**：它提供了主要的方式来从一个dataset中抽取元素。通过Iterator.get_next() 返回的该操作会yields出Datasets中的下一个元素，作为输入pipeline和模型间的接口使用。最简单的iterator是一个“one-shot iterator”，它与一个指定的Dataset相关联，通过它来进行迭代。对于更复杂的使用，Iterator.initializer操作可以使用不同的datasets重新初始化（reinitialize）和参数化（parameterize）一个iterator ，例如，在同一个程序中通过training data和validation data迭代多次。
 
-# 基本机制
+# 2.基本机制
 
 这部分描述了创建不同Dataset和Iterator对象的机制，以及如何使用它们来抽取数据。
 
-要想启动一个input pipeline，你必须定义一个source。例如，为了从内存中的一些tensors构建一个Dataset，你可以使用tf.contrib.data.Dataset.from_tensors() 以及tf.contrib.data.Dataset.from_tensor_slices()。另一种方法，如果你的输入数据在磁盘上以推荐的TFRecord格式存储，你可以构建一个tf.contrib.data.TFRecordDataset。一旦你有一个Dataset对象，通过在tf.contrib.data.Dataset对象上链式方法调用，你可以将它转化成一个新的Dataset。例如，你可以使用per-element transformations，比如：Dataset.map()，（它会在每个元素上应用一个function），以及multi-element transformations，比如：Dataset.batch()。更多详见[api](https://www.tensorflow.org/api_docs/python/tf/contrib/data/Dataset)
+**要想启动一个input pipeline，你必须定义一个source**。例如，为了从内存中的一些tensors构建一个Dataset，你可以使用tf.contrib.data.Dataset.from_tensors() 以及tf.contrib.data.Dataset.from_tensor_slices()。另一种方法，如果你的输入数据在磁盘上以推荐的TFRecord格式存储，你可以构建一个tf.contrib.data.TFRecordDataset。一旦你有一个Dataset对象，通过在tf.contrib.data.Dataset对象上链式方法调用，你可以将它转化成一个新的Dataset。例如，你可以使用per-element transformations，比如：Dataset.map()，（它会在每个元素上应用一个function），以及multi-element transformations，比如：Dataset.batch()。更多详见[api](https://www.tensorflow.org/api_docs/python/tf/contrib/data/Dataset)
 
-从一个Dataset上消费值的最常用方法，是生成一个iterator对象，它提供了一次可以访问dataset中的一个元素（例如：通过调用Dataset.make_one_shot_iterator()）。tf.contrib.data.Iterator提供了两个操作：
+从一个Dataset上消费values的最常用方法，是生成一个iterator对象，它提供了一次可以访问dataset中的一个元素（例如：通过调用Dataset.make_one_shot_iterator()）。**tf.contrib.data.Iterator提供了两个操作**：
 
 - Iterator.initializer：它允许你(re)initialize iterator的状态
 - Iterator.get_next()：它返回tf.Tensor对象，对应于指定的下一个元素。
