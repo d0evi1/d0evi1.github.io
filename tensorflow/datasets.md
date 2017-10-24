@@ -1,6 +1,6 @@
 ---
 layout: page
-title:  tensorflow中的input_fn
+title:  tensorflow中的dataset
 tagline: 
 ---
 {% include JB/setup %}
@@ -52,7 +52,7 @@ print(dataset3.output_shapes)  # ==> "(10, ((), (100,)))"
 
 {% endhighlight %}
 
-为一个元素(element)的每个component给定names很方便，例如，如果它们表示一个训练样本的不同features。除了tuples，你可以使用collections.namedtuple，或者一个将strings映射为tensors的字典来表示一个Dataset的单个元素。
+**为一个元素(element)的每个component给定names很方便**，例如，如果它们表示一个训练样本的不同features。除了tuples，你可以使用collections.namedtuple，或者一个将strings映射为关于tensors的字典来表示一个Dataset的单个元素。
 
 {% highlight python %}
 
@@ -64,7 +64,7 @@ print(dataset.output_shapes)  # ==> "{'a': (), 'b': (100,)}"
 
 {% endhighlight %}
 
-Dataset的转换（transformations）支持任何结构的datasets。当使用Dataset.map()，Dataset.flat_map()，以及Dataset.filter()转换时，它们会对每个element应用一个function，元素结构决定了函数的参数：
+**Dataset的转换（transformations）支持任何结构的datasets**。当使用Dataset.map()，Dataset.flat_map()，以及Dataset.filter()转换时，它们会对每个element应用一个function，元素结构决定了函数的参数：
 
 {% highlight python %}
 
@@ -79,14 +79,14 @@ dataset3 = dataset3.filter(lambda x, (y, z): ...)
 
 ## 2.2 创建一个iterator
 
-一旦你已经构建了一个Dataset来表示你的输入数据，下一步是创建一个Iterator来访问dataset的elements。Dataset API当前支持三种iterator，复杂度依次递增：
+一旦你已经构建了一个Dataset来表示你的输入数据，下一步是创建一个Iterator来访问dataset的elements。Dataset API当前支持四种iterator，复杂度依次递增：
 
-- one-shot
-- initializable
-- reinitializable
-- feedable
+- **one-shot**
+- **initializable**
+- **reinitializable**
+- **feedable**
 
-one-shot iterator是最简单的iterator，它只支持在一个dataset上迭代一次，不需要显式初始化。One-shot iterators可以处理几乎所有的己存在的基于队列的input pipeline支持的情况，但它们不能支持参数化（parameterization）。使用Dataset.range()示例如下：
+**one-shot iterator**是最简单的iterator，它只支持在一个dataset上迭代一次的操作，不需要显式初始化。One-shot iterators可以处理几乎所有的己存在的基于队列的input pipeline支持的情况，但它们不支持参数化（parameterization）。使用Dataset.range()示例如下：
 
 {% highlight python %}
 
@@ -124,7 +124,7 @@ for i in range(100):
 
 {% endhighlight %}
 
-**reinitializable iterator**可以从多个不同的Dataset对象处初始化。例如，你可能有一个training input pipeline：它对输入图片做随机扰动来提高泛化能力；还有一个validation input pipeline：它会在未修改过的数据上进行预测的评估。这些pipeline通常使用不同的Dataset对象，但它们具有相同的结构（例如：对每个component相同的types和shapes）
+**reinitializable iterator**可以从多个不同的Dataset对象处初始化。例如，你可能有一个training input pipeline（它对输入图片做随机扰动来提高泛化能力）；以及一个validation input pipeline（它会在未修改过的数据上进行预测的评估）。这些pipeline通常使用不同的Dataset对象，但它们具有相同的结构（例如：对每个component相同的types和shapes）
 
 {% highlight python %}
 
@@ -136,7 +136,7 @@ validation_dataset = tf.contrib.data.Dataset.range(50)
 # A reinitializable iterator is defined by its structure. We could use the
 # `output_types` and `output_shapes` properties of either `training_dataset`
 # or `validation_dataset` here, because they are compatible.
-iterator = Iterator.from_structure(training_dataset.output_types,
+iterator = tf.contrib.data.Iterator.from_structure(training_dataset.output_types,
                                    training_dataset.output_shapes)
 next_element = iterator.get_next()
 
@@ -243,7 +243,7 @@ while True:
 
 {% endhighlight %}
 
-如果dataset的每个元素都具有一个嵌套的结构，Iterator.get_next()的返回值将会是以相同嵌套结构存在的一或多个tf.Tensor对象：
+**如果dataset的每个元素都具有一个嵌套的结构，Iterator.get_next()的返回值将会是以相同嵌套结构存在的一或多个tf.Tensor对象**：
 
 {% highlight python %}
 
@@ -280,7 +280,7 @@ dataset = tf.contrib.data.Dataset.from_tensor_slices((features, labels))
 
 {% endhighlight %}
 
-注意，上述的代码段会将features 和 labels arrays作为tf.constant() 操作嵌套进你的TensorFlow graph中。这在小数据集上能良好运行，但会浪费内存——因为array的内存会被拷贝多次————对于tf.GraphDef的protocol buffer，只可以运行2GB的内存限制。
+注意，上述的代码段会将features arrays和labels arrays作为tf.constant() 操作嵌套进你的TensorFlow graph中。这在小数据集上能良好运行，但会浪费内存——因为array的内存会被拷贝多次————对于tf.GraphDef的protocol buffer，只可以运行2GB的内存限制。
 
 {% highlight python %}
 
@@ -626,4 +626,6 @@ def dataset_input_fn():
 
 {% endhighlight %}
 
-[tensorflow datasets](https://www.tensorflow.org/programmers_guide/datasets)
+# 参考
+
+[官方tensorflow datasets](https://www.tensorflow.org/programmers_guide/datasets)
