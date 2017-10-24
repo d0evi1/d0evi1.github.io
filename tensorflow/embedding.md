@@ -1,6 +1,6 @@
 ---
 layout: page
-title:  tensorflow中的input_fn
+title:  tensorflow中的embedding
 tagline: 
 ---
 {% include JB/setup %}
