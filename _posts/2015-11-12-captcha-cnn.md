@@ -10,15 +10,15 @@ tags: [深度学习]
 
 # 2.介绍
 
-常用的方法是，以两个互斥的step来检测图片中的文本：定位在文本中的词（words）或单个字符（characters）的区域，进行分割（segmenting）并接着对它们进行识别。另外，可以使用一个字典来排除不可能的词（words）。例如，Mori and Malik提出的方法来使用一个411个词的字典来CAPTCHAs。等等，然而，在现代CAPTCHAs中，单个字符不能轻易地使用矩形窗口进行分割，另外字符可以相互有交叠。这些CAPTCHAs与手写文本相类似，LeCun提出使用CNN来解决手写数字识别。这些CNNs被设计成用于构建layer by layer体系来执行分类任务。在2014年，Google fellow提出使用deep CNN来结合定位（localzation)，分割（segmentation）以及多字符文本的识别。jaderberg等提出了一种在自然场颢图片中的文本识别。然而，对于训练过程，它们人工模拟创建了一个非常大的文本图片的集合。相反的，我们则使用一个更小的训练集。通常探索Active Learning，我们在运行期对该神经网络进行微调（fine-tune），我们的网络被前馈(feed）给已正确分类但高度不确定的测试样本。
+常用的方法是，以两个相互独立的步骤来检测图片中的文本：定位在文本中的词（words）或单个字符（characters）的区域，进行分割（segmenting）并接着对它们进行识别。另外，可以使用一个字典来排除不可能的词（words）。例如，Mori and Malik提出的方法来使用一个411个词的字典来识别CAPTCHAs。等等，**然而，在现代CAPTCHAs中，单个字符不能轻易地使用矩形窗口进行分割，另外字符可以相互有交叠**。这些CAPTCHAs与手写文本相类似，LeCun提出使用CNN来解决手写数字识别。这些CNNs被设计成用于构建layer by layer体系来执行分类任务。在2014年，Google fellow提出使用deep CNN来结合定位（localzation)，分割（segmentation）以及多字符文本的识别。jaderberg等提出了一种在自然场景图片中的文本识别。然而，对于训练过程，它们人工模拟创建了一个非常大的文本图片的集合。**相反的，我们则使用一个更小的训练集**。通过探索Active Learning，我们在运行期对该神经网络进行微调（fine-tune），我们的网络接收已正确分好类但高度不确定的测试样本的前馈输入(feed）。
 
 # 3.用于CAPTCHA识别的Deep CNN
 
 <img src="http://pic.yupoo.com/wangdren23/GRpFgn5r/medish.jpg">
 
-图2. 用于captcha识别的卷积神经网络。该CNN由三个conv layer，三个pooling layer，两个fully-connected layer组成。最后的layer会输出所有数字的概率分布，我们可以由此计算预测（prediction）以及它的不确定度
+图2. 用于captcha识别的卷积神经网络。该CNN由三个conv layer，三个pooling layer，两个fully-connected layer组成。最后的layer会输出所有数字的概率分布，我们可以由此计算预测数据（prediction）以及它的不确定度
 
-我们提出了一种deep CNN来解决CAPTCHA问题。我们的方法在识别整个sequence时没有预分割（pre-segmentation）。我们使用如图2所示的网络结构。我们主要关注6数字的CAPTCHAs。每个数字（digit）在output layer中由62个神经元表示。我们定义了一个双向映射函数（bijection）：\$\sigma(x) \$，它将一个字符 \$ x \in {'0'...'9', 'A'...'Z', 'a'...,'z'} \$映射到一个整数\$ l \in {0, ...,61}\$上。
+我们提出了一种deep CNN来解决CAPTCHA问题。**我们的方法在识别整个sequence时没有预分割（pre-segmentation）**。我们使用如图2所示的网络结构。**我们主要关注6数字的CAPTCHAs**。每个数字（digit）在output layer中由62个神经元表示。我们定义了一个双向映射函数（bijection）：\$\sigma(x) \$，它将一个字符 \$ x \in \{ '0' ... '9' , 'A' ... 'Z', 'a' ... 'z' \} \$映射到一个整数\$ l \in \{ 0 , ... , 61 \}\$上。
 
 我们分配第一个62输出神经元（output neurons）到第一个序列数字上，第二个62神经元到第二个数字上，以此类推。这样，对于一个数字 \$x_i\$神经元索引n被计算成 \$ n=i \dot 62 + \theta(x_i) \$，其中\$ i \in {0,...,5} \$是数字索引，例如，output layer具有\$ 6 \dot 62 = 372 \$个神经元。为了预测一个数字，我们考虑相应的62个神经元，并将它们归一化成总和（sum）为1. 图4展示了一个神经网络输出的示例。这里，对于首个数字的预测字符索引(predicted character index)是\$c_0=52\$，预测标签为\$ x=\theta^{-1}(c_0)='q'\$。
 
