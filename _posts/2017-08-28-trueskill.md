@@ -30,7 +30,7 @@ $$
 \Delta = \alpha \beta \sqrt{\pi} (\frac{y+1}{2} - \Phi(\frac{s1-s2}{\sqrt{2} \beta}))
 $$ 
 
-其中 \$ 0 < \alpha < 1\$决定着新赛事vs.老估计的权重。大多数最近使用Elo的方差都使用logistic分布，而非高斯分布，因为它对棋类数据提供了更好的拟合。从统计学的观点看，Elo系统解决了成对竞争数据（paired comparison data）的估计问题，高斯方差对应于Thurstone Case V模型，而logistic方差对应于Brad ley-Terry模型。
+其中，\$\alpha \beta \sqrt{\pi}\$表示K因子， \$ 0 < \alpha < 1\$决定着新证据vs.老估计的权重。大多数当前使用Elo的变种都使用logistic分布(而非高斯分布)，因为它对棋类数据提供了更好的拟合。从统计学的观点看，Elo系统解决了成对竞争数据（paired comparison data）的估计问题，高斯方差对应于Thurstone Case V模型，而logistic方差对应于Brad ley-Terry模型。
 
 在Elo系统中，一个玩家的排名被看作是临时的（provisional），和基于一个少于固定场次的比赛数（比如20场）一样长。该问题由Mark Glickman的Bayesian排名系统Glicko解决，它引入了对一个选手的实力建模成高斯分布（均值为\$mu\$， 方差为\$\sigma^2\$）的思想。
 
