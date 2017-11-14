@@ -71,7 +71,7 @@ $$
 
 图1: 一个TrueSkill因子图示例。有4种类型的变量：\$s_i\$表示所有选手的实力（skills），\$p_i\$表示所有玩家的表现（player performances），\$ t_i \$表示所有队伍的表现（team performances），\$ d_j \$表示队伍的表现差（team performance differences）。第一行因子对（乘:product）先验进行编码；剩下的因子的乘积表示游戏结果Team 1 > Team 2 = Team 3的似然。**箭头表示最优的消息传递schedule**：首先，所有的轻箭头消息自顶向底进行更新。接着，在队伍表现（差：difference）节点的schedule按数的顺序进行迭代。最终，通过自底向顶更新所有平局箭头消息来计算实力的后验。
 
-因子图是一个二分图（bi-partite graph），由变量和因子节点组成，如图 1所示，对应于灰色圆圈和黑色方块。该函数由一个因子图表示————在我们的示例中，联合分布 \$ p(s,p,t \|r,A) \$ ————由所有（潜在）函数的乘积组成，与每个因子相关。因子图的结构给定了因子间的依赖关系，这是有效推断算法的基础。回到贝叶斯规则上，给定比赛结果r和队伍关系A，许多兴趣都是关于实力的后验分布\$p(s_i \| r,A)\$。\$p(s_i \| r, A)\$从联合分布中（它集成了个人的表现{pi}以及队伍表现{ti}）被计算。
+**因子图是一个二分图（bi-partite graph），由变量和因子节点组成，如图 1所示，对应于灰色圆圈和黑色方块**。该函数由一个因子图表示————在我们的示例中，联合分布 \$ p(s,p,t \|r,A) \$ ————由所有（潜在）函数的乘积组成，与每个因子相关。因子图的结构给定了因子间的依赖关系，这是有效推断算法的基础。回到贝叶斯规则(Bayes' Rule)上，给定比赛结果r和队伍关系A，许多兴趣都是关于实力的后验分布\$p(s_i \| r,A)\$。\$p(s_i \| r, A)\$从联合分布中（它集成了个人的表现{pi}以及队伍表现{ti}）进行计算。
 
 $$
 p(s \| r, A) = \int_{-\infty}^{\infty}...\int_{-\infty}^{\infty}dp dt.
@@ -79,7 +79,7 @@ $$
 
 <img src="http://pic.yupoo.com/wangdren23/GTzg8fWq/medish.jpg">
 
-图2: 对于平局临界值\$\epsilon\$的不同值的近似临界值的更新规则。对于一个两个队伍参加的比赛，参数t表示胜负队伍表现的差值。在胜者列（左），t为负值表示一个意料之外的结果会导致一个较大的更新。在平局列（右），任何队伍表现的完全误差都是令人意外，会导致一个较大的更新。
+图2: 对于平局临界值\$\epsilon\$的不同值的近似临界值的更新规则。对于一个只有两只队伍参加的比赛，参数t表示胜负队伍表现的差值。在胜者列（左），t为负值表示一个意料之外的结果会导致一个较大的更新。在平局列（右），任何队伍表现的完全误差都是令人意外，会导致一个较大的更新。
 
 # 3.近似消息传递(Approximate Message Passing)
 
@@ -92,13 +92,13 @@ $$
 ...(3)
 
 $$
-m_{f \rightarrow v_j}(v_j) = \int ... \int f(v) \prod_{i \neq j} m_{v_i \rightarrow f}(v_i) dv\j
+m_{f \rightarrow v_j}(v_j) = \int ... \int f(v) \prod_{i \neq j} m_{v_i \rightarrow f}(v_i) dv \backslash j
 $$
 
 ...(4)
 
 $$
-m_{v_k \rightarrow f}(v_k) = \prod _{\hat{f} \in F_{v_k} \ {f}}  m_{\hat{f} \rightarrow v_k} (v_k)
+m_{v_k \rightarrow f}(v_k) = \prod _{\hat{f} \in F_{v_k} \backslash {f}}  m_{\hat{f} \rightarrow v_k} (v_k)
 $$
 
 ...(5)
