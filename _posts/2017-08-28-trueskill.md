@@ -34,16 +34,16 @@ $$
 
 在Elo系统中，一个玩家的排名被看作是临时的（provisional），和基于一个少于固定场次的比赛数（比如20场）一样长。该问题由Mark Glickman的Bayesian排名系统Glicko解决，它引入了将一个选手的实力建模成高斯分布（均值为\$mu\$， 方差为\$\sigma^2\$）的思想。
 
-实力排名系统的一个重要新应用是多人在线游戏（multiplayer online games），有利于创建如下的在线游戏体验：参与的玩家实力相当，令人享受，公平，刺激。多人在线游戏提供了以下的挑战：
+实力排名系统的一个重要新应用是多人在线游戏（multiplayer online games），有利于创建如下的在线游戏体验：**参与的玩家实力相当，令人享受，公平，刺激**。多人在线游戏提供了以下的挑战：
 
 - 1.游戏结果通常涉及到玩家的队伍，而个人玩家的实力排名对将来的比赛安排（matchmaking）也是需要的。
-- 2.超过两个玩家或队伍竞技，那么比赛结果是关于队伍或玩家的排列组合（permutation），而非仅仅是决出胜者和负者。
+- 2.当超过两个玩家或队伍竞赛时，那么比赛结果是关于队伍或玩家的排列组合（permutation），而非仅仅是决出胜者和负者。
 
-[paper](https://www.microsoft.com/en-us/research/wp-content/uploads/2007/01/NIPS2006_0688.pdf)中介绍了一种新的排名系统：TrueSkill，它可以在一个principled Bayesian框架下解决这些挑战。我们将该模型表述成一个因子图（factor graph，第2节介绍），使用近似的消息传递（第3节介绍）来推断每个选手实力的临界分布（marginal belief distribution）。在第4节会在由Bungie Studios生成的真实数据（Xbox Halo 2的beta测试期间）上进行实验。
+[paper](https://www.microsoft.com/en-us/research/wp-content/uploads/2007/01/NIPS2006_0688.pdf)中介绍了一种新的排名系统：TrueSkill，它可以在一个principled Bayesian框架下解决这些挑战。我们将该模型表述成一个**因子图**（factor graph，第2节介绍），使用**近似消息传递**（第3节介绍）来推断每个选手实力的临界分布（marginal belief distribution）。在第4节会在由Bungie Studios生成的真实数据（Xbox Halo 2的beta测试期间）上进行实验。
 
 # 2.排名因子图（Factor Graphs）
 
-在一个游戏中，总体有n个选手 {1, ..., n}，并让k只队伍在一场比赛中竞技。队伍分配（team assignments）通过k个非重合的关于玩家总体的子集 \$ A_j \in {1, ..., n} \$，如果 \$ i \neq j\$， \$A_i \bigcap A_j = \emptyset \$。结果 \$ r := (r_1, ..., r_k) \in {1, ..., k} \$，每个队伍j都会有一个排名\$r_j\$，其中r=1表示获胜，而\$r_i=r_j\$表示平局的可能。排名从游戏的得分规则中派生而来。
+在一个游戏中，总体有**n个选手 {1, ..., n}**，在同一场比赛中有**k只队伍**参与竞技。队伍分配（team assignments）通过k个非重合的关于玩家总体的子集 \$ A_j \in \{ 1, ..., n \} \$，如果 \$ i \neq j\$， \$A_i \bigcap A_j = \emptyset \$。比赛结果 \$ r := (r_1, ..., r_k) \in \{ 1, ..., k \} \$，每个队伍j都会有一个排名\$r_j\$，其中r=1表示获胜，而\$r_i=r_j\$表示平局的可能。排名从游戏的得分规则中派生而来。
 
 给定实际玩家的实力s，以及队伍的安排\$A := {A_1, ..., A_k}\$，我们对游戏结果r建模其可能概率：\$P(r|s, A)\$。从贝叶斯规则（Bayes' rule）可知，我们获得其先验分布为：
 
