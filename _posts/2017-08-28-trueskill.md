@@ -39,7 +39,7 @@ $$
 - 1.游戏结果通常涉及到玩家的队伍，而个人玩家的实力排名对将来的比赛安排（matchmaking）也是需要的。
 - 2.超过两个玩家或队伍竞技，那么比赛结果是关于队伍或玩家的排列组合（permutation），而非仅仅是决出胜者和负者。
 
-本文中介绍了一种新的排名系统：TrueSkill，它可以在一个principled Bayesian框架下解决这些挑战。我们将该模型表述成一个因子图（factor graph，第2节介绍），使用近似的消息传递（第3节介绍）来推断每个选手实力的临界分布（marginal belief distribution）。在第4节会在由Bungie Studios生成的真实数据（Xbox Halo 2的beta测试期间）上进行实验。
+[paper](https://www.microsoft.com/en-us/research/wp-content/uploads/2007/01/NIPS2006_0688.pdf)中介绍了一种新的排名系统：TrueSkill，它可以在一个principled Bayesian框架下解决这些挑战。我们将该模型表述成一个因子图（factor graph，第2节介绍），使用近似的消息传递（第3节介绍）来推断每个选手实力的临界分布（marginal belief distribution）。在第4节会在由Bungie Studios生成的真实数据（Xbox Halo 2的beta测试期间）上进行实验。
 
 # 2.排名因子图（Factor Graphs）
 
