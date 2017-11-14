@@ -92,7 +92,7 @@ $$
 ...(3)
 
 $$
-m_{f \rightarrow v_j}(v_j) = \int ... \int f(v) \prod_{i \neq j} m_{v_i \rightarrow f}(v_i) dv \backslash j
+m_{f \rightarrow v_j}(v_j) = \int ... \int f(v) \prod_{i \neq j} m_{v_i \rightarrow f}(v_i) dv_{ \backslash j}
 $$
 
 ...(4)
@@ -103,9 +103,9 @@ $$
 
 ...(5)
 
-其中\$F_{v_k}\$表示连接到变量\$v_k\$的因子集，而 \$ v_{\j} \$则表示向量v除第j个元素外的其它成分。如果因子图是无环的（acyclic），那么消息可以被精确计算和表示，接着每个消息必须被计算一次，临界值 \$ p(v_k) \$可以借助等式(3)的消息进行计算。
+其中\$F_{v_k}\$表示连接到变量\$v_k\$的因子集，而 \$ v_{\backslash j} \$则表示向量v除第j个元素外的其它成分。如果因子图是无环的（acyclic），那么消息可以被精确计算和表示，接着每个消息必须被计算一次，临界值 \$ p(v_k) \$可以借助等式(3)的消息进行计算。
 
-从图1可以看到，TrueSkill因子图实际上是无环的，消息的主要部分可以被表示成1维的高斯分布。然而，等式(4)可以看到，从比较因子（\mathds{I}(\cdot > \epsilon)）a或（\mathds{I}(\cdot \leq \epsilon)）到表现差分\$d_i\$去的消息2和5并不是高斯分布的——实际上，真实的消息必须是（非高斯分布）因子本身。
+从图1可以看到，TrueSkill因子图实际上是无环的，消息的主要部分可以被表示成1维的高斯分布。然而，等式(4)可以看到，从比较因子（I(\cdot > \epsilon)）a或（I(\cdot \leq \epsilon)）到表现差分\$d_i\$去的消息2和5并不是高斯分布的——实际上，真实的消息必须是（非高斯分布）因子本身。
 
 根据期望传播算法（EP： Expectation Propagation），我们将这些消息作近似，通过将临界值\$ p(d_i)\$通过变化的矩匹配（moment matching）产生一个高斯分布\$ \hat{p}(d_i) \$，它与\$ p(d_i) \$具有相同的均值和方差。对于高斯分布，矩匹配会最小化KL散度。接着，我们利用(3)和(5)得到：
 
@@ -118,20 +118,20 @@ $$
 表1给出了所有的更新方程，这些等式对于在TrueSkill因子图中的推断是必要的。top 4的行由标准的高斯积分产生。底部的规则是由上述的矩匹配（moment matching）产生。第4个函数是对一个（双倍）截断式高斯分布的均值和方差的加乘校正项:
 
 $$
-V_{I(\cdot > \epsilon}(t, \epsilon) := \frac{N(t-\epsilon)}{\Phi(t-\epsilon)}, W_{I(\cdot > \epsilon)}(t, \epsilon) := V_{I(\cdot > \epsilon)}(t, \epsilon) \cdot (V_{I(\cdot > \epsilon)}(t, \epsilon) + t - \epsilon)
+V_{I(\cdot > \epsilon)}(t, \epsilon) := \frac{N(t-\epsilon)}{\Phi(t-\epsilon)}, W_{I(\cdot > \epsilon)}(t, \epsilon) := V_{I(\cdot > \epsilon)}(t, \epsilon) \cdot (V_{I(\cdot > \epsilon)}(t, \epsilon) + t - \epsilon)
 $$
 
 $$
-V_{I(\cdot > \epsilon}(t, \epsilon) := \frac{N(-\epsilon - t) - N(\epsilon -t)}{\Phi(\epsilon -t) - \Phi(-\epsilon -t) }
+V_{I(\cdot > \epsilon)}(t, \epsilon) := \frac{N(-\epsilon - t) - N(\epsilon -t)}{\Phi(\epsilon -t) - \Phi(-\epsilon -t) }
 $$
 
 $$
-V_{I(\cdot > \epsilon}(t, \epsilon) := V_{I(\cdot > \epsilon}^2(t, \epsilon) + \frac{(\epsilon -t) \cdot N(\epsilon -t) + ( \epsilon + t) N(\epsilon +t )}{\Phi(\epsilon -t) - \Phi(-\epsilon -t)}
+V_{I(\cdot > \epsilon)}(t, \epsilon) := V_{I(\cdot > \epsilon)}^2(t, \epsilon) + \frac{(\epsilon -t) \cdot N(\epsilon -t) + ( \epsilon + t) N(\epsilon +t )}{\Phi(\epsilon -t) - \Phi(-\epsilon -t)}
 $$
 
 <img src="http://pic.yupoo.com/wangdren23/GTzgutCu/medish.jpg">
 
-表1: 对于缓存的临界值p(x)的更新方程、以及对于一个TrueSkill因子图中所有因子类型的消息\$m_{f \rightarrow x}\$。我们根据标准参数来表示高斯分布 \$ N(\cdot; \mu, \sigma) \$：准确率（precision） \$ \pi := \simga^{-2} \$，准确率调和平均（precision adjusted mean）\$ \tao := \pi \mu \$。以及关于该消息或从(6)获得的临界值的缺失的更新方程
+表1: 对于缓存的临界值p(x)的更新方程、以及对于一个TrueSkill因子图中所有因子类型的消息\$m_{f \rightarrow x}\$。我们根据标准参数来表示高斯分布 \$ N(\cdot; \mu, \sigma) \$：准确率（precision） \$ \pi := \delta^{-2} \$，准确率调和平均（precision adjusted mean）\$ \tau := \pi \mu \$。以及关于该消息或从(6)获得的临界值的缺失的更新方程
 
 由于消息2和消息5是近似的，我们需要对所有消息在任意两个近似临界\$\hat{p}(d_i)\$的最短路径上进行迭代，直到该近似临界值几乎不再改变。产生的最优化的消息传递schedule可以在图1中发现。（箭头和大写）
 
