@@ -24,10 +24,10 @@ $$
 
 ...(1)
 
-其中\$ \Phi\$表示累积零均值单位方差的高斯分布密度函数。在游戏结束后，实力排名s1和s2会更新，以至于观察到的游戏结果变得更可能，并保持s1+s2=const常数。假如如果玩家赢得一局则y=+1; 如果赢两局则y=-1; 如果平局则y=0. 接着，生成的Elo（线性增长）会更新为：\$ s1 \leftarrow s1 + y\delta, s2 \leftarrow s2 - y \delta \$, 其中：
+其中\$ \Phi\$表示累积零均值单位方差的高斯分布密度函数。在游戏结束后，实力排名s1和s2会更新，以至于观察到的游戏结果变得更可能，并保持s1+s2=const常数。假如如果玩家赢得一局则y=+1; 如果赢两局则y=-1; 如果平局则y=0. 接着，生成的Elo（线性增长）会更新为：\$ s1 \leftarrow s1 + y\Delta, s2 \leftarrow s2 - y \Delta \$, 其中：
 
 $$
-\delta = \alpha \beta \sqrt{\pi} (\frac{y+1}{2} - \Phi(\frac{s1-s2}{\sqrt{2} \beta}))
+\Delta = \alpha \beta \sqrt{\pi} (\frac{y+1}{2} - \Phi(\frac{s1-s2}{\sqrt{2} \beta}))
 $$ 
 
 其中 \$ 0 < \alpha < 1\$决定着新赛事vs.老估计的权重。大多数最近使用Elo的方差都使用logistic分布，而非高斯分布，因为它对棋类数据提供了更好的拟合。从统计学的观点看，Elo系统解决了成对竞争数据（paired comparison data）的估计问题，高斯方差对应于Thurstone Case V模型，而logistic方差对应于Brad ley-Terry模型。
