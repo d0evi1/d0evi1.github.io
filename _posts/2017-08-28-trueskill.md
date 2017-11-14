@@ -53,7 +53,7 @@ $$
 
 ...(2)
 
-我们假设一个因子分解的高斯先验分布为：\$p(s) := \prod_{i=1}^{n} N(s_i; \mu_i, \sigma^2)\$。每个玩家i在游戏中的表现为: \$ p_i \sim N(p_i; s_i, \beta^2)\$，以实力\$ s_i \$为中心，具有方差为\$\beta^2\$。队伍j的表现\$t_j\$被建模成其队员的表现分的总和：\$ t_j := \sum_{i \in A_j} p_i \$。我们以排名的降序对队伍进行重排序：\$r_{(1)} \leq r_{(2)} \leq ... \leq r_{(k)}\$。忽略平局，游戏结果r的概率被建模成：
+我们假设一个因子分解的高斯先验分布为：\$p(s) := \prod_{i=1}^{n} N(s_i; \mu_i, \sigma^2)\$。每个玩家i在游戏中的表现为: \$ p_i \sim N(p_i; s_i, \beta^2)\$，以实力\$ s_i \$为中心，具有方差为\$\beta^2\$。队伍j的表现\$t_j\$被建模成其队员的表现分的总和：\$ t_j := \sum_{i \in A_j} p_i \$。我们以排名的降序对队伍进行重排序：\$r_{(1)} \leq r_{(2)} \leq ... \leq r_{(k)}\$。忽略平局，**比赛结果r的概率**被建模成：
 
 $$
 P(r \| {t1, ..., t_k}) = P(t_{r_{(1)}} > t_{r_{(2)}} >... > t_{r_{(k)}})
@@ -69,12 +69,12 @@ $$
 
 <img src="http://pic.yupoo.com/wangdren23/GTzfRtn1/medish.jpg">
 
-图1: 一个TrueSkill因子图示例。有4种类型的变量：\$s_i\$表示所有选手的实力（skills），\$p_i\$表示所有玩家的表现（performances），\$ t_i \$表示所有队伍的表现（performances of all teams），\$ d_j \$表示队伍的表现差（team performance differences）。第一行因子对（乘:product）先验进行编码；剩下的因子的乘积表示游戏结果Team 1 > Team 2 = Team 3的似然。箭头表示最优的消息传递schedule：首先，所有的轻箭头消息自顶向底进行更新。接着，在队伍表现（差：difference）节点的schedule按数的顺序进行迭代。最终，通过自底向顶更新所有平局箭头消息来计算实力的后验。
+图1: 一个TrueSkill因子图示例。有4种类型的变量：\$s_i\$表示所有选手的实力（skills），\$p_i\$表示所有玩家的表现（player performances），\$ t_i \$表示所有队伍的表现（team performances），\$ d_j \$表示队伍的表现差（team performance differences）。第一行因子对（乘:product）先验进行编码；剩下的因子的乘积表示游戏结果Team 1 > Team 2 = Team 3的似然。**箭头表示最优的消息传递schedule**：首先，所有的轻箭头消息自顶向底进行更新。接着，在队伍表现（差：difference）节点的schedule按数的顺序进行迭代。最终，通过自底向顶更新所有平局箭头消息来计算实力的后验。
 
-因子图是一个二分图（bi-partite graph），由变量和因子节点组成，如图 1所示，对应于灰色圆圈和黑色方块。该函数由一个因子图表示————在我们的示例中，联合分布 \$ p(s,p,t|r,A) \$ ————由所有（潜在）函数的乘积组成，与每个因子相关。因子图的结构给定了因子间的依赖关系，这是有效推断算法的基础。回到贝叶斯规则上，给定比赛结果r和队伍关系A，许多兴趣都是关于实力的后验分布\$p(s_i | r,A)\$。\$p(s_i | r, A)\$从联合分布中（它集成了个人的表现{pi}以及队伍表现{ti}）被计算。
+因子图是一个二分图（bi-partite graph），由变量和因子节点组成，如图 1所示，对应于灰色圆圈和黑色方块。该函数由一个因子图表示————在我们的示例中，联合分布 \$ p(s,p,t \|r,A) \$ ————由所有（潜在）函数的乘积组成，与每个因子相关。因子图的结构给定了因子间的依赖关系，这是有效推断算法的基础。回到贝叶斯规则上，给定比赛结果r和队伍关系A，许多兴趣都是关于实力的后验分布\$p(s_i \| r,A)\$。\$p(s_i \| r, A)\$从联合分布中（它集成了个人的表现{pi}以及队伍表现{ti}）被计算。
 
 $$
-p(s|r, A) = \int_{-\infty}^{\infty}...\int_{-\infty}^{\infty}dp dt.
+p(s \| r, A) = \int_{-\infty}^{\infty}...\int_{-\infty}^{\infty}dp dt.
 $$
 
 <img src="http://pic.yupoo.com/wangdren23/GTzg8fWq/medish.jpg">
