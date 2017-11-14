@@ -12,7 +12,7 @@ Elo在上一篇已经介绍，再来看下TrueSkill算法。更详细情况可�
 
 TrueSkill排名系统是一个为MS的Xbox Live平台开发的**基于实力（skill）的排名系统**。排名系统的目的是，标识和跟踪玩家在一场比赛中的实力，以便能将他们匹配到有竞争的比赛上（王者中有“质量局”一说，估计是这个意思）。TrueSkill排名系统只使用在一场比赛中所有队伍的最终战绩，来更新在游戏中的所有玩家的实力估计（排名）。
 
-# 介绍
+# 1.介绍
 
 在竞技游戏和体育中，实力排名（Skill rating）主要有三个功能：首先，它可以让玩家能匹配到实力相当的玩家，产生更有趣、更公平的比赛。第二，排名向玩家和公众公开，以刺激关注度和竞技性。第三，排名可以被用于比赛资格。随着在线游戏的到来，对排名系统的关注度极大地提高，因为上百万玩家每天的在线体验的质量十分重要，危如累卵。
 
@@ -32,20 +32,16 @@ $$
 
 其中，\$\alpha \beta \sqrt{\pi}\$表示K因子， \$ 0 < \alpha < 1\$决定着新证据vs.老估计的权重。大多数当前使用Elo的变种都使用logistic分布(而非高斯分布)，因为它对棋类数据提供了更好的拟合。从统计学的观点看，Elo系统解决了成对竞争数据（paired comparison data）的估计问题，高斯方差对应于Thurstone Case V模型，而logistic方差对应于Brad ley-Terry模型。
 
-在Elo系统中，一个玩家的排名被看作是临时的（provisional），和基于一个少于固定场次的比赛数（比如20场）一样长。该问题由Mark Glickman的Bayesian排名系统Glicko解决，它引入了对一个选手的实力建模成高斯分布（均值为\$mu\$， 方差为\$\sigma^2\$）的思想。
+在Elo系统中，一个玩家的排名被看作是临时的（provisional），和基于一个少于固定场次的比赛数（比如20场）一样长。该问题由Mark Glickman的Bayesian排名系统Glicko解决，它引入了将一个选手的实力建模成高斯分布（均值为\$mu\$， 方差为\$\sigma^2\$）的思想。
 
-实力排名系统的一个重要新应用是多人在线游戏（multiplayer online games），有利于创建如些的在线游戏：参与的玩家实力相当，令人享受，公平，刺激的游戏体验。多人在线游戏提供了以下的挑战：
+实力排名系统的一个重要新应用是多人在线游戏（multiplayer online games），有利于创建如下的在线游戏体验：参与的玩家实力相当，令人享受，公平，刺激。多人在线游戏提供了以下的挑战：
 
-- 1.游戏结果通常涉及到玩家的队伍，但个人玩家的实力排名对将来的比赛安排也是需要的。
-- 2.超过两个的玩家或队伍竞技，那么比赛结果是关于队伍或玩家的排列组合（permutation），而非仅仅是决出胜者和负者。
+- 1.游戏结果通常涉及到玩家的队伍，而个人玩家的实力排名对将来的比赛安排（matchmaking）也是需要的。
+- 2.超过两个玩家或队伍竞技，那么比赛结果是关于队伍或玩家的排列组合（permutation），而非仅仅是决出胜者和负者。
 
-本文中介绍了一种新的排名系统：TrueSkill，它可以在一个principled Bayesian框架下解决这些挑战。我们将该模型表述成一个因子图（factor graph，图2），使用近似的消息传递（图3）来推断每个选手实力的临界分布（marginal belief distribution）。在第4部分会在由Bungie Studios生成的真实数据（Xbox Halo 2的beta测试期间）上进行实验。
+本文中介绍了一种新的排名系统：TrueSkill，它可以在一个principled Bayesian框架下解决这些挑战。我们将该模型表述成一个因子图（factor graph，第2节介绍），使用近似的消息传递（第3节介绍）来推断每个选手实力的临界分布（marginal belief distribution）。在第4节会在由Bungie Studios生成的真实数据（Xbox Halo 2的beta测试期间）上进行实验。
 
-<img src="http://pic.yupoo.com/wangdren23/GTzg8fWq/medish.jpg">
-
-图2: 对于平局临界值\$\epsilon\$的不同值的近似临界值的更新规则。对于一个两个队伍参加的比赛，参数t表示胜负队伍表现的差值。在胜者列（左），t为负值表示一个意料之外的结果会导致一个较大的更新。在平局列（右），任何队伍表现的完全误差都是令人意外，会导致一个较大的更新。
-
-# 排名的Factor Graphs
+# 2.排名因子图（Factor Graphs）
 
 在一个游戏中，总体有n个选手 {1, ..., n}，并让k只队伍在一场比赛中竞技。队伍分配（team assignments）通过k个非重合的关于玩家总体的子集 \$ A_j \in {1, ..., n} \$，如果 \$ i \neq j\$， \$A_i \bigcap A_j = \emptyset \$。结果 \$ r := (r_1, ..., r_k) \in {1, ..., k} \$，每个队伍j都会有一个排名\$r_j\$，其中r=1表示获胜，而\$r_i=r_j\$表示平局的可能。排名从游戏的得分规则中派生而来。
 
@@ -79,7 +75,11 @@ $$
 p(s|r, A) = \int_{-\infty}^{\infty}...\int_{-\infty}^{\infty}dp dt.
 $$
 
-# 3.近似消息传递
+<img src="http://pic.yupoo.com/wangdren23/GTzg8fWq/medish.jpg">
+
+图2: 对于平局临界值\$\epsilon\$的不同值的近似临界值的更新规则。对于一个两个队伍参加的比赛，参数t表示胜负队伍表现的差值。在胜者列（左），t为负值表示一个意料之外的结果会导致一个较大的更新。在平局列（右），任何队伍表现的完全误差都是令人意外，会导致一个较大的更新。
+
+# 3.近似消息传递(Approximate Message Passing)
 
 在因子图公式中的和积算法（sum-product algorithm）会利用（exploits）图的稀疏连接结构，来通过消息传递（messgage passing）对单变量临界值（single-variable marginals）执行有效推断（ecient inference）。连续变量的消息传递通过下面的方程表示（直接符合分布率）：
 
