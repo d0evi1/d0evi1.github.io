@@ -195,6 +195,10 @@ TrueSkill一是个全局部署Bayesian的实力排名系统，它基于在因子
 
 而我们主要关注TrueSkill算法，在因子图框架内可以开发许多更多有趣的模型。特别的，因子图公式可以被应用到受限制的分类模型族（the family of constraint classication models），它包含了更宽范围的多分类和排名算法。另外，作为对个人实体进行排名的替代，你可以使用特征向量来构建一个排名函数，例如，对于网页可以表述成bags-of-words。最终，我们计算运行一个关于棋类游戏的完全时间独立的EP分析，来对获得关于象棋大师的TrueSkill排名。
 
+# 6.实现
+
+trueskill的一个python实现：[http://trueskill.org/](http://trueskill.org/)。
+
 # 参考
 
 - 0.[microsoft TrueSkill paper](https://www.microsoft.com/en-us/research/wp-content/uploads/2007/01/NIPS2006_0688.pdf)
