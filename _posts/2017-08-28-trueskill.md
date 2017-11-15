@@ -24,7 +24,7 @@ $$
 
 ...(1)
 
-其中\$ \Phi\$表示累积零均值单位方差的高斯分布密度函数。在游戏结束后，实力排名s1和s2会更新，以至于观察到的游戏结果变得更可能，并保持s1+s2=const常数。假如如果玩家赢得一局则y=+1; 如果赢两局则y=-1; 如果平局则y=0. 接着，生成的Elo（线性增长）会更新为：\$ s1 \leftarrow s1 + y\Delta, s2 \leftarrow s2 - y \Delta \$, 其中：
+其中\$ \Phi\$表示累积零均值单位方差的高斯分布密度函数（查表法取值）。在游戏结束后，实力排名s1和s2会更新，以至于观察到的游戏结果变得更可能，并保持s1+s2=const常数（一人得分，另一人失分）。假如如果选手1获胜则y=+1; 如果选手2获胜则y=-1; 如果平局则y=0. 接着，生成的Elo（线性增长）会更新为：\$ s1 \leftarrow s1 + y\Delta, s2 \leftarrow s2 - y \Delta \$, 其中：
 
 $$
 \Delta = \alpha \beta \sqrt{\pi} (\frac{y+1}{2} - \Phi(\frac{s1-s2}{\sqrt{2} \beta}))
@@ -198,6 +198,10 @@ TrueSkill一是个全局部署Bayesian的实力排名系统，它基于在因子
 # 6.实现
 
 trueskill的一个python实现：[http://trueskill.org/](http://trueskill.org/)。
+
+另外，MS还提供了一个在线模拟器，这个可以结合着去理解：[http://boson.research.microsoft.com/trueskill/rankcalculator.aspx](http://boson.research.microsoft.com/trueskill/rankcalculator.aspx)
+
+关于TrueSkill的数学基础，详见：[http://www.moserware.com/assets/computing-your-skill/The%20Math%20Behind%20TrueSkill.pdf](http://www.moserware.com/assets/computing-your-skill/The%20Math%20Behind%20TrueSkill.pdf)
 
 # 参考
 
