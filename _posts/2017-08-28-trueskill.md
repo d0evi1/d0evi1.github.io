@@ -30,16 +30,16 @@ $$
 \Delta = \alpha \beta \sqrt{\pi} (\frac{y+1}{2} - \Phi(\frac{s1-s2}{\sqrt{2} \beta}))
 $$ 
 
-其中，\$\alpha \beta \sqrt{\pi}\$表示K因子， \$ 0 < \alpha < 1\$决定着新证据vs.老估计的权重。大多数当前使用Elo的变种都使用logistic分布(而非高斯分布)，因为它对棋类数据提供了更好的拟合。从统计学的观点看，Elo系统解决了成对竞争数据（paired comparison data）的估计问题，高斯方差对应于Thurstone Case V模型，而logistic方差对应于Brad ley-Terry模型。
+其中，\$\alpha \beta \sqrt{\pi}\$表示K因子， \$ 0 < \alpha < 1\$决定着新事实vs.老估计的权重。大多数当前使用Elo的变种都使用logistic分布(而非高斯分布)，因为它对棋类数据提供了更好的拟合。从统计学的观点看，Elo系统解决了成对竞争数据（paired comparison data）的估计问题，高斯方差对应于Thurstone Case V模型，而logistic方差对应于Brad ley-Terry模型。
 
-在Elo系统中，一个玩家少于固定场次的比赛数（比如20场），那么他的排名将被看作是临时的（provisional）。该问题由Mark Glickman的Bayesian排名系统Glicko提出，该系统引入了将一个选手的实力建模成**高斯置值分布（Gaussian belief distribution：均值为\$mu\$， 方差为\$\sigma^2\$）**的思想。
+在Elo系统中，一个玩家少于固定场次的比赛数（比如20场），那么他的排名将被看作是临时的（provisional）。该问题由Mark Glickman的Bayesian排名系统Glicko提出，该系统引入了将一个选手的实力建模成**高斯置值分布（Gaussian belief distribution：均值为\$ \mu \$， 方差为\$\sigma^2\$）**的思想。
 
 实力排名系统的一个重要新应用是多人在线游戏（multiplayer online games），有利于创建如下的在线游戏体验：**参与的玩家实力相当，令人享受，公平，刺激**。多人在线游戏提供了以下的挑战：
 
 - 1.游戏结果通常涉及到玩家的队伍，而个人玩家的实力排名对将来后续的比赛安排（matchmaking）也是需要的。
 - 2.当超过两个玩家或队伍竞赛时，那么比赛结果是关于队伍或玩家的排列组合（permutation），而非仅仅是决出胜者和负者。
 
-[paper](https://www.microsoft.com/en-us/research/wp-content/uploads/2007/01/NIPS2006_0688.pdf)中介绍了一种新的排名系统：TrueSkill，它可以在一个principled Bayesian框架下解决这些挑战。我们将该模型表述成一个**因子图**（factor graph，第2节介绍），使用**近似消息传递**（第3节介绍）来推断每个选手实力的临界分布（marginal belief distribution）。在第4节会在由Bungie Studios生成的真实数据（Xbox Halo 2的beta测试期间）上进行实验。
+[paper](https://www.microsoft.com/en-us/research/wp-content/uploads/2007/01/NIPS2006_0688.pdf)中介绍了一种新的排名系统：TrueSkill，它可以在一个principled Bayesian框架下解决这些挑战。我们将该模型表述成一个**因子图**（factor graph，第2节介绍），使用**近似消息传递**（第3节介绍）来推断每个选手实力的临界置信分布（marginal belief distribution）。在第4节会在由Bungie Studios生成的真实数据（Xbox Halo 2的beta测试期间）上进行实验。
 
 # 2.排名因子图（Factor Graphs）
 
@@ -65,16 +65,16 @@ $$
 
 在每场游戏后，我们需要能报告实力的评估，因而使用在线学习的scheme涉及到：高斯密度过滤（Gaussian density filtering）。后验分布（posterior）近似是高斯分布，被用于下场比赛的先验分布（prior）。如果实力与期望差很多，可以引入高斯动态因子 \$ N(s_{i,t+1}; s_{i,t}, \gamma^2) \$，它会在后续的先验上产生一个额外的方差成分\$\gamma^2\$。
 
-例如：一个游戏，k=3只队伍，队伍分配为 \$ A_1 = {1} \$， \$ A_2={2,3} \$，\$ A_3 = {4} \$。进一步假设队伍1是获胜者，而队伍2和队伍3平局，例如：\$ r := (1, 2, 2) \$。我们将产生的联合分布表示为：\$ p(s,p,t \|r,A)\$，因子图如图1所示。
+例如：一个游戏，k=3只队伍，队伍分配为 \$ A_1 = \lbrace 1 \rbrace \$， \$ A_2=\lbrace 2,3 \rbrace \$，\$ A_3 = \lbrace 4 \rbrace \$。进一步假设队伍1是获胜者，而队伍2和队伍3平局，例如：\$ r := (1, 2, 2) \$。我们将产生的联合分布表示为：\$ p(s,p,t \|r,A)\$，因子图如图1所示。
 
 <img src="http://pic.yupoo.com/wangdren23/GTzfRtn1/medish.jpg">
 
 图1: 一个TrueSkill因子图示例。有4种类型的变量：\$s_i\$表示所有选手的实力（skills），\$p_i\$表示所有玩家的表现（player performances），\$ t_i \$表示所有队伍的表现（team performances），\$ d_j \$表示队伍的表现差（team performance differences）。第一行因子对（乘:product）先验进行编码；剩下的因子的乘积表示游戏结果Team 1 > Team 2 = Team 3的似然。**箭头表示最优的消息传递schedule**：首先，所有的轻箭头消息自顶向底进行更新。接着，在队伍表现（差：difference）节点的schedule按数的顺序进行迭代。最终，通过自底向顶更新所有平局箭头消息来计算实力的后验。
 
-**因子图是一个二分图（bi-partite graph），由变量和因子节点组成，如图 1所示，对应于灰色圆圈和黑色方块**。该函数由一个因子图表示————在我们的示例中，联合分布 \$ p(s,p,t \|r,A) \$ ————由所有（潜在）函数的乘积组成，与每个因子相关。因子图的结构给定了因子间的依赖关系，这是有效推断算法的基础。回到贝叶斯规则(Bayes' Rule)上，给定比赛结果r和队伍关系A，许多兴趣都是关于实力的后验分布\$p(s_i \| r,A)\$。\$p(s_i \| r, A)\$从联合分布中（它集成了个人的表现{pi}以及队伍表现{ti}）进行计算。
+**因子图是一个二分图（bi-partite graph），由变量和因子节点组成，如图 1所示，对应于灰色圆圈和黑色方块**。该函数由一个因子图表示————在我们的示例中，联合分布 \$ p(s,p,t \|r,A) \$ ————由所有（潜在）函数的乘积组成，与每个因子相关。因子图的结构给定了因子间的依赖关系，这是有效推断算法的基础。回到贝叶斯规则(Bayes' Rule)上，给定比赛结果r和队伍关系A，最关心的是关于实力的后验分布\$p(s_i \| r,A)\$。\$p(s_i \| r, A)\$从联合分布中（它集成了个人的表现{pi}以及队伍表现{ti}）进行计算。
 
 $$
-p(s \| r, A) = \int_{-\infty}^{\infty}...\int_{-\infty}^{\infty}dp dt.
+p(s | r, A) = \int_{-\infty}^{\infty}...\int_{-\infty}^{\infty}dp dt.
 $$
 
 <img src="http://pic.yupoo.com/wangdren23/GTzg8fWq/medish.jpg">
@@ -105,7 +105,7 @@ $$
 
 其中\$F_{v_k}\$表示连接到变量\$v_k\$的因子集，而 \$ v_{\backslash j} \$则表示向量v除第j个元素外的其它成分。如果因子图是无环的（acyclic），那么消息可以被精确计算和表示，接着每个消息必须被计算一次，临界值 \$ p(v_k) \$可以借助等式(3)的消息进行计算。
 
-从图1可以看到，TrueSkill因子图实际上是无环的，消息的主要部分可以被表示成1维的高斯分布。然而，等式(4)可以看到，从比较因子（I(\cdot > \epsilon)）a或（I(\cdot \leq \epsilon)）到表现差分\$d_i\$去的消息2和5并不是高斯分布的——实际上，真实的消息必须是（非高斯分布）因子本身。
+从图1可以看到，TrueSkill因子图实际上是无环的，消息的主要部分可以被表示成1维的高斯分布。然而，等式(4)可以看到，从比较因子（\$I(\cdot > \epsilon) \$）a或（\$ I(\cdot \leq \epsilon)\$）到表现差\$d_i\$去的消息2和5并不是高斯分布的——实际上，真实的消息必须是（非高斯分布）因子本身。
 
 根据期望传播算法（EP： Expectation Propagation），我们将这些消息作近似，通过将临界值\$ p(d_i)\$通过变化的矩匹配（moment matching）产生一个高斯分布\$ \hat{p}(d_i) \$，它与\$ p(d_i) \$具有相同的均值和方差。对于高斯分布，矩匹配会最小化KL散度。接着，我们利用(3)和(5)得到：
 
