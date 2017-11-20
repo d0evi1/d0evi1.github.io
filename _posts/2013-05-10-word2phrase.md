@@ -40,7 +40,9 @@ score = (pab - min_count) / (real)pa / (real)pb * (real)train_words;
 
 可以简化为：
 
-<img src="http://www.forkosh.com/mathtex.cgi?\frac{P_{ab}}{P_{a}P_{b}}">
+$$
+\frac{P_{ab}}{P_{a}P_{b}}
+$$
 
 
 互信息只是简单的多个log2而已.
