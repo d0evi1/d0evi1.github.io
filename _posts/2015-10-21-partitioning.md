@@ -33,7 +33,7 @@ tags: [ctr]
 
 # 3.Label Partitioning
 
-给定一个数据集: pairs \$(x_i, y_i), i=1, ..., m \$. 在每个pair中，\$ x_i \$是输入，\$ y_i \$是labels的集合（通常是可能的labels D的一个子集）。我们的目标是：给定一个新的样本 \$ x^{*} \$, 为整个labels集合D进行排序，并输出top k给用户，它们包含了最可能相关的结果。注意，我们提到的集合D是一个"labels"的集合，但我们可以很容易地将它们看成是一个关于文档的集合（例如：我们对文本文档进行ranking），或者是一个items的集合（比如：协同过滤里要推荐的items）。在所有情况下，我们感兴趣的问题是：D非常大，如果算法随label集合的size规模成线性比例，那么该算法在预测阶段并不合适使用。
+给定一个数据集: pairs \$(x_i, y_i), i=1, ..., m \$. 在每个pair中，\$ x_i \$是输入，\$ y_i \$是labels的集合（通常是可能的labels D的一个子集）。**我们的目标是：给定一个新的样本 \$ x^{*} \$, 为整个labels集合D进行排序，并输出top k给用户，它们包含了最可能相关的结果**。注意，我们提到的集合D是一个"labels"的集合，但我们可以很容易地将它们看成是一个关于文档的集合（例如：我们对文本文档进行ranking），或者是一个items的集合（比如：协同过滤里要推荐的items）。在所有情况下，我们感兴趣的问题是：D非常大，如果算法随label集合的size规模成线性比例，那么该算法在预测阶段并不合适使用。
 
 假设用户已经训练了一个label scorer: \$f(x,y)\$， 对于一个给定的输入和单个label，它可以返回一个real-valued型的分值(score)。在D中对这些labels进行ranking，可以对所有\$ y \in D\$，通过简单计算f(x,y)进行排序来执行。**这对于D很大的情况是不实际的**。再者，在计算完所有的f(x,y)后，你仍会另外做sorting计算，或者做topK的计算（比如：使用一个heap）。
 
@@ -47,7 +47,7 @@ tags: [ctr]
 在预测时，对这些labels进行ranking的过程如下：
 
 - 1.给定一个测试输入x，input partitioner会将x映射到partitions的某一个集合中： \$ p=g(x) \$
-- 2.我们检索每个被分配到分区\$p_j\$上的标签集合(label sets)：\$ L= \bigcup_{j=1}^{\|p\|} \mathscr{L}_{p_j} \$，其中 \$ \mathscr{L}_{p_j} \subseteq D \$是分配给分区\$p_j\$的标签子集。
+- 2.我们检索每个被分配到分区 \$ p_j \$上的标签集合(label sets)：\$ L = \bigcup_{j=1}^{\|p\|} \mathscr{L}_{p_j} \$，其中 \$ \mathscr{L}_{p_j} \subseteq D \$是分配给分区 \$ p_j \$的标签子集。
 - 3.使用label scorer函数\$ f(x,y) \$对满足\$ y \in L \$的labels进行打分，并对它们进行排序来产生我们最终的结果
 
 **在预测阶段ranking的开销，已经被附加在将输入分配到对应分区（通过计算\$ p=g(x) \$来得到）上的开销；以及在相对应的分区上计算每个label（计算: \$ f(x,y), y \in L \$）**。通过使用快速的input partitioner，就不用再取决于label set的size大小了（比如：使用hashing或者tree-based lookup）。提供给scorer的labels set的大小是确定的，相对小很多（例如：\$ \|L\| << \|D\| \$），我们可以确保整个预测过程在\$ \|D\| \$上是**亚线性(sublinear)**的。
