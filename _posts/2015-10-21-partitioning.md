@@ -8,11 +8,11 @@ tags: [ctr]
 
 在google 发表的paper: 《Label Partitioning For Sublinear Ranking》中，有过介绍：
 
-# 介绍
+# 一、介绍
 
-许多任务的目标是，对一个巨大的items, documents 或者labels进行排序，返回给少量top k个给用户。例如，推荐系统任务，比如：通过协同过滤，需要对产品（比如：电影或音乐）的一个大集合，根据给定的user profile进行排序。对于注解任务（annotation），比如：对图片进行关键词注解，需要通过给定的图片像素，给出的可能注解的一个大集合进行排序。最后，在信息检索中，文档的大集合（文本、图片or视频）会基于用户提供的query进行排序。该paper会涉及到实体(items, documents, 等)，被当作labels进行排序，所有上述的问题都看成是**标签排序问题（label ranking problem）**。在机器学习社区中，提出了许多强大的算法，应用于该领域。这些方法通常会通过对每个label依次进行打分(scoring)后根据可能性进行排序，可以使用比如SVM, 神经网络，决策树，其它流行方法等。我们将这些方法称为**标签打分器（label scorers）**。由于对标签打分是独立进行的，许多这些方法的开销与label的数量上是成线性关系的。因而，不幸的是，当标签数目为上百万或者更多时变得不实际，在serving time时会很慢。
+许多任务的目标是：**对一个巨大的items、documents 或者labels进行排序，返回给其中少量的top K给用户**。例如，推荐系统任务，比如：通过协同过滤，需要对产品（比如：电影或音乐）的一个大集合，根据给定的user profile进行排序。对于注解任务（annotation），比如：对图片进行关键词注解，需要通过给定的图片像素，给出的可能注解的一个大集合进行排序。最后，在信息检索中，文档的大集合（文本、图片or视频）会基于用户提供的query进行排序。该paper会涉及到实体(items, documents, 等)，被当作labels进行排序，所有上述的问题都看成是**标签排序问题（label ranking problem）**。在机器学习界中，提出了许多强大的算法应用于该领域。这些方法通常会通过对每个标签（label）依次进行打分（scoring）后根据可能性进行排序，可以使用比如SVM, 神经网络，决策树，其它流行方法等。我们将这些方法称为**标签打分器（label scorers）**。由于对标签打分是独立进行的，许多这些方法的开销与label的数量上是成线性关系的。因而，不幸的是，当标签数目为上百万或者更多时变得不实际，在serving time时会很慢。
 
-本paper的目标是，让这些方法变得实用，在现实世界中的问题就具有海量的labels。这里并没有提出一种新方法来替换你喜欢的方法，**我们提出了一个"wrapper"方法**，当想继续维持(maintaining)或者提升(improve) accuracy时，这种算法能让这些方法更容易驾驭。(**注意，我们的方法会改善测试时间，而非训练时间，作为一个wrapper方法，在训练时实际不会更快**)
+本paper的目标是：当面临着在现实世界中具有海量的labels的情况时，让这些方法变得实用。这里并没有提出一种新方法来替换你喜欢的方法，**我们提出了一个"wrapper"方法**，当想继续维持（maintaining）或者提升(improve) accuracy时，这种算法能让这些方法更容易驾驭。(**注意，我们的方法会改善测试时间，而非训练时间，作为一个wrapper方法，在训练时实际不会更快**)
 
 该算法**首先会将输入空间进行划分**，因而，任意给定的样本可以被映射到一个分区（partition）或者某分区集合(set of partitions)中。在每个分区中，只有标签的一个子集可以由给定的label scorer进行打分。我们提出该算法，用于优化输入分区，以及标签如何分配给分区。两种算法会考虑选择label scorer，来优化整体的precision @ k。我们展示了如何不需考虑这些因素，比如，label scorer的分区独立性，会导致更差的性能表现。这是因为当标签分区时（label partitioning），对于给定输入，最可能被纠正（根据ground truth）的是labels的子集，原始label scorer实际上表现也不错。我们的算法提供了一个优雅的方式来捕获这些期望。
 
@@ -23,7 +23,7 @@ tags: [ctr]
 - 对于标签分配（label assignment），我们提供了一个算法来优化期望的预测（precision@K）
 - 应用在现实世界中的海量数据集，来展示该方法
 
-# 前置工作
+# 二、前置工作
 
 有许多算法可以用于对标签进行打分和排序，它们与label set的size成线性时间关系。因为它们的打分操作会依次对每个label进行。例如，one-vs-rest方法，可以用于为每个label训练一个模型。这种模型本身可以是任何方法：线性SVM，kernel SVM，神经网络，决策树，或者其它方法。对于图片标注任务，也可以以这种方法进行。对于协同过滤，一个items的集合可以被排序，好多人提出了许多方法应用于该任务，也是通常依次为每个item进行打分，例如：item-based CF，latent ranking模型(Weimer et al.2007)，或SVD-based系统。最终，在IR领域，会对一个文档集合进行排序，SVM和神经网络，以及LambdaRank和RankNet是流行的选择。在这种情况下，不同于注解任务通常只会训练单个模型，它对输入特征和要排序的文档有一个联合表示，这样可以区别于one-vs-test训练法。然而，文档仍然会在线性时间上独立打分。本paper的目标是，提供一个wrapper方法来加速这些系统。
 
@@ -33,11 +33,11 @@ tags: [ctr]
 
 # 3.Label Partitioning
 
-给定一个数据集: pairs \$(x_i, y_i), i=1, ..., m \$. 在每个pair中，xi是输入，yi是labels的集合（通常是可能的labels D的一个子集）。我们的目标是，给定一个新的样本 \$ x^{*} \$, 为整个labels集合D进行排序，并输出top k给用户，它们包含了最可能相关的结果。注意，我们提到的集合D是一个"labels"的集合，但我们可以很容易地将它们看成是一个关于文档的集合（例如：我们对文本文档进行ranking），或者是一个items的集合（比如：协同过滤里要推荐的items）。在这些case中，我们感兴趣的问题是，D非常大，算法随label集合的size规模线性扩展，在预测阶段不合适。
+给定一个数据集: pairs \$(x_i, y_i), i=1, ..., m \$. 在每个pair中，\$ x_i \$是输入，\$ y_i \$是labels的集合（通常是可能的labels D的一个子集）。我们的目标是：给定一个新的样本 \$ x^{*} \$, 为整个labels集合D进行排序，并输出top k给用户，它们包含了最可能相关的结果。注意，我们提到的集合D是一个"labels"的集合，但我们可以很容易地将它们看成是一个关于文档的集合（例如：我们对文本文档进行ranking），或者是一个items的集合（比如：协同过滤里要推荐的items）。在所有情况下，我们感兴趣的问题是：D非常大，如果算法随label集合的size规模成线性比例，那么该算法在预测阶段并不合适使用。
 
-假设用户已经训练了一个label scorer: f(x,y)， 对于一个给定的输入和单个label，它可以返回一个real-valued型的分值(score)。在D中对这些labels进行ranking，可以对所有\$ y \in D\$，通过简单计算f(x,y)进行排序来执行。这对于D很大的情况是不实际的。再者，在计算完所有的f(x,y)后，你仍会另外做sorting计算，或者做topK的计算（比如：使用一个heap）。
+假设用户已经训练了一个label scorer: \$f(x,y)\$， 对于一个给定的输入和单个label，它可以返回一个real-valued型的分值(score)。在D中对这些labels进行ranking，可以对所有\$ y \in D\$，通过简单计算f(x,y)进行排序来执行。**这对于D很大的情况是不实际的**。再者，在计算完所有的f(x,y)后，你仍会另外做sorting计算，或者做topK的计算（比如：使用一个heap）。
 
-我们的目标是，给定一个线性时间(或更差)的label scorer: f(x,y)，为了让它在预测时更快（并保持或提升accuracy）。我们提出的方法：label partitioning，有两部分构成：
+我们的目标是：给定一个线性时间(或更差)的label scorer: f(x,y)，能让它在预测时更快（并保持或提升accuracy）。我们提出的方法：label partitioning，有两部分构成：
 
 - (i)输入划分器（input partititoner）: 对于一个给定的样本，将它映射到输入空间的一或多个partitions上
 - (ii)标签分配（label assignment）: 它会为每个partition将labels的一个子集
