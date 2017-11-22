@@ -47,19 +47,19 @@ tags: [ctr]
 在预测时，对这些labels进行ranking的过程如下：
 
 - 1.给定一个测试输入x，input partitioner会将x映射到partitions的某一个集合中： \$ p=g(x) \$
-- 2.我们检索每个被分配到分区 \$ p_j \$上的标签集合(label sets)：$$ L = \bigcup_{j=1}^{\|p\|} \mathscr{L}_{p_j} $$，其中 $$ \mathscr{L}_{p_j} \subseteq D $$是分配给分区 \$ p_j \$的标签子集。
+- 2.我们检索每个被分配到分区 \$ p_j \$上的标签集合(label sets)：$$ L = \bigcup_{j=1}^{|p|} \mathscr{L}_{p_j} $$，其中 $$ \mathscr{L}_{p_j} \subseteq D $$是分配给分区 \$ p_j \$的标签子集。
 - 3.使用label scorer函数\$ f(x,y) \$对满足\$ y \in L \$的labels进行打分，并对它们进行排序来产生我们最终的结果
 
 **在预测阶段ranking的开销，已经被附加在将输入分配到对应分区（通过计算\$ p=g(x) \$来得到）上的开销；以及在相对应的分区上计算每个label（计算: \$ f(x,y), y \in L \$）**。通过使用快速的input partitioner，就不用再取决于label set的size大小了（比如：使用hashing或者tree-based lookup）。提供给scorer的labels set的大小是确定的，相对小很多（例如：\$ \|L\| << \|D\| \$），我们可以确保整个预测过程在\$ \|D\| \$上是**亚线性(sublinear)**的。
 
-## 3.1 输入分区器（Input Partitioner）
+## 3.1 输入分区（Input Partitioner）
 
-我们将选择一个input partitioner的问题看成是：\$ g(x) \rightarrow p \subseteq \mathcal{P} \$，它将一个输入点x映射到一个分区p的集合中，其中P是可能的分区：\$ \mathcal{P} = \lbrace 1,...,P \rbrace \$。g总是映射到单个整数上，因而，每个输入只会映射到单个分区，但这不是必须的。
+我们将如何选择一个输入分区（input partitioner）的问题看成是：\$ g(x) \rightarrow p \subseteq \mathcal{P} \$，它将一个输入点x映射到一个分区p的集合中，其中P是可能的分区：\$ \mathcal{P} = \lbrace 1,...,P \rbrace \$。g总是映射到单个整数上，因而，每个输入只会映射到单个分区，但这不是必须的。
 
 有许多文献适合我们的input partitioning任务。例如：可以使用最近邻算法作为input partitioner，比如，对输入x做**hashing**（Indyk & Motwani, 1998)，或者**tree-based clustering和assignment** (e.g. hierarchical k-means (Duda
-et al., 1995)，或者**KD-trees** (Bentley, 1975)，这些方法都可行，但我们只需关注label assignment即可。然而，这些方法的要点是，当它们可以有效地对我们的数据执行fully unsupervised partitioning，它们不会对我们的任务的唯一需求做出解释。特别的，当我们希望在加速的同时还要保持accuracy。为了对我们的目标进行归纳，我们将输入空间进行分区，以便具有高度相似labels的相应样本在同一个分区内，让label scorer进行排序。
+et al., 1995)，或者**KD-trees** (Bentley, 1975)，这些方法都可行，我们只需关注label assignment即可。然而，这些方法的要点是，它们可以对我们的数据有效地执行**完全非监督式划分分区（fully unsupervised partitioning）**，但不会对我们的任务的唯一需求考虑进去。**特别的，当我们希望在加速的同时还要保持accuracy**。为了对我们的目标进行归纳，我们将输入空间进行分区成：以便**具有相似相关标签（relevant labels：它们通过label scorer进行高度排序）的相应样本在同一个分区内**。
 
-我们提出了一种**层次化分区器（hierarchical partitioner）**，对于一个label scorer：\$f(x,y)\$, 一个训练集：\$(x_i,y_i), i=\lbrace 1,...,m \rbrace \$，（注：x为input，y为label）以及之前定义的label集合D，它尝试优化目标：precision@k。对于一个给定的训练样本\$(x_i,y_i)\$以及label scorer，我们定义了：
+我们提出了一种**层次化分区（hierarchical partitioner）**的方法，对于一个label scorer：\$f(x,y)\$, 一个训练集：\$(x_i,y_i), i=\lbrace 1,...,m \rbrace \$，（注：x为input，y为label）以及之前定义的label集合D，它尝试优化目标：precision@k。对于一个给定的训练样本\$(x_i,y_i)\$以及label scorer，我们定义了：
 
 accuracy的measure（比如：precision@k）为：
 
