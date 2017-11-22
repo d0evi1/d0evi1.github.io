@@ -39,15 +39,15 @@ tags: [ctr]
 
 我们的目标是：给定一个线性时间(或更差)的label scorer: f(x,y)，能让它在预测时更快（并保持或提升accuracy）。我们提出的方法：label partitioning，有两部分构成：
 
-- (i)输入划分器（input partititoner）: 对于一个给定的样本，将它映射到输入空间的一或多个partitions上
-- (ii)标签分配（label assignment）: 它会为每个partition分配labels的一个子集
+- (i)**输入分区（input partititoner）**: 对于一个给定的样本，将它映射到输入空间的一或多个分区上
+- (ii)**标签分配（label assignment）**: 它会为每个分区分配labels的一个子集
 
 对于一个给定的样本，label scorer只会使用在相对应分区的labels子集，因此它的计算更快。
 
 在预测时，对这些labels进行ranking的过程如下：
 
 - 1.给定一个测试输入x，input partitioner会将x映射到partitions的某一个集合中： \$ p=g(x) \$
-- 2.我们检索每个被分配到分区 \$ p_j \$上的标签集合(label sets)：\$ L = \bigcup_{j=1}^{\|p\|} \mathscr{L}_{p_j} \$，其中 \$ \mathscr{L}_{p_j} \subseteq D \$是分配给分区 \$ p_j \$的标签子集。
+- 2.我们检索每个被分配到分区 \$ p_j \$上的标签集合(label sets)：$$ L = \bigcup_{j=1}^{\|p\|} \mathscr{L}_{p_j} $$，其中 $$ \mathscr{L}_{p_j} \subseteq D $$是分配给分区 \$ p_j \$的标签子集。
 - 3.使用label scorer函数\$ f(x,y) \$对满足\$ y \in L \$的labels进行打分，并对它们进行排序来产生我们最终的结果
 
 **在预测阶段ranking的开销，已经被附加在将输入分配到对应分区（通过计算\$ p=g(x) \$来得到）上的开销；以及在相对应的分区上计算每个label（计算: \$ f(x,y), y \in L \$）**。通过使用快速的input partitioner，就不用再取决于label set的size大小了（比如：使用hashing或者tree-based lookup）。提供给scorer的labels set的大小是确定的，相对小很多（例如：\$ \|L\| << \|D\| \$），我们可以确保整个预测过程在\$ \|D\| \$上是**亚线性(sublinear)**的。
