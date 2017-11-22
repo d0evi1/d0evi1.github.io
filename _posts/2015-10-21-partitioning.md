@@ -113,7 +113,7 @@ $$
 
 实际上，一个基于该目标函数的hierarchical partitioner，可以通过一个“加权(weighted)”版本的 hierarchical k-means来完成。在我们的实验中，我们简单地执行一个"hard"版本：我们只在训练样本集合 \$  \lbrace (x_i,y_i): \hat{l}(f(x_i),y_i) \geq \rho  \rbrace \$上运行k-means，取ρ = 1。
 
-注意，我们不使用 \$ l(f_g(x_i)(x_i), y_i) \$, 而使用\$ l(f(x_i),y_i) \$，但它是未知的。然而，如果\$ y_i \in L_{g(x_i)}\$，则：\$ l(f_g(x_i)(x_i), y_i) \leq l(f_D(x_i),y_i) \$，否则，\$ l(f_g(x_i)(x_i), y_i)=1\$。也就是说，我们使用的proxy loss，上界逼近真实值，因为比起完整的集合，我们只有很少的label，因而precision不能降低——除非真实label不在分区中。为了阻止后面的情况，我们必须确保具有相似label的样本在同一个分区中，我们可以通过学习一个合适的metrics来完成。
+注意，我们不使用 \$ l(f_{g(x_i)}(x_i), y_i) \$, 而使用\$ l(f(x_i),y_i) \$，但它是未知的。然而，如果\$ y_i \in L_{g(x_i)}\$，则：\$ l(f_g(x_i)(x_i), y_i) \leq l(f_D(x_i),y_i) \$，否则，\$ l(f_g(x_i)(x_i), y_i)=1\$。也就是说，我们使用的proxy loss，上界逼近真实值，因为比起完整的集合，我们只有很少的label，因而precision不能降低——除非真实label不在分区中。为了阻止后面的情况，我们必须确保具有相似label的样本在同一个分区中，我们可以通过学习一个合适的metrics来完成。
 
 **加权嵌入式分区（Weighted Embedded Partitioners）**, 在上述构建加权层次式分区器（weighted hierarchical partitioner）时，我们可以更进一步，引入约束（constraint）：共享着高度相关labels的样本会被映射到同一个分区（partitioner）上。编码这些constraint可以通过一种metric learning阶段来完成(Weinberger et al., 2006).。
 
