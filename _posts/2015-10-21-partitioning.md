@@ -187,7 +187,7 @@ $$
 
 <img src="http://pic.yupoo.com/wangdren23/GUC322fl/medish.jpg">
 
-图1: 从D中选择2个labels的label assignment问题，考虑它的precision@1。这里的\$ R_i \$是样本排序后的labels（粗体为true labels）。当选择为sky时，会正确序测样本1和2；而对于样本3-5，sky比true labels的排序还要高。最优的选择是car和house，它们在样本3-5中可以被正确预测，因为所有更高排序但不相关labels（higher-ranked irrelevant labels）会被抛弃掉。这种选择问题就是我们在要label assignment任务中要面临的挑战。
+图1: 如何从D中选择2个labels的label assignment问题，只考虑它的precision@1。这里的\$ R_i \$是样本排序后的labels（粗体为true labels）。当选择为sky时，会正确预测样本1和2；而对于样本3-5，sky比true labels的排序还要高。最优的选择是car和house，它们在样本3-5中可以被正确预测，**因为所有有更高排序但不相关labels（higher-ranked irrelevant labels）会被抛弃掉**。这种选择问题就是我们在label assignment任务中要面临的挑战。
 
 不幸的是，等式2的二元限制（binary constraint）致使等式(1)的最优化变得很难，但我们可以将约束放松些：
 
