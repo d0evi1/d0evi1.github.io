@@ -139,7 +139,7 @@ $$
 - input partitioner: g(x)，使用之前的方式构建
 - 线性时间label scorer: f(x,y)
 
-我们希望学到label assignment: \$ L_j \subseteq D \$，第j个分区对应的label set。我们提出的label assignment方法会应用到每个分区中。首先，来考虑下优化precision@1的情况，这种简化版的case中，每个样本只有一个相关的label。这里我们使用索引t来索引训练样本，相关的label为\$ y_t \$。我们定义：\$ \alpha \in \lbrace 0,1 \rbrace^{\|D\|}\$，其中\$ \alpha_{i} \$决定着一个label \$ D_i \$是否会被分配到该分区上（\$ \alpha_{i}=1 \$），或不分配（\$ \alpha_{i}=0 \$）。这里的\$ \alpha_{i} \$就是我们希望优化的变量。接下去，我们通过给定的label scorer对rankings进行编码：
+**我们希望学到label assignment: \$ L_j \subseteq D \$，第j个分区对应的label set**。我们提出的label assignment方法会应用到每个分区中。首先，来考虑下优化precision@1的情况，这种简化版的case中，每个样本只有一个相关的label。这里我们使用索引t来索引训练样本，相关的label为\$ y_t \$。我们定义：\$ \alpha \in \lbrace 0,1 \rbrace^{\|D\|}\$，其中\$ \alpha_{i} \$决定着一个label \$ D_i \$是否会被分配到该分区上（\$ \alpha_{i}=1 \$），或不分配（\$ \alpha_{i}=0 \$）。这里的\$ \alpha_{i} \$就是我们希望优化的变量。接下去，我们通过给定的label scorer对rankings进行编码：
 
 - \$ R_{t,i} \$是对于样本t的label i的rank分值：
 
@@ -202,7 +202,7 @@ $$
 我们将上述泛化成pricision@k（k>1）的情况。如果至少一个“不相关(violating)”的label排在相关label之上，我们必须统计排在相关label之上的violations的数目。回到未放松约束的最优化问题上，我们有：
 
 $$
-max_{\alpha} \sum_{t} \alpha_{y_t} (1 - \Phi( \sum_{R_{t,i} < R_{t,y_t}} \alpha_{i}
+max_{\alpha} \sum_{t} \alpha_{y_t} (1 - \Phi( \sum_{R_{t,i} < R_{t,y_t}} \alpha_{i}))
 $$
 
 ...(5)
@@ -220,7 +220,7 @@ $$
 我们已经讨论了具有一个相关标签的情况，但在许多情况下，样本具有多个相关标签的情况是很常见的，它可以使得loss的计算变得稍微更具挑战性些。我们回到precision@1的情况。在这种情况下，原始的目标函数（等式（1））将返回为：
 
 $$
-max_{\alpha} \sum_{y \in y_t} a_y (1 - max_{R_{t,i} < R_{t,y}} \alpha_i
+max_{\alpha}^{} \sum_{y \in y_t} a_y (1 - max_{R_{t,i} < R_{t,y}} \alpha_i)
 $$
 
 ...(7)
