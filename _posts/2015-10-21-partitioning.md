@@ -61,7 +61,7 @@ et al., 1995)，或者**KD-trees** (Bentley, 1975)，这些方法都可行，我
 
 我们提出了一种**层次化分区（hierarchical partitioner）**的方法，对于：
 
-- 一个label scorer：\$f(x,y)\$
+- 一个标签打分函数（label scorer）：\$f(x,y)\$
 - 一个训练集：\$(x_i,y_i), i=\lbrace 1,...,m \rbrace \$，（注：x为input，y为label）
 - 之前定义的label集合D
 
@@ -79,7 +79,7 @@ $$
 l(f(x_i),y_i)=1-\hat{l}(f(x_i),y_i)
 $$
 
-这里f(x)是对所有labels的得分向量：
+注意，上述的f(x)是对所有labels的得分向量（f(x)与f(x,y)不同）：
 
 $$
 f(x)=f_{D}(x)=(f(x,D_1),...,f(x,D_{|D|})))
@@ -93,7 +93,7 @@ $$
 \sum_{i=1}^{m}l(f_{g(x_i)}(x_i),y_i)
 $$
 
-**不幸的是，当训练输入分区（input partitioner）时，label assignments L是未知的，它会让上述的目标函数不可解(infeasible)**。然而，该模型发生的errors可以分解成一些成分（components）。对于任意给定的样本，如果发生以下情况，它的precision@k会收到一个较低值或是0:
+**不幸的是，当训练输入分区（input partitioner）时，L(label assignments)是未知的，它会让上述的目标函数不可解(infeasible)**。然而，该模型发生的errors可以分解成一些成分（components）。对于任意给定的样本，如果发生以下情况，它的precision@k会收到一个较低值或是0:
 
 - 在一个分区里，相关的标签不在该集合中
 - 原始的label scorer在排第一位的分值就低
@@ -103,7 +103,7 @@ $$
 - 对于共享着高度相关标签的样本，应被映射到相同的分区上
 - 当学习一个partitioner时，对于label scorer表现好的样本，应被优先(prioritized)处理
 
-基于此，我们提出了方法来进行input partitioning。让我们看下这种情况：假如定义了分区中心(partition centroids) \$c_i, i=1,...,P\$，某种划分，它使用最接近分配的分区：
+基于此，我们提出了方法来进行输入分区（input partitioning）。让我们看下这种情况：假如定义了分区中心(partition centroids) \$c_i, i=1,...,P\$，某种划分，它使用最接近分配的分区：
 
 $$
 g(x)=argmin_{i=\lbrace 1,...,P \rbrace} \| x-c_i \|
@@ -111,7 +111,7 @@ $$
 
 这可以很容易地泛化到层次化的情况中（hierarchical case），通过递归选择子中心(child centroids)来完成，通常在hierarchical k-means和其它方法中使用。
 
-**加权层次化分区（Weighted Hierarchical Partitioner）** ，这是一种来确保input partitioner时对于那些使用给定label scorer表现较好的样本进行优先处理的简单方法。采用的作法是，对每个训练样本进行加权：
+**加权层次化分区（Weighted Hierarchical Partitioner）** ，这是一种来确保输入分区（input partitioner）对于那些使用给定label scorer表现较好的样本（根据precision）进行优先处理的简单方法。采用的作法是，对每个训练样本进行加权：
 
 $$
 \sum_{i=1}^{m}\sum_{j=1}^{P} \hat{l}(f(x_i),y_i)\|x_i-c_j\|^{2}
@@ -129,11 +129,11 @@ $$
 \sum_{i=1}^{m} \sum_{j=1}{P} \hat{l}(f(x_i),y_i)||Mx_i-c_j||^2
 $$
 
-然而，一些label scorer已经学到了一个latent "embedding" space。例如，SVD和LSI等模型，以及一些神经网络模型（Bai et al., 2009). 在这样的case中，你可以在隐空间(latent space)上直接执行input partitioning，而非在输入空间上；例如：如果label scorer模型的形式是：\$\f(x,y)= \Phi_{x}(x)^T \Phi_{y}(y) \$，那么partitioning可以在空间 \$ \Phi_x(x) \$上执行。这同样可以节省计算两个embeddings（一个用于label partitioning，一个用于label scorer）的时间，在特征空间中的进一步分区则为label scorer调整。
+然而，一些label scorer已经学到了一个latent "embedding" space。例如，SVD和LSI等模型，以及一些神经网络模型（Bai et al., 2009). 在这样的case中，你可以在隐空间(latent space)上直接执行input partitioning，而非在输入空间上；例如：如果label scorer模型的形式是：\$ f(x,y)= \Phi_{x}(x)^T \Phi_{y}(y) \$，那么partitioning可以在空间 \$ \Phi_x(x) \$上执行。这同样可以节省计算两个embeddings（一个用于label partitioning，一个用于label scorer）的时间，在特征空间中的进一步分区则为label scorer调整。
 
 ## 3.2 Label Assignment
 
-本节将来看下如何选择一个label assignment L。
+本节将来看下如何选择一个L（label assignment）。
 
 - 训练集\$ (x_i,y_i), i=1,...,m \$，label set为：D
 - input partitioner: g(x)，使用之前的方式构建
