@@ -1,8 +1,8 @@
 ---
 layout: post
-title: 2010 youtube推荐系统 
-modified: 2014-03-28
-tags: [大数据]
+title: 2008 youtube推荐系统 
+modified: 2014-02-24
+tags:
 ---
 
 本文是youtube在2008年提出的算法，现在回过头去看看它在当时是如何实现youtube的推荐系统的。
