@@ -138,7 +138,7 @@ $$
 recall_t(W,R) = | W \cap R_t | / |W|
 $$
 
-这样，对于每个在训练周期和测试周期上同时存在的用户u，t的合理值，我们获得了一个值对(value pair): \($p_{t}^{u}, r_{t}^{u})\$ 。自然的，我们对跨所有用户进行平均来获取一个关于阈值为t的pair: (p_t, r_t)。这些值形成了in-depth分析的基础，包括ROC曲线（Receiver Operating Characteristic），Precision-Recall-Threshold 曲线以及top-rank质量评估。我们也通过每个推荐过程分析了视频集的覆盖率，见第4节。
+这样，对于每个在训练周期和测试周期上同时存在的用户u，t的合理值，我们获得了一个值对(value pair): \($p_{t}^{u}, r_{t}^{u})\$ 。自然的，我们对跨所有用户进行平均来获取一个关于阈值为t的pair: \$(p_t, r_t)\$。这些值形成了in-depth分析的基础，包括ROC曲线（Receiver Operating Characteristic），Precision-Recall-Threshold 曲线以及top-rank质量评估。我们也通过每个推荐过程分析了视频集的覆盖率，见第4节。
 
 ## 3.1 推荐的事后检验（Backtesting Recommendations）
 
