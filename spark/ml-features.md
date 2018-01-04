@@ -270,8 +270,8 @@ polyDF.select("polyFeatures").take(3).foreach(println)
 
 ## 2.7 离散cosine变换(DCT)
 
-[Discrete Cosine Transform](https://en.wikipedia.org/wiki/Discrete_cosine_transform)可以将在时间域（time domain）上长度为N的实数值序列，转换成另一个在频率域（frequency domain）内长度为N的实数值序列。DCT类提供了这个功能，将实现了[DCT-II](https://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II)并将结果通过<img src="http://www.forkosh.com/mathtex.cgi?
-1/\sqrt_2">进行归一化，以便将变换后的矩阵单元化。不需要在转换序列上进行shift操作（例如：转换序列的第0th位的元素，对应于DCT的第0th coefficient，而非N/2 th）
+[Discrete Cosine Transform](https://en.wikipedia.org/wiki/Discrete_cosine_transform)可以将在时间域（time domain）上长度为N的实数值序列，转换成另一个在频率域（frequency domain）内长度为N的实数值序列。DCT类提供了这个功能，将实现了[DCT-II](https://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II)并将结果通过\$
+1/\sqrt_2 \$进行归一化，以便将变换后的矩阵单元化。不需要在转换序列上进行shift操作（例如：转换序列的第0th位的元素，对应于DCT的第0th coefficient，而非第N/2 th）
 
 DCT示例：
 
