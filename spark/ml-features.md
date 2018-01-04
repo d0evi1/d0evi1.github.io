@@ -472,7 +472,7 @@ encoded.select("id", "categoryVec").show()
 
 ## 2.11 VectorIndexer
 
-VectorIndex可以用于索引Vectors类型数据集中的类别型feature。它可以自动决定，哪个feature可以是类别型的（categorical），并将它的原始值转换成类别id索引。必须按照以下操作：
+VectorIndex可以用于索引Vectors类型数据集中的类别型feature。它可以自动决定哪个feature是类别型的（categorical），并将它的原始值转换成类别id索引。必须按照以下操作进行：
 
 - 使用一个Vector类型的输入列，和一个参数maxCategories
 - 基于不同的值来决定哪个feature应该是类别型的，features的最大类别数由maxCategories来指定
