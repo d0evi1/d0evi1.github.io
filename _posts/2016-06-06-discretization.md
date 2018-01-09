@@ -94,11 +94,11 @@ $$
 B = c_{11} Prob(d_A \wedge HT) + c_{22} Prob (d_R \wedge NT) + c_{12} Prob(d_A \wedge NT) + c_{21} Prob (d_R \wedge HT)
 $$
 
-其中c11和c12表示做出正确选择的costs，而c12和c21表示做出错误决策的costs。这是期望贝叶斯风险（expected Bayes risk），决策规则被用于选择 \$ {d_A, d_R} \$的其中之一。贝叶斯决策原则（Bayes decision criterion），会调用选择决策规则来最小化期望的cost。
+其中\$c_{11}\$和\$c_{12}\$表示做出正确选择的costs，而\$c_{12}\$和\$c_{21}\$表示做出错误决策的costs。这是期望贝叶斯风险（expected Bayes risk），决策规则被用于选择 \$ \lbrace d_A, d_R \rbrace \$的其中之一。贝叶斯决策原则（Bayes decision criterion），会调用选择决策规则来最小化期望的cost。
 
-由于我们知道，分配给c12和c21是什么值，我们会对均匀error cost分配做重排序。如果\$ c_{11} = c_{22} = 0\$和 \$ c_{12} = c_{21} = 1\$，那么最小化Bayes risk会减小一个决策规则PEC（Probalility-of-Error Criterion），它会最小化做出错误决策的概率。接着，它会通过一个简单的派生来展示Bayes决策原则来减小采用的决策规则，给定数据集S，选择假设HT，\$ Prob{HT \\| S}\$是计算假设的最大量。我们将该决策原则适用成"贝叶斯决策策略（Bayesian Decision Strategy）"。该策略有时也被称为MAP原则（maximum a posteriori），等价于PEC。
+由于我们知道，分配给\$c_{12}\$和\$ c_{21} \$是什么值，我们会对均匀error cost分配做重排序。如果\$ c_{11} = c_{22} = 0\$和 \$ c_{12} = c_{21} = 1\$，那么最小化Bayes risk会减小一个决策规则PEC（Probalility-of-Error Criterion），它会最小化做出错误决策的概率。接着，它会通过一个简单的派生来展示Bayes决策原则来减小采用的决策规则，给定数据集S，选择假设HT，\$ Prob{HT \| S}\$是计算假设的最大量。我们将该决策原则适用成"贝叶斯决策策略（Bayesian Decision Strategy）"。该策略有时也被称为MAP原则（maximum a posteriori），等价于PEC。
 
-对于我们的决策问题，Bayesian decision strategy会选择\$d \in D\$的决策，它对应于在数据集S上具有最大概率的hypothesis：这样，如果\$ Prob{HT \\| S} > Prob {NT\\|S}\$，那么我们选\$ d_A\$。如果我们有一个方法来决策着上述两个要解决问题的概率：简单地选择hypothesis，它具有更高的概率，Bayesian决策策略会保障这是最好的策略。不幸的是，没有简单的方法来直接计算这样的概率。然而，我们应采用这样的方法：它将允许我们直接估计哪个概率更大。
+对于我们的决策问题，Bayesian decision strategy会选择\$d \in D\$的决策，它对应于在数据集S上具有最大概率的hypothesis：这样，如果\$ Prob{HT \| S} > Prob {NT \|S}\$，那么我们选\$ d_A\$。如果我们有一个方法来决策着上述两个要解决问题的概率：简单地选择hypothesis，它具有更高的概率，Bayesian决策策略会保障这是最好的策略。不幸的是，没有简单的方法来直接计算这样的概率。然而，我们应采用这样的方法：它将允许我们直接估计哪个概率更大。
 
 ## 3.2 MDLP(最小描述长度原则)
 
