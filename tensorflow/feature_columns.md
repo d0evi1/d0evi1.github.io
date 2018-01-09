@@ -127,17 +127,17 @@ e = tf.estimator.DNNLinearCombinedClassifier(
 
 {% endhighlight %}
 
-总结：
+# 总结
 
 feature columns提供了一种将数据映射到模型的机制。
 
-- bucketized_column: 会为离散型dense input创建一个_BucketizedColumn。
-- crossed_column：创建一个_CrossedColumn，用于执行特征交叉。
-- embedding_column：创建一个_EmbeddingColumn，将稀疏数据feeding进一个DNN
-- hashed_embedding_column: 会使用hashing为一个sparse feature创建_HashedEmbeddingColumn。值v的第i个embedding component，可以通过一个embedding weight（它的index为pair<v,i>的一个fingerprint）进行检索。
-- one_hot_column: 创建在DNN中使用的一个_OneHotColumn。
-- real_valued_column：为dense numeric数据创建一个_RealValuedColumn。
-- shared_embedding_columns：创建一个_EmbeddingColumn列表，它们共享相同的embedding。
+- **bucketized_column**: 会为离散型dense input创建一个_BucketizedColumn。
+- **crossed_column**：创建一个_CrossedColumn，用于执行特征交叉。
+- **embedding_column**：创建一个_EmbeddingColumn，将稀疏数据feeding进一个DNN
+- **hashed_embedding_column**: 会使用hashing为一个sparse feature创建_HashedEmbeddingColumn。值v的第i个embedding component，可以通过一个embedding weight（它的index为pair<v,i>的一个fingerprint）进行检索。
+- **one_hot_column**: 创建在DNN中使用的一个_OneHotColumn。
+- **real_valued_column**：为dense numeric数据创建一个_RealValuedColumn。
+- **shared_embedding_columns**：创建一个_EmbeddingColumn列表，它们共享相同的embedding。
 
 
 # 参考：
