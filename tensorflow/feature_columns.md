@@ -5,7 +5,9 @@ tagline:
 ---
 {% include JB/setup %}
 
-FeatureColumn表示数据中的单个特征。FeatureColumn可以表示像“height”这样的**连续值量**，或者它可以表示像“eye_color（眼珠颜色）”这样的**类别变量**：可能的值为{'blue’, ‘brown’, ‘green’}。
+# 介绍
+
+FeatureColumn表示数据中的单个特征。FeatureColumn可以表示像“高度（height）”这样的**连续型值量**，或者它可以表示像“眼珠颜色（eye_color）”这样的**类别型变量**：可能的值为{'blue’, ‘brown’, ‘green’}。
 
 在“height”这样的连续型特征和“eye_color”这种类别型特征的情况下，数据中的单个值在输入模型之前可能会被转换成一个**数字序列**。FeatureColumn这个抽象类可以将特征作为单个语义单元来操作。您可以指定转换并选择要包括的特征，而无需进行处理就可以feed给模型的tensor中的指定索引。（用名称索引，而非数字进行索引）
 
@@ -30,7 +32,7 @@ education = tf.feature_column.categorical_column_with_hash_bucket(
 
 # 2.特征交叉列
 
-**因为线性模型会为不同的features分配独立的weights，它们不能学到特征值的特定组合的相对重要性**。如果你有一个特征：“favorite_sport(喜欢的运动)”，另一个特征：“home_city（家乡城市）”, 当你尝试去预测一个人是否喜欢穿红色衣服，你的线性模型不会学到: 来自St.Louis的棒球粉丝是很喜欢穿红色衣服（圣路易斯红雀队）。
+**因为线性模型会为不同的features分配独立的weights，它们不能学到特征值的特定组合的相对重要性**。如果你有一个特征为：“favorite_sport(喜欢的运动)”，另一个特征为：“home_city（家乡城市）”, 当你尝试去预测一个人是否喜欢穿红色衣服，你的线性模型并不会学到这样的特性（两个特征都是类别型）: 来自St.Louis的爱好棒球运动的粉丝是很喜欢穿红色衣服（圣路易斯红雀队）。
 
 你可以通过创建一个新的'favorite_sport_x_home_city'特征。特征值为两个源特征的组合，例如： 'baseball_x_stlouis'。这种特征组合称为“特征交叉（feature cross）”。
 
@@ -70,9 +72,9 @@ age_buckets = tf.feature_column.bucketized_column(
 
 落到bucket中的所对应的值，会变为类别型label。
 
-## 4.1 输入函数
+## 4.1 输入函数input_fn
 
-FeatureColumn为你的模型的输入数据提供了一个关于如何表示和转换数据的规范。但它们不提供数据本身。你通过一个输入函数来提供数据。
+FeatureColumn为你的模型的输入数据提供了一个关于如何表示和转换数据的规范。但它们本身不提供数据。需要你通过一个输入函数来提供数据。
 
 输入函数（input function）必须返回一个关于tensors的字典（dictionary）。每个key对应于FeatureColumn的名字。每个key的value是一个tensor：它包含着所有数据实例的特征的值。input function详见[Building Input Functions with tf.estimator ](https://www.tensorflow.org/get_started/input_fn)，线性模型中的input_fn详见代码[linear models tutorial code](https://www.github.com/tensorflow/tensorflow/blob/r1.3/tensorflow/examples/learn/wide_n_deep_tutorial.py).
 
@@ -138,7 +140,7 @@ feature columns提供了一种将数据映射到模型的机制。
 - shared_embedding_columns：创建一个_EmbeddingColumn列表，它们共享相同的embedding。
 
 
-参考：
+# 参考：
 
-1.[tensorflow feature_columns](https://www.tensorflow.org/versions/r0.12/api_docs/python/contrib.layers/feature_columns)
-2.[linear模型中提到的feature column](https://www.tensorflow.org/tutorials/linear)
+- 1.[tensorflow feature_columns](https://www.tensorflow.org/versions/r0.12/api_docs/python/contrib.layers/feature_columns)
+- 2.[linear模型中提到的feature column](https://www.tensorflow.org/tutorials/linear)
