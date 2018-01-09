@@ -96,9 +96,9 @@ $$
 
 其中\$c_{11}\$和\$c_{12}\$表示做出正确选择的costs，而\$c_{12}\$和\$c_{21}\$表示做出错误决策的costs。这是期望贝叶斯风险（expected Bayes risk），决策规则被用于选择 \$ \lbrace d_A, d_R \rbrace \$的其中之一。贝叶斯决策原则（Bayes decision criterion），会调用选择决策规则来最小化期望的cost。
 
-由于我们知道，分配给\$c_{12}\$和\$ c_{21} \$是什么值，我们会对均匀error cost分配做重排序。如果\$ c_{11} = c_{22} = 0\$和 \$ c_{12} = c_{21} = 1\$，那么最小化Bayes risk会减小一个决策规则PEC（Probalility-of-Error Criterion），它会最小化做出错误决策的概率。接着，它会通过一个简单的派生来展示Bayes决策原则来减小采用的决策规则，给定数据集S，选择假设HT，\$ Prob{HT \| S}\$是计算假设的最大量。我们将该决策原则适用成"贝叶斯决策策略（Bayesian Decision Strategy）"。该策略有时也被称为MAP原则（maximum a posteriori），等价于PEC。
+由于我们知道，分配给\$c_{12}\$和\$ c_{21} \$是什么值，我们会对均匀error cost分配做重排序。如果\$ c_{11} = c_{22} = 0\$和 \$ c_{12} = c_{21} = 1\$，那么最小化Bayes risk会减小一个决策规则PEC（Probalility-of-Error Criterion），它会最小化做出错误决策的概率。接着，它会通过一个简单的派生来展示Bayes决策原则来减小采用的决策规则，给定数据集S，选择假设HT，\$ Prob(HT \| S)\$是计算假设的最大量。我们将该决策原则适用成"贝叶斯决策策略（Bayesian Decision Strategy）"。该策略有时也被称为MAP原则（maximum a posteriori），等价于PEC。
 
-对于我们的决策问题，Bayesian decision strategy会选择\$d \in D\$的决策，它对应于在数据集S上具有最大概率的hypothesis：这样，如果\$ Prob{HT \| S} > Prob {NT \|S}\$，那么我们选\$ d_A\$。如果我们有一个方法来决策着上述两个要解决问题的概率：简单地选择hypothesis，它具有更高的概率，Bayesian决策策略会保障这是最好的策略。不幸的是，没有简单的方法来直接计算这样的概率。然而，我们应采用这样的方法：它将允许我们直接估计哪个概率更大。
+对于我们的决策问题，Bayesian decision strategy会选择\$d \in D\$的决策，它对应于在数据集S上具有最大概率的hypothesis：这样，如果\$ Prob(HT \| S) > Prob (NT \|S)\$，那么我们选\$ d_A\$。如果我们有一个方法来决策着上述两个要解决问题的概率：简单地选择hypothesis，它具有更高的概率，Bayesian决策策略会保障这是最好的策略。不幸的是，没有简单的方法来直接计算这样的概率。然而，我们应采用这样的方法：它将允许我们直接估计哪个概率更大。
 
 ## 3.2 MDLP(最小描述长度原则)
 
@@ -106,7 +106,7 @@ $$
 
 我们会展示该决策问题，给定一个固定的样本集合，我们使用MDLP来猜测带有更高概率的hypothesis。MDLP是一个通用的原则，它的目的是，对自然界中天然的偏差进行编码，朝着更简单的理论来解释数据的相同部分。MDLP被Rissanen引入，之后被其它人使用。定义如下：
 
-**定义3**：给定一个假设集合，以及一个数据集S，MDLP会调用假设HT来：\$ MLength(HT) + MLength(S\\|HT) \$是在假设集上的最小值。MLength(HT)表示对HT编码的最小可能长度，而 \$ MLength(S\\|HT) \$是对给定hypothesis编码的最小编码长度。
+**定义3**：给定一个假设集合，以及一个数据集S，MDLP会调用假设HT来：\$ MLength(HT) + MLength(S \|HT) \$是在假设集上的最小值。MLength(HT)表示对HT编码的最小可能长度，而 \$ MLength(S \|HT) \$是对给定hypothesis编码的最小编码长度。
 
 为了方便，我们假设长度的单位是：bits。数据的编码可以被认为是对数据点进行编码，它们是对于hypothesis HT来说“异常点（exceptions）”。如果HT能完全拟合数据，那么后一项将为0.
 
@@ -120,7 +120,7 @@ MDLP原则不必要要求与之前讨论的决策原则不同。它可以轻易�
 
 使用该公式，该问题需要解决的问题是通信问题。目标是通信一个方法（分类器），它可以允许接收器（receiver）来决定在数据集中的样本分类label。假设一个发送器（sender）具有整个训练数据样本集。而接收器具有没有该分类label的样本。sender只需要将合理的分类labeling传送给receiver。sender必须选择最短描述来指定该分类。
 
-** 对Null Theory NT进行编码 **：在NT的情况下，sender必须简单地传递在S中的样本的类别。sender发送了N条消息，每个都是一个被编码过的类别label（其中N=\$ \\| S \\| \$）。为了编码在S中的样本的类别，我们必须使用一个最优化算法（比如：Huffman coding）来生成编码来优化平均编码长度。因为我们必须传递在集合S中每个样本的类别，将平均编码长度l乘以N给出了总的cost。另外，需要传递“code book”来用于解码类别。传递的code book的包含了每个类别对应的code word。因而，如果存在着K个分类，code book的长度可以通过(k * l)进行预估。注意，K是一个常数，不能随着N增长，因此，code book的cost是一个小的常数开销。
+** 对Null Theory NT进行编码 **：在NT的情况下，sender必须简单地传递在S中的样本的类别。sender发送了N条消息，每个都是一个被编码过的类别label（其中N=\$ \| S \| \$）。为了编码在S中的样本的类别，我们必须使用一个最优化算法（比如：Huffman coding）来生成编码来优化平均编码长度。因为我们必须传递在集合S中每个样本的类别，将平均编码长度l乘以N给出了总的cost。另外，需要传递“code book”来用于解码类别。传递的code book的包含了每个类别对应的code word。因而，如果存在着K个分类，code book的长度可以通过(k * l)进行预估。注意，K是一个常数，不能随着N增长，因此，code book的cost是一个小的常数开销。
 
 **对划分HT进行编码**：选中的分割点会对样本分区，必须由sender根据每两个子集中的分类编码来指定。指定分割点的开销为\$log_2(N-1)\$ bits，因为我们需要指定序列（分割点在之间落的地方）中N-1个样本的其中之一。
 
