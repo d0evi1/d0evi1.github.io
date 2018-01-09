@@ -110,7 +110,7 @@ $$
 
 为了方便，我们假设长度的单位是：bits。数据的编码可以被认为是对数据点进行编码，它们是对于hypothesis HT来说“异常点（exceptions）”。如果HT能完全拟合数据，那么后一项将为0.
 
-MDLP原则不必要要求与之前讨论的决策原则不同。它可以轻易地展示MDLP和Bayesian risk minimization strategy在理论上是相互相关的。由于篇幅原因，我们忽略了派生版本，它包含着可以包含对数据集S的hypothesis H所需要指定的bits数：\$ -log_2 (Prob{H\|S} \$，使用Bayes' rule。最终获得的表达式等价于MDLP。这可以看成是采用MDLP的动机。
+MDLP原则不必要要求与之前讨论的决策原则不同。它可以轻易地展示MDLP和Bayesian risk minimization strategy在理论上是相互相关的。由于篇幅原因，我们忽略了派生版本，它包含着可以包含对数据集S的hypothesis H所需要指定的bits数：\$ -log_2 (Prob(H\|S)) \$，使用Bayes' rule。最终获得的表达式等价于MDLP。这可以看成是采用MDLP的动机。
 
 基于最早的争论，如果我们具有一种方法来发现真实的hypotheses的最小编码长度，那么采用MDLP来选择一个完整hypotheses的集合会导致使用最大MAP的hypothesis。接着，它等价于PEC决策原则。这意味着，选中的hypothesis将会最小化做出错误选择决策的概率。然而，在物理世界中，我们不会访问概率分布。因而，MDLP被用于对cost的估计，来在hypotheses间做比较。
 
