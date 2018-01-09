@@ -91,7 +91,7 @@ A的二分离散化通过选择分割点\$T_A\$来决定，其中\$E(A, T_A; S)\
 假设\$d_A\$表示决定着接受划分\$ \pi_T\$，\$d_R\$表示拒绝。该情况中可能的决策集合是\$ D={d_A, d_R}\$，我们具有待解决的一个二分决策问题。如果我们分配了一个cost给错误的决策，那么期待的与一个决策规则相关的cost：在\$ {d_A, d_R} \$间选择具有如下的cost：
 
 $$
-B = c_{11} Prob(d_A ^ HT) + c_{22} Prob (d_R ^ NT) + c_{12} Prob(d_A ^ NT) + c_{21} Prob (d_R ^ HT)
+B = c_{11} Prob(d_A \wedge HT) + c_{22} Prob (d_R \wedge NT) + c_{12} Prob(d_A \wedge NT) + c_{21} Prob (d_R \wedge HT)
 $$
 
 其中c11和c12表示做出正确选择的costs，而c12和c21表示做出错误决策的costs。这是期望贝叶斯风险（expected Bayes risk），决策规则被用于选择 \$ {d_A, d_R} \$的其中之一。贝叶斯决策原则（Bayes decision criterion），会调用选择决策规则来最小化期望的cost。
