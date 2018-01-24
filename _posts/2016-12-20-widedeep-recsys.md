@@ -68,7 +68,7 @@ $$
 
 ## 3.3 Wide & Deep模型的联合训练
 
-Wide组件和Deep组件组合在一起，对它们的输入日志进行一个加权求和来做为预测，它会被feed给一个常见的logistic loss function来进行联合训练。注意，联合训练（joint training）和集成训练（ensemble）有明显的区别。在ensemble中，每个独立的模型会单独训练，相互并不知道，只有在预测时会组合在一起。相反地，**联合训练（joint training）会同时优化所有参数，通过将wide组件和deep组件在训练时进行加权求和的方式进行**。这也暗示了模型的size：对于一个ensemble，因为训练是不联合的，每个独立的模型size需要更大些（例如：更多的特征和转换）来达到合理的精度。**而对于联合训练（joint training），wide组件只需要一小部分的cross-product特征转换即可，而非一个full-size的wide模型**。
+Wide组件和Deep组件组合在一起，对它们的输入日志进行一个加权求和来做为预测，它会被feed给一个常见的logistic loss function来进行联合训练。注意，联合训练（joint training）和集成训练（ensemble）有明显的区别。在ensemble中，每个独立的模型会单独训练，相互并不知道，只有在预测时会组合在一起。相反地，**联合训练（joint training）会同时优化所有参数，通过将wide组件和deep组件在训练时进行加权求和的方式进行**。这也暗示了模型的size：对于一个ensemble，由于训练是不联合的（disjoint），每个单独的模型size通常需要更大些（例如：更多的特征和转换）来达到合理的精度。**相比之下，对于联合训练（joint training）来说，wide组件只需要完善deep组件的缺点，使用一小部分的cross-product特征转换即可，而非使用一个full-size的wide模型**。
 
 一个Wide&Deep模型的联合训练，通过对梯度进行后向传播算法、SGD优化来完成。在试验中，我们使用FTRL算法，使用L1正则做为Wide组件的优化器，对Deep组件使用AdaGrad。
 
@@ -96,11 +96,11 @@ app推荐的pipeline实现包含了三个stage：数据生成，模型训练，�
 
 ## 4.2 模型训练
 
-我们在试验中使用的模型结构如图4所示。在训练期间，我们的输入层接受训练数据和词汇表的输入，一起为一个label生成sparse和dense特征。wide组件包含了用户安装app和曝光app的cross-product tansformation。对于模型的deep组件，会为每个类别型特征学到一个32维的embedding向量。我们将所有embeddings联接起来形成dense features，产生一个接近1200维的dense vector。联接向量接着输入到3个ReLU层，以及最终的logistic输出单元。
+我们在试验中使用的模型结构如图4所示。在训练期间，我们的输入层接受训练数据和词汇表的输入，一起为一个label生成sparse和dense特征。wide组件包含了用户安装app和曝光app的cross-product transformation。对于模型的deep组件，会为每个类别型特征学到一个32维的embedding向量。**我们将所有embeddings联接起来形成dense features，产生一个接近1200维的dense vector**。联接向量接着输入到3个ReLU层，以及最终的logistic输出单元。
 
 <img src="http://pic.yupoo.com/wangdren23/GGEh86T9/medish.jpg">
 
-Wide & Deep模型在超过5000亿的样本上进行训练。每一时刻有新的训练数据集到达时，模型需要重新训练。然而，每次从头到尾重新训练的计算开销很大，数据到达和模型更新后serving间的延迟较大。为了解决该问题，我们实现了一个warm-starting系统，它会使用前一个模型的embeddings和线性模型权重来初始化一个新的模型。
+**Wide & Deep模型在超过5000亿的样本上进行训练**。每一时刻有新的训练数据集到达时，模型需要重新训练。然而，每次从头到尾重新训练的计算开销很大，数据到达和模型更新后serving间的延迟较大。**为了解决该问题，我们实现了一个warm-starting系统，它会使用前一个模型的embeddings和线性模型权重来初始化一个新的模型**。
 
 在将模型加载到模型服务器上之前，需要做模型的演习，以便确保它不会在serving的真实环境上出现问题。我们在经验上会验证模型质量，对比前一模型做心智检查（sanity check）。
 
@@ -120,7 +120,7 @@ Wide & Deep模型在超过5000亿的样本上进行训练。每一时刻有新�
 
 <img src="http://pic.yupoo.com/wangdren23/GGEfG0K4/medish.jpg">
 
-除了在线试验，我们也展示了在held-out离线数据上的AUC。其中Wide & Deep具有更高的离线AUC，在线也更好。一个可能的原因是，曝光和点击在离线数据集上是确定的，而在线系统通过混合generalization和memorization，从新的生户响应学到，生成新的探索推荐。
+除了在线试验，我们也展示了在held-out离线数据上的AUC。其中Wide & Deep具有更高的离线AUC，在线也更好。一个可能的原因是，曝光和点击在离线数据集上是确定的，而在线系统通过混合generalization和memorization，从新的用户响应学到，生成新的探索推荐。
 
 ## 5.2 Serving Performance
 
