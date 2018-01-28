@@ -68,14 +68,14 @@ $$
 
 ## 3.3 Wide & Deep模型的联合训练
 
-Wide组件和Deep组件组合在一起，对它们的输入日志进行一个加权求和来做为预测，它会被feed给一个常见的logistic loss function来进行联合训练。注意，联合训练（joint training）和集成训练（ensemble）有明显的区别。在ensemble中，每个独立的模型会单独训练，相互并不知道，只有在预测时会组合在一起。相反地，**联合训练（joint training）会同时优化所有参数，通过将wide组件和deep组件在训练时进行加权求和的方式进行**。这也暗示了模型的size：对于一个ensemble，由于训练是不联合的（disjoint），每个单独的模型size通常需要更大些（例如：更多的特征和转换）来达到合理的精度。**相比之下，对于联合训练（joint training）来说，wide组件只需要完善deep组件的缺点，使用一小部分的cross-product特征转换即可，而非使用一个full-size的wide模型**。
+Wide组件和Deep组件组合在一起，对它们的输入日志进行一个加权求和来做为预测，它会被feed给一个常见的logistic loss function来进行联合训练。注意，联合训练（joint training）和集成训练（ensemble）有明显的区别。在ensemble中，每个独立的模型会单独训练，相互并不知道，只有在预测时会组合在一起。相反地，**联合训练（joint training）会同时优化所有参数，通过将wide组件和deep组件在训练时进行加权求和的方式进行**。这也暗示了模型的size：对于一个ensemble，由于训练是不联合的（disjoint），每个单独的模型size通常需要更大些（例如：更多的特征和转换）来达到合理的精度。**相比之下，对于联合训练（joint training）来说，wide组件只需要补充deep组件的缺点，使用一小部分的cross-product特征转换即可，而非使用一个full-size的wide模型**。
 
 一个Wide&Deep模型的联合训练，通过对梯度进行后向传播算法、SGD优化来完成。在试验中，我们使用FTRL算法，使用L1正则做为Wide组件的优化器，对Deep组件使用AdaGrad。
 
 组合模型如图一（中）所示。对于一个logistic regression问题，模型的预测为：
 
 $$
-P(Y = 1 \| x) = \sigma(w_{wide}^{T} [x, \phi(x)] + w_{deep}^{T} a^{(l_f)} + b)
+P(Y = 1 | x) = \sigma(w_{wide}^{T} [x, \phi(x)] + w_{deep}^{T} a^{(l_f)} + b)
 $$
 
 ...(3)
@@ -130,7 +130,13 @@ Serving时具有高的吞吐率（throughout）和低延时是很有挑战性的
 
 <img src="http://pic.yupoo.com/wangdren23/GGEfFQe2/medish.jpg">
 
-# 6.Tensorflow
+# 6.相关工作
+
+将使用特征交叉转换的wide linear model与使用dense embeddings的deep neural networks，受之前工作的启发，比如FM：它会向线性模型中添加generalization，它会将两个变量的交互分解成两个低维向量的点积。在该paper中，我们扩展了模型的能力，通过神经网络而非点积，来学习在embeddings间的高度非线性交叉(highly nonlinear interactions)。
+
+在语言模型中，提出了RNN和n-gram的最大熵模型的joint training，通过学习从input到output之间的直接权重，可以极大减小RNN的复杂度（hidden layer）。在计算机视觉中，deep residual learning被用于减小训练更深模型的难度，使用简短连接（跳过一或多层）来提升accuracy。神经网络与图模型的joint training被用于人体姿式识别。在本文中，我们会探索前馈神经网络和线性模型的joint training，将稀疏特征和output unit进行直接连接，使用稀疏input数据来进行通用的推荐和ranking问题。
+
+# 7.Tensorflow
 
 只需要3步，即可以使用tf.estimator API来配置一个wide，deep或者Wide&Deep：
 
