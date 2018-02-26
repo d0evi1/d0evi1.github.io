@@ -7,11 +7,11 @@ tagline:
 
 # 高性能模型（High-Performance Models）
 
-该文档和相关脚本会详细说明如何构建高可扩展性模型，来面向许多系统类型和网络拓朴。文档中的相关技术会利用一些低级TensorFlow python原语。在未来，许多这些技术会替换成高级APIs。
+该文档和相关脚本会详细说明如何构建高可扩展性模型，来面向众多的系统类型和网络拓朴。文档中的相关技术会利用一些低级TensorFlow python原语。在未来，许多这些技术会替换成高级APIs。
 
-# Input Pipeline
+# 一、Input Pipeline
 
-[性能指南]()解释了如何来标识可能的input pipeline问题以及最佳实践。当使用大的输入时并且每高处理更多样本时，比如使用AlexNet训练ImageNet时，我们发现使用tf.FIFOQueue 和tf.train.queue_runner 不能充分利用多个这一代GPU。这是因为python线程和它的底层实现效率低。python线程的开销太大。
+[性能指南]()解释了如何来标识可能的input pipeline问题以及最佳实践。当使用大的输入（large input），并且每秒处理更多样本时（比如使用AlexNet训练ImageNet时），我们发现使用tf.FIFOQueue 和tf.train.queue_runner 不能充分利用多个新一代GPU。这是因为python线程和它的底层实现效率低。python线程的开销太大。
 
 另一种方法是（在脚本中有实现），使用Tensorflow的原生并行机制（native parallelism）来构建一个input pipeline。我们的实现由3个stages组成：
 
@@ -21,31 +21,31 @@ tagline:
 
 每个stage的主要部分会被并行执行，其它stages则使用data_flow_ops.StagingArea。StagingArea是一个类似队列的操作，与tf.FIFOQueue相类似。不同之处是，StagingArea不会保障FIFO的顺序，但会提供更简单的功能，可以与其它stages并行地在CPU和GPU上执行。将input pipeline划分成3个stages，以并行方式独立操作是可扩展的，可以充分利用多核环境。这节的其余部分会详细介绍使用data_flow_ops.StagingArea的stages。
 
-## 并行I/O读
+## 1.1 并行I/O读
 
-data_flow_ops.RecordInput用于从磁盘中并行读取。给定一列表示成TFRecords的输入文件列表，RecordInput可以连续地使用后台线程读取records。当它至少加载了一半容量时，这些records会被放置成它自己的大的内部池中(internal pool)，它会产生output tensors。
+data_flow_ops.RecordInput用于从磁盘中并行读取。给定一列表示成TFRecords的输入文件列表，RecordInput可以连续地使用后台线程读取records。当它至少加载了一半容量时，这些records会被放置到它自己的大内部池中(internal pool)，然后会产生output tensors。
 
 该op具有它自己的内部线程，可以通过消耗最小CPU的I/O时间来支配，这可以使得模型的其余部分可以并行的方式平滑运行。
 
-## 并行图片处理
+## 1.2 并行图片处理
 
 在图片从RecordInput读取后，它们作为tensors被传递给图片处理的pipeline。为了让图片处理pipeline更容易解释，假设input pipeline是面向8个GPUs，batch_size=256(每个GPU为32个）
 
 256条记录会被并行地单独读取和处理。在graph中，会启动256个独立的RecordInput读ops。每个读op跟在用于图片预处理的一个相同的ops集合后，被认为是独立和并行执行。图片预处理ops包含了：图片解码（image decoding），扭曲（distortion），以及大小调整（resizing）。
 
-一旦图片通过预处理，它们会一起串联成8个tensors，每个具有batch-size=32。我们并不需要使用tf.concat，该操作可以被实现成单个op，等待所有inputs准备好，然后将它们串联起来。而是使用tf.parallel_stack来分配一个未初始化的tensor作为output，只要input有提供，每个input tensor会被写成output tensor的指定部分。
+一旦图片通过预处理，它们会一起串联成8个tensors，每个具有batch-size=32。我们并不需要使用tf.concat，该操作可以被实现成单个op，等待所有inputs准备好，然后将它们串联起来。作为替代，我们使用的是tf.parallel_stack来分配一个未初始化的tensor作为output，只要input有数据提供，每个input tensor会被写到output tensor的指定部分。
 
 当所有的input tensors被完成时，output tensor在graph中会沿着图传递。这有效地隐藏了所有的内存延迟，因为产生所有input tensors是长尾。
 
-## 并行CPU-to-GPU数据转移
+## 1.3 并行CPU-to-GPU数据转移
 
 我们继续假设，目标是8个GPU，batch_size=256(每个GPU为32）。一旦输入的图片被处理，并通过CPU进行串联，我们会具有8个tensors，每个具有一个batch_size=32.
 
-TensorFlow可以让在一个设备上tensors直接在另一个设备上被使用。TensorFlow插入了隐式的拷贝（implicit copies），可以让tensors在其它被使用的设备上。在该tensors在实际使用之前，运行时（runtime）会在设备间对拷贝进行调度。然而，如果copy 不能按时完成，需要这些tensors的计算将停转（stall），并产生性能下降。
+TensorFlow可以让在一个设备上tensors直接在另一个设备上被使用。TensorFlow引入了隐式拷贝（implicit copies），可以让tensors在其它设备上被使用。在该tensors在实际使用之前，运行时（runtime）会在设备间对拷贝进行调度。然而，如果copy 不能按时完成，需要这些tensors的计算将停转（stall），并产生性能下降。
 
 在该实现中，data_flow_ops.StagingArea被用于显式并行地调度该copy。产生的结果是，当计算在GPU上启动时，所有tensors都已经可提供。
 
-## 软件Pipeline
+## 1.4 软件Pipeline
 
 所有的stages都能通过不同的处理器进行驱动，data_flow_ops.StagingArea在这些处理器间被使用，以便能并行运行。
 
@@ -71,17 +71,17 @@ TensorFlow可以让在一个设备上tensors直接在另一个设备上被使用
 - staging buffers具有一个固定的内存开销。它们至多有一个额外的数据集合。
 - 只有单个session.run()调用被需要来运行该step的所有stages，这可以让分析和调试（profiling & debugging）更简单。
 
-## 构建高性能模型的最佳实践
+# 二、构建高性能模型的最佳实践
 
 下面收集了一些最佳实践来提升性能和增加模型的可扩展性。
 
-### 1.同时使用NHWC 和 NCHW构建模型
+## 2.1 同时使用NHWC 和 NCHW构建模型
 
 大多数被用于CNN的TensorFlow操作，同时支持NHWC和NCHW数据格式。在GPU上，NCHW更快。但在CPU上，NHWC有时更快。
 
 构建一个模型来支持两种数据格式，可以让模型更灵活，能够进行忽略平台进行可选操作。大多数被用于CNN的TensorFlow操作同时支持NHWC和NCHW数据格式。benchmark script被写成同时支持NCHW和NHWC。
 
-### 2.使用Fused Batch-Normalization
+## 2.2 使用Fused Batch-Normalization
 
 在TensorFlow中，缺省的batch-normalization被实现成复合操作。这非常通用，但通常会导致次优性能。另一种方案是使用fused batch-normalization，它通常在GPU上具有更好的性能。下面是使用tf.contrib.layers.batch_norm的一个示例，它实现了fused batch-normalization。
 
@@ -93,7 +93,7 @@ bn = tf.contrib.layers.batch_norm(
 
 {% endhighlight %}
 
-## 变量分布与梯度聚合
+# 三、变量分布与梯度聚合
 
 在训练期间，训练变量值使用聚合梯度和deltas进行更新。在bechmark script中，我们演示了使用灵活的、通用目的的tensorflow原语，多种高性能分布和聚合schemes会被构建。
 
@@ -105,7 +105,7 @@ bn = tf.contrib.layers.batch_norm(
 
 下面是每种方法的详情
 
-### 1.参数服务器变量
+## 3.1 参数服务器变量
 
 在tensorflow中，关于管理训练变量，最常用的方法是参数服务器模式（parameter server mode）。
 
@@ -127,7 +127,7 @@ bn = tf.contrib.layers.batch_norm(
 
 <img src="https://www.tensorflow.org/images/perf_parameter_server_mode_doc.png">
 
-### 2.复制变量（Replicated Variables）
+## 3.2 复制变量（Replicated Variables）
 
 在该设计中，在server上的每个GPU都拥有属于自己的每个变量的拷贝。这些值跨GPUs进行同步保持，通过使用每个GPU上关于变量拷贝的完全聚合梯度（fully aggregated gradient）来进行。
 
@@ -140,7 +140,7 @@ bn = tf.contrib.layers.batch_norm(
 
 该模式可以在script中通过传递--variable_update=replicated来使用。
 
-### 3.在分布式训练中的Replicated Variables
+## 3.3 在分布式训练中的Replicated Variables
 
 变量的replicated方法可以扩展到分布式训练中。一种方法与replicated模式相类似：跨集群进行梯度完全聚合，并将它们应用到每个本地变量拷贝上。这可以在该脚本的将来版本中进行展示：该脚本会表示一个不同的变种，在这里描述。
 
@@ -159,7 +159,7 @@ bn = tf.contrib.layers.batch_norm(
 <img src="https://www.tensorflow.org/images/perf_distributed_replicated_mode_doc.png">
 
 
-## NCCL
+# 四、NCCL
 
 为了在相同的宿主机上，跨不同的GPU进行广播变量和聚合梯度，我们会使用缺省的TensorFlow隐拷贝机制（implicit copy mechanism）。
 
