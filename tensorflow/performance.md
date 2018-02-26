@@ -37,7 +37,7 @@ with tf.device('/cpu:0'):
 
 {% endhighlight %}
 
-如果使用tf.estimator.Estimator，input function会被自动放置在CPU上。
+**如果使用tf.estimator.Estimator，input function会被自动放置在CPU上**。
 
 ## 2.3 使用Dataset API
 
@@ -52,7 +52,7 @@ sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
 
 {% endhighlight %}
 
-## 熔合解码（decode）和裁减（crop）
+## 2.4 融合解码和裁减（fused decode & crop）
 
 如果输入是JPEG图片，也需要裁减（cropping），使用fused [tf.image.decode_and_crop_jpeg](https://www.tensorflow.org/api_docs/python/tf/image/decode_and_crop_jpeg)可以加速预处理。tf.image.decode_and_crop_jpeg只会解码（decode）在图片裁减窗口（crop window）上的部分。如果裁减窗口比起整个图片更小，就会极大地加速处理。对于ImageNet数据，该方法可以极大加速input pipeline，可提升30%。
 
@@ -85,7 +85,7 @@ tf.image.decode_and_crop_jpeg在所有平台上都有提供。在Windows平台�
 
 读取大量小文件可以极大影响I/O性能。获取最大的I/O吞吐量的其中一种方法是，将数据预处理成更大的（~100MB） TFRecord文件。对于更小的数据集（200MB-1GB），最好的方法通常是加载整个数据集到内存中。文档[下载和转化成TFRecord格式](https://github.com/tensorflow/models/tree/master/research/slim#downloading-and-converting-to-tfrecord-format)包含了相关的信息和脚本来创建TFRecords，该脚本会将CIFAR-10数据集转化成TFRecords。
 
-## 数据格式
+## 2.5 数据格式
 
 数据格式指的是传递给一个给定Op的Tensor结构。下面的讨论关于表示图片的4D Tensors。在TensorFlow中，4D tensor的部分通常指的是：
 
@@ -103,7 +103,7 @@ NHWC是Tensorflow的缺省方式，NCHW是当在NVIDIA GPU上使用cuDNN训练�
 
 最好的实践是，构建支持两种数据格式的模型。这可以简化在GPU上的训练，接着在CPU上进行inference。如果TensorFlow在Intel MKL优化器上进行编译，许多op，特别是那些与基于CNN相关的模型，会被优化并支持NCHW。如果不使用MKL，当使用NCHW时，一些op不会支持在CPU上运行。
 
-这两种格式的历史是，TensorFlow开如使用NHWC是因为它在CPU上更快一些。在很长一段时间内，我们致力于开发工具来自动化重写graphs来在格式间进行透明切换，并充分利用微优化：比起常用有效的NCHW，使用NHWC的一个GPU Op会更快。
+这两种格式的历史是，TensorFlow刚开始使用NHWC是因为它在CPU上更快一些。在很长一段时间内，我们致力于开发工具来自动化重写graphs来在格式间进行透明切换，并充分利用微优化：比起常用有效的NCHW，使用NHWC的一个GPU Op会更快。
 
 ## 常见的fused Ops
 
