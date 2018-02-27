@@ -8,23 +8,23 @@ tagline:
 
 # 1.数据导入
 
-Dataset API可以让你以简单可复用的方式构建复杂的Input Pipeline。例如：一个图片模型的Pipeline可能会聚合在一个分布式文件系统中的多个文件，对每个图片进行随机扰动（random perturbations），接着将随机选中的图片合并到一个training batch中。一个文本模型的Pipeline可能涉及到：从原始文本数据中抽取特征，将它们通过一个lookup table转换成embedding identifiers，然后将不同的长度序列batch在一起。Dataset API可以很方便地以不同的数据格式处理大量的数据，以及处理复杂的转换。
+[tf.data](https://www.tensorflow.org/api_docs/python/tf/data) API可以让你以简单可复用的方式构建复杂的Input Pipeline。例如：一个图片模型的Pipeline可能会聚合在一个分布式文件系统中的多个文件，对每个图片进行随机扰动（random perturbations），接着将随机选中的图片合并到一个training batch中。一个文本模型的Pipeline可能涉及到：从原始文本数据中抽取特征，将它们通过一个lookup table转换成embedding identifiers，然后将不同的长度序列batch在一起。tf.data API可以很方便地以不同的数据格式处理大量的数据，以及处理复杂的转换。
 
 Dataset API引入了两个新的抽象类到Tensorflow中：
 
-- **tf.contrib.data.Dataset**：表示一串元素（elements），其中每个元素包含了一或多个Tensor对象。例如：在一个图片pipeline中，一个元素可以是单个训练样本，它们带有一个表示图片数据的tensors和一个label组成的pair。**有两种不同的方式创建一个dataset**：
+- **tf.data.Dataset**：表示一串元素（elements），其中每个元素包含了一或多个Tensor对象。例如：在一个图片pipeline中，一个元素可以是单个训练样本，它们带有一个表示图片数据的tensors和一个label组成的pair。**有两种不同的方式创建一个dataset**：
 	- 创建一个**source** (例如：Dataset.from_tensor_slices())，
 从一或多个tf.Tensor对象中构建一个dataset
-	- 应用一个**transformation**（例如：Dataset.batch()），从一或多个tf.contrib.data.Dataset对象上构建一个dataset
-- **tf.contrib.data.Iterator**：它提供了主要的方式来从一个dataset中抽取元素。通过Iterator.get_next() 返回的该操作会yields出Datasets中的下一个元素，作为输入pipeline和模型间的接口使用。最简单的iterator是一个“one-shot iterator”，它与一个指定的Dataset相关联，通过它来进行迭代。对于更复杂的使用，Iterator.initializer操作可以使用不同的datasets重新初始化（reinitialize）和参数化（parameterize）一个iterator ，例如，在同一个程序中通过training data和validation data迭代多次。
+	- 应用一个**transformation**（例如：Dataset.batch()），从一或多个tf.data.Dataset对象上构建一个dataset
+- **tf.data.Iterator**：它提供了主要的方式来从一个dataset中抽取元素。通过Iterator.get_next() 返回的该操作会yields出Datasets中的下一个元素，作为输入pipeline和模型间的接口使用。最简单的iterator是一个“one-shot iterator”，它与一个指定的Dataset相关联，通过它来进行迭代。对于更复杂的使用，Iterator.initializer操作可以使用不同的datasets重新初始化（reinitialize）和参数化（parameterize）一个iterator ，例如，在同一个程序中通过training data和validation data迭代多次。
 
 # 2.基本机制
 
 这部分描述了创建不同Dataset和Iterator对象的机制，以及如何使用它们来抽取数据。
 
-**要想启动一个input pipeline，你必须定义一个source**。例如，为了从内存中的一些tensors构建一个Dataset，你可以使用tf.contrib.data.Dataset.from_tensors() 以及tf.contrib.data.Dataset.from_tensor_slices()。另一种方法，如果你的输入数据在磁盘上以推荐的TFRecord格式存储，你可以构建一个tf.contrib.data.TFRecordDataset。一旦你有一个Dataset对象，通过在tf.contrib.data.Dataset对象上链式方法调用，你可以将它转化成一个新的Dataset。例如，你可以使用per-element transformations，比如：Dataset.map()，（它会在每个元素上应用一个function），以及multi-element transformations，比如：Dataset.batch()。更多详见[api](https://www.tensorflow.org/api_docs/python/tf/contrib/data/Dataset)
+**要想启动一个input pipeline，你必须定义一个source**。例如，为了从内存中的一些tensors构建一个Dataset，你可以使用tf.data.Dataset.from_tensors() 以及tf.data.Dataset.from_tensor_slices()。另一种方法，如果你的输入数据在磁盘上以推荐的TFRecord格式存储，你可以构建一个tf.data.TFRecordDataset。一旦你有一个Dataset对象，通过在tf.data.Dataset对象上链式方法调用，你可以将它转化成一个新的Dataset。例如，你可以使用per-element transformations，比如：Dataset.map()，（它会在每个元素上应用一个function），以及multi-element transformations，比如：Dataset.batch()。更多详见[api](https://www.tensorflow.org/api_docs/python/tf/contrib/data/Dataset)
 
-从一个Dataset上消费values的最常用方法，是生成一个iterator对象，它提供了一次可以访问dataset中的一个元素（例如：通过调用Dataset.make_one_shot_iterator()）。**tf.contrib.data.Iterator提供了两个操作**：
+从一个Dataset上消费values的最常用方法，是生成一个iterator对象，它提供了一次可以访问dataset中的一个元素（例如：通过调用Dataset.make_one_shot_iterator()）。**tf.data.Iterator提供了两个操作**：
 
 - Iterator.initializer：它允许你(re)initialize iterator的状态
 - Iterator.get_next()：它返回tf.Tensor对象，对应于指定的下一个元素。
@@ -36,17 +36,17 @@ Dataset API引入了两个新的抽象类到Tensorflow中：
 
 {% highlight python %}
 
-dataset1 = tf.contrib.data.Dataset.from_tensor_slices(tf.random_uniform([4, 10]))
+dataset1 = tf.data.Dataset.from_tensor_slices(tf.random_uniform([4, 10]))
 print(dataset1.output_types)  # ==> "tf.float32"
 print(dataset1.output_shapes)  # ==> "(10,)"
 
-dataset2 = tf.contrib.data.Dataset.from_tensor_slices(
+dataset2 = tf.data.Dataset.from_tensor_slices(
    (tf.random_uniform([4]),
     tf.random_uniform([4, 100], maxval=100, dtype=tf.int32)))
 print(dataset2.output_types)  # ==> "(tf.float32, tf.int32)"
 print(dataset2.output_shapes)  # ==> "((), (100,))"
 
-dataset3 = tf.contrib.data.Dataset.zip((dataset1, dataset2))
+dataset3 = tf.data.Dataset.zip((dataset1, dataset2))
 print(dataset3.output_types)  # ==> (tf.float32, (tf.float32, tf.int32))
 print(dataset3.output_shapes)  # ==> "(10, ((), (100,)))"
 
@@ -56,7 +56,7 @@ print(dataset3.output_shapes)  # ==> "(10, ((), (100,)))"
 
 {% highlight python %}
 
-dataset = tf.contrib.data.Dataset.from_tensor_slices(
+dataset = tf.data.Dataset.from_tensor_slices(
    {"a": tf.random_uniform([4]),
     "b": tf.random_uniform([4, 100], maxval=100, dtype=tf.int32)})
 print(dataset.output_types)  # ==> "{'a': tf.float32, 'b': tf.int32}"
@@ -90,7 +90,7 @@ dataset3 = dataset3.filter(lambda x, (y, z): ...)
 
 {% highlight python %}
 
-dataset = tf.contrib.data.Dataset.range(100)
+dataset = tf.data.Dataset.range(100)
 iterator = dataset.make_one_shot_iterator()
 next_element = iterator.get_next()
 
@@ -105,7 +105,7 @@ for i in range(100):
 {% highlight python %}
 
 max_value = tf.placeholder(tf.int64, shape=[])
-dataset = tf.contrib.data.Dataset.range(max_value)
+dataset = tf.data.Dataset.range(max_value)
 iterator = dataset.make_initializable_iterator()
 next_element = iterator.get_next()
 
@@ -129,14 +129,14 @@ for i in range(100):
 {% highlight python %}
 
 # Define training and validation datasets with the same structure.
-training_dataset = tf.contrib.data.Dataset.range(100).map(
+training_dataset = tf.data.Dataset.range(100).map(
     lambda x: x + tf.random_uniform([], -10, 10, tf.int64))
-validation_dataset = tf.contrib.data.Dataset.range(50)
+validation_dataset = tf.data.Dataset.range(50)
 
 # A reinitializable iterator is defined by its structure. We could use the
 # `output_types` and `output_shapes` properties of either `training_dataset`
 # or `validation_dataset` here, because they are compatible.
-iterator = tf.contrib.data.Iterator.from_structure(training_dataset.output_types,
+iterator = tf.data.Iterator.from_structure(training_dataset.output_types,
                                    training_dataset.output_shapes)
 next_element = iterator.get_next()
 
@@ -158,21 +158,21 @@ for _ in range(20):
 
 {% endhighlight %}
 
-**feedable iterator**可以与tf.placeholder一起使用，通过熟悉的feed_dict机制，来选择在每次调用tf.Session.run所使用的Iterator，。它提供了与reinitializable iterator相同的功能，但当你在iterators间相互切换时，它不需要你去初始化iterator。例如：使用上述相同的training和validation样本，你可以使用tf.contrib.data.Iterator.from_string_handle来定义一个feedable iterator，并允许你在两个datasets间切换：
+**feedable iterator**可以与tf.placeholder一起使用，通过熟悉的feed_dict机制，来选择在每次调用tf.Session.run所使用的Iterator，。它提供了与reinitializable iterator相同的功能，但当你在iterators间相互切换时，它不需要你去初始化iterator。例如：使用上述相同的training和validation样本，你可以使用tf.data.Iterator.from_string_handle来定义一个feedable iterator，并允许你在两个datasets间切换：
 
 {% highlight python %}
 
 # Define training and validation datasets with the same structure.
-training_dataset = tf.contrib.data.Dataset.range(100).map(
+training_dataset = tf.data.Dataset.range(100).map(
     lambda x: x + tf.random_uniform([], -10, 10, tf.int64)).repeat()
-validation_dataset = tf.contrib.data.Dataset.range(50)
+validation_dataset = tf.data.Dataset.range(50)
 
 # A feedable iterator is defined by a handle placeholder and its structure. We
 # could use the `output_types` and `output_shapes` properties of either
 # `training_dataset` or `validation_dataset` here, because they have
 # identical structure.
 handle = tf.placeholder(tf.string, shape=[])
-iterator = tf.contrib.data.Iterator.from_string_handle(
+iterator = tf.data.Iterator.from_string_handle(
     handle, training_dataset.output_types, training_dataset.output_shapes)
 next_element = iterator.get_next()
 
@@ -209,7 +209,7 @@ Iterator.get_next()方法会返回一或多个tf.Tensor对象，对应于一个i
 
 {% highlight python %}
 
-dataset = tf.contrib.data.Dataset.range(5)
+dataset = tf.data.Dataset.range(5)
 iterator = dataset.make_initializable_iterator()
 next_element = iterator.get_next()
 
@@ -247,9 +247,9 @@ while True:
 
 {% highlight python %}
 
-dataset1 = tf.contrib.data.Dataset.from_tensor_slices(tf.random_uniform([4, 10]))
-dataset2 = tf.contrib.data.Dataset.from_tensor_slices((tf.random_uniform([4]), tf.random_uniform([4, 100])))
-dataset3 = tf.contrib.data.Dataset.zip((dataset1, dataset2))
+dataset1 = tf.data.Dataset.from_tensor_slices(tf.random_uniform([4, 10]))
+dataset2 = tf.data.Dataset.from_tensor_slices((tf.random_uniform([4]), tf.random_uniform([4, 100])))
+dataset3 = tf.data.Dataset.zip((dataset1, dataset2))
 
 iterator = dataset3.make_initializable_iterator()
 
@@ -276,7 +276,7 @@ with np.load("/var/data/training_data.npy") as data:
 # Assume that each row of `features` corresponds to the same row as `labels`.
 assert features.shape[0] == labels.shape[0]
 
-dataset = tf.contrib.data.Dataset.from_tensor_slices((features, labels))
+dataset = tf.data.Dataset.from_tensor_slices((features, labels))
 
 {% endhighlight %}
 
@@ -295,7 +295,7 @@ assert features.shape[0] == labels.shape[0]
 features_placeholder = tf.placeholder(features.dtype, features.shape)
 labels_placeholder = tf.placeholder(labels.dtype, labels.shape)
 
-dataset = tf.contrib.data.Dataset.from_tensor_slices((features_placeholder, labels_placeholder))
+dataset = tf.data.Dataset.from_tensor_slices((features_placeholder, labels_placeholder))
 # [Other transformations on `dataset`...]
 dataset = ...
 iterator = dataset.make_initializable_iterator()
@@ -307,13 +307,13 @@ sess.run(iterator.initializer, feed_dict={features_placeholder: features,
 
 ## 3.2 消费TFRecord数据
 
-Dataset API支持多种文件格式，因此你可以处理超过内存大小的大数据集。例如，TFRecord文件格式是一种简单的面向记录的二进制格式，许多TensorFlow应用都用它来做训练数据。tf.contrib.data.TFRecordDataset类允许你在一或多个TFRecord文件的内容上进行流化，将它们作为input pipeline的一部分：
+Dataset API支持多种文件格式，因此你可以处理超过内存大小的大数据集。例如，TFRecord文件格式是一种简单的面向记录的二进制格式，许多TensorFlow应用都用它来做训练数据。tf.data.TFRecordDataset类允许你在一或多个TFRecord文件的内容上进行流化，将它们作为input pipeline的一部分：
 
 {% highlight python %}
 
 # Creates a dataset that reads all of the examples from two files.
 filenames = ["/var/data/file1.tfrecord", "/var/data/file2.tfrecord"]
-dataset = tf.contrib.data.TFRecordDataset(filenames)
+dataset = tf.data.TFRecordDataset(filenames)
 
 {% endhighlight %}
 
@@ -322,7 +322,7 @@ TFRecordDataset initializer的**filenames**参数，可以是一个string，也�
 {% highlight python %}
 
 filenames = tf.placeholder(tf.string, shape=[None])
-dataset = tf.contrib.data.TFRecordDataset(filenames)
+dataset = tf.data.TFRecordDataset(filenames)
 dataset = dataset.map(...)  # Parse the record into tensors.
 dataset = dataset.repeat()  # Repeat the input indefinitely.
 dataset = dataset.batch(32)
@@ -343,12 +343,12 @@ sess.run(iterator.initializer, feed_dict={filenames: validation_filenames})
 
 ## 3.3 消费文本数据
 
-许多datasets以一或多个文本文件分布。tf.contrib.data.TextLineDataset提供了一种简单的方式来从文本文件中抽取行(lines)。给定一或多个filenames，一个TextLineDataset将为这些文件的每行生成一个string型的element。与TFRecordDataset类似，TextLineDataset会接受filenames参数作为一个tf.Tensor，因此你可以通过传递一个tf.placeholder(tf.string)对它参数化。
+许多datasets以一或多个文本文件分布。tf.data.TextLineDataset提供了一种简单的方式来从文本文件中抽取行(lines)。给定一或多个filenames，一个TextLineDataset将为这些文件的每行生成一个string型的element。与TFRecordDataset类似，TextLineDataset会接受filenames参数作为一个tf.Tensor，因此你可以通过传递一个tf.placeholder(tf.string)对它参数化。
 
 {% highlight python %}
 
 filenames = ["/var/data/file1.txt", "/var/data/file2.txt"]
-dataset = tf.contrib.data.TextLineDataset(filenames)
+dataset = tf.data.TextLineDataset(filenames)
 
 {% endhighlight %}
 
@@ -358,7 +358,7 @@ dataset = tf.contrib.data.TextLineDataset(filenames)
 
 filenames = ["/var/data/file1.txt", "/var/data/file2.txt"]
 
-dataset = tf.contrib.data.Dataset.from_tensor_slices(filenames)
+dataset = tf.data.Dataset.from_tensor_slices(filenames)
 
 # Use `Dataset.flat_map()` to transform each file as a separate nested dataset,
 # and then concatenate their contents sequentially into a single "flat" dataset.
@@ -366,7 +366,7 @@ dataset = tf.contrib.data.Dataset.from_tensor_slices(filenames)
 # * Filter out lines beginning with "#" (comments).
 dataset = dataset.flat_map(
     lambda filename: (
-        tf.contrib.data.TextLineDataset(filename)
+        tf.data.TextLineDataset(filename)
         .skip(1)
         .filter(lambda line: tf.not_equal(tf.substr(line, 0, 1), "#"))))
 
@@ -395,7 +395,7 @@ def _parse_function(example_proto):
 # Creates a dataset that reads all of the examples from two files, and extracts
 # the image and label features.
 filenames = ["/var/data/file1.tfrecord", "/var/data/file2.tfrecord"]
-dataset = tf.contrib.data.TFRecordDataset(filenames)
+dataset = tf.data.TFRecordDataset(filenames)
 dataset = dataset.map(_parse_function)
 
 {% endhighlight %}
@@ -420,7 +420,7 @@ filenames = tf.constant(["/var/data/image1.jpg", "/var/data/image2.jpg", ...])
 # `labels[i]` is the label for the image in `filenames[i].
 labels = tf.constant([0, 37, ...])
 
-dataset = tf.contrib.data.Dataset.from_tensor_slices((filenames, labels))
+dataset = tf.data.Dataset.from_tensor_slices((filenames, labels))
 dataset = dataset.map(_parse_function)
 
 {% endhighlight %}
@@ -448,7 +448,7 @@ def _resize_function(image_decoded, label):
 filenames = ["/var/data/image1.jpg", "/var/data/image2.jpg", ...]
 labels = [0, 37, 29, 1, ...]
 
-dataset = tf.contrib.data.Dataset.from_tensor_slices((filenames, labels))
+dataset = tf.data.Dataset.from_tensor_slices((filenames, labels))
 dataset = dataset.map(
     lambda filename, label: tf.py_func(
         _read_py_function, [filename, label], [tf.uint8, label.dtype]))
@@ -464,9 +464,9 @@ batching的最简单方式是，将数据集上n个连续的elements进行stack�
 
 {% highlight python %}
 
-inc_dataset = tf.contrib.data.Dataset.range(100)
-dec_dataset = tf.contrib.data.Dataset.range(0, -100, -1)
-dataset = tf.contrib.data.Dataset.zip((inc_dataset, dec_dataset))
+inc_dataset = tf.data.Dataset.range(100)
+dec_dataset = tf.data.Dataset.range(0, -100, -1)
+dataset = tf.data.Dataset.zip((inc_dataset, dec_dataset))
 batched_dataset = dataset.batch(4)
 
 iterator = batched_dataset.make_one_shot_iterator()
@@ -484,7 +484,7 @@ print(sess.run(next_element))  # ==> ([8, 9, 10, 11],   [-8, -9, -10, -11])
 
 {% highlight python %}
 
-dataset = tf.contrib.data.Dataset.range(100)
+dataset = tf.data.Dataset.range(100)
 dataset = dataset.map(lambda x: tf.fill([tf.cast(x, tf.int32)], x))
 dataset = dataset.padded_batch(4, padded_shapes=[None])
 
@@ -512,7 +512,7 @@ Dataset API提供了两种主要方式来处理相同数据的多个epochs。
 {% highlight python %}
 
 filenames = ["/var/data/file1.tfrecord", "/var/data/file2.tfrecord"]
-dataset = tf.contrib.data.TFRecordDataset(filenames)
+dataset = tf.data.TFRecordDataset(filenames)
 dataset = dataset.map(...)
 dataset = dataset.repeat(10)
 dataset = dataset.batch(32)
@@ -526,7 +526,7 @@ dataset = dataset.batch(32)
 {% highlight python %}
 
 filenames = ["/var/data/file1.tfrecord", "/var/data/file2.tfrecord"]
-dataset = tf.contrib.data.TFRecordDataset(filenames)
+dataset = tf.data.TFRecordDataset(filenames)
 dataset = dataset.map(...)
 dataset = dataset.batch(32)
 iterator = dataset.make_initializable_iterator()
@@ -552,7 +552,7 @@ Dataset.shuffle() 转换会与tf.RandomShuffleQueue使用相同的算法对输�
 {% highlight python %}
 
 filenames = ["/var/data/file1.tfrecord", "/var/data/file2.tfrecord"]
-dataset = tf.contrib.data.TFRecordDataset(filenames)
+dataset = tf.data.TFRecordDataset(filenames)
 dataset = dataset.map(...)
 dataset = dataset.shuffle(buffer_size=10000)
 dataset = dataset.batch(32)
@@ -567,7 +567,7 @@ tf.train.MonitoredTrainingSession API可以简化分布式设置下运行的Tens
 {% highlight python %}
 
 filenames = ["/var/data/file1.tfrecord", "/var/data/file2.tfrecord"]
-dataset = tf.contrib.data.TFRecordDataset(filenames)
+dataset = tf.data.TFRecordDataset(filenames)
 dataset = dataset.map(...)
 dataset = dataset.shuffle(buffer_size=10000)
 dataset = dataset.batch(32)
@@ -591,7 +591,7 @@ with tf.train.MonitoredTrainingSession(...) as sess:
 
 def dataset_input_fn():
   filenames = ["/var/data/file1.tfrecord", "/var/data/file2.tfrecord"]
-  dataset = tf.contrib.data.TFRecordDataset(filenames)
+  dataset = tf.data.TFRecordDataset(filenames)
 
   # Use `tf.parse_single_example()` to extract data from a `tf.Example`
   # protocol buffer, and perform any additional per-record preprocessing.
