@@ -1,6 +1,6 @@
 ---
 layout: page
-title:  tensorflow deep_cnn
+title:  tensorflow deep_cnn教程
 tagline: 
 ---
 {% include JB/setup %}
