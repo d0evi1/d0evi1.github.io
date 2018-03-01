@@ -5,7 +5,7 @@ tagline:
 ---
 {% include JB/setup %}
 
-# 分布式Tensorflow
+# 介绍
 
 该文档展示了如何创建tensorflow servers的一个集群，以及如何将计算图（computation graph）跨集群进行分布。我们假设你已经对tensorflow的基本概念已经很熟悉。
 
@@ -30,7 +30,7 @@ $ python
 
 # 二、创建一个cluster
 
-TensorFlow "**cluster**"指的是一个任务集合（a set of "tasks"），它们会以分布式方式执行一个tensorflow graph。每个任务（**task**）与一个tensorflow的"**server**"相关，该server包含了一个“**master**”：用于创建sessions，以及一个"worker"：在graph中执行op。一个cluster也可以被分割成一或多个"jobs"：其中每个job包含了一或多个tasks。
+TensorFlow "**cluster**"指的是一个任务集合（a set of "tasks"），它们会以分布式方式执行一个tensorflow graph。每个任务（**task**）与一个tensorflow的"**server**"相关，该server包含了一个“**master**”：用于创建sessions，以及一个"**worker**"：在graph中执行op。一个cluster也可以被分割成一或多个"**jobs**"：其中每个job包含了一或多个tasks。
 
 即：
 
@@ -39,10 +39,10 @@ TensorFlow "**cluster**"指的是一个任务集合（a set of "tasks"），它�
 
 为了创建一个cluster，你需要在cluster上为每个task启动tensorflow server。每个task通常会运行在一个不同的机器上，但你也可以在相同的机器上运行多个tasks（例如：为了控制不同的GPU device）。在每个task上，做以下事情：
 
-- 1.创建一个tf.train.ClusterSpec，它在cluster中描述了所有的tasks。这对于每个task来说是相同的
+- 1.创建一个[tf.train.ClusterSpec](https://www.tensorflow.org/api_docs/python/tf/train/ClusterSpec)，它在cluster中描述了所有的tasks。这对于每个task来说是相同的
 - 2.创建一个tf.train.Server，将tf.train.ClusterSpec传给构造器，使用一个job name和task index来标识local task。
 
-## 创建一个tf.train.ClusterSpec来描述cluster
+## 2.1 创建一个tf.train.ClusterSpec来描述cluster
 
 cluster指定字典会将job names映射到网络地址列表上。将该字典传递给tf.train.ClusterSpec构造器。例如：
 
@@ -78,7 +78,7 @@ tf.train.ClusterSpec
 	/job:ps/task:0
 	/job:ps/task:1
 
-## 在每个task上创建一个tf.train.Server实例
+## 2.2 在每个task上创建一个tf.train.Server实例
 
 一个tf.train.Server对象包含了一个local devices集合，一个关于与tf.train.ClusterSpec中的其它tasks相连接的connections集合，以及一个可以使用上述集合进行一个分布式计算的tf.Session。每个server是一个指定名字的job的成员，在该job内有一个task index。一个server可以与在cluster中的任何其它server进行通信。
 
@@ -131,7 +131,7 @@ with tf.Session("grpc://worker7.example.com:2222") as sess:
 
 {% endhighlight %}
 
-在上述示例中，在ps job的两个task上创建变量，模型的对计算敏感部分在worker job上被创建。tensorflow将会插入合适的在jobs间的data tansfers。(从ps到worker进行forward pass，从worker到ps应用gradients)
+在上述示例中，在ps job的两个task上创建变量，模型的对计算敏感部分在worker job上被创建。tensorflow将会插入合适的在jobs间的data transfers。(从ps到worker进行forward pass，从worker到ps应用gradients)
 
 # 四、Replicated training
 
@@ -139,8 +139,8 @@ with tf.Session("grpc://worker7.example.com:2222") as sess:
 
 - **in-graph replication**。在这种方法中，客户端会构建单个tf.Graph，它包含了一个参数集合（在位于/job:ps绑定的tf.Variable节点），以及模型的计算敏感部分的多个拷贝，每个都绑定到在/job:worker上的一个不同的任务上。
 - **between-graph replication**。这种方法中，对于每个/job:worker task存在一个独立的client，通常和worker task在相同的进程中。每个client会构建一个相似的包含这些参数（在使用[tf.train.replica_device_setter](https://www.tensorflow.org/api_docs/python/tf/train/replica_device_setter)将这些参数映射到相同的tasks上之前，先绑定到/job:ps上）的graph，以及模型的计算敏感部分的单个copy，绑定到在/job:worker中的local task上。
-- 异步训练（Asynchronous training）。在该方法中，该graph的每个replica都具有一个独立的训练loop，它的执行不需要协同。上述多种形式的replication可以兼容。
-- 同步训练（Synchronous training）。在该方法中，所有replicas会读取当前参数相同的值，并列计算梯度，接着将它们一起应用。它与in-graph replication（例如：在[cifar-10多cpu训练中](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10/cifar10_multi_gpu_train.py)使用梯度平均）、以及between-graph相兼容。（例如：使用[tf.train.SyncReplicasOptimizer](https://www.tensorflow.org/api_docs/python/tf/train/SyncReplicasOptimizer)）
+- **异步训练（Asynchronous training）**。在该方法中，该graph的每个replica都具有一个独立的训练loop，它的执行不需要协同。上述多种形式的replication可以兼容。
+- **同步训练（Synchronous training）**。在该方法中，所有replicas会读取当前参数相同的值，并列计算梯度，接着将它们一起应用。它与in-graph replication（例如：在[cifar-10多cpu训练中](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10/cifar10_multi_gpu_train.py)使用梯度平均）、以及between-graph相兼容。（例如：使用[tf.train.SyncReplicasOptimizer](https://www.tensorflow.org/api_docs/python/tf/train/SyncReplicasOptimizer)）
 
 
 ## 将它们放置在一起：示例训练程序
