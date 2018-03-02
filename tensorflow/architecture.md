@@ -132,6 +132,10 @@ runtime包含了超过200种的标准ops，包含：数学型op（mathematical�
 
 如果将一个子计算表示成一个ops的组合很难或者很低效，用户可以注册额外的kernels编写c++实现来提供一个高效的实现。例如，对于一些性能严格的操作（比如：ReLU和Sigmoid激活函数，以及相应的梯度），我们推荐注册你自己的fused kernels。[XLA compiler](https://www.tensorflow.org/performance/xla/index)具有一个自动kernel fusion的实验版的实现。
 
+相关代码
+
+- [OpKernel interface](https://www.github.com/tensorflow/tensorflow/blob/r1.6/tensorflow/core/framework/op_kernel.h)
+
 # 参考
 
 [tensorflow Architecture](https://www.tensorflow.org/extend/architecture/)
