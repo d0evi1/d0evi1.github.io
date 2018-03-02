@@ -5,7 +5,7 @@ tagline:
 ---
 {% include JB/setup %}
 
-# 支持的设备
+# 一、支持的设备
 
 在一个常见系统中，会存在多个计算设备（devices）。在tensorflow中，支持的设备类型是：CPU和GPU。它们被表示成strings。例如：
 
@@ -15,7 +15,7 @@ tagline:
 
 如果某个tensorflow操作同时具有CPU和GPU实现，当该操作被分配到一个设备时，GPU设备会有优先权。例如：matmul操作同时具有CPU和GPU kernels。在一个具有cpu:0和gpu:0的设备上，gpu:0会被选中来运行matmul。
 
-# 记录设备放置信息(placement)
+# 二、记录设备放置信息(placement)
 
 为了找到你的操作（op）和tensors被分配的设备，需要使用log_device_placement配置选项置为True来创建session：
 
@@ -47,7 +47,7 @@ MatMul: /job:localhost/replica:0/task:0/device:GPU:0
 
 {% endhighlight %}
 
-# 人工设置device placement
+# 三、人工设置device placement
 
 如果你希望某个特别的操作运行在一个你选中的设备上，而非系统自动选择，你可以使用tf.device来创建一个设备上下文，所有在该上下文的操作都具有相同的设备分配（device assigment）。
 
@@ -80,7 +80,7 @@ MatMul: /job:localhost/replica:0/task:0/device:GPU:0
 
 {% endhighlight %}
 
-# 允许GPU内存增长
+# 四、允许GPU内存增长
 
 缺省的，tensorflow会把几乎所有GPU的所有GPU内存（CUDA_VISIBLE_DEVICES）对进程可见。这样做是为了更有效地在设备上使用相对宝贵的GPU内存，以减小[内存碎片](https://en.wikipedia.org/wiki/Fragmentation_(computing))。
 
@@ -108,7 +108,7 @@ session = tf.Session(config=config, ...)
 
 如果你想为tensorflow进程真实界定可提供的GPU内存量，这方法会有用。
 
-# 在多GPU系统中使用单个GPU
+# 五、在多GPU系统中使用单个GPU
 
 如果你的系统具有超过一个GPU，缺省情况下会选中带有最小ID的GPU。如果你希望在一个不同的GPU上运行，你需要显示进行指定：
 
@@ -155,7 +155,7 @@ print(sess.run(c))
 
 {% endhighlight %}
 
-# 使用多GPU
+# 六、使用多GPU
 
 如果你想在多GPU上运行tensorflow，你可以以多塔结构（multi-tower）的方式来构建你的模型，每个tower被分配到一个不同的GPU上。例如：
 
