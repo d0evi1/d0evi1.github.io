@@ -1,6 +1,6 @@
 ---
 layout: page
-title:  tensorflow XLA
+title:  tensorflow GPU
 tagline: 
 ---
 {% include JB/setup %}
