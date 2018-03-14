@@ -69,9 +69,9 @@ TensorFlow可以让在一个设备上的tensors直接在另一个设备上被使
 - 所有stages都是非阻塞的，因为在预热之后，staging areas总是会具有数据的某个集合。
 - 每个stage可以并行运行，因为他们所有都可以立即启动
 - staging buffers具有一个固定的内存开销。它们至多有一个额外的数据集合。
-- 只有单个session.run()调用被需要来运行该step的所有stages，这可以让分析和调试（profiling & debugging）更简单。
+- 只有单个session.run()调用被需要来运行该step的所有stages，这可以使得分析和调试（profiling & debugging）更简单。
 
-# 二、构建高性能模型的最佳实践
+# 二、最佳实践
 
 下面收集了一些最佳实践来提升性能和增加模型的可扩展性。
 
@@ -83,7 +83,7 @@ TensorFlow可以让在一个设备上的tensors直接在另一个设备上被使
 
 ## 2.2 使用Fused Batch-Normalization
 
-在TensorFlow中，缺省的batch-normalization被实现成复合操作。这非常通用，但通常会导致次优性能。另一种方案是使用fused batch-normalization，它通常在GPU上具有更好的性能。下面是使用tf.contrib.layers.batch_norm的一个示例，它实现了fused batch-normalization。
+在TensorFlow中，缺省的batch-normalization被实现成组合操作（composite operations）。这很常见，但通常会导致次优性能。另一种方案是使用fused batch-normalization，它通常在GPU上具有更好的性能。下面是使用tf.contrib.layers.batch_norm的一个示例，它实现了fused batch-normalization。
 
 {% highlight python %}
 
