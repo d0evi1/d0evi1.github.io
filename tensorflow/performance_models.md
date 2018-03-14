@@ -5,9 +5,9 @@ tagline:
 ---
 {% include JB/setup %}
 
-# 高性能模型（High-Performance Models）
+# 介绍
 
-该文档和相关脚本会详细说明如何构建高可扩展性模型，来面向众多的系统类型和网络拓朴。文档中的相关技术会利用一些低级TensorFlow python原语。在未来，许多这些技术会替换成高级APIs。
+该文档和相关[脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)会详细说明如何构建高可扩展性模型，来面向众多的系统类型和网络拓朴。文档中的相关技术会利用一些低级TensorFlow python原语。在未来，许多这些技术会替换成高级APIs。
 
 # 一、Input Pipeline
 
@@ -19,11 +19,11 @@ tagline:
 - 图片处理：将图片records解码成图片，进行预处理，并组织成mini-batches。
 - CPU-to-GPU数据转换：将图片从CPU转到GPU
 
-每个stage的主要部分会被并行执行，其它stages则使用data_flow_ops.StagingArea。StagingArea是一个类似队列的操作，与tf.FIFOQueue相类似。不同之处是，StagingArea不会保障FIFO的顺序，但会提供更简单的功能，可以与其它stages并行地在CPU和GPU上执行。将input pipeline划分成3个stages，以并行方式独立操作是可扩展的，可以充分利用多核环境。这节的其余部分会详细介绍使用data_flow_ops.StagingArea的stages。
+每个stage的主要部分会被并行执行，其它stages则使用**data_flow_ops.StagingArea**。StagingArea是一个类似队列的操作，与tf.FIFOQueue相类似。**不同之处是，StagingArea不会保障FIFO的顺序，但会提供更简单的功能，可以与其它stages并行地在CPU和GPU上执行**。将input pipeline划分成3个stages，以并行方式独立操作是可扩展的，可以充分利用多核环境。这节的其余部分会详细介绍使用data_flow_ops.StagingArea的stages。
 
 ## 1.1 并行I/O读
 
-data_flow_ops.RecordInput用于从磁盘中并行读取。给定一列表示成TFRecords的输入文件列表，RecordInput可以连续地使用后台线程读取records。当它至少加载了一半容量时，这些records会被放置到它自己的大内部池中(internal pool)，然后会产生output tensors。
+**data_flow_ops.RecordInput**用于从磁盘中并行读取。给定一列表示成TFRecords的输入文件列表，RecordInput可以连续地使用后台线程读取records。当它至少加载了一半容量时，这些records会被放置到它自己的大内部池中(internal pool)，然后会产生output tensors。
 
 该op具有它自己的内部线程，可以通过消耗最小CPU的I/O时间来支配，这可以使得模型的其余部分可以并行的方式平滑运行。
 
@@ -33,7 +33,7 @@ data_flow_ops.RecordInput用于从磁盘中并行读取。给定一列表示成T
 
 256条记录会被并行地单独读取和处理。在graph中，会启动256个独立的RecordInput读ops。每个读op跟在用于图片预处理的一个相同的ops集合后，被认为是独立和并行执行。图片预处理ops包含了：图片解码（image decoding），扭曲（distortion），以及大小调整（resizing）。
 
-一旦图片通过预处理，它们会一起串联成8个tensors，每个具有batch-size=32。我们并不需要使用tf.concat，该操作可以被实现成单个op，等待所有inputs准备好，然后将它们串联起来。作为替代，我们使用的是tf.parallel_stack来分配一个未初始化的tensor作为output，只要input有数据提供，每个input tensor会被写到output tensor的指定部分。
+一旦图片通过预处理，它们会一起串联成8个tensors，每个具有batch-size=32。我们并不需要使用tf.concat，该操作可以被实现成单个op，等待所有inputs准备好，然后将它们串联起来。作为替代，我们使用的是**tf.parallel_stack**来分配一个未初始化的tensor作为output，只要input有数据提供，每个input tensor会被写到output tensor的指定部分。
 
 当所有的input tensors被完成时，output tensor在graph中会沿着图传递。这有效地隐藏了所有的内存延迟，因为产生所有input tensors是长尾。
 
@@ -41,7 +41,7 @@ data_flow_ops.RecordInput用于从磁盘中并行读取。给定一列表示成T
 
 我们继续假设，目标是8个GPU，batch_size=256(每个GPU为32）。一旦输入的图片被处理，并通过CPU进行串联，我们会具有8个tensors，每个具有一个batch_size=32.
 
-TensorFlow可以让在一个设备上tensors直接在另一个设备上被使用。TensorFlow引入了隐式拷贝（implicit copies），可以让tensors在其它设备上被使用。在该tensors在实际使用之前，运行时（runtime）会在设备间对拷贝进行调度。然而，如果copy 不能按时完成，需要这些tensors的计算将停转（stall），并产生性能下降。
+TensorFlow可以让在一个设备上的tensors直接在另一个设备上被使用。TensorFlow引入了**隐式拷贝（implicit copies）**，可以让tensors在其它设备上被使用。在该tensors在实际使用之前，运行时（runtime）会在设备间对拷贝进行调度。然而，如果copy 不能按时完成，需要这些tensors参与的计算将停转（stall），并产生性能下降。
 
 在该实现中，data_flow_ops.StagingArea被用于显式并行地调度该copy。产生的结果是，当计算在GPU上启动时，所有tensors都已经可提供。
 
@@ -49,7 +49,7 @@ TensorFlow可以让在一个设备上tensors直接在另一个设备上被使用
 
 所有的stages都能通过不同的处理器进行驱动，data_flow_ops.StagingArea在这些处理器间被使用，以便能并行运行。
 
-在模型启动运行所有stages之前，input pipeline会预热，使staging buffers在数据的集合间准备好。在每个运行step期间，在每个stage的开始阶段，数据的某个集合（one set of data）会从staging buffers读取，该set最终会被推进。
+在模型启动运行所有stages之前，input pipeline会**预热(warm up)**，使staging buffers在数据的集合间准备好。在每个运行step期间，在每个stage的开始阶段，数据的某个集合（one set of data）会从staging buffers读取，该set最终会被推进。
 
 例如：如果存在三个stages：A, B和C。在之间存在两个staging areas：S1和S2。在预热期间（warm up），我们运行：
 
@@ -62,11 +62,11 @@ TensorFlow可以让在一个设备上tensors直接在另一个设备上被使用
 	Step 4: A3  B2  C1
 	Step 5: A4  B3  C2
 
-在预热期间，在S1和S2中，每个都会有一个数据集合。在实际热行的每个step，数据的某个集合会从每个staging area上被消费，加一个集合被被添加进该step。
+在预热期间，在S1和S2中，每个都会有一个数据集合。在实际运行的每个step，数据的某个集合会从每个staging area上被消费，另一个集合被添加进该step。
 
 使用这种scheme的好处：
 
-- 所有stages都是非阻塞的，因为在预热之后，staging areas总是会具有数据的一个集合。
+- 所有stages都是非阻塞的，因为在预热之后，staging areas总是会具有数据的某个集合。
 - 每个stage可以并行运行，因为他们所有都可以立即启动
 - staging buffers具有一个固定的内存开销。它们至多有一个额外的数据集合。
 - 只有单个session.run()调用被需要来运行该step的所有stages，这可以让分析和调试（profiling & debugging）更简单。
@@ -97,7 +97,7 @@ bn = tf.contrib.layers.batch_norm(
 
 在训练期间，训练变量值使用聚合梯度和deltas进行更新。在bechmark script中，我们演示了使用灵活的、通用目的的tensorflow原语，多种高性能分布和聚合schemes会被构建。
 
-该脚本中变量分布和聚量的三个示例：
+该脚本中变量分布和聚合的三个示例：
 
 - parameter_server: 其中训练模型的每个replica会从一个参数服务器上读取变量，并独立地更新该变量。当每个模型需要该变量时，他们会通过由tensorflow runtime被添加的标准隐式拷贝进行copy。该示例script展示了使用该方法进行本地训练，分布式同布训练，以及分布式异步训练。
 - replicated: 会在每个GPU上为每个训练变量放置一个相同copy。forward和backward计算可以随着这些变量数据的提供而立即启动。梯度会跨多个GPUs进行累积，聚合总梯度会被应用到每个GPU的变量拷贝上，同步保持他们。
