@@ -48,13 +48,13 @@ with tf.name_scope('hidden') as scope:
 
 说明：pool_1的展开视图。点击-按钮可以折叠它
 
-通过name scopes对节点进行分组，可以生成一个清晰的graph的关键。如果你正构建一个模型，name scopes可以控制生成的可视化。你的name scope命名的越好，你的可视化就越好。
+通过name scopes对节点进行分组，是生成一个清晰graph的关键。如果你正构建一个模型，name scopes可以控制生成的可视化好坏。**你的name scope命名的越好，你的可视化就越好。**
 
-上图展示了可视化的第二好外。tensorflow graph具有两类连接（connection）：数据依赖（data dependencies）和控制依赖（control dependencies）。数据依赖展示了两个op间的tensor流（实线表示），控制依赖使用点划线表示。在展开视图中（右边），除了CheckNumerics和control_dependency是点划线连接外，所有连接是数据依赖。
+上图展示了可视化的第二好处。tensorflow graph具有两类连接（connection）：**数据依赖（data dependencies）和控制依赖（control dependencies）**。数据依赖展示了两个op间的tensor流，用实线表示；控制依赖使用点划线表示。在展开视图中（右边），除了CheckNumerics和control_dependency间的连接是点划线外，其它所有连接是数据依赖。
 
-第二个技巧是，简化layout。大多数tensorflow graph有少量节点会比其它节点有多个连接。例如，许多节点在初始化step时具有一个控制依赖。在init节点和它的依赖间的所有边，会创建一个非常集聚的视图。
+第二个技巧是，简化layout。大多数tensorflow graph有少量节点会比其它节点有更多连接。例如，许多节点在初始化step时具有一个控制依赖。在init节点和它的依赖间的所有边，会创建一个非常杂乱（clutter）的视图。
 
-为了减少集聚，可视化将所有高度（high-degree）的节点划分到一个右侧的auxiliary区域，并且不会绘制线条来表示它们的边（edge）。作为线的替代，我们会绘制小节点图标（small node icons）来表示连接。将auxiliary节点相分离通常不会移除关键信息，因为这些节点通常与记帐函数（bookkeeping function）相关。参见：[interaction]()来看如何移除main graph与auxiliary area间的节点。
+为了降低杂乱程度，可视化将所有高度（high-degree）的节点划分到一个右侧的辅助区域（auxiliary area），并且不会绘制线条来表示它们的边（edge）。作为线的替代，我们会绘制小节点图标（small node icons）来表示连接。将auxiliary节点相分离通常不会移除关键信息，因为这些节点通常与记帐函数（bookkeeping function）相关。参见：[interaction]()来看如何移除main graph与auxiliary area间的节点。
 
 <img src="https://www.tensorflow.org/images/conv_1.png">
 
