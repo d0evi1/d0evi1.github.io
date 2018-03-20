@@ -58,17 +58,21 @@ with tf.name_scope('hidden') as scope:
 
 <img src="https://www.tensorflow.org/images/conv_1.png">
 
-conv_1与save相连接。注意，在右侧的save节点。
+说明：conv_1与save相连接。注意，在右侧的save节点。
 
 <img src="https://www.tensorflow.org/images/save.png">
 
-save具有一个高的degree，将会以一个auxiliary node显示。与conv_1的连接被看成是一个在左侧的node icon。为了进一步减小集聚，由于save具有许多连接，我们展示了前5个，将其它标为... 12 more。
+说明：save具有一个高的degree，将会以一个辅助节点（auxiliary node）形式显示。与conv_1的连接被看成是一个在左侧的node icon。为了进一步减小杂乱度，由于save具有许多连接，我们展示了前5个，将其它标为... 12 more。
 
-最后一个结构化简化是系列化折叠（series collapsing）。序列化图案（即，它们的节点名通过后缀的一个数字进行区别，具有相同的结构）会被折叠成单个stack的节点，如下所示。对于长序列的网络，这可以极大简化视图。有了层级节点，双击可以展开该series。
+最后一个结构化简化是**系列折叠（series collapsing）**。序列图案（即，它们的节点名通过后缀的一个数字进行区别，具有相同的结构）会被折叠成单个stack的节点，如下所示。对于长序列的网络，这可以极大简化视图。有了层级节点，双击可以展开该series。
 
 <img src="https://www.tensorflow.org/images/series.png">
 
+说明：一个节点序列的折叠视图
+
 <img src="https://www.tensorflow.org/images/series_expanded.png">
+
+说明：双击后，展开视图的一小部分
 
 最后，为了帮助可读性，可视化会使用特殊的图标来表示constants node和summary nodes。为了归纳，这里提供了一个节点符号表：
 
