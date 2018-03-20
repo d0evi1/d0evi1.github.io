@@ -54,7 +54,7 @@ with tf.name_scope('hidden') as scope:
 
 第二个技巧是，简化layout。大多数tensorflow graph有少量节点会比其它节点有更多连接。例如，许多节点在初始化step时具有一个控制依赖。在init节点和它的依赖间的所有边，会创建一个非常杂乱（clutter）的视图。
 
-为了降低杂乱程度，可视化将所有高度（high-degree）的节点划分到一个右侧的辅助区域（auxiliary area），并且不会绘制线条来表示它们的边（edge）。作为线的替代，我们会绘制小节点图标（small node icons）来表示连接。将auxiliary节点相分离通常不会移除关键信息，因为这些节点通常与记帐函数（bookkeeping function）相关。参见：[interaction]()来看如何移除main graph与auxiliary area间的节点。
+为了降低杂乱程度，可视化将所有高度（high-degree）的节点划分到一个右侧的**辅助区域（auxiliary area）**，并且不会绘制用于表示边（edge）的线。作为线的替代，我们会绘制小节点图标（small node icons）来表示连接。将辅助节点（auxiliary nodes）相分离通常不会移除关键信息，因为这些节点通常与记帐函数（bookkeeping function）相关。参见下面的Interaction部分来看如何移除main graph与auxiliary area间的节点。
 
 <img src="https://www.tensorflow.org/images/conv_1.png">
 
