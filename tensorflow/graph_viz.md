@@ -78,19 +78,21 @@ with tf.name_scope('hidden') as scope:
 
 <img src="http://pic.yupoo.com/wangdren23/HcDdJAe0/medish.jpg">
 
-# 交互(Interaction)
+# 2.交互(Interaction)
 
-通过panning和zooming进行导航。点击和拖动pan，并使用一个scroll姿式进行缩放。双击一个节点，并点击它的加号（+）按钮，来展开一个name scope（它表示一组操作）。为了能轻易地跟踪zooming和panning时的当前viewpoint，在右下角有一个minimap。
+通过panning和zooming进行导航。点击和拖动pan，并使用一个scroll姿式进行缩放。双击一个节点，并点击它的加号（+）按钮，来展开一个name scope（它表示一组操作）。为了能轻易地跟踪zooming和panning时的当前视角（viewpoint），在右下角有一个小地图（minimap）。
 
 为了关闭一个已打开的node，再次双击它，并点击它的减号（-）按钮。你也可以点击一次来选择一个节点。它会变成一个更暗的色，有关于它和连接到该节点的详情，出现在右上角的info card。
 
 <img src="https://www.tensorflow.org/images/infocard.png">
 
-图：info card展示了关于conv2 name scop的详情。inputs和outputs组合来自于name scope内的op节点。
+说明：info card展示了关于name scope名为conv2的详情。inputs和outputs的组合来自于该name scope内的op节点的input和output。name scope本身没有属性
 
 <img src="https://www.tensorflow.org/images/infocard_op.png">
 
-图：
+说明：info card展示了DecodeRaw op节点的详情。除了inputs和outpus外，该card展示了与当前op相关的device和attributes
+
+
 
 tensorboard提供了多种方式来更改graph的layout可视化。这不会更改graph的计算语义，但它为网络结构带来更清晰一些。通过右击一个节点，或者按住info card底部的按钮，可以得到关于layout的如下变更：
 
