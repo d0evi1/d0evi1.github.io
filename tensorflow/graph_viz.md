@@ -13,11 +13,11 @@ tensorflow计算图(computation graphs)很强大，但很复杂。graph可视化
 
 图1: 一个tensorflow graph的可视化
 
-为了看到你自己的graph，运行tensorboard，并指向你的job的log目录，点击顶上面板的graph tab，使用左上角的菜单，选择合适的参数运行。
+为了看到你自己的graph，运行tensorboard，并指向你的job的log目录，点击顶部面板的graph tab，使用左上角的菜单，选择合适的参数运行。
 
-# Name scoping和nodes
+# 1.Name scoping和nodes
 
-常见的tensorflow graph具有上千个节点————一次性看不了那么多，也布局不了那么多。为了简化，变量名会进行范围指定（scope），可视化会使用该信息在graph中定义一次层级结构。缺省的，只有顶层结构会可见。这里给出了在hidden名下的一个示例：
+常见的tensorflow graph具有几千个节点————一次性看不了那么多，也布局不了那么多。为了简化，变量名会用于指定范围（scope），可视化时会使用该信息在graph中定义一个层级结构。缺省的，只有顶层结构会可见。这里给出了在hidden名下的一个示例：
 
 {% highlight python %}
 
@@ -36,13 +36,17 @@ with tf.name_scope('hidden') as scope:
 - hidden/weights
 - hidden/biases
 
-缺省的，可视化会折叠这三个到一个hidden的label下。其它细节会不展示。你可以双击或者点击橙色"+"号来展开它，这样你可以看到三个子节点（subnodes）：alpha，weights，biases.
+缺省的，可视化会折叠这三个op到一个hidden的label下。其它细节则不展示。你可以双击或者点击橙色"+"号来展开它，这样你可以看到三个子节点（subnodes）：alpha，weights，biases.
 
 这里是一个真实的示例，有一个在初始化和展开状态上更复杂的节点。
 
+<img src="https://www.tensorflow.org/images/pool1_collapsed.png">
+
+说明：顶层name scope为pool_1的初始视图。点击橙色+按钮，或者双击可以展开它
+
 <img src="https://www.tensorflow.org/images/pool1_expanded.png">
 
-图二
+说明：pool_1的展开视图。点击-按钮可以折叠它
 
 通过name scopes对节点进行分组，可以生成一个清晰的graph的关键。如果你正构建一个模型，name scopes可以控制生成的可视化。你的name scope命名的越好，你的可视化就越好。
 
