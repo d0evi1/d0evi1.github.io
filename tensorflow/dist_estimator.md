@@ -1,6 +1,6 @@
 ---
 layout: page
-title:  分布式Experiment
+title:  分布式Estimator
 tagline: 
 ---
 {% include JB/setup %}
