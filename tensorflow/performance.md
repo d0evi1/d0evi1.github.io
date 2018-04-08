@@ -22,7 +22,7 @@ tagline:
 判断input pipeline是否是瓶颈可能很复杂。一个最简单的方法是，在pipeline之后，将模型减至单个操作（trivial model），并测量每秒处理的样本数。如果对于完整模型（full model）和简单模型（trivial model）每秒处理样本的差距很小，那么输入的pipeline很可能是瓶颈。下面还有其它方法来验证该问题：
 
 - 通过nvidia-smi -l 2确认是否一个GPU未被充分利用。如果GPU使用率（GPU utilization）没有达到80-100%，那么输入的pipeline可能是个瓶颈。
-- 生成一个timeline，然后占用大块(large blocks)的空白期（等待期）。生成timeline的示例详见[XLA JTI](https://www.tensorflow.org/performance/xla/jit)
+- 生成一个timeline，然后观察那些空白（等待状态）的大块(large blocks)。生成timeline的示例详见[XLA JTI](https://www.tensorflow.org/performance/xla/jit)
 - 预估所需要的吞吐量，并验证所使用的磁盘是否能支撑该吞吐量。一些云解决方案（cloud solutions）具有云盘（network attached disks），可能低至50M/sec，它比spinning disk（150MB/sec）、SATA SSDs (500 MB/sec)、 和PCIe SSDs (2,000+ MB/sec)还低。
 
 ## 2.2 CPU预处理
