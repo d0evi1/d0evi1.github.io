@@ -1,13 +1,13 @@
 ---
 layout: page
-title:  tensorflow input pipeline性能指南
+title:  tensorflow:input pipeline性能指南
 tagline: 
 ---
 {% include JB/setup %}
 
 # 介绍
 
-GPU和TPU可以从根本上减少执行单个training step所需的时间。为了达到高性能，我们需要一个高效的input pipeline，它可以在当前step完成后为下一个step高效分发数据。tf.data API可以帮助构建灵活和高效的input pipeline。该文档解释了tf.data API的特性以及最佳实践，来跨多种模型和加速器构建高性能tensorflow input pipelines。
+GPU和TPU可以从根本上减少执行单个training step所需的时间。**为了达到高性能，我们需要一个高效的input pipeline，它可以在当前step完成后为下一个step高效分发数据**。tf.data API可以帮助构建灵活和高效的input pipeline。该文档解释了tf.data API的特性以及最佳实践，来跨多种模型和加速器构建高性能tensorflow input pipelines。
 
 该指南包括：
 
@@ -195,14 +195,14 @@ tf.data.Dataset.repeat转换会将input数据以一个有限次数进行重复�
 
 这里有设计input pipeline的最佳实践总结：
 
-- 使用prefetch转换来将一个producer和consumer进行时序重合。特别的，我们推荐添加prefetch(n)（其中，n = 元素数 /单个training step消费的batches）到你的input pipeline的结尾处，在cpu上执行重合转换，在加速器上进行训练。
-- 通过设置num_parallel_calls参数将map转换并行化。我们推荐使用可提供的CPU cores来作为它的值。
-- 如果你使用batch转换将预处理的元素组合成一个batch，我们推荐使用fused map_and_batch转换；特别是，当你正使用大的batch_size时。
-- 如果你正使用远端存储的数据，以及（或者）需要还原序列化（deserialization），我们推荐使用parallel_interleave转换来将从不同文件读取（以及deserialization）进行时序重合（overlap）。
-- 将传给map转换的用户自定义函数向量化，分摊调度和执行该函数的开销。
-- 如果你的数据可以fit进内存，在第一个epoch中使用cache转换来缓存它到内存中，从而让后续的epochs可以避免对它进行读取、解析、转换的开销。
+- 使用**prefetch**转换来将一个producer和consumer进行时序重合。特别的，我们推荐添加prefetch(n)（其中，**n = 元素个数 /单个training step消费的batches**）到你的input pipeline的结尾处，在cpu上执行重合转换，在加速器上进行训练。
+- 通过设置**num_parallel_calls**参数将map转换并行化。我们推荐使用可提供的**CPU cores**来作为它的值。
+- 如果你使用batch转换将预处理的元素组装成一个batch，我们推荐使用fused **map_and_batch**转换；特别是，当你正使用大的batch_size时。
+- 如果你的数据存储在远端，以及（或者）你的数据需要还原序列化（deserialization），我们推荐使用**parallel_interleave**转换来将从不同文件读取（以及deserialization）进行时序重合（overlap）。
+- 将传给map转换的用户自定义函数进行**向量化（Vectorize）**，分摊调度和执行该函数的开销。
+- 如果你的数据刚好可以装进内存，在第一个epoch中使用**cache**转换来缓存它到内存中，从而让后续的epochs可以避免对它进行读取、解析、转换的开销。
 - 如果你的预处理增加了数据的size，我们推荐首先应用interleave, prefetch, 和 shuffle（如果可能）来减小内存使用量
-- 我们推荐在repeat转换之前使用shuffle转换，理想情况下使用fused shuffle_and_repeat转换。
+- 我们推荐**在repeat转换之前使用shuffle转换**，理想情况下使用fused shuffle_and_repeat转换。
 
 
 # 参考
