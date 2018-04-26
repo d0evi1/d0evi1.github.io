@@ -21,6 +21,7 @@ tagline: 介绍
 
 - [1.feature column](/tensorflow/feature_column)
 - [2.datasets](/tensorflow/dataset)
-- [3.estimator](/tensorflow/estimator)
-- [4.input_fn](/tensorflow/input_fn)
+- [3.estimator](/tensorflow/estimators)
+- [4.custom estimator](/tensorflow/custom_estimators)
+- [5.input_fn](/tensorflow/input_fn)
 
