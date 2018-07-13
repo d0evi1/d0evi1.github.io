@@ -16,7 +16,7 @@ TensorFlow Serving是一个灵活的，高性能的机器学习模型serving系�
 
 Servables是在Tensorflow Serving中的核心抽象。Servables是客户端（clients）用于执行计算（例如：一次lookup或inference）的底层对象。
 
-一个Servable的大小（size）和粒度（granularity）是很灵活的。单个Servable必须包含任何来自一个lookup table的单个shard，到一个关于inference models的tuple。Servable可以是任何类型和接口，这样可以保证灵活性和未来的改进：
+一个Servable的大小（size）和粒度（granularity）是很灵活的。单个Servable必须包含来自一个lookup table（将单个模型映射到对应inference models的tuple）的单个shard的任何东西。Servable可以是任何类型和接口，这样可以保证灵活性和将来的改进：
 
 - streaming结果
 - experimental APIs
@@ -29,17 +29,17 @@ Servables不会管理它们的生命周期（lifecycle）。
 - 一个TensorFlow SavedModelBundle (tensorflow::Session)
 - 一个用于embedding或vocabulary查询的lookup table
 
-## 1.2 Servable Versions
+## 1.1.1 Servable Versions
 
 在单个服务实例的生命周期中，TensorFlow Serving可以处理一或多个版本（versions）的servable。这使得在这段时间内可以加载新算法配置、权重、其它数据。Versions使得超过一个以上的version被并行加载，支持渐近回滚（gradual rollout）和试验（experimentation）。在服务时，对于特定的模型，clients可以请求最新版本或一个特定的版本id。
 
-## 1.3 Servable Streams
+## 1.1.2 Servable Streams
 
 一个Servable stream是关于一个servable的versions序列，通过递增的版本号进行排序。
 
-## 1.4 Models
+## 1.2 Models
 
-TensorFlow Serving将一个模型（model）表示成一或多个servables。一个机器学习模型可以包含一或多个算法（包括学到的权重）、lookup tables 或者 embedding tables。
+TensorFlow Serving将一个模型（Model）表示成一或多个servables。**一个机器学习模型（Model）可以包含一或多个算法（包括学到的权重）、lookup tables 或者 embedding tables**。
 
 你可以将一个**复合模型（composite model）**表示成以下之一：
 
@@ -48,35 +48,35 @@ TensorFlow Serving将一个模型（model）表示成一或多个servables。一
 
 一个servable也可以对应一个模型的一部分。例如，一个大的lookup table可以跨多个tensorflow Serving实例共享。
 
-## 1.5 Loaders
+## 1.2 Loaders
 
-Loaders管理着一个servable的生命周期。Loader API允许公共设施独立于特定的学习算法，数据或者产品用例。特别的，Loaders会对API进行标准化来加载或卸载一个servable。
+**Loaders管理着一个servable的生命周期**。Loader API允许公共设施独立于特定的学习算法，数据或者产品用例。特别的，Loaders会使用标准化API来**加载或卸载一个servable**。
 
-## 1.6 Sources
+## 1.3 Sources
 
-Sources是插件模块，它可以查找和提供servables。每个Source提供了零或多个servable streams。对于每个servable stream，一个Source会为每个version提供一个Loader实例，使得可以被加载。（一个Source实际上会使用零或多个SourceAdapters链接在一起，链（chain）上的最后一个item会发射（emits）该Loaders。
+**Sources是插件模块，它可以查找和提供servables**。每个Source提供了零或多个servable streams。对于每个servable stream，一个Source会为每个version提供一个Loader实例，使得可以被加载。（一个Source实际上会使用零或多个SourceAdapters链接在一起，链（chain）上的最后一个item会触发（emits）该Loaders。
 
-对于Sources的TensorFlow Serving的接口，可以从特定存储系统中发现servables。Tensorflow Serving包括了公共索引Source的实现。例如，Source可以访问类似RPC的机制，可以poll一个文件系统。
+对于Sources的TensorFlow Serving的接口，可以从特定存储系统中查找servables。Tensorflow Serving包括了公共索引Source的实现。例如，Source可以访问类似RPC的机制，可以poll一个文件系统。
 
 Sources可以维持跨多个servables或versions进行共享的状态（state）。这对于使用delta(diff)来在versions间进行更新的servables很有用。
 
-## 1.7 Aspired Versions
+## 1.4 Aspired Versions
 
-Aspired versions表示servable versions的集合，可以被加载和ready。Sources会与该servable versions集合进行通讯，一次一个servable stream。当一个Source给出一个aspired versions的新列表到Manager时，它会为该servable stream取代之前的列表。该Manager会unload任何之前已加载的versions，使它们不再出现在该列表中。
+**Aspired versions表示Servable Versions的集合，可以被加载和ready**。Sources会与该servable versions集合进行通讯，一次一个servable stream。当一个Source给出一个aspired versions的新列表到Manager时，它会为该servable stream取代之前的列表。该Manager会unload任何之前已加载的versions，使它们不再出现在该列表中。
 
-## 1.8 Managers
+## 1.5 Managers
 
-Managers处理Servable的完整生命周期，包括：
+**Managers处理Servable的完整生命周期**，包括：
 
 - loading Servalbes
 - serving Servables
 - unloading Servables
 
-Manager会监听Source，并跟踪所有的versions。Manager会尝试满足Sources的请求，但如果需要的resources不提供的话，也可以拒绝加载一个aspired version。Managers也可以延期一个“unload”操作。例如，一个Manager可以等待unload直到一个更新的version完成loading，基于一个策略来保证在所有时间内至少一个version被加载。
+Manager会监听Source，并跟踪所有的versions。Manager会尝试满足Sources的请求，但如果需要的resources不提供的话，也可以拒绝加载一个aspired version。Managers也可以延期一个“unload”操作。例如，一个Manager可以等待unload直到一个更新的version完成loading，基于一个策略(Policy)来保证在所有时间内至少一个version被加载。
 
-Tensorflow Serving Manager提供了一个简单的，narrow接口——GetServableHandle()——给clients来访问已加载的servable实例。
+Tensorflow Serving Manager提供了一个单一的接口——GetServableHandle()——给clients来访问已加载的servable实例。
 
-## 1.9 Core
+## 1.6 Core
 
 TensorFlow Serving Core（通过标准Tensorflow Serving API）管理着以下的servables：
 
@@ -97,7 +97,7 @@ TensorFlow Serving Core将servables和loaders看成是透明的对象。
 
 更详细的：
 
-- 1.一个Source插件会为一个特定的version创建一个Loader。该Loaders包含了任何在加载Servable时需要的元数据。
+- 1.一个Source插件会为一个特定的version创建一个Loader。该Loaders包含了在加载Servable时所需的任何元数据。
 - 2.Source会使用一个callback来通知该Aspired Version的Manager。
 - 3.该Manager应用该配置过的Version Policy来决定下一个要采用的动作，它会被unload一个之前已经加载过的version，或者加载一个新的version。
 - 4.如果该Manager决定它是否安全，它会给Loader所需的资源，并告诉该Loader来加载新的version。
