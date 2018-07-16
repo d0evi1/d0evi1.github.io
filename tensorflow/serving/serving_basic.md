@@ -59,9 +59,19 @@ FLAGS.model_version指定了该模型的版本。当要导出相同模型的更�
 
 你可以使用SavedModelBuilder.add_meta_graph_and_variables() 添加meta graph和variables到该builder中，使用以下的参数：
 
-- sess：
-- tags：
-- signature_def_map：
+- sess：tensorflow session，它会持有你导出的训练模型.
+- tags：tags集合，用于保存元图(meta graph)。这种情况下，由于我们打算在serving中使用graph，我们会使用来自预定义的SavedModel标签常数的serve tag。更多细节，详见tag_constants.py。
+- signature_def_map：指定了一个map：关于签名(signature)的key由用户提供，它指向一个添加到meta graph中的tensorflow::SignatureDef。signature指定了模型导出的类型、以及当运行inference时所绑定的input/output tensors。
+
+特殊的signature key（serving_default）指定了缺省的serving signature。缺省的serving signature def key，会随着与签名相关的其它常数，被定义成SavedModel签名常数的一部分。更多细节详见signature_constants.py。
+
+另外，为了帮助构建signature defs，SavedModel API提供了[签名工具类](https://www.tensorflow.org/api_docs/python/tf/saved_model/signature_def_utils)。特定的，在mnist_saved_model.py上面的代码片段中，我们使用了signature_def_utils.build_signature_def()来构建predict_signature和classification_signature。
+
+正如示例中predict_signature是如何被定义的，该工具类也会采用以下的参数：
+
+- inputs={'images': tensor_info_x} ：指定了input tensor的信息
+- outputs={'scores': tensor_info_y}：指定了scores tensor的信息
+- method_name：inference所使用的方法。对于预测请求，它会设置成tensorflow/serving/predict。更多方法名，详见：[signature_constants.py](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/saved_model/signature_constants.py)
 
 注意，tensor_info_x和tensor_info_y具有tensorflow::TensorInfo 所定义的[protobuf](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/protobuf/meta_graph.proto)的结构。为了更轻易构建tensor信息，Tensorflow SavedModel API也提供了[utils.py](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/saved_model/utils.py)
 
