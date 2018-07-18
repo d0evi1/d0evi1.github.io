@@ -43,7 +43,7 @@ tagline:
 
 # 2.ServerCore
 
-现在，假设v1和v2是在runtime时动态生成的，比如：新算法试验的进行，或者模型使用新的数据集进行训练。在生产环境下，你可能希望构建一个server来支持渐近式上线（gradual rollout），在其中，v2可以被发现，加载，实验，监控，或者回滚。另外，你可以希望在上v2时撤下v1。TensorFlow Serving支持两种选项——其中，一种对于在转换期继续维持服务很好，另一种可以最小化资源使用（比如：RAM）。
+现在，假设v1和v2是在runtime时动态生成的，比如：新算法试验的进行，或者模型使用新的数据集进行训练。在生产环境下，你可能希望构建一个server来支持渐近式上线（gradual rollout），在其中，v2可以被发现，加载，实验，监控，或者回滚。另外，你可以希望在上线v2时撤下v1。TensorFlow Serving支持两种选项——其中，一种对于在切换期继续提供服务，另一种可以最小化资源使用（比如：RAM）。
 
 Tensorflow Serving的Manager就是做这个事的。它会处理tensorflow模型的完整生命周期：加载(loading)、服务(serving)以及版本更迭时的上传（uploading）。在该教程中，你将在Tensorflow Serving的ServerCore上构建你的server。它内部会封装一个AspiredVersionsManager。
 
@@ -93,7 +93,7 @@ ServerCore内部会做以下事情：
 
 # 3.Batching
 
-另一个我们希望在生产环境中具有的典型server特性是Batching。当inference请求以大的batches运行，现代硬件加速（GPU等）用于机器学习inference通常能达到最佳的计算效率。
+另一个我们希望在生产环境中具有的典型server特性是Batching。当inference请求以大batches方式运行时，现代硬件加速（GPU等）用于机器学习inference通常能达到最佳的计算效率。
 
 当创建SavedModelBundleSourceAdapter时，Batching可以通过提供合适的SessionBundleConfig开启。在这种情况下，我们设置了BatchingParameters，使用了许多缺省值。Batching可以通过设置定制的timeout、batch_size进行fine-tuned。详细的，可以参考BatchingParameters。
 
