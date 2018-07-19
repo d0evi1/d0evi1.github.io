@@ -15,12 +15,12 @@ tagline:
 
 # 1.准备serving inputs
 
-在训练时，input_fn()会获取数据，在模型使用前进行预处理。相似的，在serving时，需要一个serving_input_receiver_fn()，它会接收inference请求，并为该模型做相应的预处理。该函数具有以下的功能：
+在训练时，input_fn()会获取数据，在模型使用前对数据进行预处理。相似的，在serving时，需要一个serving_input_receiver_fn()，它会接收inference请求，并为该模型做相应的预处理。该函数具有以下的功能：
 
 - 增加**placeholders**到graph中，serving系统在获得inference请求时会进行feed数据
 - 增加了**额外ops**：可以将原有输入格式的数据转换成模型所需特征tensors
 
-该函数会返回一个tf.estimator.export.ServingInputReceiver对象，**它会将placeholders打包，并生成相应的特征Tensors**。
+该函数会返回一个[tf.estimator.export.ServingInputReceiver](https://www.tensorflow.org/api_docs/python/tf/estimator/export/ServingInputReceiver)对象，**它会将placeholders打包，并生成相应的特征Tensors**。
 
 **一个典型的模式(pattern)是，inference请求以序列化的tf.Example(S)到达，因此，serving_input_receiver_fn()会创建单个string placeholder来接收他们。接着，serving_input_receiver_fn()会通过添加一个tf.parse_example op到graph中来负责解析tf.Example(S)。**
 
