@@ -9,7 +9,7 @@ tagline:
 
 为了让一个已训练好的Estimator进行serving，你必须将它导出成标准的SavedModel格式。该文会解释：
 
-- 如何指定输出节点和相应的APIs（Classify, Regress, or Predict）。
+- 如何指定输出节点(output nodes)和相应的APIs（Classify, Regress, or Predict）。
 - 如何将你的模型导出成SavedModel格式
 - 如何在一个local server上提供模型服务，并请求预测
 
