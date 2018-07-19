@@ -7,24 +7,24 @@ tagline:
 
 在训练完一个Estimator模型后，你希望创建一个service：使用该模型来对请求返回相应的预测结果。你可以在本机运行这样的service，或者将它部署到云平台上。
 
-为了准备一个训练好的Estimator进行serving，你必须将它导出成标准的SavedModel格式。该部分会解释：
+为了让一个已训练好的Estimator进行serving，你必须将它导出成标准的SavedModel格式。该文会解释：
 
-- 指定输出节点和可服务的相应的APIs（Classify, Regress, or Predict）。
-- 将你的模型导出成SavedModel格式
-- 从一个local server上提供模型服务，并请求预测
+- 如何指定输出节点和相应的APIs（Classify, Regress, or Predict）。
+- 如何将你的模型导出成SavedModel格式
+- 如何在一个local server上提供模型服务，并请求预测
 
 # 1.准备serving inputs
 
 在训练时，input_fn()会获取数据，在模型使用前进行预处理。相似的，在serving时，需要一个serving_input_receiver_fn()，它会接收inference请求，并为该模型做相应的预处理。该函数具有以下的功能：
 
-- 增加placeholders到graph中，serving系统在获得inference请求时会进行feed数据
-- 增加了其它将原有输入格式的数据转换成模型所需特征tensors的额外ops
+- 增加**placeholders**到graph中，serving系统在获得inference请求时会进行feed数据
+- 增加了**额外ops**：可以将原有输入格式的数据转换成模型所需特征tensors
 
-该函数会返回一个tf.estimator.export.ServingInputReceiver对象，它会将placeholders打包，并生成相应的特征Tensors。
+该函数会返回一个tf.estimator.export.ServingInputReceiver对象，**它会将placeholders打包，并生成相应的特征Tensors**。
 
-一个典型的模式(pattern)是，inference请求以序列化的tf.Example(S)到达，因此，serving_input_receiver_fn()会创建单个string placeholder来接收他们。接着，serving_input_receiver_fn()会通过添加一个tf.parse_example op到graph中来负责解析tf.Example(S)。
+**一个典型的模式(pattern)是，inference请求以序列化的tf.Example(S)到达，因此，serving_input_receiver_fn()会创建单个string placeholder来接收他们。接着，serving_input_receiver_fn()会通过添加一个tf.parse_example op到graph中来负责解析tf.Example(S)。**
 
-当编写这样的serving_input_receiver_fn()时，你必须传递一个parsing sepcification给tf.parse_example来告诉parser：哪些特征名，以及如何将它们映射成Tensor(s)。一个parsing specification会采用一个字典格式，将特征名映射到tf.FixedLenFeature, tf.VarLenFeature, and tf.SparseFeature。注意，该parsing specification不应包含任何label column或weight columns，因为这在serving time时是不需提供的——而训练时的input_fn()则相反。
+当编写这样的serving_input_receiver_fn()时，你必须传递一个parsing sepcification给tf.parse_example来告诉parser：哪些特征名，以及如何将它们映射成Tensor(s)。一个parsing specification会采用一个字典格式，将特征名映射到tf.FixedLenFeature, tf.VarLenFeature, 以及tf.SparseFeature。注意，该parsing specification不应包含任何label column或weight columns，因为这在serving time时是不需提供的——而训练时的input_fn()则相反。
 
 组成在一起，即：
 
