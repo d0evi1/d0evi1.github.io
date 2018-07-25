@@ -120,7 +120,7 @@ Tensorflow serving提供了一些扩展点，使你可以添加新功能。
 
 Version Policy可以指定version序列，在单个servable stream中加载或卸载。
 
-tensorflow serving包含了两个策略（policy）来适应大多数已经用例。分别是：Availability Preserving Policy(避免没有version加载的情况；在卸载一个老version前通常会加载一个新的version)， Resource Preserving Policy（避免两个version同时被加载，这需要两倍的资源；会在加载一个新version前卸载老version）。对于tensorflow serving的简单用法，一个模型的serving能力很重要，资源消耗要低，Availability Preserving Policy会确保在新version加载前卸载老version。对于TensorFlow Serving的复杂用法，例如跨多个server实例管理version，Resource Preserving Policy需要最少的资源（对于加载新version无需额外buffer）
+tensorflow serving包含了两个策略（policy）来适应大多数已知用例。分别是：Availability Preserving Policy(避免没有version加载的情况；在卸载一个老version前通常会加载一个新的version)， Resource Preserving Policy（避免两个version同时被加载，这需要两倍的资源；会在加载一个新version前卸载老version）。对于tensorflow serving的简单用法，一个模型的serving能力很重要，资源消耗要低，Availability Preserving Policy会确保在新version加载前卸载老version。对于TensorFlow Serving的复杂用法，例如跨多个server实例管理version，Resource Preserving Policy需要最少的资源（对于加载新version无需额外buffer）
 
 ## 3.2 Source
 
@@ -132,7 +132,7 @@ Loaders是用于添加算法和数据后端的扩展点。Tensorflow就是这样
 
 ## 3.4 Batcher
 
-会将多个请求打包（Batching）成单个请求，可以极大减小执行inference的开销，特别是像GPU这样的硬件加速存在的时候。Tensorflow Serving包含了一个请求打包组件（request batching widget），使得客户端（clients）可以很容易地将特定类型的inferences跨请求进行打包成一个batch，使得算法系统可以更高效地处理。详见Batching Guide。
+会将多个请求打包（Batching）成单个请求，可以极大减小执行inference的开销，特别是像GPU这样的硬件加速存在的时候。Tensorflow Serving包含了一个请求打包组件（request batching widget），使得客户端（clients）可以很容易地将特定类型的inferences跨请求进行打包成一个batch，使得算法系统可以更高效地处理。详见[Batching Guide](/tensorflow/serving/batching)。
 
 
 
