@@ -7,7 +7,7 @@ tagline:
 
 # 介绍
 
-TensorFlow Serving是一个灵活的，高性能的机器学习模型serving系统，专为生产环境设计。Tensorflow Serving使得部署新算法和新实验更加简单，同时又能保持相同的服务器架构和APIs。Tensorflow Serving提供了开箱即用的tensorflow模型集成，并可以很容易地扩展到服务其它类型的模型。
+TensorFlow Serving是一个灵活的、高性能的机器学习模型serving系统，专为生产环境设计。Tensorflow Serving使得部署新算法和新实验更加简单，同时又能保持相同的服务器架构和APIs。Tensorflow Serving提供了开箱即用的tensorflow模型集成，并可以很容易地扩展到服务其它类型的模型。
 
 # 1.核心概念
 
@@ -15,9 +15,9 @@ TensorFlow Serving是一个灵活的，高性能的机器学习模型serving系�
 
 ## 1.1 Servables
 
-Servables是在Tensorflow Serving中的核心抽象。Servables是客户端（clients）用于执行计算（例如：一次lookup或inference）的底层对象。
+Servables是在Tensorflow Serving中的核心抽象。**Servables是客户端（clients）用于执行计算（例如：一次lookup或inference）的底层对象**。
 
-一个Servable的大小（size）和粒度（granularity）是很灵活的。单个Servable必须包含来自一个lookup table（将单个模型映射到对应inference models的tuple）的单个shard的任何东西。Servable可以是任何类型和接口，这样可以保证灵活性和将来的改进：
+一个Servable的大小（size）和粒度（granularity）是很灵活的。单个Servable必须包含任何东西：可以是某个模型的lookup table的某个分片(shard)，也可以是inference models的一个tuple。Servable可以是任何类型和接口，这样可以保证灵活性和将来的改进：
 
 - streaming结果
 - experimental APIs
