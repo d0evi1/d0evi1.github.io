@@ -7,14 +7,14 @@ tagline:
 
 # 介绍
 
-当一个tensorflow模型进行serving时，将单个模型inference请求进行batching对于请求来说相当重要。特别的，batching对于解锁由硬件加速器(例如：GPU)的高吞吐量来说很重要。存在一个库（library）来对请求（requests）进行batching，以及对这些batches进行调度。该library自身不与GPUs相绑定，可以被用于以下情况：多个小任务处理组协同运行（该文档假设GPUs是为了简化表述）。它提供了一个特别的tensorflow Session API，同时也提供了用于以其它粒度进行batch的底层APIs。
+当一个tensorflow模型进行serving时，将单个模型inference请求进行batching对于请求来说相当重要。特别的，batching对于解锁由硬件加速器(例如：GPU)的高吞吐量来说很重要。tensorflow serving存在一个库（library）来对请求（requests）进行batching，以及对这些batches进行调度。该library自身不与GPUs相绑定，可以被用于以下情况：多个小任务处理分组(group)一起协同运行（该文档假设GPUs是为了简化表述）。它提供了一个特别的tensorflow Session API，同时也提供了用于以其它粒度进行batch的底层APIs。
 
 该library当前分隔在两个位置： 
 
 - 1) tensorflow/contrib/batching (core API and implementation)
 - 2) tensorflow_serving/batching (higher-level and experimental code)
 
-该library提供了多个可选的类（classes）以供选择。这些选择的原因是，有许多合理的方式来执行batching。不存在“最佳”的方法，因为不同的用例具有不同的需求：
+该library提供了多个可选的类（classes）以供选择。这些选择的原因是，有许多合理的方式来执行batching。**不存在“最佳”的方法，因为不同的用例具有不同的需求**：
 
 - API偏好选择：Tensor API vs. general API; 异步 vs 同步 (synchronous vs. asynchronous)
 - 除了GPU外，模型是否有很大的CPU组件
@@ -25,13 +25,13 @@ tagline:
 
 # 2.Simple Batching
 
-如果你刚接触batching library或者只有基本的需求，你可以只关注BatchingSession或者BasicBatchScheduler。
+如果你刚接触batching library或者只有基本需求，你可以只关注BatchingSession或者BasicBatchScheduler。
 
 ## 2.1 BatchingSession
 
 BatchingSession会添加batching到一个标准的tensorflow::Session中，接着由你使用单个tensor（非batching）的方式调用Session::Run() ，你可以获得你看不见的batching收益。如果你的应用使用tensorflow，可以搭配Session:Run()的synchronous API，该抽象（abstraction）效果不错——请求线程调用Session::Run() 时会阻塞，等待其它调用将它们分组（group）成同一个batch。**为了在synchronous API上达到好的吞吐量（throughput），我们推荐你将客户端线程数设置成batch_size的两倍**。
 
-BatchingSession可以与其它batch调度器（包括BasicBatchScheduler）一起使用。它提供了一种方式来将限定每个Session:Run()的调用能阻塞多久。使用BatchingSession的最简单方式是使用CreateRetryingBasicBatchingSession()来创建: 它可以给你返回一个使用一个BasicBatchScheduler底层的tensorflow::Session()对象，也可以处理从调度队列溢出的重试请求。你可以提供一些关键参数来管理传给底层BasicBatchScheduler的批请求（batched requests）的调度和执行；下面会有详细介绍。BasicBatchScheduler具有一个限定size的队列；你可以设置参数来管理当队列满时Session::Run()是否会失败；或者以一定的时延进行重试多少次，等等。
+**BatchingSession可以与其它batch调度器（包括BasicBatchScheduler）一起使用**。它提供了一种方式来将限定每个Session:Run()的调用能阻塞多久。使用BatchingSession的最简单方式是使用CreateRetryingBasicBatchingSession()来创建: 它可以给你返回一个使用一个BasicBatchScheduler底层的tensorflow::Session()对象，也可以处理来自从调度队列溢出的重试请求。你可以提供一些关键参数来管理传给底层BasicBatchScheduler的批请求（batched requests）的调度和执行；下面会有详细介绍。BasicBatchScheduler具有一个限定size的队列；你可以设置参数来管理当队列满时Session::Run()是否会失败；或者以一定的时延进行重试多少次，等等。
 
 最终的配置参数是allowed_batch_sizes。该参数是可选的。如果未设置，那么batch size会是任意在[1, 最大允许size(比如:1024)]间的任何数。取决于你的环境，batch_size很大可能会带来问题。allowed_batch_sizes参数可以让你将batch size限定在一个固定集，比如：128, 256, 512, 1024. BatchingSession会保持这种限制：通过使用空数据（dummy data）补足不合理size的batches来达到下一个合法的size。
 
