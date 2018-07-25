@@ -5,6 +5,8 @@ tagline:
 ---
 {% include JB/setup %}
 
+# 介绍
+
 该tutorial会教你如何使用tensorflow serving组件来export一个训练好的tensorflow模型，并使用标准的tensorflow_model_server来提供服务。如果你已经对tensorflow serving很熟悉，你可以知道更多关于server内部工作机制，详见[advance_tutorial](https://www.tensorflow.org/serving/serving_advanced)。
 
 该tutorial会使用简单的softmax regression模型来处理手写图片分类（MNIST 数据集）。
