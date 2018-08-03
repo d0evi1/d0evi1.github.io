@@ -17,7 +17,7 @@ tagline:
 
 tensorflow的计算基础是Graph对象。它会持有一个节点网络，每个节点代表了一个操作（op），它会与其它op作为输入或输出进行相互连接。在你已经创建一个Graph对象后，你可以通过调用as_graph_def()来保存它，它会返回一个GraphDef对象。
 
-GraphDef类是一个由Protobuf库根据在[tensorflow/core/framework/graph.proto](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/graph.proto)的定义创建的对象。protobuf工具会解析该文本文件，生成代码来加载、存储和操控graph定义。如果你看到一个独立的用来表示一个模型的tensorflow文件，它会包含关于这些由protobuf代码保存的GraphDef对象一个系列化版本。
+GraphDef类是一个由Protobuf库根据在[tensorflow/core/framework/graph.proto](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/graph.proto)的定义创建的对象。protobuf工具会解析该文本文件，生成代码来加载、存储和操控graph定义。如果你看到一个用来表示一个模型的tensorflow独立文件，它会包含关于这些由protobuf代码保存的GraphDef对象一个序列化版本。
 
 生成的代码用于从磁盘中保存和加载GraphDef。该代码实际上会以如下方式加载模型：
 
