@@ -10,7 +10,7 @@ Faster R-CNN由Ross Girshick等人提出。
 
 # 总览
 
-在目标检测领域的最新进展来源于候选区域法（region proposal methods）以基于区域的卷积神经网络（region-based convolutional neural networks）的成功。尽管基于区域的CNN开销很大，通过跨候选块（proposals）共享卷积的方式，它们的开销可以极大地减小。Fast R-CNN通过使用极深网络已经达到了接近实时的准确率，忽略在候选区域（region proposals）上花费的时间。现在，proposals在主流的检测系统上，都存在着在测试时间上的计算瓶劲。
+在目标检测领域的最新进展来源于**候选区域法（region proposal methods）**以**基于区域的卷积神经网络（region-based convolutional neural networks）**的成功。尽管region-based CNN开销很大，但如果通过跨候选块（proposals）共享卷积，可以极大地减小开销。Fast R-CNN通过使用极深网络已经达到了接近实时的准确率，忽略在候选区域（region proposals）上花费的时间。现在，proposals在主流的检测系统上，都存在着在测试时间上的计算瓶劲。
 
 Region proposal methods通常依赖于开销低的特征以及比较经济的inference schemes。选择性搜索法（Selective Search）是其中一种最流行的方法之一，会基于开发的低级特征(low-level features)，可以贪婪地将superpixels进行合并。当对比于efficient
 detection networks[paper 2]时，Selective Search更慢些，在CPU的实现上每张图片需要2秒。EdgeBoxes[6]方法提供了在proposal质量和速率上的最佳权衡，每张图片0.2秒。尽管如此，region
