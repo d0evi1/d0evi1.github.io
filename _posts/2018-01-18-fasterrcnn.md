@@ -10,17 +10,16 @@ Faster R-CNN由Ross Girshick等人提出。
 
 # 总览
 
-在目标检测领域的最新进展来源于**候选区域法（region proposal methods）**以**基于区域的卷积神经网络（region-based convolutional neural networks）**的成功。尽管region-based CNN开销很大，但如果通过跨候选块（proposals）共享卷积，可以极大地减小开销。Fast R-CNN通过使用极深网络已经达到了接近实时的准确率，忽略在候选区域（region proposals）上花费的时间。现在，proposals在主流的检测系统上，都存在着在测试时间上的计算瓶劲。
+在目标检测领域的最新进展来源于**候选区域法（region proposal methods）**以**基于区域的卷积神经网络（region-based convolutional neural networks）**的成功。尽管region-based CNN开销很大，但如果通过跨候选块（proposals）共享卷积，可以极大地减小开销。当忽略掉在候选区域（region proposals）上花费的时间时，Fast R-CNN通过使用极深网络已经达到了接近实时的准确率。现在，在主流的检测系统中，在测试时间上都存在着proposals的计算瓶劲。
 
-Region proposal methods通常依赖于开销低的特征以及比较经济的inference schemes。选择性搜索法（Selective Search）是其中一种最流行的方法之一，会基于开发的低级特征(low-level features)，可以贪婪地将superpixels进行合并。当对比于efficient
-detection networks[paper 2]时，Selective Search更慢些，在CPU的实现上每张图片需要2秒。EdgeBoxes[6]方法提供了在proposal质量和速率上的最佳权衡，每张图片0.2秒。尽管如此，region
-proposal的步骤仍然会像该检测网络一样消耗相当多的运行时（running time）。
+Region proposal methods通常依赖于开销低的特征以及比较经济的inference模式(schemes)。**选择性搜索法（Selective Search）**是其中一种最流行的方法之一，它会基于已经开发的低级特征(low-level features)，对superpixels进行贪婪式合并。当与其它有效的检测网络[paper 2]进行对比时，Selective Search方法会更慢些，在CPU的实现上每张图片需要2秒。EdgeBoxes[6]方法提供了在proposal上的质量和速率上的最佳权衡，每张图片0.2秒。尽管如此，region
+proposal阶段步骤仍然会像该检测网络一样消耗相当多的运行时（running time）。
 
-有人注意到，fast region-based CNN可以利用GPU，而在研究中使用的region proposal methods则在CPU上实现，使得这样的运行时比较不公平。一个用于加速proposal计算的明显方法是，在GPU上重新实现。这是一个有效的工程解决方案，但重新实现会忽略下游的检测网络（down-stream detection network），从而失去共享计算的机会。
+有人注意到，fast region-based CNN可以利用GPU，而在研究中使用的region proposal methods则在CPU上实现，使得这样的运行时比较变得不公平。用于加速proposal计算的一种很明显方法就是：在GPU上重新实现。这是一个有效的工程解决方案，但重新实现会忽略下游的检测网络（down-stream detection network），从而失去共享计算的机会。
 
-本paper中展示了一种新方法——使用DNN来计算proposals——来产生一个优雅并有效的解决方案，在给定检测网络的计算下，其中proposal计算的几乎没有开销。我们引入了新的Region Proposal Networks（RPNs）来在最新的目标检测网络[1][2]中共享卷积层。通过在测试时（test-time）共享卷积，计算proposals的边缘开销很小（例如：每张图片10ms）。
+本paper中展示了一种新方法——使用DNN来计算proposals——来产生一个优雅并有效的解决方案，在给定检测网络的计算下，其中proposal计算的几乎没有开销。我们引入了新的**Region Proposal Networks（RPNs）**来在最新的目标检测网络[1][2]中共享卷积层。通过在测试时（test-time）共享卷积，计算proposals的边缘开销很小（例如：每张图片10ms）。
 
-我们观察到，由region-based dectectors（例如：Fast R-CNN）所使用的卷积特征图，也可以被用于生成region proposals。在这些卷积特征（convolutional features）的顶层（top），我们通过添加一些额外的conv layers构建了一个RPN，这些layers可以同时回归(regress)在一个常规网格(regular grid)上的每个位置的区域边界（region bounds）和目标得分（objectness scores）。RPN是这样一种完全卷积网络（FCN: fully convolutional network）[7]，它可以以end-to-end方式训练，特别用于生成候选检测（detection proposals）。
+我们观察到，由region-based dectectors（例如：Fast R-CNN）所使用的卷积特征图，也可以被用于生成候选区域（region proposals）。在这些卷积特征（convolutional features）之上，我们通过添加一些额外的conv layers构建了一个RPN，这些layers可以同时回归(regress)在一个常规网格(regular grid)上的每个位置的区域边界（region bounds）和目标得分（objectness scores）。RPN是这样一种完全卷积网络（FCN: fully convolutional network）[7]，它可以以end-to-end方式训练，特别用于生成候选检测（detection proposals）。
 
 <img src="http://pic.yupoo.com/wangdren23/HI4Ky9cg/medish.jpg">
 
