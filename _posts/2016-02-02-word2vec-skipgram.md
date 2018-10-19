@@ -27,7 +27,7 @@ and their Compositionality>.
 
 词向量表示受限于它不能表示常用短语，因为它们不由独立的单词组成。例如, “Boston Globe”（波士顿环球报）实际是个报纸，因而它不是由“Boston”和"Globe"组合起来的意思。因此，使用向量来表示整个短语，会使得skip-gram模型更有表现力。因此，通过语向量来构成有意义的句子的其它技术（比如：递归autoencoders 17)，可以受益于使用短语向量，而非词向量。
 
-从基于词的模型扩展成基于短语的模型相当简单。首先，我们使用数据驱动的方法标识了大量的短语，接着我们在训练中将这些短语看成是独自的tokens。为了评估短语向量的质量，我们开发了一个类比原因任务(analogical reasoning tasks)测试集，它同时包含了词和短语。我们测试集中的一个典型的类比对(analogy pair)：“Montreal”:“Montreal Canadiens”::“Toronto”:“Toronto Maple Leafs”。如果与vec("Montreal Canadiens")-vec("Montreal")+vec("Toronto")最接近的向量是：vec("Toronto Maple Leafs")，那么我们可以认为回答是正确的。
+从基于词的模型扩展成基于短语的模型相当简单。首先，我们使用数据驱动的方法标识了大量的短语，接着我们在训练中将这些短语看成是独自的tokens。为了评估短语向量的质量，我们开发了一个类比推理任务(analogical reasoning tasks)测试集，它同时包含了词和短语。我们测试集中的一个典型的类比对(analogy pair)：“Montreal”:“Montreal Canadiens”::“Toronto”:“Toronto Maple Leafs”。如果与vec("Montreal Canadiens")-vec("Montreal")+vec("Toronto")最接近的向量是：vec("Toronto Maple Leafs")，那么我们可以认为回答是正确的。
 
 译者注1：
 
