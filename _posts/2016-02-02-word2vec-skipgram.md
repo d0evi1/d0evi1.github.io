@@ -51,7 +51,7 @@ and their Compositionality>.
 Skip-gram模型的训练目标是，为预测一个句子或一个文档中某个词的周围词汇，找到有用的词向量表示。更正式地，给定训练词汇$$w_1,w_2,w_3,...,w_T$$, Skip-gram模型的学习目标是，最大化平均log概率：
 
 $$
-\frac{1}{T}\sum_{t=1}^{T}\sum_{-c\leq{j}\leq{c},j\neq0} ^{} logp(w_{t+j}|w_t)
+\frac{1}{T} \sum_{t=1}^{T} \sum_{-c\leq{j}\leq{c},j\neq0} log p(w_{t+j} | w_t)
 $$ 
 ...  (1)
 
