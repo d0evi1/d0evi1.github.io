@@ -57,11 +57,12 @@ $$
 
 其中，c是训练上下文的size($$w_t$$是中心词)。c越大，会产生更多的训练样本，并产生更高的准确度，训练时间也更长。最基本的skip-gram公式使用softmax函数来计算 $$ p(w_{t+j} \| w_t) $$: 
 
-$$
+{% highlight python %}
 
 p(w_O | w_I) =\frac{ exp(v'_{w_O}^T * v_{w_I})}{\sum_{w=1}^{W} exp(v'_{w}^T * v_{w_I})}
 
-$$
+{% endhighlight %}
+
 ... (2)
 
 其中，vw和v'w表示w的输入向量和输出向量。W则是词汇表中的词汇数。该公式在实际中不直接采用，因为计算$$ \nabla
@@ -77,9 +78,11 @@ Hierarchical Softmax外的另一可选方法是Noise Contrastive Estimation(NCE)
 
 而NCE可以近似最大化softmax的log概率，Skip-gram模型只关注学习高质量的向量表示，因此，我们可以自由地简化NCE，只要向量表示仍能维持它的质量。我们定义了Negative sampling(NEG)的目标函数：
 
+{% highlight python %}
 $$
 log \sigma{(v'_{w_O}^T v_{w_I})} + \sum_{i=1}^k E_{w_i}~P_n(w)[log \sigma{(-v'_{w_i}^T v_{w_I})}]
 $$
+{% endhighlight %}
 
 在Skip-gram目标函数中，每个$$ P(w_O \| w_I) $$项都被替换掉。该任务是为了区分目标词wo，以及从使用logistic回归的噪声分布Pn(w)得到的词。其中每个数据样本存在k个negative样本。我们的试验中，对于小的训练数据集，k的值范围(5-20)是合适的；而对于大的数据集，k可以小到2-5。Negative sampling和NCE的最主要区分是，NCE同时需要样本和噪声分布的数值概率，而Negative sampling只使用样本。NCE逼近最大化softmax的log概率时，该特性对于我们的应用不是很重要。
 
