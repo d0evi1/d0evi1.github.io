@@ -19,15 +19,19 @@ and their Compositionality>.
 
 词在向量空间上的分布式表示(distributed representations)，通过将相似的词语进行群聚，可以帮助学习算法在nlp任务中完成更好的性能。词向量表示的最早应用可以追溯到1986年Rumelhart, Hinton等人提的(详见paper 13). 该方法用于统计语言建模中，并取得了可喜的成功。接下来，应用于自动语音识别和机器翻译(14,7)，以及其它更广泛的NLP任务(2,20,15,3,18,19,9)
 
-最近，Mikolov（8）提出了Skip-gram模型，它是一个高效的方法，可以从大量非结构化文本数据中学到高质量的词向量表示。不同于大多数之前用于词向量学习所使用的神经网络结构，skip-gram模型(图1)不会涉太到稠密矩阵乘法(dense matrix multiplications)。这使得学习极其有效率：一个优化版的单机实现，一天可以训练超过10亿个词。
+最近，Mikolov（8）提出了Skip-gram模型，它是一个高效的方法，可以从大量非结构化文本数据中学到高质量的词向量表示。不同于大多数之前用于词向量学习所使用的神经网络结构，skip-gram模型(图1)不会涉及到稠密矩阵乘法(dense matrix multiplications)。这使得学习过程极为高效：一个优化版的单机实现，一天可以训练超过10亿个词。
 
-使用神经网络的词向量表示计算非常有意思，因为学习得到的向量显式地编码了许多语言学规律和模式。更令人吃惊的是，许多这些模式可以被表示成线性变换(linear translations)。例如，比起其它向量，向量计算vec("Madrid")-vec("Spain")+vec("France")与vec("Paris")的结果更接近(9,8)。
+使用神经网络的词向量表示计算非常有意思，因为通过学习得到的向量可以显式地对许多语言学规律和模式进行编码。更令人吃惊的是，许多这些模式可以被表示成线性变换(linear translations)。例如，比起其它向量，向量计算vec("Madrid")-vec("Spain")+vec("France")与vec("Paris")的结果更接近(9,8)。
 
-本文中，我们描述了一些原始skip-gram模型的扩展。我们展示了高频词的subsampling，在训练期间可以带来极大的提升（2x-10x的性能提升），并改进了低频词的向量表示的精度。另外，我们提出了一种Noise Contrastive Estimation (NCE) (4)的变种，来训练skip-gram模型，对比于复杂的hierachical softmax，它的训练更快，并可以为高频词得到更好的向量表示。
+本文中，我们描述了一些原始skip-gram模型的扩展。我们展示了对高频词进行subsampling，可以在训练期间带来极大提升（2x-10x的性能提升），并且同时能改进低频词的向量表示的精度。另外，我们提出了一种Noise Contrastive Estimation (NCE) (4)的变种，来训练skip-gram模型，对比于复杂的hierachical softmax，它的训练更快，并可以为高频词得到更好的向量表示。
 
-词向量表示受限于它不能表示常用短语，因为它们不由独立的单词组成。例如, “Boston Globe”（波士顿环球报）实际是个报纸，因而它不是由“Boston”和"Globe"组合起来的意思。因此，使用向量来表示整个短语，会使得skip-gram模型更有表现力。因此，通过语向量来构成有意义的句子的其它技术（比如：递归autoencoders 17)，可以受益于使用短语向量，而非词向量。
+词向量表示受限于它不能表示常用短语，因为它们不由独立的单词组成。例如, “Boston Globe”（波士顿环球报）实际是个报纸，因而它不是由“Boston”和"Globe"组合起来的意思。**因此，使用向量来表示整个短语，会使得skip-gram模型更有表现力**。因此，通过短语向量来构成有意义的句子的其它技术（比如：递归autoencoders 17)，可以受益于使用短语向量，而非词向量。
 
-从基于词的模型扩展成基于短语的模型相当简单。首先，我们使用数据驱动的方法标识了大量的短语，接着我们在训练中将这些短语看成是独自的tokens。为了评估短语向量的质量，我们开发了一个类比推理任务(analogical reasoning tasks)测试集，它同时包含了词和短语。我们测试集中的一个典型的类比对(analogy pair)：“Montreal”:“Montreal Canadiens”::“Toronto”:“Toronto Maple Leafs”。如果与vec("Montreal Canadiens")-vec("Montreal")+vec("Toronto")最接近的向量是：vec("Toronto Maple Leafs")，那么我们可以认为回答是正确的。
+从基于词的模型扩展成基于短语的模型相当简单。**首先，我们使用数据驱动的方式标注了大量短语，接着我们在训练中将这些短语看成是独自的tokens**。为了评估短语向量的质量，我们开发了一个类比推理任务(analogical reasoning tasks)测试集，它同时包含了词和短语。我们的测试集中的一个典型的类比对(analogy pair)如下：
+
+“Montreal”:“Montreal Canadiens”::“Toronto”:“Toronto Maple Leafs”
+
+如果与vec("Montreal Canadiens")-vec("Montreal")+vec("Toronto")最接近的向量是：vec("Toronto Maple Leafs")，那么我们可以认为回答是正确的。
 
 译者注1：
 
@@ -44,10 +48,10 @@ and their Compositionality>.
 
 # 2.Skip-gram模型
 
-Skip-gram模型的训练目标是，为预测一个句子或一个文档中某个词的周围词汇，找到有用的词向量表示。更正式地，通过给定训练词汇w1,w2,w3,...,wT, Skip-gram模型的目标是，最大化平均log概率：
+Skip-gram模型的训练目标是，为预测一个句子或一个文档中某个词的周围词汇，找到有用的词向量表示。更正式地，给定训练词汇$$w_1,w_2,w_3,...,w_T$$, Skip-gram模型的学习目标是，最大化平均log概率：
 
 $$
-\frac{1}{T}\sum_{t=1}^{T}\sum_{-c\leq{j}\leq{c},j\neq0}logp(w_{t+j}|w_t)
+\frac{1}{T}\sum_{t=1}^{T}\sum_{-c\leq{j}\leq{c},j\neq0} ^{} logp(w_{t+j}|w_t)
 $$ 
 ...  (1)
 
