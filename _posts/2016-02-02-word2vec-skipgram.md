@@ -55,15 +55,17 @@ $$
 $$ 
 ...  (1)
 
-其中，c是训练上下文的size($$w_t$$是中心词)。c越大，会产生更多的训练样本，并产生更高的准确度，训练时间也更长。最基本的skip-gram公式使用softmax函数来计算 \$ p(w_{t+j} \| w_t) \$: 
+其中，c是训练上下文的size($$w_t$$是中心词)。c越大，会产生更多的训练样本，并产生更高的准确度，训练时间也更长。最基本的skip-gram公式使用softmax函数来计算 $$ p(w_{t+j} \| w_t) $$: 
 
 $$
-p(w_O|w_I)=\frac{exp(v'_{w_O}^T*v_{w_I})}{\sum_{w=1}^{W}exp(v'_{w}^T*v_{w_I})}
+
+p(w_O | w_I) =\frac{ exp(v'_{w_O}^T * v_{w_I})}{\sum_{w=1}^{W} exp(v'_{w}^T * v_{w_I})}
+
 $$
 ... (2)
 
-其中，vw和v'w表示w的输入向量和输出向量。W则是词汇表中的词汇数。该公式在实际中不直接采用，因为计算\$ \nabla
-{logp(w_{O}|w_I)} \$与W成正比，经常很大($$10^5-10^7$$次方)
+其中，vw和v'w表示w的输入向量和输出向量。W则是词汇表中的词汇数。该公式在实际中不直接采用，因为计算$$ \nabla
+{logp(w_{O} \| w_I)} $$与W成正比，经常很大($$10^5-10^7$$次方)
 
 ## 2.1 Hierarchical Softmax
 
@@ -76,10 +78,10 @@ Hierarchical Softmax外的另一可选方法是Noise Contrastive Estimation(NCE)
 而NCE可以近似最大化softmax的log概率，Skip-gram模型只关注学习高质量的向量表示，因此，我们可以自由地简化NCE，只要向量表示仍能维持它的质量。我们定义了Negative sampling(NEG)的目标函数：
 
 $$
-log\sigma{(v'_{w_O}^Tv_{w_I})}+\sum_{i=1}^kE_{w_i}~P_n(w)[log\sigma{(-v'_{w_i}^Tv_{w_I})}]
+log \sigma{(v'_{w_O}^T v_{w_I})} + \sum_{i=1}^k E_{w_i}~P_n(w)[log \sigma{(-v'_{w_i}^T v_{w_I})}]
 $$
 
-在Skip-gram目标函数中，每个\$ P(w_O|w_I) \$项都被替换掉。该任务是为了区分目标词wo，以及从使用logistic回归的噪声分布Pn(w)得到的词。其中每个数据样本存在k个negative样本。我们的试验中，对于小的训练数据集，k的值范围(5-20)是合适的；而对于大的数据集，k可以小到2-5。Negative sampling和NCE的最主要区分是，NCE同时需要样本和噪声分布的数值概率，而Negative sampling只使用样本。NCE逼近最大化softmax的log概率时，该特性对于我们的应用不是很重要。
+在Skip-gram目标函数中，每个$$ P(w_O \| w_I) $$项都被替换掉。该任务是为了区分目标词wo，以及从使用logistic回归的噪声分布Pn(w)得到的词。其中每个数据样本存在k个negative样本。我们的试验中，对于小的训练数据集，k的值范围(5-20)是合适的；而对于大的数据集，k可以小到2-5。Negative sampling和NCE的最主要区分是，NCE同时需要样本和噪声分布的数值概率，而Negative sampling只使用样本。NCE逼近最大化softmax的log概率时，该特性对于我们的应用不是很重要。
 
 NCE和NEG都有噪声分布Pn(w)作为自由参数。对于Pn(w)我们采用了一些不同选择，在每个任务上使用NCE和NEG，我们尝试包含语言建模（该paper没提及），发现unigram分布U(w)提升到3/4幂（如：\$ U(w)^{2/4}/Z \$）时，胜过unigram和uniform分布很多！
 
@@ -87,7 +89,10 @@ NCE和NEG都有噪声分布Pn(w)作为自由参数。对于Pn(w)我们采用了�
 
 # 3.结果
 
-该部分我们评估了Hierarchical Softmax(HS), Noise Contrastive Estimation, Negative Sampling和训练词汇的subsampling。我们使用由Mikolov引入的analogical reasoning task进行评估(8)。该任务包含了类似这样的类比：s“Germany” : “Berlin” :: “France” : ?。通过找到这样的一个向量x，使得在cosine距离上，vec(x)接近于vec("Berlin")-vec("Germany")+vec("France")。如果x是"Paris"，则该特定示例被认为是回答正确的。该任务有两个宽泛的类别：syntactic analogies:句法结果的类比(比如： “quick” : “quickly” :: “slow” : “slowly”)，以及semantic analogies: 语义类比（比如：国家与城市的关系）。
+该部分我们评估了Hierarchical Softmax(HS), Noise Contrastive Estimation, Negative Sampling和训练词汇的subsampling。我们使用由Mikolov引入的analogical reasoning task进行评估(8)。该任务包含了类似这样的类比：s“Germany” : “Berlin” :: “France” : ?。通过找到这样的一个向量x，使得在cosine距离上，vec(x)接近于vec("Berlin")-vec("Germany")+vec("France")。如果x是"Paris"，则该特定示例被认为是回答正确的。该任务有两个宽泛的类别：
+
+- syntactic analogies：句法结果的类比(比如： “quick” : “quickly” :: “slow” : “slowly”)
+- semantic analogies：语义类比（比如：国家与城市的关系）
 
 对于训练Skip-gram模型来说，我们已经使用了一个大数据集，它包括许多新文章（内部Google数据集，超过10亿单词）。我们抛弃了训练集中在词汇表中出现次数不足5次的词汇，这样产生的词汇表大小为：692k。在词类比测试中，多种Skip-gram模型的性能如表1。在analogical reasoning task上，该表展示了Negative Sampling的结果比Hierarchical Softmax效果要好，并且它比Noise Contrasitive Estimation的效果也略好。高频词的subsampling提升了好几倍的训练速度，并使得词向量表示更加精准。
 
@@ -104,7 +109,7 @@ NCE和NEG都有噪声分布Pn(w)作为自由参数。对于Pn(w)我们采用了�
 这种方法，我们可以产生许多合理的短语，同时也不需要极大增加词汇的size；理论上，我们可以使用所有n-gram来训练Skip-gram模型，但这样很耗费内存。在文本上标识短语方面，之前已经有许多技术提出。然而，对比比较这些方法超出了该paper范围。我们决定使用一种简单的基于数据驱动的方法，短语的形成基于unigram和bigram的数目，使用：
 
 $$
-score(w_i,w_j)=\frac{count(w_iw_j-\delta}{count(w_i) * count(w_j)}
+score(w_i,w_j)= \frac{count(w_i w_j- \delta} {count(w_i) * count(w_j)}
 $$  (6)
 
 其中，delta被用于一个打折系数(discounting coefficient)，它可以阻止产生过多的包含许多不常见词的短语。bigram的score如果比选择的阀值要大，那么则认为该短语成立。通常，我们会不断降低阀值，运行2-4遍的训练数据，以允许形成包含更多词的更长短语。我们使用一个新的关于短语的analogical reasoning task，来评估短语表示的质量。该数据集在网上是公开的。[下载](http://2code.google.com/p/word2vec/source/browse/trunk/questions-phrases.txt)
