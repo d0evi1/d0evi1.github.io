@@ -57,11 +57,9 @@ $$
 
 其中，c是训练上下文的size($$w_t$$是中心词)。c越大，会产生更多的训练样本，并产生更高的准确度，训练时间也更长。最基本的skip-gram公式使用softmax函数来计算 $$ p(w_{t+j} \| w_t) $$: 
 
-{% highlight python %}
-
-p(w_O | w_I) =\frac{ exp(v'_{w_O}^T * v_{w_I})}{\sum_{w=1}^{W} exp(v'_{w}^T * v_{w_I})}
-
-{% endhighlight %}
+$$
+p(w_O | w_I) = \frac{ exp(v'_{w_O}^T * v_{w_I})}{\sum_{w=1}^{W} exp(v'_{w}^T * v_{w_I})}
+$$
 
 ... (2)
 
