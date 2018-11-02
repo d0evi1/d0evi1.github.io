@@ -25,11 +25,11 @@ proposal）阶段步骤仍然会像该检测网络一样消耗相当多的运行
 
 图1: 多种scales和sizes下的不同模式（schemes）。(a) 构建图片和feature maps的金字塔，在所有scales上运行分类器 (b) 使用多个scales/sizes的filters，在feature map上运行  (c) 使用在回归函数中参照框(reference box)金字塔
 
-RPN被设计成使用一个范围较广的比例（scales）和高宽比（aspect ratios）来高效地预测region proposals。对比于之前使用图片金字塔（图1，a）的方法或者过滤器金字塔（图1，b），我们引入了新的“anchor” boxes，在多个不同尺度和高宽比的情况下充当索引。我们的scheme可以被看成是一个regression references的金字塔（图1,c），它可以避免枚举多个不同尺度和高宽比的图片或filters。当使用单尺度图片进行训练和测试时，该模型执行很好，并且能提升运行速度。
+RPN被设计成使用一个较广范围的比例（scales）和高宽比（aspect ratios）来高效地预测region proposals。对比于上面使用图片金字塔（图1，a）的方法或者过滤器金字塔（图1，b），我们引入了新的**锚点边框“anchor” boxes**，在多个不同尺度和高宽比的情况下充当参照（references）。我们的scheme可以被看成是一个对参照（references）进行回归的金字塔（图1,c），它可以避免枚举多个不同尺度和高宽比的图片或filters。当使用单尺度图片进行训练和测试时，该模型执行很好，并且能提升运行速度。
 
-为了将RPN和Fast R-CNN目标检测网络进行统一，我们提出了一个training scheme，它可以轮流为region proposal任务和目标检测进行fine-tuning，并保持proposals固定。该scheme可以快速收敛，并生成一个使用卷积特征(可在任务间共享)的统一网络。
+为了将RPN和Fast R-CNN目标检测网络进行统一，我们提出了一个training scheme，它可以轮流为region proposal任务和目标检测任务进行fine-tuning，并保持proposals固定。该scheme可以快速收敛，并生成一个使用卷积特征(可在任务间共享)的统一网络。
 
-我们在PASCAL VOC benchmarks上进行综合评估，其中使用Fast R-CNN的RPNs准确率比使用Fast R-CNN的Selective Search(baseline)要好。同时，我们的方法没有Selective Search在测试时的计算开销——可以在10ms内有效运行proposals。使用昂贵的极深网络，我们的检测方法在GPU上仍然有5fps（包含所有steps）的帧率，这是一个在速率和准确率上实际可行的目标检测系统。我们也在MS COCO数据集上做了测试，并研究了在PASCAL VOC数据集上使用COCO数据进行提升。代码在：[matlab code](https://github.com/shaoqingren/faster_rcnn) 和 [python code](https://github.com/
+我们在PASCAL VOC benchmarks上进行综合评估，其中**使用Fast R-CNN的RPNs准确率比使用Fast R-CNN的Selective Search(baseline)要好**。同时，我们的方法没有Selective Search在测试时的计算开销——可以在10ms内有效运行proposals。使用昂贵的极深网络，我们的检测方法在GPU上仍然有5fps（包含所有steps）的帧率，这是一个在速率和准确率上实际可行的目标检测系统。我们也在MS COCO数据集上做了测试，并研究了在PASCAL VOC数据集上使用COCO数据进行提升。代码在：[matlab code](https://github.com/shaoqingren/faster_rcnn) 和 [python code](https://github.com/
 rbgirshick/py-faster-rcnn)。
 
 该paper的预览版在此前有发布。在此之后，RPN和Faster R-CNN的框架已经被其它方法实现并实现，比如：3D目标检测[13], part-based detection[14], instance segmentation[15]，image captioning[16]。我们的快速有效目标检测系统已经在比如Pinterests等商业系统中使用。
