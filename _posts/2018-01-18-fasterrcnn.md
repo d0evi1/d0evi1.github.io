@@ -23,7 +23,7 @@ proposal）阶段步骤仍然会像该检测网络一样消耗相当多的运行
 
 <img src="http://pic.yupoo.com/wangdren23/HI4Ky9cg/medish.jpg">
 
-图1: 多种scales和sizes下的不同模式（schemes）。(a) 构建图片和feature maps的金字塔，在所有scales上运行分类器 (b) 多个scales/sizes的filters，在feature map上运行  (c) 使用
+图1: 多种scales和sizes下的不同模式（schemes）。(a) 构建图片和feature maps的金字塔，在所有scales上运行分类器 (b) 使用多个scales/sizes的filters，在feature map上运行  (c) 使用在回归函数中参照框(reference box)金字塔
 
 RPN被设计成使用一个范围较广的比例（scales）和高宽比（aspect ratios）来高效地预测region proposals。对比于之前使用图片金字塔（图1，a）的方法或者过滤器金字塔（图1，b），我们引入了新的“anchor” boxes，在多个不同尺度和高宽比的情况下充当索引。我们的scheme可以被看成是一个regression references的金字塔（图1,c），它可以避免枚举多个不同尺度和高宽比的图片或filters。当使用单尺度图片进行训练和测试时，该模型执行很好，并且能提升运行速度。
 
