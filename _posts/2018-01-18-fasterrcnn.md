@@ -183,7 +183,7 @@ boxes’ coordinates）, 也就是网络响应，因而是近似的。在我们�
 
 表2展示了使用不同region proposal methords的训练和测试结果。对于Selective Search(SS)[4]方法，我们通过"fast"模式生成了大约2000个proposals。对于EdgeBoxes（EB）[6]方法，我们通过缺省的EB setting将IoU设置为0.7来生成proposals。在Fast R-CNN框架下，SS的mAP具有58.7%，而EB的mAP具有58.6%。RPN和Fast R-CNN达到的完整结果为，mAP具有59.9%，仅使用300个proposals。使用RPN会比SS或EB生成一个更快的检测系统，因为共享卷积计算；更少的proposals也会减小region-wise FC layers的开销（表5）。
 
-RPN上的Ablation实验。为了研究RPN作为proposal method的行为，我们做了一些ablation研究。首先，我们展示了在RPN和Fast R-CNN检测网络间共享conv layers的效果。为了达到这个，我们在第二个step后停止训练过程。使用独立的网络将结果减小到58.7%（RPN+ZF,unshared, 表2）。我们观察到这是因为在第三个step中，当detector-tuned features被用于fine-tune该RPN时，proposal质量会被提升。
+RPN上的Ablation实验。为了研究RPN作为proposal method的行为，我们做了一些ablation研究。首先，我们展示了在RPN和Fast R-CNN检测网络间共享卷积层（conv layers）的效果。为了达到这个，我们在第二个step后停止训练过程。使用独立的网络将结果减小到58.7%（RPN+ZF,unshared, 表2）。我们观察到这是因为在第三个step中，当detector-tuned features被用于fine-tune该RPN时，proposal质量会被提升。
 
 接着，我们放开RPN对Fast R-CNN训练的影响。出于该目的，我们训练了一个Fast R-CNN模型，使用2000个SS proposals和ZF net。我们固定该detector，通过更改在测试时的proposal regions，来评估该detection的mAP。在这些ablation实验中，RPN不会与detector共享features。
 
