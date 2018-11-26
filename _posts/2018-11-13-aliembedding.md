@@ -61,7 +61,7 @@ $$
 
 <img src="http://pic.yupoo.com/wangdren23/HNP0twlk/medish.jpg">
 
-图2: 淘宝graph embedding总览： a) 用户行为序列：用户u1对应一个session，u2和u3分别各对应一个session；这些序列被用于构建item graph；b) 有向加权item graph（weighted directed item graph）$$G=(V,E)$$; c)在item graph上由random walk生成的序列； d) Skip-Gram有embedding
+图2: 淘宝graph embedding总览： **a) 用户行为序列**：用户u1对应一个session，u2和u3分别各对应一个session；这些序列被用于构建item graph；**b) 有向加权item graph**（weighted directed item graph）$$G=(V,E)$$; **c)在item graph上由random walk生成的序列**； **d) 使用Skip-Gram生成embedding**
 
 
 在本节，我们详述了从用户行为构建item graph。现实中，在淘宝上一个用户的行为趋向于如图2(a)所示的序列。之前基于CF的方法只考虑了items的共现，但忽略了顺序信息（可以更精准地影响用户的偏好）。然而，不可能使用一个用户的整个历史，因为：
@@ -93,14 +93,14 @@ $$
 接着，我们使用Skip-Gram算法来学习embeddings，它会最大化在获取序列上的两个节点间的共现概率。这会生成以下的优化问题：
 
 $$
-minimize \limits_{\Phi} - log Pr (\lbrace v_{i-w}, ..., v_{i+w} \rbrace \backslash v_i | \Phi(v_i)) 
+minimize_{\Phi} - log Pr (\lbrace v_{i-w}, ..., v_{i+w} \rbrace \backslash v_i | \Phi(v_i)) 
 $$
 ...(3)
 
 其中，w是在序列中上下文节点的window size。使用独立假设，我们具有：
 
 $$
-Pr (\lbrace v_{i-w}, ..., v_{i+w} \rbrace \v_i | \Phi(v_i)) = \prod_{j=i-w, j \nq i}^{i+w} Pr(v_j | \Phi(v_i))
+Pr (\lbrace v_{i-w}, ..., v_{i+w} \rbrace \backslash v_i | \Phi(v_i)) = \prod_{j=i-w, j \neq i}^{i+w} Pr(v_j | \Phi(v_i))
 $$ 
 ...(4)
 
