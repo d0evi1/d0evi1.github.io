@@ -53,11 +53,16 @@ minimize _{\Phi}^{} \sum_{v \in V}^{} \sum_{c \in N(v)}^{} -log Pr(c | \Phi(v))
 $$
 ...(1)
 
-其中，$$N(v)$$是节点v的邻节点，可以被定义为从v开始在一跳或两跳内的节点。$$Pr(c \| \Phi(v))$$定义了给定一个节点v后，具有上下文节点c的条件概率。
+其中，$$N(v)$$是节点v的邻节点，可以被定义为从v开始在一跳或两跳内的节点。$$Pr(c \mid \Phi(v))$$定义了给定一个节点v后，具有上下文节点c的条件概率。
 
 在本节的其它部分，我们首先会介绍如何从用户行为中构建item graph，接着提供了基于DeepWalk的graph embedding方法来生成在taobao上20亿item上的低维表示。
 
 ## 2.2 根据用户行为构建item graph
+
+<img src="http://pic.yupoo.com/wangdren23/HNP0twlk/medish.jpg">
+
+图2: 淘宝graph embedding总览： a) 用户行为序列：用户u1对应一个session，u2和u3分别各对应一个session；这些序列被用于构建item graph；b) 有向加权item graph（weighted directed item graph）$$G=(V,E)$$; c)在item graph上由random walk生成的序列； d) Skip-Gram有embedding
+
 
 在本节，我们详述了从用户行为构建item graph。现实中，在淘宝上一个用户的行为趋向于如图2(a)所示的序列。之前基于CF的方法只考虑了items的共现，但忽略了顺序信息，它可以更精准地影响用户的偏好。然而，它不可能使用一个用户的整个历史，因为：
 
@@ -85,14 +90,10 @@ $$
 
 其中，$$N_{+}(v_i)$$表示出链（outlink）的邻节点集合，例如，从$$v_i$$出发指向在$$N_{+}(v_i)$$所有节点的边。通过运行随机游走，我们可以生成如图2(c)所示的许多序列。
 
-<img src="http://pic.yupoo.com/wangdren23/HNP0twlk/medish.jpg">
-
-图2: 淘宝graph embedding总览： a) 用户行为序列：用户u1对应一个session，u2和u3分别各对应一个session；这些序列被用于构建item graph；b) 有向加权item graph（weighted directed item graph）$$G=(V,E)$$; c)在item graph上由random walk生成的序列； d) Skip-Gram有embedding
-
 接着，我们使用Skip-Gram算法来学习embeddings，它会最大化在获取序列上的两个节点间的共现概率。这会生成以下的优化问题：
 
 $$
-minimize_{\Phi} - log Pr (\left v_{i-w}, ..., v_{i+w} \right | \Phi(v_i)) 
+minimize_{\Phi} - log Pr (\textbraceleft v_{i-w}, ..., v_{i+w} \textbraceright \backslash v_i | \Phi(v_i)) 
 $$
 ...(3)
 
