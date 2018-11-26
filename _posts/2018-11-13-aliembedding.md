@@ -64,7 +64,7 @@ $$
 图2: 淘宝graph embedding总览： a) 用户行为序列：用户u1对应一个session，u2和u3分别各对应一个session；这些序列被用于构建item graph；b) 有向加权item graph（weighted directed item graph）$$G=(V,E)$$; c)在item graph上由random walk生成的序列； d) Skip-Gram有embedding
 
 
-在本节，我们详述了从用户行为构建item graph。现实中，在淘宝上一个用户的行为趋向于如图2(a)所示的序列。之前基于CF的方法只考虑了items的共现，但忽略了顺序信息，它可以更精准地影响用户的偏好。然而，它不可能使用一个用户的整个历史，因为：
+在本节，我们详述了从用户行为构建item graph。现实中，在淘宝上一个用户的行为趋向于如图2(a)所示的序列。之前基于CF的方法只考虑了items的共现，但忽略了顺序信息（可以更精准地影响用户的偏好）。然而，不可能使用一个用户的整个历史，因为：
 
 - 1.计算开销和存储开销会非常大
 - 2.一个用户的兴趣趋向于随时间漂移
@@ -84,7 +84,7 @@ $$
 在我们获取weighted directed item graph后，表示$$G=(V,E)$$。我们采用DeepWalk来学习在图G中的每个节点的embedding。假设M表示G的邻近矩阵（adjacency matrix），$$M_{ij}$$表示从节点i指向节点j的加权边。我们首先基于随机游走生成节点序列，接着在这些序列上运行Skip-Gram算法。随机游走的转移概率定义如下：
 
 $$
-P(v_j | v_i) = \begin{bmatrix} \frac{M_{ij}}{\sum_{j \in N_{+}(v_i)} M_{ij}},  v_j \in N_{+}(v_i) \\ 0, e_{ij} \notin E \end{bmatrix}
+P(v_j | v_i) = \begin{cases} \frac{M_{ij}}{\sum_{j \in N_{+}(v_i)} M_{ij}}, & v_j \in N_{+}(v_i) \\ 0, & e_{ij} \notin E \end{cases}
 $$
 ...(2)
 
