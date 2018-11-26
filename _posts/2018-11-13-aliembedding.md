@@ -138,7 +138,7 @@ $$
 
 尽管GES可以获得收益，当在embedding过程中集成不同类型的side information时，仍存在一个问题。等式(6)中，不同类型的side information对最终的embedding的贡献是相等的，在现实中这不可能。例如，一个购买了IPhone的用户，趋向于会浏览Macbook或者Ipad，因为品牌都是"Apple"；而一个购买了多个不同品牌衣服的用户，出于便利和更低价格，还会在相同的淘宝店上继续购买。因此，不同类型的side information对于在用户行为中的共现items的贡献各不相同。
 
-为了解决该问题，我们提出了EGES方法来聚合不同类型的side information。该框架与GES相同（见图3）。不同之处是，当embeddings聚合时，不同类型的side information具有不同贡献。 因而，我们提出了一个加权平均的average layer来聚合与items相关的side information的embeddings。给定一个item v，假设$$ A \in R^{\|V\| \times (n+1)}$$是权重矩阵（weight matrix），条目$$A_{ij}$$是第i个item、第j个类型side information的权重。注意，$$A_{*0}$$，例如，A的第一列，表示item v的权限自身。出于简洁性，我们使用$$a_v^s$$来表示关于第v个item的第s个类型的side information的权重，$$a_v^0$$表示item v自身的权重。加权平均层（weighted average layer）会给合不同的side information，定义如下：
+为了解决该问题，我们提出了EGES方法来聚合不同类型的side information。该框架与GES相同（见图3）。不同之处是，当embeddings聚合时，不同类型的side information具有不同贡献。 因而，我们提出了一个加权平均的average layer来聚合与items相关的side information的embeddings。给定一个item v，假设$$ A \in R^{\mid V \mid \times (n+1)}$$是权重矩阵（weight matrix），条目$$A_{ij}$$是第i个item、第j个类型side information的权重。注意，$$A_{*0}$$，例如，A的第一列，表示item v的权限自身。出于简洁性，我们使用$$a_v^s$$来表示关于第v个item的第s个类型的side information的权重，$$a_v^0$$表示item v自身的权重。加权平均层（weighted average layer）会给合不同的side information，定义如下：
 
 $$
 H_v = \frac{\sum_{j=0}^{n} e^{a_v^j} W_v^j} {\sum_{j=0}^n e^{a_v^j}}
@@ -157,7 +157,14 @@ $$
 为了求解它，梯度求导如下：
 
 $$
-\frac{\partial L} {\partial a_v^s} = \frac{\partial L} {\partial H_v} \frac{\partial H_v} {\partial a_v^s} \\ (\sigma(H_v^T Z_u) -y) Z_u \frac{(\sum_{j=0}^n e^{a_v^j}) e^{a_v^s} W_v^s - e^{a_v^s} \sum_{j=0}^n e^{a_v^j} W_v^j} { (\sum_{j=0}^n e^{a_v^j})^2}
+\frac{\partial L}{Z_u}=(\sigma(H_v^T Z_u) -y) H_v
+$$
+...(9)
+
+对于第s个side information：
+
+$$
+\frac{\partial L} {\partial a_v^s} = \frac{\partial L} {\partial H_v} \frac{\partial H_v} {\partial a_v^s} \\ & (\sigma(H_v^T Z_u) -y) Z_u \frac{(\sum_{j=0}^n e^{a_v^j}) e^{a_v^s} W_v^s - e^{a_v^s} \sum_{j=0}^n e^{a_v^j} W_v^j} { (\sum_{j=0}^n e^{a_v^j})^2}
 $$
 ...(10)
 
