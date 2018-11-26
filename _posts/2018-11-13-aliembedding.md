@@ -143,6 +143,7 @@ $$
 $$
 H_v = \frac{\sum_{j=0}^{n} e^{a_v^j} W_v^j} {\sum_{j=0}^n e^{a_v^j}}
 $$
+
 ...(7)
 
 其中，我们使用$$e^{a_v^j}$$来替代$$a_v^j$$，以确保每个side information的贡献大于0, $$\sum_{j=0}^n e^{a_v^j}$$被用于归一化不同类型side information的embeddings的相关权重。
@@ -152,6 +153,7 @@ $$
 $$
 L(v, u, y) = - [ y log(\sigma(H_v^T Z_u)) + (1-y)log(1-\sigma(H_v^T z_u))]
 $$
+
 ...(8)
 
 为了求解它，梯度求导如下：
@@ -159,18 +161,21 @@ $$
 $$
 \frac{\partial L}{Z_u}=(\sigma(H_v^T Z_u) -y) H_v
 $$
+
 ...(9)
 
 对于第s个side information：
 
 $$
-\frac{\partial L} {\partial a_v^s} = \frac{\partial L} {\partial H_v} \frac{\partial H_v} {\partial a_v^s} \\ & (\sigma(H_v^T Z_u) -y) Z_u \frac{(\sum_{j=0}^n e^{a_v^j}) e^{a_v^s} W_v^s - e^{a_v^s} \sum_{j=0}^n e^{a_v^j} W_v^j} { (\sum_{j=0}^n e^{a_v^j})^2}
+\frac{\partial L} {\partial a_v^s} = \frac{\partial L} {\partial H_v} \frac{\partial H_v} {\partial a_v^s} \\  (\sigma(H_v^T Z_u) -y) Z_u \frac{(\sum_{j=0}^n e^{a_v^j}) e^{a_v^s} W_v^s - e^{a_v^s} \sum_{j=0}^n e^{a_v^j} W_v^j} { (\sum_{j=0}^n e^{a_v^j})^2}
 $$
+
 ...(10)
 
 $$
 \frac{\partial L} {\partial W_v^s} = \frac{\partial L} {\partial H_v} \frac{\partial L} {\partial W_v^s} \\ \frac{e^{a_v^s}}{\sum_{j=0}^n e^{a_v^j}} (\sigma(H_v^T Z_u) -y ) Z_u
 $$
+
 ...(11)
 
 EGES的伪代码如算法1如示，加权Skip-Gram updater的伪代码如算法2所示。最终每个item的隐表示通过等式(7)来计算：
