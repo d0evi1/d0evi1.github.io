@@ -1,0 +1,270 @@
+---
+layout: post
+title: 淘宝embedding介绍
+description: 
+modified: 2018-09-01
+tags: 
+---
+
+阿里在KDD 2018上开放了它们的方法:《Billion-scale Commodity Embedding for E-commerce Recommendation in Alibaba》, 我们来看下：
+
+# 介绍
+
+互联网技术持续改变着商业版图，电商变得无处不在。Alibaba blala，10亿用户，2017 GMV是37670亿rmb，2017收入是1580亿rmb。blala。
+
+10亿users和2亿items，例如，在淘宝，最重要的问题是，如何帮助用户快速发现需要和感兴趣的items。为了达成这个目标，推荐系统很重要。例如，淘宝移动APP的主页（图1），会基于用户过去的行为结合推荐技术生成，贡献了40%的总推荐流量。再者，在淘宝上，收入和流量的大头都来自推荐。简言之，推荐是taobao和alibaba的GMV和收入的核心引擎。尽管在学术界和工业界大多数推荐方法获得成功，例如：CF，基于内容的方法，基于deeplearning的方法；在淘宝，这些方法面对的问题变得更严峻，因为由海量的用户和海量的items。
+
+<img src="http://pic.yupoo.com/wangdren23/HNOWs4Xy/medish.jpg">
+
+图1: 虚线框的区域对于淘宝10亿用户来说是个性化的。为了更好的用户体验，吸引人的图片和方案描述也同样是生成的。注意，Taobao移动端主页贡献了40%的总推荐流量
+
+这里淘宝推荐系统有三个主要的技术挑战：
+
+- 可扩展性(Scalability)：尽量许多已经存在的推荐方法可以在小规模数据集上能很好工作(例如：数百万的users和items)，但它们通常会在淘宝的海量数据集上试验失败。
+- 稀疏性(Sparsity)：由于用户趋向于只与小部分的items交互，特别是当users或items只有少量交互时，很难训练一个精准的推荐模型。这通常被称为“sparsity”问题。
+- 冷启动(cold start)：在淘宝，数百万的新items会在每小时持续被上传。这些items没有用户行为。处理这些items、或者预测用户对这些items的偏好是个挑战，这被称为“cold start”问题。
+
+为了解决这些挑战，我们在淘宝技术平台上设计了two-stage推荐框架。第一阶段称为matching，第二阶段为ranking。在matching阶段，我们会生成一个候选集，它的items会与用户接触过的每个item具有相似性；接着在ranking阶段，我们会训练一个深度神经网络模型，它会为每个用户根据他的偏好对候选items进行排序。由于上述挑战，在二个阶段都会面临不同的问题。另外，每个阶段的目标不同，会导致技术解决方案的不同。
+
+在本paper中，我们主要关注如何解决在matching阶段的挑战，其中，核心任务是，基于用户行为，计算所有items的两两（pairwise）相似度。在获取items的pairwise相似度后，我们可以生成一个items候选集合，进一步在ranking阶段使用。为了达到该目的，我们提出了根据用户行为历史构建一个item graph，接着使用state-of-art的graph embedding方法[8,15,17]来学习每个item的embedding，这被称为**BGE（Base Graph Embedding）**。在这种方式下，我们可以基于items的embeddings向量进行点乘来计算候选items集合的相似度。注意，在之前的工作中，基于CF的方法来计算这些相似度。然而，基于CF的方法只考虑了在用户行为历史上的items的共现率。在我们的工作中，会在item graph中使用random walk，来捕获items间的高维相似性。这样，它比基于CF的方法要好。**然而，为少量或者没有交互行为的items学到精准的embeddings仍是个挑战**。为了减轻该问题，我们提供了使用side information来增强embedding过程，这被称为使用**Side information的Graph Embedding（Graph Embedding with
+Side information (GES)）**。例如，items属于相似的类目，或者品版在embedding space空间应更接近。在这种方式下，即使items只有少理或没有交互，我们也可以获取精确的items embedding。然而，在淘宝，只有许多种类型的side information。比如类目（category），品牌（brand），或价格（price），等，直觉上不同的side information对于学习items的embeddings的贡献也不一样。因而，我们进一步提出了一种**加权机制来使用，这被称为Enhanced Graph Embedding with
+Side information（EGES）**。
+
+总之，matching阶段有三个重要的部分：
+
+- (1) 基于在淘宝这些年的实践，我们设计了一个有效的启发式方法，基于在淘宝上10亿多用户的行为历史来构建item graph。
+- (2) 我们提供了BGE，GES和EGES，来学习在淘宝上20亿items的embeddings。我们进行离线实验来演示：GES和EGES与BGE、以及其它embedding方法对比的效果。
+- (3) 为了部署十亿级users和items的方法，我们基于baobao XTensorflow（XTF）平台来构建graph embedding systems。我们展示了提出的框架可以极大提升在taobao移动端app上的推荐效果，同时能满足在双十一节上的训练效率和实时服务。
+
+paper的其余部分组织如下：第2节介绍三种embedding方法。第3节介绍离线和在线实验结果。第4节介绍在taobao上的系统部署。第5节回顾相关工作。第6节收尾。
+
+# 2.框架
+
+这一节，首先引入graph embedding的基础，接着详述如何从用户行为历史上构建item graph。最后，我们研究了在淘宝学习items embeddings的方法。
+
+## 2.1 前提条件
+
+本节，我们会给出一个关于graph embedding的总览，一个很流行的方法是：DeepWalk，在此基础上，我们提出了在matching阶段我们的graph embedding方法。给定一个graph：$$G = (V, E) $$，其中V和E分别表示节点集合和边集合。Graph embedding是为在空间$$R^d$$上的每个节点$$v \in V$$学习一个低维的表示，其中$$ d \ll \|V \| $$。换句话说，我们的目的是，学习一个映射函数：$$\Phi: V \rightarraw R^d $$，例如，在V中的每个节点表示成一个d维向量。
+
+在[13,14]中，提出了word2vec来学习在语料中的每个词的embedding。受word2vec的启发，Perozzi等提出了DeepWalk来学习在graph中每个节点的embedding。首先通过运行在graph中的random walk来生成节点序列，接着应用Skip-Gram算法来学习在graph中的每个节点表示。为了维持该graph的拓朴结构，他们需要解决以下的优化问题：
+
+$$
+minimize_{\Phi} \sum_{v \in V} \sum_{c \in N(v)} -log Pr(c | \Phi(v))
+$$
+...(1)
+
+其中，$$N(v)$$是节点v的邻节点，可以被定义为从v开始在一跳或两跳内的节点。$$Pr(c \| \Phi(v))$$定义了给定一个节点v后，具有上下文节点c的条件概率。
+
+在本节的其它部分，我们首先会介绍如何从用户行为中构建item graph，接着提供了基于DeepWalk的graph embedding方法来生成在taobao上20亿item上的低维表示。
+
+## 2.2 根据用户行为构建item graph
+
+在本节，我们详述了从用户行为构建item graph。现实中，在淘宝上一个用户的行为趋向于如图2(a)所示的序列。之前基于CF的方法只考虑了items的共现，但忽略了顺序信息，它可以更精准地影响用户的偏好。然而，它不可能使用一个用户的整个历史，因为：
+
+- 1.计算开销和存储开销会非常大
+- 2.一个用户的兴趣趋向于随时间漂移
+
+因此，实际上，我们设置了一个时间窗口，只选择用户在该窗口内的行为。这被称为是基于session的用户行为（session-based）。经验上，该时间窗口的区间是一个小时。
+
+如果我们获取基于session的用户行为，如果两个items它们连续出现，会通过一个有向边进行连接，例如：图2(b)的item D和item A是连接的，因为在图2(a)中用户$$u_1$$顺序访问了item D和A。通过利用在淘宝上所有用户的协同行为，我们会为每条边$$e_{ij}$$基于在所有用户行为的行连接items中的出现总数分配一个权重。特别的，在所有用户行为历史中，该边的权重等于item i转向item j的频次。这种方法中，构建的item graph可以基于所有用户行为表示不同items间的相似度。
+
+实际上，在我们抽取了用户行为序列之前，我们需要过滤一些非法数据和异常行为来为我们的方法消除噪声。下述行为会被我们的系统认定为噪声：
+
+- 如果在一次点击后的停留时长少于1秒，该点击可能是无意识的，需要被移除。
+- 在淘宝中有许多"过度活跃(over-active)"用户，它们实际上是有害用户（spam users）。根据我们在淘宝上的时长观察，如果在三个月内，单个用户购买1000个items或者他/她的总点击数超过3500个items，该用户非常可能是一个spam user。我们需要过滤掉这些用户的行为。
+- 淘宝零售商们（Retailers）会保持更新一个商品(commodity)的详情。极端情况下，在淘宝上的一个商品可能在一连串更新后，虽然相同的id，但很可能变成了不同的item。因而，这种item也会根据id进行移除。
+
+## 2.3 基于图的Embedding（BGE）
+
+在我们获取weighted directed item graph后，表示$$G=(V,E)$$。我们采用DeepWalk来学习在图G中的每个节点的embedding。假设M表示G的邻近矩阵（adjacency matrix），$$M_{ij}$$表示从节点i指向节点j的加权边。我们首先基于随机游走生成节点序列，接着在这些序列上运行Skip-Gram算法。随机游走的转移概率定义如下：
+
+$$
+P(v_j | v_i) = \begin{bmatrix} \frac{M_{ij}}{\sum_{j \in N_{+}(v_i)} M_{ij}},  v_j \in N_{+}(v_i) \\ 0, e_{ij} \notin E \end{bmatrix}
+$$
+...(2)
+
+其中，$$N_{+}(v_i)$$表示出链（outlink）的邻节点集合，例如，从$$v_i$$出发指向在$$N_{+}(v_i)$$所有节点的边。通过运行随机游走，我们可以生成如图2(c)所示的许多序列。
+
+<img src="http://pic.yupoo.com/wangdren23/HNP0twlk/medish.jpg">
+
+图2: 淘宝graph embedding总览： a) 用户行为序列：用户u1对应一个session，u2和u3分别各对应一个session；这些序列被用于构建item graph；b) 有向加权item graph（weighted directed item graph）$$G=(V,E)$$; c)在item graph上由random walk生成的序列； d) Skip-Gram有embedding
+
+接着，我们使用Skip-Gram算法来学习embeddings，它会最大化在获取序列上的两个节点间的共现概率。这会生成以下的优化问题：
+
+$$
+minimize_{\Phi} - log Pr (\left v_{i-w}, ..., v_{i+w} \right | \Phi(v_i)) 
+$$
+...(3)
+
+其中，w是在序列中上下文节点的window size。使用独立假设，我们具有：
+
+$$
+Pr (\left v_{i-w}, ..., v_{i+w} \right \v_i | \Phi(v_i)) = \prod_{j=i-w, j \nq i}^{i+w} Pr(v_j | \Phi(v_i))
+$$ 
+...(4)
+
+应用negative sampling，等式4可以转换成：
+
+$$
+minimize log \sigma (\Phi(v_j)^T \Phi(v_i)) + \sum_{t \in N_(v_i)'} log \sigma(- \Phi(v_t)^T \Phi(v_i))
+$$
+...(5)
+
+其中，$$V(v_i)'$$是对于$$v_i$$的负采样，$$\sigma()$$是sigmoid函数。经验上，$$ \| N(v_i)' \|$$越大，获得的结果越好。
+
+## 2.4 使用Side Information的GE（GES）
+
+通过应用2.3节的embedding方法，我们可以学到在淘宝上的所有items的embedding，来捕获在用户行为序列上的更高阶相似度，这种特性会被基于CF的方法忽略。然而，对于“冷启动（cold-start）”的items，学到精准的embeddings仍然是个挑战。
+
+为了解决冷启动问题，我们提出了增强式BGE，它会使用side information来与冷启动items做绑定。在商业推荐系统的场景中，side information常指关于一个item的：类目(category)，shop(商名)，价格(price)等，它们常被当成是ranking阶段的关键特征而广泛使用，但很少用于matching阶段。我们可以通过将side information合并到graph embedding中来缓合cold-start问题。例如，优衣库(UNIQLO：相同店)的两款卫衣（相同类目）可能很相似，一个喜欢Nikon镜头的用户，也可能对Canon Cemera有兴趣（相同类目和相似品牌）。这意味着这些items具有相似的side information也可在embedding空间中更接近。基于这个猜想，我们提出了如图3的GES方法。
+
+<img src="http://pic.yupoo.com/wangdren23/HNP160zX/medish.jpg">
+
+图3: GES和EGES的总框架。SI表示side information，其中"SI O"表示item自身。惯例上，1）对于items和不同的SIs，稀疏特征趋向于one-hot-encoder vectors。 2) Dense embeddings是items和相应的SI的表示 3) hidden representation是一个item和它相应的SI的聚合embedding
+
+为了清晰些，我们对概念做了精微调整。我们使用W来表示items或者side information的embedding matrix。特别的，$$W_v^0$$表示item v的embedding，$$W_v^S$$表示绑定到item v上的第s个类型的side information的embedding。接着，对于item v，使用n种类型的side information，我们具有n+1个向量$$w_v^0, ..., W_v^n \in R^d$$，其中，d是embedding的维度。注意，item embeddings和side information embeddings的维度，经验上设置为相同的值。
+
+如图3所示，为了合并side information，我们为item v将n+1个embedding vectors进行拼接，增加一个layer，使用average-pooling操作来将所有与item v的embeddings进行聚合，它是：
+
+$$
+H_v = \frac{1}{n+1} \sum_{s=0}^n W_v^s
+$$
+...(6)
+
+其中，$$H_v$$是item v的聚合embeddings。这种方法中，我们将side information以这样的方式合并，从而使具有相近side information的items可以在embedding空间内更接近。这会为cold-start items的embeddings更精准些，并且提升了在线和离线的效果。（见第3节）
+
+## 2.5 增强型EGS（EGES）
+
+尽管GES可以获得收益，当在embedding过程中集成不同类型的side information时，仍存在一个问题。等式(6)中，不同类型的side information对最终的embedding的贡献是相等的，在现实中这不可能。例如，一个购买了IPhone的用户，趋向于会浏览Macbook或者Ipad，因为品牌都是"Apple"；而一个购买了多个不同品牌衣服的用户，出于便利和更低价格，还会在相同的淘宝店上继续购买。因此，不同类型的side information对于在用户行为中的共现items的贡献各不相同。
+
+为了解决该问题，我们提出了EGES方法来聚合不同类型的side information。该框架与GES相同（见图3）。不同之处是，当embeddings聚合时，不同类型的side information具有不同贡献。 因而，我们提出了一个加权平均的average layer来聚合与items相关的side information的embeddings。给定一个item v，假设$$ A \in R^{\|V\| \times (n+1)}$$是权重矩阵（weight matrix），条目$$A_{ij}$$是第i个item、第j个类型side information的权重。注意，$$A_{*0}$$，例如，A的第一列，表示item v的权限自身。出于简洁性，我们使用$$a_v^s$$来表示关于第v个item的第s个类型的side information的权重，$$a_v^0$$表示item v自身的权重。加权平均层（weighted average layer）会给合不同的side information，定义如下：
+
+$$
+H_v = \frac{\sum_{j=0}^{n} e^{a_v^j} W_v^j} {\sum_{j=0}^n e^{a_v^j}}
+$$
+...(7)
+
+其中，我们使用$$e^{a_v^j}$$来替代$$a_v^j$$，以确保每个side information的贡献大于0, $$\sum_{j=0}^n e^{a_v^j}$$被用于归一化不同类型side information的embeddings的相关权重。
+
+在训练数据中，对于节点v和它的上下文节点u，我们使用$$Z_u \in R^d$$来表示它的embedding，y来表示label。接着，EGES的目标函数变为：
+
+$$
+L(v, u, y) = - [ y log(\sigma(H_v^T Z_u)) + (1-y)log(1-\sigma(H_v^T z_u))]
+$$
+...(8)
+
+为了求解它，梯度求导如下：
+
+$$
+\frac{\partial L} {\partial a_v^s} = \frac{\partial L} {\partial H_v} \frac{\partial H_v} {\partial a_v^s} \\ (\sigma(H_v^T Z_u) -y) Z_u \frac{(\sum_{j=0}^n e^{a_v^j}) e^{a_v^s} W_v^s - e^{a_v^s} \sum_{j=0}^n e^{a_v^j} W_v^j} { (\sum_{j=0}^n e^{a_v^j})^2}
+$$
+...(10)
+
+$$
+\frac{\partial L} {\partial W_v^s} = \frac{\partial L} {\partial H_v} \frac{\partial L} {\partial W_v^s} \\ \frac{e^{a_v^s}}{\sum_{j=0}^n e^{a_v^j}} (\sigma(H_v^T Z_u) -y ) Z_u
+$$
+...(11)
+
+EGES的伪代码如算法1如示，加权Skip-Gram updater的伪代码如算法2所示。最终每个item的隐表示通过等式(7)来计算：
+
+<img src="http://pic.yupoo.com/wangdren23/HNPkqqvq/medish.jpg">
+
+算法一：
+
+<img src="http://pic.yupoo.com/wangdren23/HNPkqxpI/medish.jpg">
+
+算法二：
+
+# 3.实验
+
+本节中，我们引入大量实验来演示这些方法的效果。首先通过链接预测任务评估方法，然后是在Taobao移动端APP上的在线实验。最终，我们提出一些真实case来进一步深入这些方法。
+
+## 3.1 离线评估
+
+**链接预测（Link Prediction）**。链接预测任务被用于离线实验，因为它是在网络中的一个基础问题。给定移除某些边的一个网络，预测任务是预测这些链接的出现概率。根据在[30]中相似的实验设置，1/3的边被随机选中及移除，在测试集中作为ground truth，图中剩余的边作为训练集。在测试集中，相同数目的没有边连接的节点对（node pairs）会被随机选中作为负样本。为了评估链接预测的效果，使用AUC得分作为metric。
+
+**数据集**：我们使用两个数据集来进行链接预测任务。第一个是Amazon Electronics数据集。第二个从Taobao移动端APP抽取。两个数据集都包含了不同类型的side information。对于Amazon数据集，item graph可以从“共同购买（co-purchasing）”的关系中被构建（在提供的数据中由also_bought表示），使用了三种类型的side information，例如：类目（category），子类目(sub-category)以及品牌。对于Taobao数据集，item graph通过第2.2节的方法购建。注意，为了效率和效果，在Taobao真实生产环境中，使用了12种类型的side information，包括：零售商（retailer）, 品牌（brand）, 购买级别（purchase level）, 年代（age）, 适用性别（gender）, 风格（style）, 等等。这些类型的side information根据这些年在taobao的实际经验很有用。两个数据集的统计如表1所示。我们可以看到两个数据集的稀疏性大于99%。
+
+<img src="http://pic.yupoo.com/wangdren23/HNPuB5NL/medish.jpg">
+
+表1
+
+**比较方法**。引入了4种方法进行实验：BGE, LINE, GES和EGES。LINE在[17]中被提出，它可以捕获在graph embedding中的第一阶和第二阶的邻近关系。我们使用由作者提供的实现，使用第一阶和第二阶邻近（LINE(1st)和LINE(2nd)）来运行它。我们实现了其它三种方法。所有这些方法的embedding维度都设置为160.对于我们的BGE、GES和EGES，随机游走的长度为10, 每个节点的walks数目为20, 上下文窗口为5.
+
+<img src="http://pic.yupoo.com/wangdren23/HNPuBfW5/medish.jpg">
+表2
+
+**结果分析**。结果如表2所示。我们可以看到GES和EGES的AUC效果在两个数据集上都要好于BGE、LINE(1st)和LINE(2st)。另换，稀疏性问题也通过合并side information而缓合。当比较Amazon和Taobao的效果时，我们可以看到，在taobao数据集上的效果增益更大。我们将它归功于在Taobao数据集上使用了更多类型的有效的、有信息量的side information。当比较GES和EGES时，我们可以看到，在Amazon上的效果收益比在Taobao上的要大。这可能归功于Taobao的效果已经非常好了，比如：0.97.因而，EGES的提升不显著。在Amazon dataset上，EGES在AUC上的效果要好于GES。基于这些结果，我们可以观察到合并side information对于graph embedding非常有效，准确率可以通过对多个side information的mebeddings进行加权聚合而提升。
+
+<img src="http://pic.yupoo.com/wangdren23/HNP1m7ci/medish.jpg">
+
+图4 2017年11月连续7天内不同方法的在线CTR
+
+# 3.2 在线A/B test
+
+我们在一个A/B testing框架下进行在线实验。实验的目标是在Taobao APP主页上的CTR。我们实现了上述的graph embedding方法，接着为每个item生成多个相似的items作为推荐候选。最终在Taobao主页（见图1）上的推荐结果，由基于一个DNN模型的ranking引擎生成。在实验中，我们在ranking上使用相同的方法对候选排序。如上所述，相似items的质量直接影响着推荐结果。因而，推荐效果（例如：CTR）可以受matching阶段不同的方法而影响。我们在A/B test框架上部署了4个方法。并对2017年11月中的7天的结果进行展示（如图4）。注意，“Base”表示一个item-based CF的方法，在graph embedding方法部署之前，它被广泛用于淘宝上。它会根据item的共现以及用户投票权重，计算两个items间的相似度。该相似度可以很好地进行调参、并很适合淘宝电商。
+
+从图4我们可以看到，EGES和GES在CTR上的效果要好于BGE、以及Base方法，这展示了在graph embedding上合并side information的效果。另外，Base的CTR要大于BGE。这意味着，经过良好调参的CF-based方法可以战胜简单的embedding方法，因为在实际中会大量使用人工经验的策略。另一方面，EGES会一直胜过GES，它在3.1节的离线实验中一致。这进一步演示了，side information的加权聚合要胜过平均聚合。
+
+## 3.2 案例研究
+
+在本节中，我们提出了一些在taobao的真实案例，来展示这些方法的效果。这些case会检查三个方面：
+
+- 1.通过EGES的embedding可视化
+- 2.冷启动items
+- 3.在EGES中的权重
+
+### 3.3.1 可视化
+
+在本部分，我们会将由EGES学到的items的embeddings进行可视化。我们使用由tensorflow提供的可视化工具。结果如图7所示。从图7(a)，我们可以看到不同类目（categories）的鞋子会在不同的聚类中。这里一种颜色表示一个类目，比如：羽毛球，乒乓球，足球。它演示了学到的合并side information的embeddings的效果。例如，具有相似side information的items在embedding空间中应更接近。从图7(b)看到，我们进一步分析三种鞋子的embeddings：羽毛球，乒乓球，足球。在embedding空间中，羽毛球和乒乓球相互很接近，而足球更更远些。这可以被解释成：在中国，喜欢羽毛球的人很多也喜欢打乒乓球。然而，喜欢足球的人与喜欢户内运动（羽毛球和乒乓球）的人则相当不同。推荐羽毛球鞋给这些观看过乒乓球鞋的人效果要好于推足球鞋的。
+
+### 3.3.2 冷启动items
+
+<img src="http://pic.yupoo.com/wangdren23/HNP1zNxT/medish.jpg">
+
+图5: 冷启动item的相似items。展示了top4相似的items。注意：这里的"cat"表示category.
+
+在本部分，我们展示了冷启动的embeddings质量。对于在淘宝上刚更新的一个新item，在item graph中没法学到embedding，之前基于CF的方法也不能处理冷启动问题。然而，我们可以将一个冷启动item使用它的side information进行表示。结果如图5所示。我们可以看到，尽管对于两个冷启动items来说缺失用户行为，但可以利用不同的side information来有效学习它们的embeddings，在top相似的items上。在图中，我们为每个相似的item做了注释，连接到冷启动item上的side information的类型。我们可以看到，items的所属商店（shops）是用于衡量两个items相似度上非常重要的信息，它也会在下面部分使和每个side information的权重进行对齐。
+
+<img src="http://pic.yupoo.com/wangdren23/HNP1PYZI/medish.jpg">
+
+图6: 不同items的不同side information的weights. 这里的"Item"表示一个item本身的embedding
+
+### 3.3.3 在EGES中的权重
+
+我们会为不同的items作不同类型side information权重可视化。每个在不同类目上的8个items会被选中，与这些items相关的所有side information的权重会从学到的weight matrix A中抽取。结果如图6所示，其中，每一行记录了一个item的结果。可以观察到许多注意点：
+
+- 1.不同items的weight分布很不同，它们会与我们的猜假一致，不同的side information对于最终的表示来说贡献是不同的。
+- 2.在所有items中，"Item"的权重，表示了item自身的embeddings，会一直大于其它的side information的权重。必须承认的是，一个item自身的embedding仍然是用户行为的主要源，其中side information提供了额外的提示来推断用户行为。
+- 3.除了"Item"外，"Shop"的权重会一直大于其它side information的权重。这与淘宝的用户行为相一致，也就是说，用户可能出于便利或更低价格因素，趋向于购买在相同店内的items。
+
+<img src="http://pic.yupoo.com/wangdren23/HNP26h25/medish.jpg">
+
+图7: 随机选中的鞋子的一个集合的embedding可视化。item embeddings通过PCA被投影到一个2D平面上。不同颜色表示不同的categories。相同category中的Item被一起分组。
+
+# 4.系统部署和操作
+
+本节中介绍graph embedding方法在淘宝的实现和部署。首先给出对淘宝整个推荐平台的一个大体介绍，接着详述与embedding方法相关的模块。
+
+<img src="http://pic.yupoo.com/wangdren23/HNP2lcAo/medish.jpg">
+
+图8: 淘宝推荐平台的架构
+
+在图8中，我们展示了推荐平台的架构。该平台包含了两个子系统：online和offline。对于online子系统，主要组件是TPP（Taobao Personality Platform:淘宝个性化平台）和RSP（Ranking Service Platform: 排序服务平台）。一个典型的workflow如下所示：
+
+- 当用户加载淘宝移动APP时，TPP会抽取用户最新的信息，并从离线子系统中检索一个items候选集，它们会接着被fed进RSP。RSP会使用一个fine-tuned DNN模型对items候选集进行排序，接着返回相应的排序结果给TPP。
+- 当用户在淘宝内浏览时，它们的行为会被收集和存储成离线子系统中的日志。
+
+offline子系统的workflow，包含了graph embedding的实现和部署，如下描述：
+
+- 包含用户行为的日志会被检索。item graph会基于用户行为进行构建。实际上，我们会选择最近三个月的日志。在生成基于session的用户行为序列之前，会对数据进行anti-spam。留下的日志包含了6000亿条目。item graph会根据2.2节的方法进行构建。
+- 为了运行我们的graph embedding方法，会采用两种实际方法：1) 整个graph划分成许多个sub-graphs，它们可以通过Taobao的ODPs（Open Data Processing Service）分布式平台进行处理。每个subgraph有将近5000w个节点。2)为了生成random walk序列，我们在ODPs中使用基于迭代的分布式图框架。通过random walk生成的序列总是将近1500亿。
+- 为了实现该embedding算法，在我们的XTF平台上使用了100个GPU。在部署平台上，使用1500亿样本，在离线子系统中的所有模块，包含日志检索、anti-spam、item图构建、通过random walk生成序列、embedding、item-to-item相似度计算以及map生成，执行过程小于6个小时。这样，我们的推荐服务可以在非常短时间内响应用户最近行为。
+
+
+
+
+# 参考
+
+- 1.[Billion-scale Commodity Embedding for E-commerce
+Recommendation in Alibaba](https://arxiv.org/pdf/1803.02349.pdf)
