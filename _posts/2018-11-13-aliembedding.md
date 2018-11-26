@@ -12,7 +12,7 @@ tags:
 
 互联网技术持续改变着商业版图，电商变得无处不在。Alibaba blala，10亿用户，2017 GMV是37670亿rmb，2017收入是1580亿rmb。blala。
 
-10亿users和2亿items，例如，在淘宝，最重要的问题是，如何帮助用户快速发现需要和感兴趣的items。为了达成这个目标，推荐系统很重要。例如，淘宝移动APP的主页（图1），会基于用户过去的行为结合推荐技术生成，贡献了40%的总推荐流量。再者，在淘宝上，收入和流量的大头都来自推荐。简言之，推荐是taobao和alibaba的GMV和收入的核心引擎。尽管在学术界和工业界大多数推荐方法获得成功，例如：CF，基于内容的方法，基于deeplearning的方法；在淘宝，这些方法面对的问题变得更严峻，因为由海量的用户和海量的items。
+淘宝有10亿users和2亿items，最重要的问题是，如何帮助用户快速发现需要和感兴趣的items。推荐系统对于达成这个目标来说至关重要。例如，淘宝移动APP的主页（图1），会基于用户过去的行为结合推荐技术生成，贡献了40%的总推荐流量。再者，在淘宝上，收入和流量的大头都来自推荐。简言之，推荐是taobao和alibaba的GMV和收入的核心引擎。尽管在学术界和工业界大多数推荐方法都能获得成功（例如：CF，基于内容的方法，基于deeplearning的方法），但是在淘宝，这些方法面对的问题变得更严峻，因为有海量的用户和海量的items存在。
 
 <img src="http://pic.yupoo.com/wangdren23/HNOWs4Xy/medish.jpg">
 
@@ -24,10 +24,10 @@ tags:
 - 稀疏性(Sparsity)：由于用户趋向于只与小部分的items交互，特别是当users或items只有少量交互时，很难训练一个精准的推荐模型。这通常被称为“sparsity”问题。
 - 冷启动(cold start)：在淘宝，数百万的新items会在每小时持续被上传。这些items没有用户行为。处理这些items、或者预测用户对这些items的偏好是个挑战，这被称为“cold start”问题。
 
-为了解决这些挑战，我们在淘宝技术平台上设计了two-stage推荐框架。第一阶段称为matching，第二阶段为ranking。在matching阶段，我们会生成一个候选集，它的items会与用户接触过的每个item具有相似性；接着在ranking阶段，我们会训练一个深度神经网络模型，它会为每个用户根据他的偏好对候选items进行排序。由于上述挑战，在二个阶段都会面临不同的问题。另外，每个阶段的目标不同，会导致技术解决方案的不同。
+为了解决这些挑战，我们在淘宝技术平台上设计了two-stage推荐框架。第一阶段称为matching，第二阶段为ranking。在matching阶段，我们会生成一个候选集，它的items会与用户接触过的每个item具有相似性；接着在ranking阶段，我们会训练一个深度神经网络模型，它会为每个用户根据他的偏好对候选items进行排序。由于上述挑战的存在，在两个阶段都会面临不同的问题。另外，每个阶段的目标不同，会导致技术解决方案的不同。
 
 在本paper中，我们主要关注如何解决在matching阶段的挑战，其中，核心任务是，基于用户行为，计算所有items的两两（pairwise）相似度。在获取items的pairwise相似度后，我们可以生成一个items候选集合，进一步在ranking阶段使用。为了达到该目的，我们提出了根据用户行为历史构建一个item graph，接着使用state-of-art的graph embedding方法[8,15,17]来学习每个item的embedding，这被称为**BGE（Base Graph Embedding）**。在这种方式下，我们可以基于items的embeddings向量进行点乘来计算候选items集合的相似度。注意，在之前的工作中，基于CF的方法来计算这些相似度。然而，基于CF的方法只考虑了在用户行为历史上的items的共现率。在我们的工作中，会在item graph中使用random walk，来捕获items间的高维相似性。这样，它比基于CF的方法要好。**然而，为少量或者没有交互行为的items学到精准的embeddings仍是个挑战**。为了减轻该问题，我们提供了使用side information来增强embedding过程，这被称为使用**Side information的Graph Embedding（Graph Embedding with
-Side information (GES)）**。例如，items属于相似的类目，或者品版在embedding space空间应更接近。在这种方式下，即使items只有少理或没有交互，我们也可以获取精确的items embedding。然而，在淘宝，只有许多种类型的side information。比如类目（category），品牌（brand），或价格（price），等，直觉上不同的side information对于学习items的embeddings的贡献也不一样。因而，我们进一步提出了一种**加权机制来使用，这被称为Enhanced Graph Embedding with
+Side information (GES)）**。例如，属于相似的类目或品牌的items在embedding space空间应更接近。在这种方式下，即使items只有少理或没有交互，我们也可以获取精确的items embedding。然而，在淘宝，有许多种类型的side information。比如类目（category）、品牌（brand）、或价格（price）等，直觉上不同的side information对于学习items的embeddings的贡献也不一样。因而，我们进一步提出了一种**加权机制来使用，这被称为Enhanced Graph Embedding with
 Side information（EGES）**。
 
 总之，matching阶段有三个重要的部分：
@@ -40,11 +40,11 @@ paper的其余部分组织如下：第2节介绍三种embedding方法。第3节�
 
 # 2.框架
 
-这一节，首先引入graph embedding的基础，接着详述如何从用户行为历史上构建item graph。最后，我们研究了在淘宝学习items embeddings的方法。
+这一节，首先引入graph embedding的基础，接着详述如何从用户行为历史上构建item graph。最后，我们研究了在淘宝上进行学习items embeddings的方法。
 
 ## 2.1 前提条件
 
-本节，我们会给出一个关于graph embedding的总览，一个很流行的方法是：DeepWalk，在此基础上，我们提出了在matching阶段我们的graph embedding方法。给定一个graph：$$G = (V, E) $$，其中V和E分别表示节点集合和边集合。Graph embedding是为在空间$$R^d$$上的每个节点$$v \in V$$学习一个低维的表示，其中$$ d \ll \|V \| $$。换句话说，我们的目的是，学习一个映射函数：$$\Phi: V \rightarraw R^d $$，例如，在V中的每个节点表示成一个d维向量。
+本节，我们会给出一个关于graph embedding的总览，会采用一个很流行的方法：DeepWalk；在此基础上，我们提出了在matching阶段我们的graph embedding方法。给定一个graph：$$G = (V, E) $$，其中V和E分别表示节点集合和边集合。Graph embedding是为在空间$$R^d$$上的每个节点$$v \in V$$学习一个低维的表示，其中$$ d \ll \mid V \mid $$。换句话说，我们的目的是，学习一个映射函数：$$\Phi: V \rightarraw R^d $$，例如，在V中的每个节点表示成一个d维向量。
 
 在[13,14]中，提出了word2vec来学习在语料中的每个词的embedding。受word2vec的启发，Perozzi等提出了DeepWalk来学习在graph中每个节点的embedding。首先通过运行在graph中的random walk来生成节点序列，接着应用Skip-Gram算法来学习在graph中的每个节点表示。为了维持该graph的拓朴结构，他们需要解决以下的优化问题：
 
