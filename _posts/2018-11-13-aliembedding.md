@@ -93,14 +93,14 @@ $$
 接着，我们使用Skip-Gram算法来学习embeddings，它会最大化在获取序列上的两个节点间的共现概率。这会生成以下的优化问题：
 
 $$
-minimize_{\Phi} - log Pr (\textbraceleft v_{i-w}, ..., v_{i+w} \textbraceright \backslash v_i | \Phi(v_i)) 
+minimize_{\Phi} - log Pr (\lbrace v_{i-w}, ..., v_{i+w} \rbrace \backslash v_i | \Phi(v_i)) 
 $$
 ...(3)
 
 其中，w是在序列中上下文节点的window size。使用独立假设，我们具有：
 
 $$
-Pr (\left v_{i-w}, ..., v_{i+w} \right \v_i | \Phi(v_i)) = \prod_{j=i-w, j \nq i}^{i+w} Pr(v_j | \Phi(v_i))
+Pr (\lbrace v_{i-w}, ..., v_{i+w} \rbrace \v_i | \Phi(v_i)) = \prod_{j=i-w, j \nq i}^{i+w} Pr(v_j | \Phi(v_i))
 $$ 
 ...(4)
 
