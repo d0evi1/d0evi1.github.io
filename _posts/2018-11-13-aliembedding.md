@@ -111,7 +111,7 @@ minimize log \sigma (\Phi(v_j)^T \Phi(v_i)) + \sum_{t \in N_(v_i)'} log \sigma(-
 $$
 ...(5)
 
-其中，$$V(v_i)'$$是对于$$v_i$$的负采样，$$\sigma()$$是sigmoid函数。经验上，$$ \| N(v_i)' \|$$越大，获得的结果越好。
+其中，$$V(v_i)'$$是对于$$v_i$$的负采样，$$\sigma()$$是sigmoid函数。经验上，$$ \mid N(v_i)' \mid$$越大，获得的结果越好。
 
 ## 2.4 使用Side Information的GE（GES）
 
