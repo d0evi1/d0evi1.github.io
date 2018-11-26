@@ -44,7 +44,7 @@ paper的其余部分组织如下：第2节介绍三种embedding方法。第3节�
 
 ## 2.1 前提条件
 
-本节，我们会给出一个关于graph embedding的总览，会采用一个很流行的方法：DeepWalk；在此基础上，我们提出了在matching阶段我们的graph embedding方法。给定一个graph：$$G = (V, E) $$，其中V和E分别表示节点集合和边集合。Graph embedding是为在空间$$R^d$$上的每个节点$$v \in V$$学习一个低维的表示，其中$$ d \ll \mid V \mid $$。换句话说，我们的目的是，学习一个映射函数：$$\Phi: V \rightarraw R^d $$，例如，在V中的每个节点表示成一个d维向量。
+本节，我们会给出一个关于graph embedding的总览，会采用一个很流行的方法：DeepWalk；在此基础上，我们提出了在matching阶段我们的graph embedding方法。给定一个graph：$$G = (V, E) $$，其中V和E分别表示节点集合和边集合。Graph embedding会为空间$$R^d$$上的每个节点$$v \in V$$学习一个低维表示，其中$$ d \ll \mid V \mid $$。换句话说，我们的目的是，学习一个映射函数：$$\Phi: V \rightarrow R^d $$，（即：在V中的每个节点表示成一个d维向量）。
 
 在[13,14]中，提出了word2vec来学习在语料中的每个词的embedding。受word2vec的启发，Perozzi等提出了DeepWalk来学习在graph中每个节点的embedding。首先通过运行在graph中的random walk来生成节点序列，接着应用Skip-Gram算法来学习在graph中的每个节点表示。为了维持该graph的拓朴结构，他们需要解决以下的优化问题：
 
