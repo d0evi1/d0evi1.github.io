@@ -117,11 +117,11 @@ $$
 
 通过应用2.3节的embedding方法，我们可以学到在淘宝上的所有items的embedding，来捕获在用户行为序列上的更高阶相似度，这种特性会被基于CF的方法忽略。然而，对于“冷启动（cold-start）”的items，学到精准的embeddings仍然是个挑战。
 
-为了解决冷启动问题，我们提出了增强式BGE，它会使用side information来与冷启动items做绑定。在商业推荐系统的场景中，side information常指关于一个item的：类目(category)，shop(商名)，价格(price)等，它们常被当成是ranking阶段的关键特征而广泛使用，但很少用于matching阶段。我们可以通过将side information合并到graph embedding中来缓合cold-start问题。例如，优衣库(UNIQLO：相同店)的两款卫衣（相同类目）可能很相似，一个喜欢Nikon镜头的用户，也可能对Canon Cemera有兴趣（相同类目和相似品牌）。这意味着这些items具有相似的side information也可在embedding空间中更接近。基于这个猜想，我们提出了如图3的GES方法。
+为了解决冷启动问题，我们提出了增强式BGE，它会使用side information来与冷启动items做绑定。在商业推荐系统的场景中，side information常指关于一个item的：类目(category)，shop(商名)，价格(price)等，它们常被当成是ranking阶段的关键特征而广泛使用，但很少用于matching阶段。我们可以通过将side information合并到graph embedding中来缓合cold-start问题。例如，优衣库(UNIQLO：相同店)的两款卫衣（相同类目）可能很相似，一个喜欢Nikon镜头的用户，也可能对Canon相机感兴趣（相似类目和相似品牌）。这意味着这些具有相似的side information的items也可在embedding空间中更接近。基于这个猜想，我们提出了如图3的GES方法。
 
 <img src="http://pic.yupoo.com/wangdren23/HNP160zX/medish.jpg">
 
-图3: GES和EGES的总框架。SI表示side information，其中"SI O"表示item自身。惯例上，1）对于items和不同的SIs，稀疏特征趋向于one-hot-encoder vectors。 2) Dense embeddings是items和相应的SI的表示 3) hidden representation是一个item和它相应的SI的聚合embedding
+图3: GES和EGES的总框架。SI表示side information，其中"SI 0"表示item自身。惯例上，1）对于items和不同的SIs，稀疏特征趋向于one-hot-encoder vectors。 2) Dense embeddings是items和相应的SI的表示 3) hidden representation是一个item和它相应的SI的聚合embedding
 
 为了清晰些，我们对概念做了精微调整。我们使用W来表示items或者side information的embedding matrix。特别的，$$W_v^0$$表示item v的embedding，$$W_v^S$$表示绑定到item v上的第s个类型的side information的embedding。接着，对于item v，使用n种类型的side information，我们具有n+1个向量$$w_v^0, ..., W_v^n \in R^d$$，其中，d是embedding的维度。注意，item embeddings和side information embeddings的维度，经验上设置为相同的值。
 
