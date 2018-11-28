@@ -48,7 +48,7 @@ $$
 这里，$$H(p_{\cdot \mid i}, q_{\cdot \mid i}(\theta))$$是期望概率$$p_{\cdot \mid i}$$的交叉熵，表示基于输入商品$$i \in I$$和预测条件概率$$q_{\cdot \mid i}$$, 在输出空间J上看过的任何商品：
 
 $$
-q_{j|i}(\theta) = \frac{exp(w_i^T w_j)}{ exp(w_i^T w_j) + \sum_{j^' \in (V_{J-j} exp(W_i^T W_j^'))}}
+q_{j|i}(\theta) = \frac{e^(w_i^T w_j)} { e^(w_i^T w_j) + \sum_{ j^' \in (V_{J-j})} e^(W_i^T W_j^')}
 $$
 
 其中，$$X_i$$表示商品i的输入频次，$$X_{ij}^{POS}$$是商品对(product pair)(i,j)在训练数据中被观察到的频次数目。
@@ -72,7 +72,7 @@ $$
 
 ## 3.2 Meta-Prod2Vec
 
-在相关工作这节，已经有相关工作使用side information进行推荐，尤其是结合CF和CB的混合方法。在embeddings的case中，最相关的工作是Doc2Vec模型，其中words和paragraph会进行联合训练（jointly），但只有paragraph embedding会被用于最终的任务中。
+在第一节，已经有相关工作使用side information进行推荐，尤其是结合CF和CB的混合方法。在embeddings的方法中，最相关的工作是Doc2Vec模型，其中words和paragraph会进行联合训练（jointly），但只有paragraph embedding会被用于最终的任务中。
 
 我们提出了相似的架构，在NN的输入空间和输出空间中同时包含side information，在嵌入的items和metadata间的交互相互独立进行参数化，如图2所示。
 
