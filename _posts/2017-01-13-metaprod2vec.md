@@ -53,7 +53,9 @@ $$
 
 其中，$$X_i$$表示商品i的输入频次，$$X_{ij}^{POS}$$是商品对(product pair)(i,j)在训练数据中被观察到的频次数目。
 
-图一
+<img src="http://pic.yupoo.com/wangdren23_v/e8131d66/medium.png">
+
+图一: Prod2Vec架构
 
 对于Prod2Vec产生的结构，如图1所示，使用一个只有单个hidden layer和一个softmax output layer的NN，位于中心窗口的所有商品的输入空间被训练成用于预测周围商品的值。
 
@@ -74,7 +76,9 @@ $$
 
 我们提出了相似的架构，在NN的输入空间和输出空间中同时包含side information，在嵌入的items和metadata间的交互相互独立进行参数化，如图2所示。
 
-图二
+<img src="http://pic.yupoo.com/wangdren23_v/3476895d/medium.png">
+
+图二: Prod2Vec架构
 
 ### Meta-Prod2Vec目标函数
 
@@ -92,6 +96,10 @@ $$
 - $$L_{M \mid M}$$:
 
 总结下，$$L_{J \mid I}$$和$$L_{M \mid M}$$会分别对items序列和metadata序列的似然建模进行编码loss项。$$L_{I \mid M}$$表示在给定元信息的情况下item id的条件似然，$$L_{J \mid M}$$和$$L_{M \mid I}$$表示在item ids和metadata间的cross-item交叉项。如图3如示，我们展示了由Prod2Vec因子分解出的item matrix，以及另一个由Meta-Prod2Vec分解出的item matrix。
+
+<img src="http://pic.yupoo.com/wangdren23_v/0c301967/medium.png">
+
+图三：将MetaProd2Vec看成是items和metadata扩展矩阵的矩阵分解
 
 Meta-Prod2Vec的更通用等式，为4种类型的side information（$$\lambda_{mi}, \lambda_{jm}, \lambda_{mm}, \lambda_{im}$$）引入了一个独立的$$\lambda$$。
 
