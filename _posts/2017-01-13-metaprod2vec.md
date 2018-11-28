@@ -45,10 +45,10 @@ $$
 L_{P2V} = L_{J|I}(\theta) = \sum_{ij} (-X_{ij}^{POS} log q_{j|i}(\theta) -(X_i - X_{ij}^{POS} log(1-q_{j|i}(\theta)))) \\ = \sum_{ij} X_i(-p_{j|i} log q_{j|i}(\theta) - p_{\neg j|i} log q_{\neg j|i}(\theta)) \\ = \sum_i X_i H(p_{\cdot | i}, q_{\cdot|i}(\theta))
 $$
 
-这里，$$H(p_{\cdot \mid i}, q_{\cdot \mid i}(\theta))$$是期望概率$$p_{\cdot \mid i}$$的交叉熵，表示基于输入产口$$i \in I$$和预测条件概率$$q_{\cdot \mid i}$$, 在输出空间J上看过的任何商品：
+这里，$$H(p_{\cdot \mid i}, q_{\cdot \mid i}(\theta))$$是期望概率$$p_{\cdot \mid i}$$的交叉熵，表示基于输入商品$$i \in I$$和预测条件概率$$q_{\cdot \mid i}$$, 在输出空间J上看过的任何商品：
 
 $$
-q_{j|i}(\theta) = \frac{exp(w_i^T w_j)}{ exp(w_i^T w_j) + \sum_{j' \in (V_{J-j} exp(W_i^T W_j^'))}}
+q_{j|i}(\theta) = \frac{exp(w_i^T w_j)}{ exp(w_i^T w_j) + \sum_{j^' \in (V_{J-j} exp(W_i^T W_j^'))}}
 $$
 
 其中，$$X_i$$表示商品i的输入频次，$$X_{ij}^{POS}$$是商品对(product pair)(i,j)在训练数据中被观察到的频次数目。
