@@ -25,7 +25,7 @@ Prod2Vec算法只使用由商品序列(product sequences)确立的局部商品�
 
 原算法（Word2Vec）原本是一个高度可扩展的预测模型，用于从文本中学习词向量，属于自然语言神经网络模型。在该领域大多数工作都是基于Distributional Hypothesis[27]，它宣称在相同的上下文中出现的词更接近，即使意思不同。
 
-一个相似的hypothesis可以被应用于更大的上下文中，比如：在线电商，音乐和媒体消费，它们的基础是CF算法。在CF设置中，服务的使用者（用户）被当成分布式上下文使用，在该上下文中哪些商品共现过，从而在CF中产生经典的item co-occurence方法。基于co-count的推荐方法和Word2Vec间的相似关系由Omer[16]确定；该作者展示了embedding方法的目标函数与矩阵分解（它包含了局部共现items的the Shifted Positive PMI）很接近，其中PMI表示Point-Wise Mutual Information：
+该hypothesis可以被应用于更大的上下文中，比如：在线电商，音乐和媒体消费，这些服务的基础是CF算法。在CF设置中，服务的使用者（用户）被当成上下文使用，在该上下文中哪些商品共现过，从而在CF中产生经典的item 共现（co-occurence）方法。基于co-count的推荐方法和Word2Vec间的相似关系由Omer[16]确定；该作者展示了embedding方法的目标函数与矩阵分解（它包含了局部共现items的the Shifted Positive PMI）很接近，其中PMI表示Point-Wise Mutual Information：
 
 $$
 PMI_{ij} = log(\frac{X_{ij} \cdot |D|}{X_i X_j})
@@ -45,7 +45,7 @@ $$
 L_{P2V} = L_{J|I}(\theta) = \sum_{ij} (-X_{ij}^{POS} log q_{j|i}(\theta) -(X_i - X_{ij}^{POS} log(1-q_{j|i}(\theta)))) \\ = \sum_{ij} X_i(-p_{j|i} log q_{j|i}(\theta) - p_{\neg j|i} log q_{\neg j|i}(\theta)) \\ = \sum_i X_i H(p_{\cdot | i}, q_{\cdot|i}(\theta))
 $$
 
-这里，$$H(p_{\cdot|i}, q_{\cdot|i}(\theta))$$是期望概率$$p_{\cdot | i}$$的交叉熵，表示基于输入产口$$i \in I$$和预测条件概率$$q_{\cdot | i}$$, 在输出空间J上看过的任何商品：
+这里，$$H(p_{\cdot \mid i}, q_{\cdot \mid i}(\theta))$$是期望概率$$p_{\cdot \mid i}$$的交叉熵，表示基于输入产口$$i \in I$$和预测条件概率$$q_{\cdot \mid i}$$, 在输出空间J上看过的任何商品：
 
 $$
 q_{j|i}(\theta) = \frac{exp(w_i^T w_j)}{ exp(w_i^T w_j) + \sum_{j' \in (V_{J-j} exp(W_i^T W_j^'))}}
