@@ -11,7 +11,7 @@ Side-Information for Recommendation》：
 
 # 1.介绍
 
-Prod2Vec算法只使用由商品序列(product sequences)确立的局部商品共现信息来创建商品的distributed representations，但不会增强它们的元信息(metadata)。Prod2Vec的作者提出了一个算法扩展，以序列结构的方式利用上上下文内容信息，但该方法只针对文本元信息，产生的结构是层次化的，因而会缺失一些side informations项。我们结合在推荐上的工作，使用side information并提出了Meta-Prod2Vec，它是一个通用方法，可以以一种很简单高效的方法，来增加类别型(categorical) side information到Prod2vec模型中。将额外项信息作为side information的用法（例如：只在训练时提供），受推荐系统在实时打分时要保存的特征值数量限制的启发。这种情况下，只在训练时使用的metadata，当提升在线效果时，可以让内存占用量（memory footprint）保持常数（假设一个已经存在的推荐系统会使用item embeddings）。
+Prod2Vec算法只使用由商品序列(product sequences)确立的局部商品共现信息来创建商品的distributed representations，但不会利用它们的元信息(metadata)。Prod2Vec的作者提出了一个算法扩展：以序列结构的方式利用上下文内容信息，但该方法只针对文本元信息，产生的结构是层次化的，因而会缺失一些side informations项。我们结合了在推荐上的工作，使用side information并提出了Meta-Prod2Vec，它是一个通用方法，可以以一种很简单高效的方法，来增加类别型(categorical) side information到Prod2vec模型中。将额外项信息作为side information的用法（例如：只在训练时提供），受推荐系统在实时打分时要保存的特征值数量限制的启发。这种情况下，只在训练时使用的metadata，当提升在线效果时，可以让内存占用量（memory footprint）保持常数（假设一个已经存在的推荐系统会使用item embeddings）。
 
 在30Music的listening和playlists数据集的子集上，我们展示了我们的方法可以极大提升推荐系统的效果，实现开销和集成开销很小。
 
@@ -21,7 +21,7 @@ Prod2Vec算法只使用由商品序列(product sequences)确立的局部商品�
 
 ## 3.1 Prod2Vec
 
-在Prod2Vec的paper[9]中，Grbovic等人提供了在从电子邮件的商品收据序列上使用Word2Vec算法。更正式的，结定一个商品序列的集合S: $$s = (p_1, p_2, ..., p_M), s \in S$$，目标函数是发现一个D维的真实表示$$u_p \in R^D $$，以便相似的商品可以在结合的向量空间内更接近。
+在Prod2Vec的paper[9]中，Grbovic等人提供了在从电子邮件的商品收据序列上使用Word2Vec算法。更正式的，结定一个商品序列的集合S: $$s = (p_1, p_2, ..., p_M), s \in S$$，目标函数是发现一个D维的真实表示$$u_p \in R^D $$，以便相似的商品可以在产生的向量空间内更接近。
 
 原算法（Word2Vec）原本是一个高度可扩展的预测模型，用于从文本中学习词向量，属于自然语言神经网络模型。在该领域大多数工作都是基于Distributional Hypothesis[27]，它宣称在相同的上下文中出现的词更接近，即使意思不同。
 
