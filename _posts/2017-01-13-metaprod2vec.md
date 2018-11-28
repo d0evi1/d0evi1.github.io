@@ -48,7 +48,7 @@ $$
 这里，$$H(p_{\cdot \mid i}, q_{\cdot \mid i}(\theta))$$是期望概率$$p_{\cdot \mid i}$$的交叉熵，表示基于输入商品$$i \in I$$和预测条件概率$$q_{\cdot \mid i}$$, 在输出空间J上看过的任何商品：
 
 $$
-q_{j|i}(\theta) = \frac{e^{w_i^T w_j}} { e^{w_i^T w_j} + \sum_{ j^' \in (V_{J-j})} e^{W_i^T W_j^'}}
+q_{j|i}(\theta) = \frac{e^{w_i^T w_j}} { e^{w_i^T w_j} + \sum_{ j' \in (V_{J-j})} e^{W_i^T W_j'}}
 $$
 
 其中，$$X_i$$表示商品i的输入频次，$$X_{ij}^{POS}$$是商品对(product pair)(i,j)在训练数据中被观察到的频次数目。
