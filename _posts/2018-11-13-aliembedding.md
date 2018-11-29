@@ -2,7 +2,7 @@
 layout: post
 title: 淘宝embedding介绍
 description: 
-modified: 2018-09-01
+modified: 2018-11-13
 tags: 
 ---
 
@@ -27,7 +27,7 @@ tags:
 为了解决这些挑战，我们在淘宝技术平台上设计了**two-stage推荐框架**。第一阶段称为matching，第二阶段为ranking。在matching阶段，我们会生成一个候选集，它的items会与用户接触过的每个item具有相似性；接着在ranking阶段，我们会训练一个深度神经网络模型，它会为每个用户根据他的偏好对候选items进行排序。由于上述挑战的存在，在两个阶段都会面临不同的问题。另外，每个阶段的目标不同，会导致技术解决方案的不同。
 
 在本paper中，我们主要关注如何解决在matching阶段的挑战，其中，核心任务是，基于用户行为，计算所有items的两两（pairwise）相似度。在获取items的pairwise相似度后，我们可以生成一个items候选集合，进一步在ranking阶段使用。为了达到该目的，我们提出了根据用户行为历史构建一个item graph，接着使用state-of-art的graph embedding方法[8,15,17]来学习每个item的embedding，这被称为**BGE（Base Graph Embedding）**。在这种方式下，我们可以基于items的embeddings向量进行点乘来计算候选items集合的相似度。注意，在之前的工作中，基于CF的方法来计算这些相似度。然而，基于CF的方法只考虑了在用户行为历史上的items的共现率。在我们的工作中，会在item graph中使用random walk，来捕获items间的高维相似性。这样，它比基于CF的方法要好。**然而，为少量或者没有交互行为的items学到精准的embeddings仍是个挑战**。为了减轻该问题，我们提供了使用side information来增强embedding过程，这被称为使用**Side information的Graph Embedding（Graph Embedding with
-Side information (GES)）**。例如，属于相似的类目或品牌的items在embedding space空间应更接近。在这种方式下，即使items只有少理或没有交互，我们也可以获取精确的items embedding。然而，在淘宝，有许多种类型的side information。比如类目（category）、品牌（brand）、或价格（price）等，直觉上不同的side information对于学习items的embeddings的贡献也不一样。因而，我们进一步提出了一种**加权机制来使用，这被称为Enhanced Graph Embedding with
+Side information (GES)）**。例如，属于相似的类目或品牌的items在embedding space空间应更接近。在这种方式下，即使items只有少数互交或没有交互，我们也可以获取精确的items embedding。然而在淘宝，有许多种类型的side information。比如类目（category）、品牌（brand）、或价格（price）等，直觉上不同的side information对于学习items的embeddings的贡献也不一样。因而，我们进一步提出了一种**加权机制来使用，这被称为Enhanced Graph Embedding with
 Side information（EGES）**。
 
 总之，matching阶段有三个重要的部分：
@@ -61,8 +61,7 @@ $$
 
 <img src="http://pic.yupoo.com/wangdren23/HNP0twlk/medish.jpg">
 
-图2: 淘宝graph embedding总览： **a) 用户行为序列**：用户u1对应一个session，u2和u3分别各对应一个session；这些序列被用于构建item graph；**b) 有向加权item graph**（weighted directed item graph）$$G=(V,E)$$; **c)在item graph上由random walk生成的序列**； **d) 使用Skip-Gram生成embedding**
-
+图2: 淘宝graph embedding总览： **a) **用户行为序列：用户u1对应一个session，u2和u3分别各对应一个session；这些序列被用于构建item graph；**b) **有向加权item graph（weighted directed item graph）$$G=(V,E)$$; **c)**在item graph上由random walk生成的序列； **d) **使用Skip-Gram生成embedding**
 
 在本节，我们详述了从用户行为构建item graph。现实中，在淘宝上一个用户的行为趋向于如图2(a)所示的序列。之前基于CF的方法只考虑了items的共现，但忽略了顺序信息（可以更精准地影响用户的偏好）。然而，不可能使用一个用户的整个历史，因为：
 
@@ -136,9 +135,9 @@ $$
 
 ## 2.5 增强型EGS（EGES）
 
-尽管GES可以获得收益，当在embedding过程中集成不同类型的side information时，仍存在一个问题。等式(6)中，不同类型的side information对最终的embedding的贡献是相等的，在现实中这不可能。例如，一个购买了IPhone的用户，趋向于会浏览Macbook或者Ipad，因为品牌都是"Apple"；而一个购买了多个不同品牌衣服的用户，出于便利和更低价格，还会在相同的淘宝店上继续购买。因此，不同类型的side information对于在用户行为中的共现items的贡献各不相同。
+尽管GES可以获得收益，但在embedding过程中集成不同类型的side information时，仍存在一个问题。等式(6)中，不同类型的side information对最终的embedding的贡献是相等的，在现实中这不可能。例如，一个购买了IPhone的用户，趋向于会浏览Macbook或者Ipad，因为品牌都是"Apple"；而一个购买了多个不同品牌衣服的用户，出于便利和更低价格，还会在相同的淘宝店上继续购买。因此，不同类型的side information对于在用户行为中的共现items的贡献各不相同。
 
-为了解决该问题，我们提出了EGES方法来聚合不同类型的side information。该框架与GES相同（见图3）。不同之处是，当embeddings聚合时，不同类型的side information具有不同贡献。 因而，我们提出了一个加权平均的average layer来聚合与items相关的side information的embeddings。给定一个item v，假设$$ A \in R^{\mid V \mid \times (n+1)}$$是权重矩阵（weight matrix），条目$$A_{ij}$$是第i个item、第j个类型side information的权重。注意，$$A_{*0}$$，例如，A的第一列，表示item v的权限自身。出于简洁性，我们使用$$a_v^s$$来表示关于第v个item的第s个类型的side information的权重，$$a_v^0$$表示item v自身的权重。加权平均层（weighted average layer）会给合不同的side information，定义如下：
+为了解决该问题，我们提出了EGES方法来聚合不同类型的side information。该框架与GES相同（见图3）。不同之处是，当embeddings聚合时，不同类型的side information具有不同贡献。 因而，我们提出了一个加权平均的average layer来聚合与items相关的side information的embeddings。给定一个item v，假设$$ A \in R^{\mid V \mid \times (n+1)}$$是权重矩阵（weight matrix），条目$$A_{ij}$$是第i个item、第j个类型side information的权重。注意，$$A_{*0}$$，例如，A的第一列，表示item v的权限自身。出于简洁性，我们使用$$a_v^s$$来表示关于第v个item的第s个类型的side information的权重，$$a_v^0$$表示item v自身的权重。加权平均层（weighted average layer）会结合不同的side information，定义如下：
 
 $$
 H_v = \frac{\sum_{j=0}^{n} e^{a_v^j} W_v^j} {\sum_{j=0}^n e^{a_v^j}}
@@ -167,13 +166,13 @@ $$
 对于第s个side information：
 
 $$
-\frac{\partial L} {\partial a_v^s} = \frac{\partial L} {\partial H_v} \frac{\partial H_v} {\partial a_v^s} \\  (\sigma(H_v^T Z_u) -y) Z_u \frac{(\sum_{j=0}^n e^{a_v^j}) e^{a_v^s} W_v^s - e^{a_v^s} \sum_{j=0}^n e^{a_v^j} W_v^j} { (\sum_{j=0}^n e^{a_v^j})^2}
+\frac{\partial L} {\partial a_v^s} = \frac{\partial L} {\partial H_v} \frac{\partial H_v} {\partial a_v^s} \\ = (\sigma(H_v^T Z_u) -y) Z_u \frac{(\sum_{j=0}^n e^{a_v^j}) e^{a_v^s} W_v^s - e^{a_v^s} \sum_{j=0}^n e^{a_v^j} W_v^j} { (\sum_{j=0}^n e^{a_v^j})^2}
 $$
 
 ...(10)
 
 $$
-\frac{\partial L} {\partial W_v^s} = \frac{\partial L} {\partial H_v} \frac{\partial L} {\partial W_v^s} \\ \frac{e^{a_v^s}}{\sum_{j=0}^n e^{a_v^j}} (\sigma(H_v^T Z_u) -y ) Z_u
+\frac{\partial L} {\partial W_v^s} = \frac{\partial L} {\partial H_v} \frac{\partial L} {\partial W_v^s} \\ = \frac{e^{a_v^s}}{\sum_{j=0}^n e^{a_v^j}} (\sigma(H_v^T Z_u) -y ) Z_u
 $$
 
 ...(11)
