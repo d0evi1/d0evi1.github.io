@@ -10,17 +10,17 @@ NVidia在2017年提出了《Training Deep AutoEncoders for Collaborative Filteri
 
 # 1.介绍
 
-像Amazon, netflix和Soptify使用推荐系统给用户推荐items。推荐系统分为两类：基于上下文的推荐(context-based)，基于个性化的推荐(personized)。
+Amazon, Netflix和Soptify均使用推荐系统给用户推荐items。推荐系统分为两类：基于上下文的推荐(context-based)，基于个性化的推荐(personized)。
 
 基于上下文的推荐可以解释上下文因子，比如：位置、日期、时间。基于个性化的推荐通常使用CF来推荐items给用户。在本方法中，用户兴趣会基于个人品味、其它用户在系统中行为的偏好、用户间的隐式相似度进行分析。底层假设是：两个具有相似品味的用户，比两个随机选择的用户，在对于某一个item具有相同的看法上，具有更高的似然。
 
 在设计推荐系统中，目标是提取预测的accuracy。Netflix Prize比赛提供了最著名的示例：预测用户对于电影的评分。
 
-这是个经典的CF问题：推断在 $$m \times n$$矩阵R中缺失条目，它的第(i,j)条目描述了由用户i给第i个item的评分。接着使用RMSE（Root Mean Squared Error）进行衡量。
+这是个经典的CF问题：推断在 $$m \times n$$矩阵R中缺失条目，它的第(i,j)条目描述了由用户i给第j个item的评分。接着使用RMSE（Root Mean Squared Error）进行衡量。
 
 ## 1.1 相关工作
 
-深度学习在图片识别、NLP、增强学习上上取得了突破。自然的，这些成功也刺激了在推荐系统上使用deep learning。首先使用DL的推荐系统使用的是RBM（restricted Boltzman machines）[16]。一些最近方法使用autoencoders [17, 18]，前馈神经网络[5]以及RNN [17]。许多流行的矩阵分解技术可以看成是降维。因此，对于推荐很自然地会采用deep autoencoders。I-AutoRec（item-based autoencoder）和U-AutoRec(user-based autoencoder)首先进行了成功尝试[17]。
+深度学习在图片识别、NLP、增强学习等领域取得了突破。自然的，这些成功也刺激了在推荐系统上使用deep learning。首先使用DL的推荐系统使用的是RBM（restricted Boltzman machines）[16]。一些最近方法使用autoencoders [17, 18]，前馈神经网络[5]以及RNN [17]。许多流行的矩阵分解技术可以看成是降维。因此，对于推荐很自然地会采用deep autoencoders。I-AutoRec（item-based autoencoder）和U-AutoRec(user-based autoencoder)首先进行了成功尝试[17]。
 
 还有许多非深度学习类型的CF方法[3,15]。矩阵分解技术，例如：ALS[8,12]，概率矩阵分解[14]都很流行。最健壮的系统可以包含这些方法来赢取Netflix Prize竞赛[10]。
 
