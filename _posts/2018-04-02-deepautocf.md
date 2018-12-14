@@ -47,7 +47,7 @@ autoencoder的目标是获取数据的d维数据，以确保在x和$$f(x)=decode
 
 在我们的模型中，encoder和decoder部分的autoencoder包含了前馈神经网络，它具有经典的fully connected layers：$$l = f(W * x+b) $$，其中f是一些非线性激活函数。如果activation的范围小于这些数据，decoder的最后的layer应是线性的。我们发现，对于在hidden layers中的激活函数f来说，包含非零负部分（non-zero negative part）, 接着我们会在大多数我们的实验中使用SELU units。
 
-如果ecoder与encoder是镜像结构，那么可以限制decoder的权重$$W_d^l$$，与从相应的layer l转换的encoder权重$$W_e^l$$相同。这样的autoencoder被称为受限的（constrained/tied），比不受限的参数数目要小两倍。
+如果ecoder与encoder是镜像结构，那么可以限制：decoder的权重$$W_d^l$$与从相应的layer l转换的encoder权重$$W_e^l$$相同。这样的autoencoder被称为受限的（constrained/tied），比不受限的参数数目要小一倍。
 
 前向传播和推断（forward pass和inference）：在forward pass（和inference）期间，模型会使用通过评分训练集$$x \in R^n$$的用户向量表示，其中n是items的数目。注意，x是非常稀疏的，而decoder的输出$$f(x) \in R^n$$是dense的，它包含了在语料中所有items的预测评分。
 
@@ -58,6 +58,7 @@ autoencoder的目标是获取数据的d维数据，以确保在x和$$f(x)=decode
 $$
 MMSE = \frac{m_i * (r_i - y_i)^2} {\sum_{i=0}^{i=n} m_i}
 $$
+
 ...(i)
 
 其中$$r_i$$是实际评分，$$y_i$$是重构评分（或预测评分），其中$$m_i$$是一个mask函数：
@@ -69,7 +70,11 @@ $$
 
 ## 2.2 Dense re-feeding
 
-在训练和inference期间，输入$$x \in R^n$$是非常稀疏的，由于没有用户会进行真实评分，所有items只有一少部分有。另一方面，autoencoder的输出$$f(x)$$是dense的。假设考虑这样的理想场景，有一个完美的f。那么$$f(x)_i = x_i \forall i: x_i \neq 0$$，并且$$f(x)_i$$可以准确预测所有用户对于items: $$x_i = 0$$的将来评分（future ratings）。那么这意味着，如果用户对新的item k进行评分（创建一个新向量x'），那么$$f(x)_k = x_k'，f(x)=f(x')$$。这样，在理想场景下，$$y=f(x)$$应是一个关于训练良好的antoencoder $$f(y)=y$$的确定点（fixed point）。
+在训练和inference期间，输入$$x \in R^n$$是非常稀疏的，由于没有用户会进行真实评分，所有items只有一少部分有评分。另一方面，autoencoder的输出$$f(x)$$是dense的。假设考虑这样的理想场景：有一个完美的f。那么：
+
+$$f(x)_i = x_i， \forall i: x_i \neq 0$$，
+
+其中$$f(x)_i$$可以准确预测所有用户对于items: $$x_i = 0$$的将来评分（future ratings）。那么这意味着，如果用户对新的item k进行评分（创建一个新向量x'），那么$$f(x)_k = x_k'，f(x)=f(x')$$。这样，在理想场景下，$$y=f(x)$$应是一个关于训练良好的antoencoder $$f(y)=y$$的确定点（fixed point）。
 
 为了显式增强fixed-point constraint，以及能执行dense training updates，我们使用一个迭代式dense re-feeding steps（以下的3和4）来增大每个最优化迭代（optimization iteration）。
 
