@@ -19,7 +19,7 @@ and their Compositionality>.
 
 词在向量空间上的分布式表示(distributed representations)，通过将相似的词语进行群聚，可以帮助学习算法在nlp任务中完成更好的性能。词向量表示的最早应用可以追溯到1986年Rumelhart, Hinton等人提的(详见paper 13). 该方法用于统计语言建模中，并取得了可喜的成功。接下来，应用于自动语音识别和机器翻译(14,7)，以及其它更广泛的NLP任务(2,20,15,3,18,19,9)
 
-最近，Mikolov（8）提出了Skip-gram模型，它是一个高效的方法，可以从大量非结构化文本数据中学到高质量的词向量表示。不同于大多数之前用于词向量学习所使用的神经网络结构，skip-gram模型(图1)不会涉及到稠密矩阵乘法(dense matrix multiplications)。这使得学习过程极为高效：一个优化版的单机实现，一天可以训练超过10亿个词。
+最近，Mikolov（8）提出了Skip-gram模型，它是一个高效的方法，可以从大量非结构化文本数据中学到高质量的词向量表示。不同于以往用于词向量学习所使用的大多数神经网络结构，skip-gram模型(图1)不会涉及到稠密矩阵乘法(dense matrix multiplications)。这使得学习过程极为高效：一个优化版的单机实现，一天可以训练超过10亿个词。
 
 使用神经网络的词向量表示计算非常有意思，因为通过学习得到的向量可以显式地对许多语言学规律和模式进行编码。更令人吃惊的是，许多这些模式可以被表示成线性变换(linear translations)。例如，比起其它向量，向量计算vec("Madrid")-vec("Spain")+vec("France")与vec("Paris")的结果更接近(9,8)。
 
@@ -53,6 +53,7 @@ Skip-gram模型的训练目标是，为预测一个句子或一个文档中某�
 $$
 \frac{1}{T} \sum_{t=1}^{T} \sum_{-c\leq{j}\leq{c},j\neq0}^{} log p(w_{t+j} | w_t)
 $$ 
+
 ...  (1)
 
 其中，c是训练上下文的size($$w_t$$是中心词)。c越大，会产生更多的训练样本，并产生更高的准确度，训练时间也更长。最基本的skip-gram公式使用softmax函数来计算 \$ p(w_{t+j} \| w_t) \$: 
@@ -76,11 +77,9 @@ Hierarchical Softmax外的另一可选方法是Noise Contrastive Estimation(NCE)
 
 而NCE可以近似最大化softmax的log概率，Skip-gram模型只关注学习高质量的向量表示，因此，我们可以自由地简化NCE，只要向量表示仍能维持它的质量。我们定义了Negative sampling(NEG)的目标函数：
 
-{% highlight python %}
 $$
 log \sigma{(v'_{w_O}^T v_{w_I})} + \sum_{i=1}^k E_{w_i}~P_n(w)[log \sigma{(-v'_{w_i}^T v_{w_I})}]
 $$
-{% endhighlight %}
 
 在Skip-gram目标函数中，每个$$ P(w_O \| w_I) $$项都被替换掉。该任务是为了区分目标词wo，以及从使用logistic回归的噪声分布Pn(w)得到的词。其中每个数据样本存在k个negative样本。我们的试验中，对于小的训练数据集，k的值范围(5-20)是合适的；而对于大的数据集，k可以小到2-5。Negative sampling和NCE的最主要区分是，NCE同时需要样本和噪声分布的数值概率，而Negative sampling只使用样本。NCE逼近最大化softmax的log概率时，该特性对于我们的应用不是很重要。
 
