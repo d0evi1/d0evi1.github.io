@@ -11,7 +11,7 @@ Side-Information for Recommendation》：
 
 # 1.介绍
 
-Prod2Vec算法只使用由商品序列(product sequences)确立的局部商品共现信息来创建商品的distributed representations，但不会利用它们的元信息(metadata)。Prod2Vec的作者提出了一个算法扩展：以序列结构的方式利用上下文内容信息，但该方法只针对文本元信息，产生的结构是层次化的，因而会缺失一些side informations项。我们结合了在推荐上的工作，使用side information并提出了Meta-Prod2Vec，它是一个通用方法，可以以一种很简单高效的方法，来增加类别型(categorical) side information到Prod2vec模型中。将额外项信息作为side information的用法（例如：只在训练时提供），受推荐系统在实时打分时要保存的特征值数量限制的启发。这种情况下，只在训练时使用的metadata，当提升在线效果时，可以让内存占用量（memory footprint）保持常数（假设一个已经存在的推荐系统会使用item embeddings）。
+Prod2Vec算法只使用由商品序列(product sequences)确立的局部商品共现信息来创建商品的distributed representations，但没有利用商品的元信息(metadata)。Prod2Vec的作者提出了一个算法扩展：以序列结构的方式利用上下文内容信息，但该方法只针对文本元信息，产生的结构是层次化的，因而会缺失一些side informations项。我们结合了在推荐上的工作，使用side information并提出了Meta-Prod2Vec，它是一个通用方法，可以以一种很简单高效的方法，来增加类别型(categorical) side information到Prod2vec模型中。将额外项信息作为side information的用法（例如：只在训练时提供），受推荐系统在实时打分时要保存的特征值数量限制的启发。这种情况下，只在训练时使用的metadata，当提升在线效果时，可以让内存占用量（memory footprint）保持常数（假设一个已经存在的推荐系统会使用item embeddings）。
 
 在30Music的listening和playlists数据集的子集上，我们展示了我们的方法可以极大提升推荐系统的效果，实现开销和集成开销很小。
 
@@ -64,7 +64,7 @@ $$
 例如，假设输入是关于已经被归好类商品的序列，标准的Prod2Vec embeddings不会建模以下的交互：
 
 - 给定属于类别c的商品p的当前访问，下一个访问的商品$$p'$$更可能属于相同的类别c
-- 给定当前类别c，可一个类别更可能是c，或者一个相关的类别$$c'$$（例如：在购买一件游泳衣后，很可能会有一个防晒油的购买行为，它们属于一个完全不同的商品类目，但相近）
+- 给定当前类别c，下一个类别更可能是c，或者一个相关的类别$$c'$$（例如：在购买一件游泳衣后，很可能会有一个防晒油的购买行为，它们属于一个完全不同的商品类目，但相近）
 - 给定当前商品p，下一个类目更可能是c或者一个相关类目$$c'$$
 - 给定当前类别c，被访问的当前商品更可能是p或$$p'$$
 
