@@ -82,7 +82,7 @@ log \sigma{(v'_{w_O}^T v_{w_I})} + \sum_{i=1}^k E_{w_i}
 \sim P_n(w)\[log \sigma{(-v'_{w_i}^T v_{w_I})} \]
 $$
 
-在Skip-gram目标函数中，每个$$ P(w_O \| w_I) $$项都被替换掉。该任务是为了区分目标词wo，以及从使用logistic回归的噪声分布Pn(w)得到的词。其中每个数据样本存在k个negative样本。我们的试验中，对于小的训练数据集，k的值范围(5-20)是合适的；而对于大的数据集，k可以小到2-5。Negative sampling和NCE的最主要区分是，NCE同时需要样本和噪声分布的数值概率，而Negative sampling只使用样本。NCE逼近最大化softmax的log概率时，该特性对于我们的应用不是很重要。
+在Skip-gram目标函数中，每个$$ P(w_O \mid w_I) $$项都被替换掉。该任务是为了区分目标词wo，以及从使用logistic回归的噪声分布$$P_n(w)$$得到的词。其中每个数据样本存在k个negative样本。我们的试验中，对于小的训练数据集，k的值范围(5-20)是合适的；而对于大的数据集，k可以小到2-5。Negative sampling和NCE的最主要区分是，NCE同时需要样本和噪声分布的数值概率，而Negative sampling只使用样本。NCE逼近最大化softmax的log概率时，该特性对于我们的应用不是很重要。
 
 NCE和NEG都有噪声分布Pn(w)作为自由参数。对于Pn(w)我们采用了一些不同选择，在每个任务上使用NCE和NEG，我们尝试包含语言建模（该paper没提及），发现unigram分布U(w)提升到3/4幂（如：\$ U(w)^{2/4}/Z \$）时，胜过unigram和uniform分布很多！
 
