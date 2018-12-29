@@ -70,7 +70,7 @@ $$
 
 ## 2.2 Dense re-feeding
 
-在训练和inference期间，输入$$x \in R^n$$是非常稀疏的，由于没有用户会进行真实评分，所有items只有一少部分有评分。另一方面，autoencoder的输出$$f(x)$$是dense的。假设考虑这样的理想场景：有一个完美的f。那么：
+在训练和inference期间，输入$$x \in R^n$$是非常稀疏的，由于很少用户会在现实中进行评分，所有items只有一少部分有评分。另一方面，autoencoder的输出$$f(x)$$是dense的。假设考虑这样的理想场景：有一个完美的f，使得：
 
 $$f(x)_i = x_i， \forall i: x_i \neq 0$$，
 
