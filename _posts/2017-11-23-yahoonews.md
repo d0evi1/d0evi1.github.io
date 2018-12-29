@@ -83,13 +83,13 @@ ID-based方法，比如CF或低秩因子分解，可以很好地做出推荐。�
 我们的方法会基于一个denoising autoencoder，并使用弱监督的方法来生成分布式表示向量。常见的denosing autoencoder可以公式化：
 
 $$
-\hat \sim q(\hat{x} | x) \\
+\hat{x} \sim q(\hat{x} | x) \\
 h = f(W \hat{x} + b)  \\
 y = f(w'h+b') \\
 \theta = argmin_{W,W',b,b'} \sum_{x \in X} L_R(y,x)
 $$
 
-其中$$x \in X$$是原始input vector，$$q(\cdot \mid \cdot)$$是降维表示（corrupting distribution）。stochastically corrupted vector, $$\hat{x}$$，从$$q(\cdot \mid x)$$中获取。隐表示，h，从$$\hat{x}$$映射穿过该网络，它包含了一个激活函数，$$f(\cdot)$$，参数矩阵W，参数向量b。在相同的方式下，reconstructed vector，y, 也从h映射，带有参数$$W'$$和$$b'$$。使用一个loss函数，$$L_R(\cdot, \cdot)$$，我们学习这些参数来最小化y和x的reconstruction errors。
+其中$$x \in X$$是原始input vector，$$q(\cdot \mid \cdot)$$是加噪声混淆分布（corrupting distribution）。stochastically corrupted vector, $$\hat{x}$$，从$$q(\cdot \mid x)$$中获取。隐表示，h，从$$\hat{x}$$映射穿过该网络，它包含了一个激活函数，$$f(\cdot)$$，参数矩阵W，参数向量b。在相同的方式下，reconstructed vector，y, 也从h映射，带有参数$$W'$$和$$b'$$。使用一个loss函数，$$L_R(\cdot, \cdot)$$，我们学习这些参数来最小化y和x的reconstruction errors。
 
 h通常被用于一个对应于x的向量表示。然而，h只持有x的信息。我们希望解释，如果$$x_0$$与$$x_1$$更相似时，两个表示向量的内积 $$h_0^T h_1$$更大。为了达到该目的，我们使用了一个三元组，$$(x_0, x_1, x_2) \in X^3$$，作为训练的输入，并修改了目标函数，来维持他们的类目相似性：
 
@@ -102,7 +102,7 @@ L_T(h_0, h_1, h_2) = log(1 + exp(h_0^T h_2 - h_0 ^T h_1)) \\
 
 $$
 
-其中，$$T \subset X^3$$， 以至于$$x_0$$和$$x_1$$具有相同或相似的类目，$$x_0$$和$$x_2$$具有不同的类目。在等式(1)中的h满足该属性，$$x=0 \rightarraw h = 0$$。这意味着，这是一篇与其它文章都不相似的文章。该概念，$$L_T(\cdot, \cdot, \cdot)$$是一个关于文章相似度的罚项函数，它对应于类别相似度（categorical similarity），其中$$\alpha$$是一个用于权衡的超参数。图2提供了该方法的一个总览。
+其中，$$T \subset X^3$$， 以至于$$x_0$$和$$x_1$$具有相同或相似的类目，$$x_0$$和$$x_2$$具有不同的类目。在等式(1)中的h满足该属性，$$x=0 \rightarrow h = 0$$。这意味着，这是一篇与其它文章都不相似的文章。该概念，$$L_T(\cdot, \cdot, \cdot)$$是一个关于文章相似度的罚项函数，它对应于类别相似度（categorical similarity），其中$$\alpha$$是一个用于权衡的超参数。图2提供了该方法的一个总览。
 
 <img src="http://pic.yupoo.com/wangdren23_v/58a3a83b/4cd2f99b.png">
 
