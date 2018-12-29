@@ -108,7 +108,7 @@ $$
 
 图2: 文章三元组有encoder
 
-我们使用elementwise sigmoid 函数，$$\sigma(x)_i = frac{1}{1+exp(-x_i)}$$作为$$f(\cdot)$$，elementwsie cross entropy为$$L_R(\cdot, \cdot)$$，masking noise为$$q(\cdot \mid \cdot)$$。我们训练该模型，$$\theta = \lbrace W, W', b, b' \rbrace$$，通过使用mini-batch SGD进行最优化。
+我们使用elementwise sigmoid 函数，$$\sigma(x)_i = \frac{1}{1+exp(-x_i)}$$作为$$f(\cdot)$$，elementwsie cross entropy为$$L_R(\cdot, \cdot)$$，masking noise为$$q(\cdot \mid \cdot)$$。我们训练该模型，$$\theta = \lbrace W, W', b, b' \rbrace$$，通过使用mini-batch SGD进行最优化。
 
 我们在应用阶段（application phase）通过使用常数衰减来构建$$\hat{x}$$，在训练阶段（training phase）则使用stochastic corruption作为替代：
 
