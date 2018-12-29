@@ -59,7 +59,7 @@ $$
 MMSE = \frac{m_i * (r_i - y_i)^2} {\sum_{i=0}^{i=n} m_i}
 $$
 
-...(i)
+...(1)
 
 其中$$r_i$$是实际评分，$$y_i$$是重构评分（或预测评分），其中$$m_i$$是一个mask函数：
 
@@ -76,12 +76,12 @@ $$f(x)_i = x_i， \forall i: x_i \neq 0$$，
 
 其中$$f(x)_i$$可以准确预测所有用户对于items: $$x_i = 0$$的将来评分（future ratings）。那么这意味着，如果用户对新的item k进行评分（创建一个新向量x'），那么$$f(x)_k = x_k'，f(x)=f(x')$$。这样，在理想场景下，$$y=f(x)$$应是一个关于训练良好的antoencoder $$f(y)=y$$的确定点（fixed point）。
 
-为了显式增强fixed-point constraint，以及能执行dense training updates，我们使用一个迭代式dense re-feeding steps（以下的3和4）来增大每个最优化迭代（optimization iteration）。
+为了显式增强fixed-point constraint，以及能执行dense training updates，我们使用一个**迭代式dense re-feeding steps（以下的3和4）**来增大每个最优化迭代（optimization iteration）。
 
 - 1.给定稀疏x，使用等式(1)来计算dense f(x)和loss
-- 2.计算梯度和执行权重更新(backward pass)
-- 3.将f(x)看成是一个新的样本，计算f(f(x))。现在f(x)和f(f(x))是dense的，来自等式(1)的m个lossf都是非零（第二个forward pass）
-- 4.计算梯度和执行weight更新（第二个backward pass）
+- 2.计算梯度、执行权重更新(backward pass)
+- 3.**将f(x)看成是一个新的样本**，计算f(f(x))。现在f(x)和f(f(x))是dense的，来自等式(1)的loss上所有m项都是非零的（第二个forward pass）
+- 4.计算梯度、执行weight更新（第二个backward pass）
 
 第(3)和(4)对于每个迭代也可以执行多次。
 
