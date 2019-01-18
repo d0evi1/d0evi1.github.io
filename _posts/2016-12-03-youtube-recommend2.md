@@ -114,6 +114,8 @@ YouTube上，每秒都有许多视频上传上来。推荐这些最新上传的�
 
 <img src="http://pic.yupoo.com/wangdren23/GkHGYqVO/medish.jpg">
 
+图6 在video embeddings之外的features可以提升holdout的Mean Average Precision(MAP)以及layers的深度添加了表现力，以便模通过对这些交互建模来有效使用这些额外特征
+
 # 二、Ranking
 
 Ranking的主要作用是，针对指定的UI，使用曝光数据来特化和校正候选预测（specialized and calibrate candidate predictions）。例如，用户通常会观看一个probability值较高的视频，但不大可能去点击指定主页上缩略图的曝光。在Ranking时，我们会访问许多描述视频的特征、以及视频与用户关系的特征，因为在候选集生成阶段，只有一小部分的视频被打过分，而非上百w的视频。Ranking对于聚合不同的候选源很重要，因为每个源的得分不能直接对比。
