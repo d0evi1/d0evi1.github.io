@@ -62,7 +62,7 @@ $$
 
 **Efficient Extreme Multiclass**
 
-为了有效地训练这样一个上百万分类的模型，我们采用的技术是：从后台分布中对负例采样(sample negative classes)，接着通过按权重重要性加权(importance weighting)纠正这些样本。对于每个样本，为true-label和negative-label，学习目标是最小化cross-entropy loss。实际中，会抽样上千个负样本，这种方法可以比传统的softmax快100倍。另一个可选的方法是：hierarchical softmax，但这里我们不去做对比。
+为了有效地训练这样一个具有上百万分类的模型，我们采用的技术是：从后台分布（“候选抽样candidate sampling”）中对采样负类(sample negative classes)，接着通过按重要性加权(importance weighting)[10]来纠正这些样本。对于每个样本，为true-label和negative-label，学习目标是最小化cross-entropy loss。实际中，会抽样上千个负样本，这种方法可以比传统的softmax快100倍。另一个可选的方法是：hierarchical softmax，但这里我们不去做对比。
 
 在提供服务的阶段（serving time），我们需要计算最可能的N个分类（视频），以便选中其中的top N，来展现给用户。对上百w级的item进行打分，会在10ms左右的延迟内完成。之前的Youtube系统靠hashing技术[24]解决，和这里描述的分类器使用相类似的技术。**由于在serving time时并不需要对softmax输出层校准(calibrated)likelihoods，打分问题(scoring problem)可以缩减至在点乘空间中的最近邻搜索问题，可以使用[12]中提供的库来完成。**我们发现，在最近邻搜索算法上做A/B test效果并不特别明显。
 
@@ -155,7 +155,7 @@ Ranking的主要作用是，针对指定的UI，使用曝光数据来特化和�
 
 我们的目标是，给定训练样本：包含正例（曝光的视频被点击）和负例（曝光的视频没被点击），来预测期望的观看时间。正例可以解释成：该用户花费观看该视频的时间量。为了预测期望的观看时间，我们出于该目的，开发并使用加权logistic regression技术。
 
-该模型的训练通过logistic regression和cross-entropy loss进行（图7）。然而，正例（被点的）的曝光，会由视频所观察到的观看时间进行加权。所有负例（未点击）的曝光，都使用单位加权。这种方式下，通过logistic regression学到的差异（odds）是：\$ \frac{\sum{T_i}}{N-k} \$，其中N是训练样本的数目，k是正例曝光的数目，Ti是第i个曝光的观看时间。假设，正例曝光很小（真实情况就这样），学到的差异(odds)近似为：\$ E[T](1+P) \$，其中P是点击概率，而E[T]是该曝光所期望的观看时间。由于P很小，该乘积近似为E[T]。为便于推理，我们使用指数函数e^x作为最终的激活函数，来产成这些odds，来近似估计期望的观看时长。
+该模型的训练通过logistic regression和cross-entropy loss进行（图7）。然而，正例（被点的）的曝光，会由视频所观察到的观看时间进行加权。所有负例（未点击）的曝光，都使用单位加权。这种方式下，通过logistic regression学到的差异（odds）是：\$ \frac{\sum{T_i}}{N-k} \$，其中N是训练样本的数目，k是正例曝光的数目，Ti是第i个曝光的观看时间。假设，正例曝光很小（真实情况就这样），学到的差异(odds)近似为：$$ E[T](1+P) $$，其中P是点击概率，而E[T]是该曝光所期望的观看时间。由于P很小，该乘积近似为E[T]。为便于推理，我们使用指数函数e^x作为最终的激活函数，来产成这些odds，来近似估计期望的观看时长。
 
 ## 2.3 隐层的试验
 
