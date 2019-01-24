@@ -11,19 +11,19 @@ Amazon在hogwild、hogbatch之后，提出了《BlazingText: Scaling and Acceler
 
 # 介绍
 
-Word2vec是流行的算法。原始c实现、以及fastText可以利用多核cpu架构来并行化。还有少部分实现则利用GPU并行化，但会牺牲accuracy和可扩展性。本paper提出了BlazingText，一个使用CUDA高度优化的word2vec实现，可以利用多GPU进行训练。BlazingText可以在8GPU上达到43M words/sec的训练速度，它是8线程CPU实现的9倍，并且对embeddings的质量影响很小。
+Word2vec是流行的算法。原始google c实现、以及facebook fastText可以利用多核cpu架构来并行化。还有一少部分实现方式则利用GPU并行化，但会牺牲accuracy和可扩展性。本paper提出了BlazingText，一个使用CUDA高度优化的word2vec实现，可以利用多GPU进行训练。BlazingText可以在8GPU上达到43M words/sec的训练速度，达到了8线程CPU实现的9倍，并且对embeddings的质量影响很小。
 
-word2vec的最优化通过SGD完成，它会进行迭代式求解；在每一个step，会选对一个词对（pair of words）：一个输入词和一个目标词，它们来自于window或一个随机负样本。接着根据两个选中的词来计算目标函数的梯度，然后基于该梯度值更新两个词的词表示（word representations）。该算法接着使用不同的word pair来处理下一次迭代。
+word2vec的最优化通过SGD完成，它会进行迭代式求解；在每一个step，会选取一个词对（pair of words）：一个输入词和一个目标词，它们来自于window或一个随机负样本。接着根据选中的两个词来计算目标函数的梯度，然后基于该梯度值更新两个词的词表示（word representations）。该算法接着使用不同的word pair来处理下一次迭代。
 
-SGD的一个主要问题是，它的顺序性；这是因为它在这一轮迭代的更新、与下一轮迭代的计算之间存在着依赖关系（他们可能遇到相同的词表示），每一轮迭代必须潜在等待前一轮迭代的更新完成。这不允许我们使用硬件并行资源。
+**SGD的一个主要问题是，它的顺序性**；这是因为它在这一轮迭代的更新、与下一轮迭代的计算之间存在着依赖关系（他们可能遇到相同的词表示），每一轮迭代必须潜在等待前一轮迭代的更新完成。这不允许我们使用硬件并行资源。
 
-然而，为了解决上述问题，word2vec使用Hogwild，它使用不同线程来并行处理不同的word pairs，并忽略任何在模型更新阶段中发生的冲突。理论上，对比起顺序运行，这会让算法的收敛率下降。然而，对于跨多线程更新不可能会是相同的词的这种情况，Hogwild方法已经得到验证能运行良好；对于大词汇表size，冲突相对较少发生，收敛通常不受影响。
+**然而，为了解决上述问题，word2vec使用Hogwild，它使用不同线程来并行处理不同的word pairs，并忽略任何在模型更新阶段中发生的冲突**。理论上，对比起顺序运行，这会让算法的收敛率下降。然而，对于跨多线程更新不可能会是相同的词的这种情况，Hogwild方法已经得到验证能运行良好；对于大词汇表size，冲突相对较少发生，收敛通常不受影响。
 
 Hogwild方法在多核架构上的成功，使得该算法利用GPU成为可能，GPU比CPU提供更强的并行化。在该paper中，我们提出了一种有效的并行化技术来使用GPU加速word2vec。
 
-在深度学习框架中使用GPU加速，对于加速word2vec来说并不是好选择[6]。这些框架通常更适合于“深度网络（deep networks）”，它们的计算量主要由像卷积（conv）以及大矩阵乘法（large matrix multiplications）等重型操作主宰。而word2vec则是一个相对浅层的网络（shallow network），每一个training step包含了一个embedding lookup、梯度计算（gradient computation）、以及最终为word pair进行权重更新（weight updates）。梯度计算和更新涉及很小的点乘操作，使用cuDNN[7]或cuBLAS[8]并不能受益。
+在深度学习框架中使用GPU加速，对于加速word2vec来说并不是好选择[6]。这些框架通常更适合于“深度网络（deep networks）”，它们的计算量主要由像卷积（conv）以及大矩阵乘法（large matrix multiplications）等重型操作主宰。**而word2vec则是一个相对浅层的网络（shallow network），每一个training step包含了一个embedding lookup、梯度计算（gradient computation）、以及最终为word pair进行权重更新（weight updates）**。梯度计算和更新涉及很小的点乘操作，使用cuDNN[7]或cuBLAS[8]并不能受益。
 
-深度学习框架的限制导致我们探索CUDA C++ API。我们从头设计了训练算法，以便最优利用CUDA多线程能力，并且防止过度利用GPU并行化，不伤害输出accuracy。
+深度学习框架的限制导致我们探索CUDA C++ API。我们从头设计了训练算法，以便最优利用CUDA多线程能力，并且防止对GPU并行化的过度利用，从而不伤害输出的accuracy。
 
 最终，我们开发了BlazingText，它处理文本语料的速率能达到数百万 words/sec，我们演示了使用多GPU来执行数据并行训练的可能性。我们对比了开源的工具与BlazingText之间的benchmark。
 
@@ -45,10 +45,10 @@ $$
 
 然而，这样的模型不适合我们的case中，因为它意味着，给定一个词$$w_t$$，我们只能预测一个上下文词$$w_c$$。
 
-预测上下文词(context words)的问题可以通过构建独立的二分类任务集合来替代。接着，该目标是独立地预测上下文词的出现（或者不出现）。对于在位置t处的词，我们会考虑所有的上下文词作为正例，并从字典中随机抽样负样本。对于一个选中的上下文位置c，使用binary logistic loss，我们可以获取以下的negative log-likelihood:
+预测上下文词(context words)的问题可以通过构建独立的二分类任务集合来替代。接着，该目标是独立地预测上下文词是否出现。对于在位置t处的词，我们会考虑所有的上下文词作为正例，并从字典中随机抽样负样本。对于一个选中的上下文位置c，使用binary logistic loss，我们可以获取以下的negative log-likelihood:
 
 $$
-log(1 + e^{-s(w_t,w_c)}) + \sum_{n \in N_{t,c} log(1 + e^{s(w_t,n)})}
+log(1 + e^{-s(w_t,w_c)}) + \sum_{n \in N_{t,c}} log(1 + e^{s(w_t,n)})
 $$
 
 其中$$N_{t,c}$$是从词汇表中抽取的负样本的一个集合。通过表示logistic loss function l：$$x \rightarrow log(1+e^{-x})$$，我们可以重写目标函数：
