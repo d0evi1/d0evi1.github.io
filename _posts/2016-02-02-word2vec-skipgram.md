@@ -78,8 +78,8 @@ Hierarchical Softmax外的另一可选方法是Noise Contrastive Estimation(NCE)
 而NCE可以近似最大化softmax的log概率，Skip-gram模型只关注学习高质量的向量表示，因此，我们可以自由地简化NCE，只要向量表示仍能维持它的质量。我们定义了Negative sampling(NEG)的目标函数：
 
 $$
-log \sigma{(v^{'}_{w_O}^T v_{w_I})} + \sum_{i=1}^k E_{w_i} 
-\sim P_n(w)\[log \sigma{(-v^{'}_{w_i}^T v_{w_I})} \]
+log \sigma{(v'_{w_O}^T v_{w_I})} + \sum_{i=1}^k E_{w_i} 
+\sim P_n(w)\[log \sigma{(-v'_{w_i}^T v_{w_I})} \]
 $$
 
 在Skip-gram目标函数中，每个$$ P(w_O \mid w_I) $$项都被替换掉。该任务是为了区分目标词wo，以及从使用logistic回归的噪声分布$$P_n(w)$$得到的词。其中每个数据样本存在k个negative样本。我们的试验中，对于小的训练数据集，k的值范围(5-20)是合适的；而对于大的数据集，k可以小到2-5。Negative sampling和NCE的最主要区分是，NCE同时需要样本和噪声分布的数值概率，而Negative sampling只使用样本。NCE逼近最大化softmax的log概率时，该特性对于我们的应用不是很重要。
