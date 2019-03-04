@@ -51,6 +51,7 @@ paper的其余部分组织如下：第2节介绍三种embedding方法。第3节�
 $$
 minimize_{\Phi} \sum \limits_{v \in V} \sum \limits_{c \in N(v)} -log Pr(c | \Phi(v))
 $$
+
 ...(1)
 
 其中，$$N(v)$$是节点v的邻节点，可以被定义为从v开始在一跳或两跳内的节点。$$Pr(c \mid \Phi(v))$$定义了给定一个节点v后，具有上下文节点c的条件概率。
@@ -85,6 +86,7 @@ $$
 $$
 P(v_j | v_i) = \begin{cases} \frac{M_{ij}}{\sum_{j \in N_{+}(v_i)} M_{ij}}, & v_j \in N_{+}(v_i) \\ 0, & e_{ij} \notin E \end{cases}
 $$
+
 ...(2)
 
 其中，$$N_{+}(v_i)$$表示出链（outlink）的邻节点集合，例如，从$$v_i$$出发指向在$$N_{+}(v_i)$$所有节点的边。通过运行随机游走，我们可以生成如图2(c)所示的许多序列。
@@ -94,6 +96,7 @@ $$
 $$
 minimize_{\Phi} - log Pr (\lbrace v_{i-w}, ..., v_{i+w} \rbrace \backslash v_i | \Phi(v_i)) 
 $$
+
 ...(3)
 
 其中，w是在序列中上下文节点的window size。使用独立假设，我们具有：
@@ -101,6 +104,7 @@ $$
 $$
 Pr (\lbrace v_{i-w}, ..., v_{i+w} \rbrace \backslash v_i | \Phi(v_i)) = \prod_{j=i-w, j \neq i}^{i+w} Pr(v_j | \Phi(v_i))
 $$ 
+
 ...(4)
 
 应用negative sampling，等式4可以转换成：
@@ -108,6 +112,7 @@ $$
 $$
 minimize log \sigma (\Phi(v_j)^T \Phi(v_i)) + \sum_{t \in N_(v_i)'} log \sigma(- \Phi(v_t)^T \Phi(v_i))
 $$
+
 ...(5)
 
 其中，$$V(v_i)'$$是对于$$v_i$$的负采样，$$\sigma()$$是sigmoid函数。经验上，$$ \mid N(v_i)' \mid$$越大，获得的结果越好。
@@ -129,6 +134,7 @@ $$
 $$
 H_v = \frac{1}{n+1} \sum_{s=0}^n W_v^s
 $$
+
 ...(6)
 
 其中，$$H_v$$是item v的聚合embeddings。这种方法中，我们将side information以这样的方式合并，从而使具有相近side information的items可以在embedding空间内更接近。这会为cold-start items的embeddings更精准些，并且提升了在线和离线的效果。（见第3节）
@@ -272,9 +278,6 @@ offline子系统的workflow，包含了graph embedding的实现和部署，如�
 - 包含用户行为的日志会被检索。item graph会基于用户行为进行构建。实际上，我们会选择最近三个月的日志。在生成基于session的用户行为序列之前，会对数据进行anti-spam。留下的日志包含了6000亿条目。item graph会根据2.2节的方法进行构建。
 - 为了运行我们的graph embedding方法，会采用两种实际方法：1) 整个graph划分成许多个sub-graphs，它们可以通过Taobao的ODPs（Open Data Processing Service）分布式平台进行处理。每个subgraph有将近5000w个节点。2)为了生成random walk序列，我们在ODPs中使用基于迭代的分布式图框架。通过random walk生成的序列总是将近1500亿。
 - 为了实现该embedding算法，在我们的XTF平台上使用了100个GPU。在部署平台上，使用1500亿样本，在离线子系统中的所有模块，包含日志检索、anti-spam、item图构建、通过random walk生成序列、embedding、item-to-item相似度计算以及map生成，执行过程小于6个小时。这样，我们的推荐服务可以在非常短时间内响应用户最近行为。
-
-
-
 
 # 参考
 
