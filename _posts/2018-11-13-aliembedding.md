@@ -143,7 +143,7 @@ $$
 
 尽管GES可以获得收益，但在embedding过程中集成不同类型的side information时，仍存在一个问题。等式(6)中，不同类型的side information对最终的embedding的贡献是相等的，在现实中这不可能。例如，一个购买了IPhone的用户，趋向于会浏览Macbook或者Ipad，因为品牌都是"Apple"；而一个购买了多个不同品牌衣服的用户，出于便利和更低价格，还会在相同的淘宝店上继续购买。因此，不同类型的side information对于在用户行为中的共现items的贡献各不相同。
 
-为了解决该问题，我们提出了EGES方法来聚合不同类型的side information。该框架与GES相同（见图3）。不同之处是，当embeddings聚合时，不同类型的side information具有不同贡献。 因而，我们提出了一个加权平均的average layer来聚合与items相关的side information的embeddings。给定一个item v，假设$$ A \in R^{\mid V \mid \times (n+1)}$$是权重矩阵（weight matrix），条目$$A_{ij}$$是第i个item、第j个类型side information的权重。注意，$$A_{*0}$$，例如，A的第一列，表示item v的权限自身。出于简洁性，我们使用$$a_v^s$$来表示关于第v个item的第s个类型的side information的权重，$$a_v^0$$表示item v自身的权重。加权平均层（weighted average layer）会结合不同的side information，定义如下：
+为了解决该问题，我们提出了EGES方法来聚合不同类型的side information。该框架与GES相同（见图3）。不同之处是，当embeddings聚合时，不同类型的side information具有不同贡献。 因而，我们提出了一个加权平均的average layer来聚合与items相关的side information的embeddings。给定一个item v，假设$$ A \in R^{\mid V \mid \times (n+1)}$$是权重矩阵（weight matrix），条目$$A_{ij}$$是第i个item、第j个类型side information的权重。注意，$$A_{*0}$$，例如，A的第一列，表示item v的权限自身。**出于简洁性，我们使用$$a_v^s$$来表示关于第v个item的第s个类型的side information的权重，$$a_v^0$$表示item v自身的权重**。加权平均层（weighted average layer）会结合不同的side information，定义如下：
 
 $$
 H_v = \frac{\sum_{j=0}^{n} e^{a_v^j} W_v^j} {\sum_{j=0}^n e^{a_v^j}}
@@ -153,10 +153,10 @@ $$
 
 其中，我们使用$$e^{a_v^j}$$来替代$$a_v^j$$，以确保每个side information的贡献大于0, $$\sum_{j=0}^n e^{a_v^j}$$被用于归一化不同类型side information的embeddings的相关权重。
 
-在训练数据中，对于节点v和它的上下文节点u，我们使用$$Z_u \in R^d$$来表示它的embedding，y来表示label。接着，EGES的目标函数变为：
+在训练数据中，对于节点v和它的上下文节点u，**我们使用$$Z_u \in R^d$$来表示它的embedding，y来表示label**。接着，EGES的目标函数变为：
 
 $$
-L(v, u, y) = - [ y log(\sigma(H_v^T Z_u)) + (1-y)log(1-\sigma(H_v^T z_u))]
+L(v, u, y) = - [ y log(\sigma(H_v^T Z_u)) + (1-y)log(1-\sigma(H_v^T Z_u))]
 $$
 
 ...(8)
@@ -242,7 +242,7 @@ EGES的伪代码如算法1如示，加权Skip-Gram updater的伪代码如算法2
 
 图5: 冷启动item的相似items。展示了top4相似的items。注意：这里的"cat"表示category.
 
-在本部分，我们展示了冷启动item的embeddings质量。对于在淘宝上刚更新的一个新item，不能马上在item graph中没法学到embedding，之前基于CF的方法也不能处理冷启动问题。然而，**我们可以将一个冷启动item使用它的side information的average embeddings进行表示。接着，我们基于两个items的embeddings的点乘计算，从已经存在的items中检索最相似的items**。结果如图5所示。我们可以看到，对于两个冷启动items来说，尽管缺失用户行为，但可以利用不同的side information来有效学到它们的embeddings，在top相似的items上。在图中，我们为每个相似的item做了注释，连接到冷启动item上的side information的类型。我们可以看到，items的所属商店（shops）是用于衡量两个items相似度上非常重要的信息，它也会在下面部分使和每个side information的权重进行对齐。
+在本部分，我们展示了冷启动item的embeddings质量。对于在淘宝上刚更新的一个新item，不能马上在item graph中没法学到embedding，之前基于CF的方法也不能处理冷启动问题。然而，**我们可以将一个冷启动item使用它的side information的average embeddings进行表示。接着，我们基于两个items的embeddings的点乘计算，从已经存在的items中检索最相似的items**。结果如图5所示。我们可以看到，对于两个冷启动items来说，尽管缺失用户行为，但可以利用不同的side information来有效学到它们的embeddings，在top相似的items上。在图中，我们为每个相似的item注释上：连接到冷启动item上的side information的类型。我们可以看到，items的所属商店（shops）是用于衡量两个items相似度上非常重要的信息，它也会在下面部分使和每个side information的权重进行对齐。
 
 <img src="http://pic.yupoo.com/wangdren23/HNP1PYZI/medish.jpg">
 
