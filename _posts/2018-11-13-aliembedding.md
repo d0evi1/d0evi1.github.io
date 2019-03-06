@@ -242,7 +242,7 @@ EGES的伪代码如算法1如示，加权Skip-Gram updater的伪代码如算法2
 
 图5: 冷启动item的相似items。展示了top4相似的items。注意：这里的"cat"表示category.
 
-在本部分，我们展示了冷启动的embeddings质量。对于在淘宝上刚更新的一个新item，在item graph中没法学到embedding，之前基于CF的方法也不能处理冷启动问题。然而，我们可以将一个冷启动item使用它的side information进行表示。结果如图5所示。我们可以看到，尽管对于两个冷启动items来说缺失用户行为，但可以利用不同的side information来有效学习它们的embeddings，在top相似的items上。在图中，我们为每个相似的item做了注释，连接到冷启动item上的side information的类型。我们可以看到，items的所属商店（shops）是用于衡量两个items相似度上非常重要的信息，它也会在下面部分使和每个side information的权重进行对齐。
+在本部分，我们展示了冷启动item的embeddings质量。对于在淘宝上刚更新的一个新item，不能马上在item graph中没法学到embedding，之前基于CF的方法也不能处理冷启动问题。然而，**我们可以将一个冷启动item使用它的side information的average embeddings进行表示。接着，我们基于两个items的embeddings的点乘计算，从已经存在的items中检索最相似的items**。结果如图5所示。我们可以看到，对于两个冷启动items来说，尽管缺失用户行为，但可以利用不同的side information来有效学到它们的embeddings，在top相似的items上。在图中，我们为每个相似的item做了注释，连接到冷启动item上的side information的类型。我们可以看到，items的所属商店（shops）是用于衡量两个items相似度上非常重要的信息，它也会在下面部分使和每个side information的权重进行对齐。
 
 <img src="http://pic.yupoo.com/wangdren23/HNP1PYZI/medish.jpg">
 
@@ -275,9 +275,9 @@ EGES的伪代码如算法1如示，加权Skip-Gram updater的伪代码如算法2
 
 offline子系统的workflow，包含了graph embedding的实现和部署，如下描述：
 
-- 包含用户行为的日志会被检索。item graph会基于用户行为进行构建。实际上，我们会选择最近三个月的日志。在生成基于session的用户行为序列之前，会对数据进行anti-spam。留下的日志包含了6000亿条目。item graph会根据2.2节的方法进行构建。
-- 为了运行我们的graph embedding方法，会采用两种实际方法：1) 整个graph划分成许多个sub-graphs，它们可以通过Taobao的ODPs（Open Data Processing Service）分布式平台进行处理。每个subgraph有将近5000w个节点。2)为了生成random walk序列，我们在ODPs中使用基于迭代的分布式图框架。通过random walk生成的序列总是将近1500亿。
-- 为了实现该embedding算法，在我们的XTF平台上使用了100个GPU。在部署平台上，使用1500亿样本，在离线子系统中的所有模块，包含日志检索、anti-spam、item图构建、通过random walk生成序列、embedding、item-to-item相似度计算以及map生成，执行过程小于6个小时。这样，我们的推荐服务可以在非常短时间内响应用户最近行为。
+- 包含用户行为的日志会被检索。item graph会基于用户行为进行构建。实际上，我们会选择最近三个月的日志。在生成基于session的用户行为序列之前，会对数据进行anti-spam。**留下的日志包含了6000亿条目**。item graph会根据2.2节的方法进行构建。
+- 为了运行我们的graph embedding方法，会采用两种实际方法：1) 整个graph划分成许多个sub-graphs，它们可以通过Taobao的ODPs（Open Data Processing Service）分布式平台进行处理。每个subgraph有将近5000w个节点。2)为了生成random walk序列，我们在ODPs中使用基于迭代的分布式图框架。**通过random walk生成的序列总是将近1500亿**。
+- **为了实现该embedding算法，在我们的XTF平台上使用了100个GPU**。在部署平台上，使用1500亿样本，在离线子系统中的所有模块，包含日志检索、anti-spam、item图构建、通过random walk生成序列、embedding、item-to-item相似度计算以及map生成，**执行过程小于6个小时**。这样，我们的推荐服务可以在非常短时间内响应用户最近行为。
 
 # 参考
 
