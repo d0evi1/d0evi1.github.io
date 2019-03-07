@@ -31,7 +31,7 @@ $$
 我们创建一个候选集合$$C_i$$，它包含了关于target class和sampled classes的union：
 
 $$
-C_i = S_i \union \lbrace t_i \rbrace
+C_i = S_i \cup \lbrace t_i \rbrace
 $$
 
 我们的训练任务是为了指出，在给定集合$$C_i$$上，在$$C_i$$中哪个类是target class。
@@ -44,6 +44,20 @@ $$
 P(t_i=y|x_i,C_i) = P(t_i=y,C_i|x_i) / P(C_i|x_i) \\
 =P(t_i=y|x_i) P(C_i|t_i=y,x_i) / P(C_i|x_i) \\
 =P(y|x_i)P(C_i|t_i=y,x_i) / P(C_i|x_i)
+$$
+
+接着，为了计算$$P(C_i \mid t_i=y,x_i)$$，我们注意到为了让它发生，$$S_i$$可能或不可能包含y，必须包含$$C_i$$所有其它元素，必须不包含在$$C_i$$任意classes。因此：
+
+$$
+P(t_i=y|x_i, C_i) = P(y|x_i) \prod_{y \in C_i - \lbrace y \rbrace} Q({y'}|x_i) \prod_{y \in (L-C_i)} (1-Q({y'}|x_i)) / P(C_i | x_i) \\
+= \frac{P(y|x_i)}{Q(y|x_i)} \prod_{{y'} \in C_i} Q({y'}|x_i) \prod_{{y'} \in (L-C_i)} (1-Q({y'}|x_i))/P(C_i|x_i) \\
+=\frac{P(y|x_i)}{Q(y|x_i)} / K(x_i,C_i)
+$$
+
+其中，$$K(x_i,C_i)$$是一个函数，它与y无关。因而：
+
+$$
+log(P(t_i=y|x_i,C_i)) = log(P(y|x_i)) - log(Q(y|x_i)) + {K'}(x_i,C_i)
 $$
 
 
