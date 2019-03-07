@@ -65,7 +65,7 @@ $$
 因此，我们尝试训练函数F(x,y)来逼近$$log(P(y \mid x))$$，它会采用在我们的网络中表示F(x,y)的layer，减去$$log(Q(y \mid x))$$，然后将结果传给一个softmax classifier来预测哪个candidate是true样本。
 
 $$
-training softmax input=F(x,y) - log(Q(y|x))
+training-softmax-input = F(x,y) - log(Q(y|x))
 $$
 
 从该classifer对梯度进行BP，可以训练任何我们想到的F。
