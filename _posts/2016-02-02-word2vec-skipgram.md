@@ -110,8 +110,10 @@ NCE和NEG都有噪声分布$$P_n(w)$$作为自由参数。对于$$P_n(w)$$我们
 这种方法，我们可以产生许多合理的短语，同时也不需要极大增加词汇的size；理论上，我们可以使用所有n-gram来训练Skip-gram模型，但这样很耗费内存。在文本上标识短语方面，之前已经有许多技术提出。然而，对比比较这些方法超出了该paper范围。我们决定使用一种简单的基于数据驱动的方法，短语的形成基于unigram和bigram的数目，使用：
 
 $$
-score(w_i,w_j)= \frac{count(w_i w_j- \delta} {count(w_i) * count(w_j)}
-$$  (6)
+score(w_i,w_j)= \frac{count(w_i w_j- \delta} ){count(w_i) * count(w_j)}
+$$  
+
+...(6)
 
 其中，delta被用于一个打折系数(discounting coefficient)，它可以阻止产生过多的包含许多不常见词的短语。bigram的score如果比选择的阀值要大，那么则认为该短语成立。通常，我们会不断降低阀值，运行2-4遍的训练数据，以允许形成包含更多词的更长短语。我们使用一个新的关于短语的analogical reasoning task，来评估短语表示的质量。该数据集在网上是公开的。[下载](http://2code.google.com/p/word2vec/source/browse/trunk/questions-phrases.txt)
 
