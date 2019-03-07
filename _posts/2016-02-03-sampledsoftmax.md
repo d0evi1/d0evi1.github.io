@@ -57,7 +57,7 @@ $$
 其中，$$K(x_i,C_i)$$是一个函数，它与y无关。因而：
 
 $$
-log(P(t_i=y | x_i, C_i)) = log(P(y|x_i)) - log(Q(y|x_i)) + K'(x_i,C_i)
+log(P(t_i=y | x_i, C_i)) = log(P(y|x_i)) - log(Q(y|x_i)) + K(x_i,C_i)
 $$
 
 这些是relative logits，应feed给一个softmax classifier，来预测在$$C_i$$中的哪个candidates是正样本（true）。
