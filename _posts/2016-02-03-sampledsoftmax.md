@@ -20,9 +20,9 @@ $$
 
 其中，K(x)是一个特有函数，它不依赖于y。
 
-在full softmax训练中，对于每个训练样本$$(x_i,{t_i})$$，我们会为在$$y \in L$$中的所有类计算logits F(x_i,y)。如果类L很大，计算很会昂贵。
+在full softmax训练中，对于每个训练样本$$(x_i,\brace t_i \rbrace)$$，我们会为在$$y \in L$$中的所有类计算logits F(x_i,y)。如果类L很大，计算很会昂贵。
 
-在"Sampled Softmax"中，对于每个训练样本$$(x_i,{t_i})$$，我们会根据一个选择抽样函数$$Q(y \mid x)$$来选择一个关于“sampled” classese的小集合$$S_i \subset L$$。每个类$$ y \in L $$被包含在$$S_i$$中，它与概率$$Q(y \mid x_i)$$完全独立。
+在"Sampled Softmax"中，对于每个训练样本$$(x_i, \lbrace t_i \rbrace)$$，我们会根据一个选择抽样函数$$Q(y \mid x)$$来选择一个关于“sampled” classese的小集合$$S_i \subset L$$。每个类$$ y \in L $$被包含在$$S_i$$中，它与概率$$Q(y \mid x_i)$$完全独立。
 
 $$
 P(S_i = S|x_i) = \prod_{y \in S} Q(y|x_i) \prod_{y \in (L-S)} (1-Q(y|x_i))
@@ -41,12 +41,12 @@ $$
 使用Bayes' rule：
 
 $$
-P(t_i=y|x_i,C_i) = P(t_i=y,C_i|x_i) / P(C_i|x_i)\\
-=P(t_i=y|x_i) P(C_i|t_i=y,x_i) / P(C_i|x_i)\\
+P(t_i=y|x_i,C_i) = P(t_i=y,C_i|x_i) / P(C_i|x_i) \\
+=P(t_i=y|x_i) P(C_i|t_i=y,x_i) / P(C_i|x_i) \\
 =P(y|x_i)P(C_i|t_i=y,x_i) / P(C_i|x_i)
 $$
 
-接着，为了计算$$P(C_i|t_i=y,x_i)$$，我们注意到为了让它发生，$$S_i$$可能或不可能包含y，必须包含$$C_i$$所有其它元素，必须不包含在$$C_i$$任意classes。因此：
+接着，为了计算$$P(C_i \mid t_i=y,x_i)$$，我们注意到为了让它发生，$$S_i$$可能或不可能包含y，必须包含$$C_i$$所有其它元素，必须不包含在$$C_i$$任意classes。因此：
 
 $$
 P(t_i=y|x_i, C_i) = P(y|x_i) \prod_{y \in C_i - \lbrace y \rbrace} Q({y'}|x_i) \prod_{y \in (L-C_i)} (1-Q({y'}|x_i)) / P(C_i | x_i) \\
@@ -62,7 +62,7 @@ $$
 
 这些是relative logits，应feed给一个softmax classifier，来预测在$$C_i$$中的哪个candidates是正样本（true）。
 
-因此，我们尝试训练函数F(x,y)来逼近$$log(P(y \mid x))$$，它会采用在我们的网络中表示F(x,y)的layer，减去$$log(Q(y|x))$$，然后将结果传给一个softmax classifier来预测哪个candidate是true样本。
+因此，我们尝试训练函数F(x,y)来逼近$$log(P(y \mid x))$$，它会采用在我们的网络中表示F(x,y)的layer，减去$$log(Q(y \mid x))$$，然后将结果传给一个softmax classifier来预测哪个candidate是true样本。
 
 $$
 training softmax input=F(x,y) - log(Q(y|x))
