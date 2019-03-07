@@ -50,11 +50,16 @@ $$
 
 $$
 P(t_i=y|x_i, C_i) = P(y|x_i) \prod_{y \in C_i - \lbrace y \rbrace} Q({y'}|x_i) \prod_{y \in (L-C_i)} (1-Q({y'}|x_i)) / P(C_i | x_i) \\
-= \frac{P(y|x_i)}{Q(y|x_i)} \prod_{{y'} \in C_i} Q({y'}|x_i) \prod_{{y'} \in (L-C_i)} (1-Q({y'}|x_i))/P(C_i|x_i) \\
+= \frac{P(y|x_i)}{Q(y|x_i)} \prod_{ {y'} \in C_i} Q({y'}|x_i) \prod_{{y'} \in (L-C_i)} (1-Q({y'}|x_i))/P(C_i|x_i) \\
 =\frac{P(y|x_i)}{Q(y|x_i)} / K(x_i,C_i)
 $$
 
 其中，$$K(x_i,C_i)$$是一个函数，它与y无关。因而：
+
+$$
+log(P(t_i=y | x_i, C_i)) = log(P(y|x_i)) - log(Q(y|x_i)) + K'(x_i,C_i)
+$$
+
 这些是relative logits，应feed给一个softmax classifier，来预测在$$C_i$$中的哪个candidates是正样本（true）。
 
 因此，我们尝试训练函数F(x,y)来逼近$$log(P(y \mid x))$$，它会采用在我们的网络中表示F(x,y)的layer，减去$$log(Q(y \mid x))$$，然后将结果传给一个softmax classifier来预测哪个candidate是true样本。
