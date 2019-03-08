@@ -42,9 +42,11 @@ $$
 
 $$
 单变量: P(B|A) = P(A|B)*P(B) / P(A) \\
-多变量: P(A|B,C)=P(B|A)*P(A)*P(C|A,B)/(P(B)*P(C|B))
-$$
+双变量: P(A|B,C)=P(B|A)*P(A)*P(C|A,B)/(P(B)*P(C|B))\\
+另一个：P(C_i|A,B) = \frac{P(C_i,B|A)}{\sum_i P(C_i,B|A)}
+$$...(b)
 
+得到：
 
 $$
 P(t_i=y|x_i,C_i) = P(t_i=y,C_i|x_i) / P(C_i|x_i) \\
