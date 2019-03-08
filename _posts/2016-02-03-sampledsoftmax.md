@@ -40,10 +40,10 @@ $$
 
 使用Bayes' rule：
 
+[bayes]{https://math.stackexchange.com/questions/549887/bayes-theorem-with-multiple-random-variables}
+
 $$
-单变量: P(B|A) = P(A|B)*P(B) / P(A) \\
-双变量: P(A|B,C)=P(B|A)*P(A)*P(C|A,B)/(P(B)*P(C|B))\\
-另一个：P(C_i|A,B) = \frac{P(C_i,B|A)}{\sum_i P(C_i,B|A)}
+P(Z|X,Y) = P(Y,Z|X) P(X) / P(X,Y) = P(Y,Z|X) P(Y|X)
 $$...(b)
 
 得到：
