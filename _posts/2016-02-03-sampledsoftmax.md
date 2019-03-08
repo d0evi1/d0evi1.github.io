@@ -41,8 +41,8 @@ $$
 使用Bayes' rule：
 
 $$
-P(A \cap B) = P(A)*P(B|A)=P(B)*P(A|B) \\
-P(B|A) = P(A|B)*P(B) / P(A)
+单变量: P(B|A) = P(A|B)*P(B) / P(A) \\
+多变量: P(A|B,C)=P(B|A)*P(A)*P(C|A,B)/(P(B)*P(C|B))
 $$
 
 
