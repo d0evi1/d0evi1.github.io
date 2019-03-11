@@ -11,11 +11,11 @@ Ranking at Airbnb》, 我们来看下：
 
 # 介绍
 
-在过去十年的搜索体系中（通常基于经典的IR），已经出许了许多机器学习技术，尤其是在搜索排序领域。
+在过去十年的搜索体系中（通常基于经典的IR），已经出现了许多机器学习技术，尤其是在搜索排序领域。
 
-任何搜索算法的目标（objective）都依赖于自身的平台。其中，一些平台的目标是增加网站参与度（engagement：比如在搜索之后的新闻文章上的点击、消费），还有的目标是最大化转化（conversions: 比如：在搜索后的商品或服务的购买），还有的目标是需要为双边市场主体（比如：购买者和零售商）优化搜索结果。这种双边市场会合成一个可行的商业模型。特别的，我们会从社交网络范式转移到一个关于不同供需类型参与者组成的网络中。工业界的示例有：住房（airbnb），出行共享（Uber, Lyft），在线电商（Etsy）等。为这种类型的市场进行内容发现和搜索排序，需要满足供需双方，从而保持增长和繁荣。
+任何搜索算法的目标（objective）都依赖于自身的平台。其中，一些平台的目标是增加网站参与度（engagement：比如在搜索之后的新闻文章上的点击、消费），还有的目标是最大化转化率（conversions: 比如：在搜索后的商品或服务的购买），还有的目标是需要为双边市场主体（比如：购买者和零售商）优化搜索结果。这种双边市场会合成一个可行的商业模型。特别的，我们会从社交网络范式转移到一个关于不同供需类型参与者组成的网络中。工业界的示例有：住房（airbnb），出行共享（Uber, Lyft），在线电商（Etsy）等。为这种类型的市场进行内容发现和搜索排序，**需要满足供需双方**，从而保持增长和繁荣。
 
-在Airbnb中，需要对**主人（hosts）和客人（guests）**进行最优化搜索，这意味着，给定一个输入query，它带有位置（location）和旅行日期（trip dates），我们必须为客人带有位置、价格、风格、评论等出现给客户排序高的listings，同时，它又能很好地匹配主人关于旅行日期(trip dates)和交付期（lead days）的偏好。也就是说，我们需要发现这样的listings：它可能因为差评、宠物、逗留时间、group size或其它因素而拒绝客户，并将这些listings排的序更低。为了达到该目的，我们会使用L2R进行重排序。特别的，我们会将该问题公式化成pairwise regression问题（正向：预订bookings，负向：拒绝rejections）。
+在Airbnb中，需要对**主人（hosts）和客人（guests）**进行最优化搜索，**这意味着，给定一个输入query，它带有位置（location）和旅行日期（trip dates），我们必须为客人带有位置、价格、风格、评论等出现给客户排序高的listings，同时，它又能很好地匹配主人关于旅行日期(trip dates)和交付期（lead days）的偏好**。也就是说，我们需要发现这样的listings：它可能因为差评、宠物、逗留时间、group size或其它因素而拒绝客户，并将这些listings排的序更低。为了达到该目的，我们会使用L2R进行重排序。特别的，我们会将该问题公式化成pairwise regression问题（正向：预订bookings，负向：拒绝rejections）。
 
 由于客户通常会在预测前浏览多个搜索结构，例如：点击多个listing，并在它们的搜索session内联系多个主人，我们可以使用这些in-session信号（例如，点击（clicks）、与主人的联系（host contacts）等）进行实时个性化，目标是展示给用户与它的search session相似的多个listings。同时，我们可以使用负向信号（比如，高排名listings的跳过次数），从而展示给客人尽可能少的不喜欢列表。
 
@@ -25,13 +25,14 @@ Ranking at Airbnb》, 我们来看下：
 
 ## 3.1 Listing embeddings
 
-假设，给定从N个用户中获取的S个点击sessions的一个集合S，其中每个session $$s = (l_1, ..., l_M) \in S$$被定义成一个关于该用户点击的M个listing ids连续序列。当在两个连续的用户点击之间超过30分钟的时间间隔时，启动一个新的session。给定该数据集，目标是为每个唯一的listing $$l_i$$学习一个d维的real-valued表示: $$v_{l_i} \in R^d$$，以使相似的listing在该embedding空间中更接近。
+假设，给定从N个用户中获取的S个点击sessions的一个集合S，其中每个session $$s = (l_1, ..., l_M) \in S$$被定义成：一个关于该用户点击的M个listing ids连续序列。**当在两个连续的用户点击之间超过30分钟的时间间隔时，启动一个新的session**。给定该数据集，目标是为每个唯一的listing $$l_i$$学习一个d维的real-valued表示: $$v_{l_i} \in R^d$$，以使相似的listing在该embedding空间中更接近。
 
 更正式的，该模型的目标函数是使用skip-gram模型，通过最大化搜索sessions的集合S的目标函数L来学习listing表示，L定义如下：
 
 $$
-L = \sum_{s \in S} \sum_{l_i \in s} (\sum_{-m \leq j \leq m, i \neq 0} log P(l_{i+j} | l_i))
+L = \sum\limits_{s \in S} \sum\limits_{l_i \in s} (\sum\limits_{-m \leq j \leq m, i \neq 0} log P(l_{i+j} | l_i))
 $$
+
 ...(1)
 
 从被点击的listing $$l_i$$的上下文邻居上观察一个listing $$l_{i+j}$$的概率$$P(l_{i+j} \mid l_{i})$$，使用softmax定义：
@@ -39,6 +40,7 @@ $$
 $$
 P(l_{i+j} | l_i) = \frac{exp(v_{l_i}^T v_{l_{i+j}}')} {\sum_{l=1}^{|V|} exp(v_{l_i}^T v_l')}
 $$
+
 ...(2)
 
 其中$$v_l$$和$$v_l'$$是关于listing l的输入和输出的向量表示，超参数m被定义成对于一个点击listing的forward looking和backward looking上下文长度，V被定义成在数据集中唯一listings的词汇表。从(1)和(2)中可以看到提出的方法会对listing点击序列建模时序上下文，其中具有相似上下文的listing，将具有相似的表示。
