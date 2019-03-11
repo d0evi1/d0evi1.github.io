@@ -127,7 +127,7 @@ $$
 
 图3: GES和EGES的总框架。SI表示side information，其中"SI 0"表示item自身。惯例上，1）对于items和不同的SIs，稀疏特征趋向于one-hot-encoder vectors。 2) Dense embeddings是items和相应的SI的表示 3) hidden representation是一个item和它相应的SI的聚合embedding
 
-为了清晰些，我们对概念做了精微调整。我们使用W来表示items或者side information的embedding matrix。特别的，$$W_v^0$$表示item v的embedding，$$W_v^S$$表示绑定到item v上的第s个类型的side information的embedding。接着，对于item v，使用n种类型的side information，我们具有n+1个向量$$w_v^0, ..., W_v^n \in R^d$$，其中，d是embedding的维度。注意，item embeddings和side information embeddings的维度，经验上设置为相同的值。
+为了清晰些，我们对概念做了精微调整。我们使用W来表示items或者side information的embedding matrix。**特别的，$$W_v^0$$表示item v的embedding，$$W_v^S$$表示绑定到item v上的第s个类型的side information的embedding**。接着，对于item v，使用n种类型的side information，我们具有n+1个向量$$w_v^0, ..., W_v^n \in R^d$$，其中，d是embedding的维度。注意，item embeddings和side information embeddings的维度，经验上设置为相同的值。
 
 如图3所示，为了合并side information，我们为item v将n+1个embedding vectors进行拼接，增加一个layer，使用average-pooling操作来将所有与item v的embeddings进行聚合，它是：
 
