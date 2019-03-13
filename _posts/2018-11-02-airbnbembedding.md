@@ -45,7 +45,7 @@ $$
 
 其中$$v_l$$和$$v_l'$$是关于listing l的输入和输出的向量表示，超参数m被定义成对于一个点击listing的forward looking和backward looking上下文长度，V被定义成在数据集中唯一listings的词汇表。从(1)和(2)中可以看到提出的方法会对listing点击序列建模时序上下文，其中具有相似上下文的listing，将具有相似的表示。
 
-计算(1)中目标函数的梯度$$\Delta L$$的时间，与词汇表size $$\mid V \mid $$成正比，对于大词汇表来说，通常有好几百万listing ids，是不可行的任务。做为替代，我们会使用negative-sampling方法，它能极大减小计算复杂度。Negative-sampling可以如下所述。我们会生成一个positive pairs (l, c)的集合$$D_p$$，其中l表示点击的listings，c表示它的上下文，然后从整个词典V中随机抽取n个listings来组成negative pairs (l, c)的集合$$D_n$$。优化的目标函数变为：
+计算(1)中目标函数的梯度$$\Delta L$$的时间，与词汇表size $$\mid V \mid $$成正比，对于大词汇表来说，通常有好几百万listing ids，是不可行的任务。做为替代，我们会使用negative-sampling方法，它能极大减小计算复杂度。Negative-sampling可以如下所述。我们会生成一个**positive pairs (l, c)的集合$$D_p$$**，其中l表示点击的listings，c表示它的上下文，然后从整个词典V中随机抽取n个listings来组成**negative pairs (l, c)的集合$$D_n$$**。优化的目标函数变为：
 
 $$
 argmax_{\theta} \sum\limits_{(l,c) \in D_p} log \frac{1}{1+e^{-v_c'v_l}} + \sum\limits_{(l,c) \in D_n} log \frac{1}{1+e^{v_c'v_l}}
@@ -57,28 +57,29 @@ $$
 
 **将预订Listing看成全局上下文。** 我们将点击session集合S划分为：
 
-- 1) 预订的sessions（booked sessions)， 例如，点击sessions会以用户在某一listing上进行预订而结束  
-- 2) 探索性的session（ exploratory session），例如，点击sessions最后不会以预订结束，用户仅仅只是浏览. 
+- 1) 预订型sessions（booked sessions)， 例如，点击sessions会以用户在某一listing上进行预订而结束  
+- 2) 探索型session（exploratory session），例如，点击sessions最后不会以预订结束，用户仅仅只是浏览. 
 
-对于捕获上下文相似度的角度来说两者都有用，然而，预订的sessions可以被用于适配以下的最优化：在每个step上，我们不仅仅只预测邻居点击listing，也会预测预订的listing。这种适配可以通过将预测的listing作为全局上下文（global context）来完成，从而能总是被预测，不管是否在上下文窗口内部。因此，对于booked sessions来说，embedding的更新规则变为：
+对于捕获上下文相似度的角度来说两者都有用，然而，预订型sessions可以被用于适配以下的最优化：在每个step上，我们不仅仅只预测邻居clicked listing，也会预测booked listing。这种适配可以通过将预测的listing作为全局上下文（global context）来完成，从而能总是被预测，不管是否在上下文窗口内部。因此，对于预订型sessions来说，embedding的更新规则变为：
 
 $$
-argmax_{\theta} \sum_{(l,c) \in D_p} log \frac{1}{1+e^{-v_c'v_l}} + \sum_{(l,c) \in D_n} log \frac{1}{1+e^{v_c'v_l}} + log \frac{1}{1+ e^{-v_{l_b}' v_l}}
+argmax_{\theta} \sum\limits_{(l,c) \in D_p} log \frac{1}{1+e^{-v_c'v_l}} + \sum\limits_{(l,c) \in D_n} log \frac{1}{1+e^{v_c'v_l}} + log \frac{1}{1+ e^{-v_{l_b}' v_l}}
 $$
+
 ...(4)
 
-其中，$$v_{l_b}$$是预订listing $$l_b$$的embedding。对于 exploratory session来说，更新仍会由（3）的最优化进行管理。
+其中，$$v_{l_b}$$是booked listing $$l_b$$的embedding。对于 探索型session来说，更新仍会由（3）的最优化进行管理。
 
 <img src="http://pic.yupoo.com/wangdren23_v/56179234/bbaa9059.png">
 
 图1
 
-图1展示了listing embeddings是如何从booked sessions中进行学习的，它会使用一个滑动窗口size=2n+1, 从第一个clicked listing到最后的booked listing滑动。在每一步，**中心listing** $$v_l$$的embedding会被更新，以便它能预测**上下文listing** $$v_c$$的embedding、以及**预定listing**  $$v_{l_b}$$的embedding。随着窗口滑入和滑出上下文集合，预定listing总是会作为全局上下文存在。
+图1展示了listing embeddings是如何从预定型sessions中进行学习的，它会使用一个滑动窗口size=2n+1, 从第一个clicked listing到最后的booked listing滑动。在每一步，**central listing** $$v_l$$的embedding会被更新，以便它能预测**context listing** $$v_c$$的embedding、以及**booked listing**  $$v_{l_b}$$的embedding。随着窗口滑入和滑出上下文集合，**booked listing总是会作为全局上下文存在**。
 
-**自适应训练**. 在线旅行预定网站的用户通常会在单个market(例如，他们想逗留的地理位置)内进行搜索。因此，$$D_p$$会有较高的概率包含了相同market中的listings。在另一方面，归因于negative sampling，$$D_n$$包含的大多数listings与$$D_p$$包含的listings很大可能不会是相同的markets。在每一步，对于一个给定的中心listing l，**positive上下文**几乎由与l相同market的listings所组成，而**negative上下文**几乎由与l不同market的listings组成。为了解决该问题，我们提议添加一个随机负样本集合$$D_{m_n}$$，它从中心listing l的market上抽样得到：
+**自适应训练**. 在线旅行预定网站的用户通常会在**单个market(例如，他们想逗留的地理位置)**内进行搜索。因此，$$D_p$$会有较高的概率包含了相同market中的listings。**在另一方面，归因于negative sampling，$$D_n$$包含的大多数listings与$$D_p$$包含的listings很大可能不会是相同的markets**。在每一步，对于一个给定的中心listing l，**positive上下文**几乎由与l相同market的listings所组成，而**negative上下文**几乎由与l不同market的listings组成。为了解决该问题，我们提议添加一个随机负样本集合$$D_{m_n}$$，它从中心listing l的market上抽样得到：
 
 $$
-argmax_{\theta} \sum_{(l,c) \in D_p} log \frac{1}{1+e^{-v_c'v_l}} + \sum_{(l,c) \in D_n} log \frac{1}{1+e^{v_c'v_l}} + log \frac{1}{1+ e^{-v_{l_b}' v_l}} + \sum_{(l,m_n) \in D_{m_n}} log \frac{1}{1+e^{v_{m_n}'}v_l}
+argmax_{\theta} \sum\limits_{(l,c) \in D_p} log \frac{1}{1+e^{-v_c'v_l}} + \sum\limits_{(l,c) \in D_n} log \frac{1}{1+e^{v_c'v_l}} + log \frac{1}{1+ e^{-v_{l_b}' v_l}} + \sum\limits_{(l,m_n) \in D_{m_n}} log \frac{1}{1+e^{v_{m_n}'}v_l}
 $$
 ...(5)
 
