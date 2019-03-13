@@ -13,7 +13,7 @@ Ranking at Airbnb》, 我们来看下：
 
 在过去十年的搜索体系中（通常基于经典的IR），已经出现了许多机器学习技术，尤其是在搜索排序领域。
 
-任何搜索算法的目标（objective）都依赖于自身的平台。其中，一些平台的目标是增加网站参与度（engagement：比如在搜索之后的新闻文章上的点击、消费），还有的目标是最大化转化率（conversions: 比如：在搜索后的商品或服务的购买），还有的目标是需要为双边市场主体（比如：购买者和零售商）优化搜索结果。这种双边市场会合成一个可行的商业模型。特别的，我们会从社交网络范式转移到一个关于不同供需类型参与者组成的网络中。工业界的示例有：住房（airbnb），出行共享（Uber, Lyft），在线电商（Etsy）等。为这种类型的市场进行内容发现和搜索排序，**需要满足供需双方**，从而保持增长和繁荣。
+任何搜索算法的目标（objective）都依赖于自身的平台。其中，一些平台的目标是增加**网站参与度**（engagement：比如在搜索之后的新闻文章上的点击、消费），还有的目标是最大化**转化率**（conversions: 比如：在搜索后的商品或服务的购买），还有的目标是需要为**双边市场主体**（比如：购买者和零售商）优化搜索结果。这种双边市场会合成一个可行的商业模型。特别的，我们会从社交网络范式转移到一个关于不同供需类型参与者组成的网络中。工业界的示例有：住房（airbnb），出行共享（Uber, Lyft），在线电商（Etsy）等。为这种类型的市场进行内容发现和搜索排序，**需要满足供需双方**，从而保持增长和繁荣。
 
 在Airbnb中，需要对**主人（hosts）和客人（guests）**进行最优化搜索，**这意味着，给定一个输入query，它带有位置（location）和旅行日期（trip dates），我们必须为客人带有位置、价格、风格、评论等出现给客户排序高的listings，同时，它又能很好地匹配主人关于旅行日期(trip dates)和交付期（lead days）的偏好**。也就是说，我们需要发现这样的listings：它可能因为差评、宠物、逗留时间、group size或其它因素而拒绝客户，并将这些listings排的序更低。为了达到该目的，我们会使用L2R进行重排序。特别的，我们会将该问题公式化成pairwise regression问题（正向：预订bookings，负向：拒绝rejections）。
 
@@ -38,7 +38,7 @@ $$
 从被点击的listing $$l_i$$的上下文邻居上观察一个listing $$l_{i+j}$$的概率$$P(l_{i+j} \mid l_{i})$$，使用softmax定义：
 
 $$
-P(l_{i+j} | l_i) = \frac{exp(v_{l_i}^T v_{l_{i+j}}')} {\sum_{l=1}^{|V|} exp(v_{l_i}^T v_l')}
+P(l_{i+j} | l_i) = \frac{exp(v_{l_i}^T v_{l_{i+j}}')} {\sum\limits_{l=1}^{|V|} exp(v_{l_i}^T v_l')}
 $$
 
 ...(2)
@@ -48,11 +48,12 @@ $$
 计算(1)中目标函数的梯度$$\Delta L$$的时间，与词汇表size $$\mid V \mid $$成正比，对于大词汇表来说，通常有好几百万listing ids，是不可行的任务。做为替代，我们会使用negative-sampling方法，它能极大减小计算复杂度。Negative-sampling可以如下所述。我们会生成一个positive pairs (l, c)的集合$$D_p$$，其中l表示点击的listings，c表示它的上下文，然后从整个词典V中随机抽取n个listings来组成negative pairs (l, c)的集合$$D_n$$。优化的目标函数变为：
 
 $$
-argmax_{\theta} \sum_{(l,c) \in D_p} log \frac{1}{1+e^{-v_c'v_l}} + \sum_{(l,c) \in D_n} log \frac{1}{1+e^{v_c'v_l}}
+argmax_{\theta} \sum\limits_{(l,c) \in D_p} log \frac{1}{1+e^{-v_c'v_l}} + \sum\limits_{(l,c) \in D_n} log \frac{1}{1+e^{v_c'v_l}}
 $$
+
 ...(3)
 
-其中要学的参数$$\theta$$是：$$v_l$$和$$v_c$$,  $$l, c \in V$$. 优化通过随机梯度上升法（SGA）完成。
+其中要学的参数$$\theta$$是：$$v_l$$和$$v_c$$,  $$l, c \in V$$. 优化通过**随机梯度上升法（SGA）完成**。
 
 **将预订Listing看成全局上下文。** 我们将点击session集合S划分为：
 
