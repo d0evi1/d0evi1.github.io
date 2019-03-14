@@ -76,18 +76,19 @@ $$
 
 图1展示了listing embeddings是如何从预定型sessions中进行学习的，它会使用一个滑动窗口size=2n+1, 从第一个clicked listing到最后的booked listing滑动。在每一步，**central listing** $$v_l$$的embedding会被更新，以便它能预测**context listing** $$v_c$$的embedding、以及**booked listing**  $$v_{l_b}$$的embedding。随着窗口滑入和滑出上下文集合，**booked listing总是会作为全局上下文存在**。
 
-**自适应训练**. 在线旅行预定网站的用户通常会在**单个market(例如，他们想逗留的地理位置)**内进行搜索。因此，$$D_p$$会有较高的概率包含了相同market中的listings。**在另一方面，归因于negative sampling，$$D_n$$包含的大多数listings与$$D_p$$包含的listings很大可能不会是相同的markets**。在每一步，对于一个给定的中心listing l，**positive上下文**几乎由与l相同market的listings所组成，而**negative上下文**几乎由与l不同market的listings组成。为了解决该问题，我们提议添加一个随机负样本集合$$D_{m_n}$$，它从中心listing l的market上抽样得到：
+**自适应训练**. 在线旅行预定网站的用户通常会在**单个market(例如，他们想逗留的地理位置)**内进行搜索。因此，$$D_p$$会有较高的概率包含了相同market中的listings。**在另一方面，归因于negative sampling，$$D_n$$包含的大多数listings与$$D_p$$包含的listings很大可能不会是相同的markets**。在每一步，对于一个给定的central listing l，**positive上下文**几乎由与l相同market的listings所组成，而**negative上下文**几乎由与l不同market的listings组成。为了解决该问题，我们提议添加一个随机负样本集合$$D_{m_n}$$，它从中心listing l的market上抽样得到：
 
 $$
 argmax_{\theta} \sum\limits_{(l,c) \in D_p} log \frac{1}{1+e^{-v_c'v_l}} + \sum\limits_{(l,c) \in D_n} log \frac{1}{1+e^{v_c'v_l}} + log \frac{1}{1+ e^{-v_{l_b}' v_l}} + \sum\limits_{(l,m_n) \in D_{m_n}} log \frac{1}{1+e^{v_{m_n}'}v_l}
 $$
+
 ...(5)
 
 其中要学习的参数$$\theta$$有：$$v_l$$和$$v_c$$, $$l,c \in V$$。
 
 **冷启动listing的embeddings.** 每天都有新的listings被主人创建，并在Airbnb上提供出租。这时候，这些listings不会有一个embedding，因为他们在训练数据中没有对应的点击sessions。为了为这些新的listings创建embeddings，我们打算利用其它listings的embeddings。
 
-在listing创建时，需要提供listing的信息，比如：位置，价格，listing type等。我们利用这些关于listing的meta-data来发现3个地理位置上接近的listings（在10公里内），它们具有embeddings，并且具有与新的listing相同的listing-type，并与新listing属于相同的价格区间（比如：每晚20-25美刀）。接着，我们使用3个embeddings计算平均向量，来构成新的listing embedding。使用该技术，我们可以覆盖98%的新listings。
+**在listing创建时，需要提供listing的信息，比如：位置，价格，listing type等**。我们利用这些关于listing的meta-data来发现3个地理位置上接近的listings（在10公里内），这些listings具有embeddings，并且具有与新listing相同的listing-type，并与新listing属于相同的价格区间（比如：每晚20-25美刀）。接着，**我们使用3个embeddings计算平均向量，来构成新的listing embedding**。使用该技术，我们可以覆盖98%的新listings。
 
 <img src="http://pic.yupoo.com/wangdren23_v/b4046284/514b39d6.png">
 
@@ -108,7 +109,7 @@ $$
 
 图3
 
-有一些listing特性（比如价格），不需要学习，因为他们会从listing的meta-data中被抽取，其它类型的listing特性，（比如：房屋结构architecture、装修风格style、感受feel）更通讯从listing features中抽取。为了评估这些特性是否由embeddings捕获，我们检查了在listing embedding空间中单一房屋结构的listings的k近邻。图3展示了这个case，对于左侧的一个单一architecture的listing来说，最相似的listings具有相同的style和architecture。为了能在listing embedding空间上进行快速和方便的探索，我们开发了一个内部的相似度探索工具，如图4所示。
+有一些listing特性（比如价格）不需要学习，因为他们会直接从listing的meta-data中被抽取；而其它类型的listing特性（比如：房屋结构:architecture、装修风格:style、感受:feel），很难以listing features的形式进行抽取。为了评估这些特性是否由embeddings捕获，我们检查了在listing embedding空间中单一房屋结构的listings的k近邻。图3展示了这个case，对于左侧的一个单一architecture的listing来说，最相似的listings具有相同的style和architecture。为了能在listing embedding空间上进行快速和方便的探索，我们开发了一个内部的相似度探索工具，如图4所示。
 
 <img src="http://pic.yupoo.com/wangdren23_v/c5ffb672/260ce544.png">
 
@@ -118,13 +119,13 @@ $$
 
 ## 3.2 User-type & Listing-type embeddings
 
-在3.1节描述的是Listing embeddings。它使用点击sessions进行训练，能很好地发现相同market间的listings相似度。这样，他们更适合短期(short-term)、session内（insession）、个性化的需求，目标是展示给user listings，他们与在搜索session期间点击的listing相似。
+在3.1节描述的是Listing embeddings。它使用clicked sessions进行训练，能很好地发现相同market间的listings相似度。同样的，他们更适合短期(short-term)、session内（insession）、个性化的需求，它们的目标是展示给用户与在搜索session期间点击的listing相似的listings。
 
 然而，除了in-session personalization，（它基于在相同session内发生的信号构建），基于用户长期历史的信号对于个性化搜索来说很有用。例如，给定一个用户，他当前在搜索洛杉矶内的一个listing，过去他在纽约、伦敦预定过，给他推荐之前预定过的listings相似的listings是很有用的。
 
-当在由点击训练得到的listing embeddings中捕获一些cross-market相似度时，学习这种cross-market相似度一个原则性方法是，从由listings构成的sessions中学习。特别的，假设，我们给定一个从N个用户中获取的booking sessions的集合$$S_b$$，其中每个booking session $$s_b = (l_{b1}, ..., l_{b_M})$$被定义成，由用户j按时间顺序排列的一个预定listings序列。尝试为每个listing_id，使用该类型数据学习embeddings $$v_{l_{id}}$$，会有以下多方面挑战：
+当在由点击训练得到的listing embeddings中捕获一些cross-market相似度时，学习这种cross-market相似度一个原则性方法是，从由listings构成的sessions中学习。特别的，假设，**我们给定一个从N个用户中获取的booking sessions的集合$$S_b$$，其中每个booking session $$s_b = (l_{b1}, ..., l_{b_M})$$被定义成：由用户j按预定的时间顺序排列的一个listings序列**。为了使用该类型数据来为每个listing_id，学习embeddings $$v_{l_{id}}$$，会有以下多方面挑战：
 
-- 1.booking sessions数据$$S_b$$比click sessions数据S要小很多，因为预定是低频事件。
+- 1.**booking sessions数据$$S_b$$比click sessions数据S要小很多**，因为预定是低频事件。
 - 2.许多用户在过去只预定单个listing，我们不能从session length=1中进行学习
 - 3.为了上下文信息中的任意实体学习一个有意义的embeddings，至少需要该实体出现5-10次，然而在平台中的许多listing_ids会低于5-10次。
 - 4.最后，由同用户的两个连续预定可能会有很长时间的间隔，这时候，用户偏好（ 比如：价格点）可能会随职业发展而变化。
