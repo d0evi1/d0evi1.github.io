@@ -17,7 +17,7 @@ Ranking at Airbnb》, 我们来看下：
 
 在Airbnb中，需要对**主人（hosts）和客人（guests）**进行最优化搜索，**这意味着，给定一个输入query，它带有位置（location）和旅行日期（trip dates），我们必须为客人带有位置、价格、风格、评论等出现给客户排序高的listings，同时，它又能很好地匹配主人关于旅行日期(trip dates)和交付期（lead days）的偏好**。也就是说，我们需要发现这样的listings：它可能因为差评、宠物、逗留时间、group size或其它因素而拒绝客户，并将这些listings排的序更低。为了达到该目的，我们会使用L2R进行重排序。特别的，我们会将该问题公式化成pairwise regression问题（正向：预订bookings，负向：拒绝rejections）。
 
-由于客户通常会在预测前浏览多个搜索结构，例如：点击多个listing，并在它们的搜索session内联系多个主人，我们可以使用这些in-session信号（例如，点击（clicks）、与主人的联系（host contacts）等）进行实时个性化，目标是展示给用户与它的search session相似的多个listings。同时，我们可以使用负向信号（比如，高排名listings的跳过次数），从而展示给客人尽可能少的不喜欢列表。
+由于客户通常会在预测前浏览多个搜索结构，例如：点击多个listing，并在它们的搜索session内联系多个主人，我们可以使用这些in-session信号（例如，点击（clicks）、与主人的联系（host contacts）等）进行实时个性化，目标是给用户展示与search session相似的多个listings。同时，我们可以使用负向信号（比如，高排名listings的跳过次数），从而展示给客人尽可能少的不喜欢列表。
 
 # 3.方法
 
@@ -119,46 +119,45 @@ $$
 
 ## 3.2 User-type & Listing-type embeddings
 
-在3.1节描述的是Listing embeddings。它使用clicked sessions进行训练，能很好地发现相同market间的listings相似度。同样的，他们更适合短期(short-term)、session内（insession）、个性化的需求，它们的目标是展示给用户与在搜索session期间点击的listing相似的listings。
+在3.1节描述的是Listing embeddings。它使用clicked sessions进行训练，能很好地发现相同market间的listings相似度。同样的，他们更适合短期(short-term)、session内（insession）、个性化的需求，它们的目标是给用户展示与在搜索session期间点击的listing相似的listings。
 
-然而，除了in-session personalization，（它基于在相同session内发生的信号构建），基于用户长期历史的信号对于个性化搜索来说很有用。例如，给定一个用户，他当前在搜索洛杉矶内的一个listing，过去他在纽约、伦敦预定过，给他推荐之前预定过的listings相似的listings是很有用的。
+然而，除了in-session personalization，（它基于在相同session内发生的信号构建），**基于用户长期历史的信号对于个性化搜索来说很有用**。例如，给定一个用户，他当前在搜索洛杉矶内的一个listing，过去他在纽约、伦敦预定过，给他推荐之前预定过的listings相似的listings是很有用的。
 
-当在由点击训练得到的listing embeddings中捕获一些cross-market相似度时，学习这种cross-market相似度一个原则性方法是，从由listings构成的sessions中学习。特别的，假设，**我们给定一个从N个用户中获取的booking sessions的集合$$S_b$$，其中每个booking session $$s_b = (l_{b1}, ..., l_{b_M})$$被定义成：由用户j按预定的时间顺序排列的一个listings序列**。为了使用该类型数据来为每个listing_id，学习embeddings $$v_{l_{id}}$$，会有以下多方面挑战：
+当在由点击训练得到的listing embeddings中捕获一些cross-market相似度时，学习这种cross-market相似度一个原则性方法是，从由listings构成的sessions中学习。特别的，假设，**我们给定一个从N个用户中获取的booking sessions的集合$$S_b$$，其中每个booking session $$s_b = (l_{b1}, ..., l_{b_M})$$被定义成：由用户j按预定(booking)的时间顺序排列的一个listings序列**。为了使用该类型数据来为每个listing_id，学习embeddings $$v_{l_{id}}$$，会有以下多方面挑战：
 
 - 1.**booking sessions数据$$S_b$$比click sessions数据S要小很多**，因为预定是低频事件。
 - 2.许多用户在过去只预定单个listing，我们不能从session length=1中进行学习
-- 3.为了上下文信息中的任意实体学习一个有意义的embeddings，至少需要该实体出现5-10次，然而在平台中的许多listing_ids会低于5-10次。
+- 3.为了上下文信息中的任意实体学习一个有意义的embeddings，**至少需要该实体出现5-10次**，然而在平台中的许多listing_ids会低于5-10次。
 - 4.最后，由同用户的两个连续预定可能会有很长时间的间隔，这时候，用户偏好（ 比如：价格点）可能会随职业发展而变化。
 
-为了解决这些非常常见的问题，我们提出了在listing_type级别学习embeddings，而非listing_id级别。给定一个特定listing_id的meta-data，比如：位置，价格，listing-type，空间，床数等，我们使用一个在表3中定义的基于规则的映射，来决定listing_type。
+**为了解决这些非常常见的问题，我们提出了在listing_type级别学习embeddings**，而非listing_id级别。给定一个特定listing_id的meta-data，比如：位置，价格，listing-type，空间，床数等，我们使用一个在表3中定义的基于规则的映射，来决定listing_type。
 
 <img src="http://pic.yupoo.com/wangdren23_v/fe9b447e/d784f502.png">
 
 表3
 
-例如，一个来自US的Entire Home listing，它是一个二人间，1床，一个卧室 & 1个浴室，每晚平均价格为60.8美刀，每晚每个客人的平均价格为29.3美刀，5个评价，所有均5星好评，100%的新客接受率（New Guest Accept Rate），可以映射为：listing_type = U S_lt1_pn3_pg3_r3_5s4_c2_b1_bd2_bt2_nu3. 分桶以一个数据驱动的方式决定，在每个listing_type分桶中最大化覆盖。从listing_id到一个
+**例如，一个来自US的Entire Home listing（lt1），它是一个二人间(c2)，1床（b1），一个卧室(bd2) & 1个浴室(bt2)，每晚平均价格为60.8美刀(pn3)，每晚每个客人的平均价格为29.3美刀(pg3)，5个评价(r3)，所有均5星好评(5s4)，100%的新客接受率（nu3），可以映射为：listing_type = U S_lt1_pn3_pg3_r3_5s4_c2_b1_bd2_bt2_nu3. **分桶以一个数据驱动的方式决定，在每个listing_type分桶中最大化覆盖。从listing_id到一个
 listing_type的映射是一个多对一的映射，这意味着许多listings会被映射到相同的listing_type。
 
 <img src="http://pic.yupoo.com/wangdren23_v/985ff268/ad7ffd09.png">
 
 表4:
 
-为了解释用户随时间变化的偏好，我们提出在与listing_type embedding相同的向量空间中学习user_type embeddings。user_type使用一个与listings相似的过程来决定，例如，利用关于user和它之前预订记录的metadata，如表4定义。例如，对一个来自San Francisco、带有MacBook laptop，英文设置、具有用户照片的全轮廓，83.4%平均5星率，它在过去有3个预订，其中关于booked listings的平均统计是：52.52美刀 Price
-Per Night, 31.85美刀 Price Per Night Per Guest, 2.33 Capacity, 8.24 Reviews and 76.1% Listing 5 star rating, 生成的user_type是：SF_lg1_dt1_fp1_pp1_nb1_ppn2_ppg3_c2_nr3_l5s3_g5s3. 当为训练embeddings生成的booking sessions时，我们会计算user_type，一直到最近的预定。对于那先首次做出预定的user_type的用户，可以基于表4的第5行进行计算，因为预测时我们没有关于过去预定的先验信息。这很便利，因为对于为user_types的embeddings，它基于前5行，可以用于对登出用户或者没有过往预定记录的新用户进行冷启动个性化。
+为了解释用户随时间变化的偏好，我们提出在与listing_type embedding相同的向量空间中学习**user_type embeddings**。user_type使用一个与listings相似的过程来决定，例如，利用关于user和它之前预订记录的metadata，如表4定义。**例如，对于一个用户，他来自San Francisco(SF)、带有MacBook笔记本（dt1）、说英文(lg1)、具有用户照片资料(pp1)、83.4%平均5星率(l5s3)、他在过去有3个预订(nb1)、其中关于订单（booked listings）的平均消费统计为：52.52美刀 (每晚平均价格: Price Per Night), 31.85美刀 (每晚单客户平均价格：Price Per Night Per Guest), 2.33(Capacity), 8.24(平均浏览数：Reviews）、76.1%（5星好评单：Listing 5 star rating)。对于该用户所生成的user_type是：SF_lg1_dt1_fp1_pp1_nb1_ppn2_ppg3_c2_nr3_l5s3_g5s3**. 当为训练embeddings生成booking sessions时，我们会一直计算user_type直到最近的预定。对于那些首次做出预定的user_type的用户，可以基于表4的第5行进行计算，因为预测时我们没有关于过去预定的先验信息。**这很便利，因为对于为user_types的embeddings，它基于前5行，可以用于对登出用户或者没有过往预定记录的新用户进行冷启动个性化**。
 
-**训练过程**. 为了学习在相同向量空间中的user_type和listing_type的embeddings，我们将user_type插入到booking sessions中。特别的，我们形成了一个$$S_b$$集合，它由N个用户的$$N_b$$个booking sessions组成， 其中每个session $$$s_b = (u_{type_1} l_{type_1}, ..., u_{type_M} l_{type_M}) \in S_b$$ 被定义成一个关于booking事件的序列，例如：按时间顺序排列的(user_type, listing_type)元组。注意，每个session由相同user_id的bookings组成，然而，对于单个user_id来说，他们的user_types可以随时间变化，这一点与下述情况相似：相同listing的listing_types会随着他们接受越来越多的bookings按时间变化。
+**训练过程**. 为了学习在相同向量空间中的user_type和listing_type的embeddings，我们将user_type插入到booking sessions中。特别的，我们形成了一个$$S_b$$集合，它由N个用户的$$N_b$$个booking sessions组成， 其中每个session $$s_b = (u_{type_1} l_{type_1}, ..., u_{type_M} l_{type_M}) \in S_b$$被定义成一个关于booking事件的序列，例如：按时间顺序排列的(user_type, listing_type)元组。**注意，每个session由相同user_id的bookings组成，然而，对于单个user_id来说，他们的user_types可以随时间变化**，这一点与下述情况相似：相同listing的listing_types会随着他们接受越来越多的bookings按时间变化。
 
-目标函数与(3)相似，会替换listing l，中心项需要使用$$user\_type(u_t)$$或者$$listing_type(l_t)$$进行更新，取决于在滑动窗口中捕获的项。例如，为了更新中心项$$user\_type(u_t)$$，我们使用：
+目标函数与(3)相似，会替换listing l，中心项需要使用$$user\_type(u_t)$$或者$$listing\_type(l_t)$$进行更新，取决于在滑动窗口中捕获的项。例如，为了更新中心项$$user\_type(u_t)$$，我们使用：
 
 $$
-argmax_{\theta} \sum_{(u_t,c) \in D_{book}} log \frac{1} {1+e^{-v_c'v_{u_t}}} + \sum_{(u_t,c) \in D_{neg}} log \frac{1} {1 + e^{v_c'v_{u_t}}} 
+argmax_{\theta} \sum\limits_{(u_t,c) \in D_{book}} log \frac{1} {1+e^{-v_c'v_{u_t}}} + \sum\limits_{(u_t,c) \in D_{neg}} log \frac{1} {1 + e^{v_c'v_{u_t}}} 
 $$
 ...(6)
 
 其中$$D_{book}$$包含了来自最近用户历史的user_type和listing_type，特别是与中心项接近的用户预定记录，其中$$D_{neg}$$包含了使用随机的user_type或listing_type实例作为负例。相似的，如果中心项是一个listing_type($$l_t$$)，我们可以对下式最优化：
 
 $$
-argmax_{\theta} \sum_{(l_t,c) \in D_{book}} log \frac{1} {1+e^{-v_c'v_{l_t}}} + \sum_{(l_t,c) \in D_{neg}} log \frac{1} {1 + e^{v_c'v_{l_t}}} 
+argmax_{\theta} \sum\limits_{(l_t,c) \in D_{book}} log \frac{1} {1+e^{-v_c'v_{l_t}}} + \sum\limits_{(l_t,c) \in D_{neg}} log \frac{1} {1 + e^{v_c'v_{l_t}}} 
 $$
 ...(7)
 
