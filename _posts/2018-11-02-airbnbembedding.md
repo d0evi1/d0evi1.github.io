@@ -189,7 +189,7 @@ $$
 
 更新一个$$listing\_type(l_t)$$的中心item：
 $$
-argmax_{\theta} \sum\limits_{(l_t,c) \in D_{book}} log \frac{1} {1+e^{-v_c'v_{l_t}}} + \sum\limits_{(l_t,c) \in D_{neg}} log \frac{1} {1 + e^{v_c'v_{l_t}}} + \sum\limits_{(l_t,u_t) \in D_{reject}} log frac{1} {1+exp(v_{u_t}' v_{l_t})}
+argmax_{\theta} \sum\limits_{(l_t,c) \in D_{book}} log \frac{1} {1+e^{-v_c'v_{l_t}}} + \sum\limits_{(l_t,c) \in D_{neg}} log \frac{1} {1 + e^{v_c'v_{l_t}}} + \sum\limits_{(l_t,u_t) \in D_{reject}} log \frac{1}{1+exp(v_{u_t}' v_{l_t})}
 $$
 
 ...(9)
