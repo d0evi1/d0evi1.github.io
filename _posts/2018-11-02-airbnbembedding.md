@@ -198,12 +198,29 @@ $$
 
 表5
 
-对于所有user_types和listing_types所学到的embeddings，我们可以根据用户当前的user_type embedding和listing_type embedding，基于cosine相似度给用户推荐最相关的listings。例如，表5中，我们展示了cosine相似度：
+对于所有user_types和listing_types所学到的embeddings，**我们可以根据用户当前的user_type embedding和listing_type embedding，基于cosine相似度给用户推荐最相关的listings**。例如，表5中，我们展示了cosine相似度：
 
 user_type = SF_lg1_dt1_fp1_pp1_nb3_ppn5_ppg5_c4_nr3_l5s3_g5s3, 该用户通常会预定高质量、宽敞、好评率高、并且在美国有多个不同listing_types的listings。可以观察到，listing_types最匹配这些用户的偏好，例如，整租，好评多，大于平均价，具有较高cosine相似度；而其它不匹配用户偏好的，例如：空间少，低价，好评少，具有较低cosine相似度。
 
 # 4.实验
 
+## 4.2 Listing Embeddings的离线评估
+
+为了能快速根据不同最优化函数、训练数据构造、超参数、等做出快速决策，我们需要一种方式来快速对比不同的embeddings。
+
+一种对训练出的embedding进行评估的方法是，基于最近用户点击行为，测试在用户推荐列表中将要预测的效果好坏。更特别的，假设我们给定了最常见的clicked listing和需要被排序的候选listing，它包含了用户最终预定的listing。通过计算在clicked listing和candidate listings间的cosine相似度，我们可以对候选进行排序，并观察到booked listing的排序位置。
+
+<img src="http://pic.yupoo.com/wangdren23_v/34fa77cb/4a80a73c.png" alt="f6.png">
+
+图6
+
+为了评估，我们使用一个大数目的这种search、click和booking事件，其中rankings通过我们的Search Ranking模型进行分派。在图6中，我们展示了离线评估的结果，我们比较了d=32的多个版本embeddings，并认为他们基于点击来对booked listing进行排序。booked listing的rankings对于每个产生预定的点击进行平均，在预定之前的17次点击，转到在预定之前的最后一次点击（Last click）。越低值意味着越高的ranking。我们要对比的embedding versions有：
+
+- d32: 它使用(3)进行训练
+- d32 book: 它使用bookings做为全局上下文 (4)
+- d32 book + neg: 它使用bookings做为全局上下文，并对于相同的market采用展式负样本（5）
+
+可以观察到，Search Ranking模型会随着它使用记忆型特征（memorization features）而获得更好更多的点击。可以观查到基于embedding相似度的re-ranking listings是有用的，特别是在search漏斗的早期阶段。最后，我们可以断定：d32 book + neg的效果要好于其它两者。相同类型的图可以被用于对其它因素：（超参数、数据构建）做出决策。
 
 # 参考
 
