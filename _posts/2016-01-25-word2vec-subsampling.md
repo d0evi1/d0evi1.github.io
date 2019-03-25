@@ -18,24 +18,18 @@ $$
 P(w_i)=1-\sqrt{\frac{t}{f(w_i)}}
 $$
 
-$$f(w_i)$$是$$w_i$$的词频，t为选中的一个阀值，通常为$$10^{-5}$$周围(0.00001)。我们之所以选择该subsampling公式，是因为：它可以很大胆的对那些词频大于t的词进行subsampling，并保留词频的排序(ranking of the frequencies)。尽管subsampling公式的选择是拍脑袋出来的（启发式的heuristically），我们发现它在实践中很有效。它加速了学习，并极大改善了罕见词的学习向量的准确率（accuracy）。
+$$f(w_i)$$是$$w_i$$的词频，t为选中的一个阀值，通常为$$10^{-5}$$周围(1e-5=0.00001)。我们之所以选择该subsampling公式，是因为：它可以很大胆的对那些词频大于t的词进行subsampling，并保留词频的排序(ranking of the frequencies)。尽管subsampling公式的选择是拍脑袋出来的（启发式的heuristically），我们发现它在实践中很有效。它加速了学习，并极大改善了罕见词的学习向量的准确率（accuracy）。
 
 # 具体实现
 
-有道之前的<deep learning实战之word2vec>中，提到的该subsampling描述也不准确。在当中的描述是：
+在当中的描述是：
 
 $$
 P(w_i)=1-(\sqrt{\frac{sample}{freq(w_i)}}+\frac{sample}{freq(w_i)})
 $$
 
 
-而实际中，采用的是：
-
-$$
-P(w_i)=\frac{random}{65535}-(\sqrt{\frac{sample}{freq(w_i)}}+\frac{sample}{freq(w_i)})
-$$
-
-部分代码：
+实际代码如下：
 
 {% highlight c %}
 
