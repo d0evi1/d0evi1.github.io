@@ -27,10 +27,10 @@ microsoft在《Position-Normalized Click Prediction in Search Advertising》对c
 
 观察到的CTR是一个条件概率 $$p(click \mid i,j)$$。对于在竞价搜索广告中的经验假设，我们做出如下简化：
 
-- 1.一个ad的点击是与它的位置相互独立的 (假设：位置可以物理上进行检查)。
+- 1.一个ad的点击是与它的位置相互独立的 (假设：位置可以物理上进行检查examining)。
 - 2.给定一个ad的位置，检查（examining）一个广告是与它的内容或相关度是相互独立的
 
-正式的，位置依赖的CTR(position-dependent CTR)可以为：
+正式的，位置依赖的CTR(position-dependent CTR)可以表示为：
 
 $$
 p(click | i,j) = p(click | exam, i) p(exam | j)
@@ -38,14 +38,19 @@ $$
 
 ...(1)
 
-第一个因子 $$p(click \mid exam, i)$$，可以简单表示为$$p_i$$，它是一个位置归一化的CTR（position-normalized CTR），可以表示ad的相关度。第二个因子 $$p(exam \mid j)$$，可以简单表示为$$q_j$$，体现了位置偏差（ positional bias）。有了该CTR因子分解（factorization），我们可以处理关于点击行为的两种自然随机模型，接着在部署模型上通过一个先验进行平滑。【1,9】
+其中：
+
+- 第一个因子 $$p(click \mid exam, i)$$：可以简单表示为$$p_i$$，它是一个位置归一化的CTR（position-normalized CTR），可以表示ad的相关度
+- 第二个因子 $$p(exam \mid j)$$，可以简单表示为$$q_j$$，体现了位置偏差（ positional bias）。
+
+有了该CTR因子分解（factorization），我们可以处理关于点击行为的两种自然随机模型，接着在部署模型上通过一个先验进行平滑。【1,9】
 
 # 3. Binomial模型
 
 很自然的，假设点击数遵循一个二项分布：
 
 $$
-c_{ij} \sim Binomial(v_{ij}, p_i q_j),  \foreach i,j
+c_{ij} \sim Binomial(v_{ij}, p_i q_j),  \forall i,j
 $$
 。。。
 
@@ -54,7 +59,7 @@ $$
 如果尝试次数n足够大，成功概率p (success probability)足够小，那么$$Binomial(n,p) \rightarrow Poisson(np)$$。由于广告(ad)就是这样一个领域，我们可以导出Poisson模型，它会生成一个相似的且足够有效的更新。该生成模型是：
 
 $$
-c_{ij} \sim Poisson(v_{ij} p_i q_j), \foreach i,j
+c_{ij} \sim Poisson(v_{ij} p_i q_j), \forall i,j
 $$
 
 ...(9)
@@ -66,7 +71,7 @@ $$
 对于empirical和regularization的目的，我们在Poisson模型中在位置因子(positional factor)上引入了一个gamma先验：
 
 $$
-q_j \sim Gamma(\alpha, \beta), \foreach j
+q_j \sim Gamma(\alpha, \beta), \forall j
 $$
 
 ...(16)
