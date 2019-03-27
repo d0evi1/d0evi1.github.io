@@ -16,7 +16,11 @@ tags:
 
 “穷举（Exhaustive）”训练法，比如：softmax和logistic regression需要我们为每个训练样本，对于每个类$$y \in L$$去计算F(x,y)。当$$\mid L \mid$$很大时，计算开销会很大。
 
-## 1.2 Candidate Sampling与候选类$$C_i$$
+## 1.2 $$T_i$$、$$C_i$$、$$S_i$$
+
+- target classes: $$T_i$$
+- candidate classes: $$C_i$$
+- randomly sample classes: $$S_i$$
 
 “候选采样（Candidate Sampling）”训练法，涉及到构建这样一个训练任务：对于每个训练样本$$(x_i, T_i)$$，我们只需要为**候选类$$C_i \subset L$$**评估F(x,y)。通常，候选集合$$C_i$$是target classes的union，它会随机选择对（其它）classes $$S_i \subset L$$进行抽样。
 
