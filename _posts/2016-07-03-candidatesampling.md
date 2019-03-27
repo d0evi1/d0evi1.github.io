@@ -12,20 +12,20 @@ tags:
 
 ## 1.1 F(x,y)
 
-我们希望学习到一个兼容函数（compatibility function） $$F(x,y)$$，它会说明关于某个class y以及一个context x间的兼容性。例如——给定该上下文，该class的概率。
+我们希望学习到一个兼容函数（compatibility function） $$F(x,y)$$，它会说明关于某个class y以及一个context x间的兼容性。**例如——给定该上下文，该class的概率**。
 
 “穷举（Exhaustive）”训练法，比如：softmax和logistic regression需要我们为每个训练样本，对于每个类$$y \in L$$去计算F(x,y)。当$$\mid L \mid$$很大时，计算开销会很大。
 
 ## 1.2 $$T_i$$、$$C_i$$、$$S_i$$
 
-- target classes: $$T_i$$
-- candidate classes: $$C_i$$
-- randomly sample classes: $$S_i$$
+- target classes（正样本）: $$T_i$$
+- candidate classes（候选样本）: $$C_i$$
+- randomly chosen sample of classes（负样本）: $$S_i$$
 
-“候选采样（Candidate Sampling）”训练法，涉及到构建这样一个训练任务：对于每个训练样本$$(x_i, T_i)$$，我们只需要为**候选类$$C_i \subset L$$**评估F(x,y)。通常，候选集合$$C_i$$是target classes的union，它会随机选择对（其它）classes $$S_i \subset L$$进行抽样。
+“候选采样（Candidate Sampling）”训练法，涉及到构建这样一个训练任务：对于每个训练样本$$(x_i, T_i)$$，我们只需要为**候选类（candidate classes）$$C_i \subset L$$**评估F(x,y)。通常，候选集合$$C_i$$是target classes的union，它是一个随机选中抽样的classes(非正例) $$S_i \subset L$$。
 
 $$
-C_i = T_i \cap S_i
+C_i = T_i \cup S_i
 $$
 
 随机样本$$S_i$$可能或不可能依赖于$$x_i$$和/或$$T_i$$。
@@ -36,7 +36,7 @@ $$
 
 图1
 
-- $$Q(y \mid x)$$: 被定义为：给定context x，在抽样classes的集合中，根据抽样算法得到class y的概率（或：期望count）。
+- $$Q(y \mid x)$$: 被定义为：给定context x，在抽样classes的集合中，根据抽样算法得到class y的概率（或：expected count）。
 - $$K(x)$$：是一个任意函数（arbitrary function），不依赖于候选类（candidate class）。由于softmax涉及到一个归一化（normalization），对这种函数的求和不会影响到计算概率。
 - logistic training loss= $$\sum\limits_i (\sum )$$
 - softmax training loss = $$\sum\limits_i (-G(x_i,t_i) + log(\sum\limits_{y \in POS_i \cap NEG_i}) exp(G(x_i,y))))$$
