@@ -37,7 +37,7 @@ $$
 图1
 
 - $$Q(y \mid x)$$: 被定义为：给定context x，根据抽样算法在sampled classes的集合中得到class y的概率（或：expected count）。
-- $$K(x)$$：是一个任意函数（arbitrary function），不依赖于候选类（candidate class）。由于softmax涉及到一个归一化（normalization），对这种函数的求和不会影响到计算概率。
+- $$K(x)$$：是一个任意函数（arbitrary function），不依赖于候选类（candidate class）。由于softmax涉及到一个归一化（normalization），加上这种函数不会影响到计算概率。
 - logistic training loss= $$\sum\limits_i (\sum\limits_{y \in POS_i} log(1+exp(-G(x,y)) _ \sum\limits_{y \in NEG_i} log(1+exp(G(x_i,y)) )$$
 - softmax training loss = $$\sum\limits_i (-G(x_i,t_i) + log(\sum\limits_{y \in POS_i \cap NEG_i}) exp(G(x_i,y))))$$
 - NCE 和Negatvie Sampling可以泛化到$$T_i$$是一个multiset的情况。在这种情况中，$$P(y \mid x)$$表示在$$T_i$$中y的期望数（expected count）。相似的，NCE，Negative Sampling和Sampled Logistic可以泛化到$$S_i$$是一个multiset的情况。在这种情况下，$$Q(y \mid x)$$表示在$$S_i$$中y的期望数（expected count）。
