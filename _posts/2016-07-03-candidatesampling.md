@@ -6,13 +6,19 @@ modified: 2016-07-03
 tags: 
 ---
 
-我们有一个multi-class或者multi-label问题，其中每个训练样本$$(x_i, T_i)$$包含了一个上下文$$x_i$$，以及一个关于target classese $$T_i$$的小集合，它在一个关于可能classes的大型空间L的范围之外。例如，我们的问题可能是，给定前面的词汇，预测在句子中的下一个词。
+# 1.介绍
+
+我们有一个multi-class或者multi-label问题，其中每个训练样本$$(x_i, T_i)$$包含了一个上下文$$x_i$$，以及一个关于target classes $$T_i$$的小集合（该集合在一个关于可能classes的大型空间L的范围之外）。例如，我们的问题可能是：给定前面的词汇，预测在句子中的下一个词。
+
+## 1.1 F(x,y)
 
 我们希望学习到一个兼容函数（compatibility function） $$F(x,y)$$，它会说明关于某个class y以及一个context x间的兼容性。例如——给定该上下文，该class的概率。
 
-“穷举（Exhaustive）”训练法，比如：softmax和logistic regression需要我们为每个训练样本，每个类$$y \in L$$去计算F(x,y)。当$$\mid L \mid$$很大时，计算开销会很大。
+“穷举（Exhaustive）”训练法，比如：softmax和logistic regression需要我们为每个训练样本，对于每个类$$y \in L$$去计算F(x,y)。当$$\mid L \mid$$很大时，计算开销会很大。
 
-“候选采样（Candidate Sampling）”训练法，涉及到构建这样一个训练任务：对于每个训练样本$$(x_i, T_i)$$，我们只需要为候选类$$C_i \subset L$$评估F(x,y)。通常，候选集合$$C_i$$是target classes的union，它会随机选择对（其它）classes $$S_i \subset L$$进行抽样。
+## 1.2 Candidate Sampling与候选类$$C_i$$
+
+“候选采样（Candidate Sampling）”训练法，涉及到构建这样一个训练任务：对于每个训练样本$$(x_i, T_i)$$，我们只需要为**候选类$$C_i \subset L$$**评估F(x,y)。通常，候选集合$$C_i$$是target classes的union，它会随机选择对（其它）classes $$S_i \subset L$$进行抽样。
 
 $$
 C_i = T_i \cap S_i
@@ -21,6 +27,8 @@ $$
 随机样本$$S_i$$可能或不可能依赖于$$x_i$$和/或$$T_i$$。
 
 训练算法会采用神经网络的形式，其中表示F(x,y)的layer会通过BP算法从一个loss function中进行训练。
+
+<img src="http://pic.yupoo.com/wangdren23_v/b3d02b58/79854e95.png">
 
 图1
 
@@ -146,12 +154,12 @@ sampled_candidates的elements会从基础分布进行无放回抽样（如果uni
 对于该操作的base distribution是一个近似的log-uniform or Zipfian分布：
 
 $$
-P(class) = (log(class + 2) - log(class + 1)) / log(range_max + 1)
+P(class) = (log(class + 2) - log(class + 1)) / log(range\_max + 1)
 $$
 
-当target classes近似遵循这样的一个分布时，该sampler很有用——例如，如果该classes表示字典中的词以词频降序排列时。如果你的classes不以词频降序排列，无需使用该op。
+**当target classes近似遵循这样的一个分布时，该sampler很有用——例如，如果该classes表示字典中的词以词频降序排列时。如果你的classes不以词频降序排列，无需使用该op**。
 
-另外，该操作会返回true_expected_count和sampled_expected_count的tensors，它们分别对应于表示每个target classes(true_classes)以及sampled classes（sampled_candidates）在sampled claases的一个平均tensor中期望出现的次数。这些值对应于在上面的$$Q(y \mid x)$$。如果unique=True，那么它是一个post-rejection概率，我们会近似计算它。
+另外，该操作会返回true_expected_count和sampled_expected_count的tensors，它们分别对应于表示每个target classes(true_classes)以及sampled classes（sampled_candidates）在sampled classes的一个平均tensor中期望出现的次数。这些值对应于在上面的$$Q(y \mid x)$$。如果unique=True，那么它是一个post-rejection概率，我们会近似计算它。
 
 # 参考
 
