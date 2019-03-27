@@ -36,7 +36,7 @@ $$
 
 图1
 
-- $$Q(y \mid x)$$: 被定义为：给定context x，在抽样classes的集合中，根据抽样算法得到class y的概率（或：expected count）。
+- $$Q(y \mid x)$$: 被定义为：给定context x，根据抽样算法在sampled classes的集合中得到class y的概率（或：expected count）。
 - $$K(x)$$：是一个任意函数（arbitrary function），不依赖于候选类（candidate class）。由于softmax涉及到一个归一化（normalization），对这种函数的求和不会影响到计算概率。
 - logistic training loss= $$\sum\limits_i (\sum )$$
 - softmax training loss = $$\sum\limits_i (-G(x_i,t_i) + log(\sum\limits_{y \in POS_i \cap NEG_i}) exp(G(x_i,y))))$$
