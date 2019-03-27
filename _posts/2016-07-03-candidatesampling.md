@@ -102,6 +102,57 @@ $$
 
 从该classifer对梯度进行BP，可以训练任何我们想到的F。
 
+
+# 
+
+以tensorflow中的tf.random.log_uniform_candidate_sampler为例。
+
+它会使用一个log-uniform(Zipfian)base分布。
+
+该操作会随样从抽样分类(sampled_candidates)中抽取一个tensor，范围为[0, range_max)。
+
+sampled_candidates的元素会使用base分布被无放回投样（如果：unique=True），否则会使用有放回抽样。
+
+对于该操作，基础分布是log-uniform或Zipf分布的一个近似：
+
+$$
+P(class) = (log(class+2) - log(class+1)) / log(range_max + 1)
+$$
+
+当target classes近似遵循这样的一个分布时，该sampler很有用——例如，如果该classes以一个字母序表示的词语，并以频率降序排列。如果你的classes没有通过词频降序排列，就不需要使用该op。
+
+另外，该操作会返回tensors: true_expected_count， 
+
+
+## log_uniform_candidate_sampler
+
+	tf.random.log_uniform_candidate_sampler(
+    true_classes,
+    num_true,
+    num_sampled,
+    unique,
+    range_max,
+    seed=None,
+    name=None
+	)
+
+
+使用一个log-uniform(Zipfian)的基础分布来采样classes集合。
+
+该操作会对一个sampled classes（sampled_candidates） tensor从范围[0, range_max)进行随机抽样。
+
+sampled_candidates的elements会从基础分布进行无放回抽样（如果unique=True）或者有放回抽样（unique=False）。
+
+对于该操作的base distribution是一个近似的log-uniform or Zipfian分布：
+
+$$
+P(class) = (log(class + 2) - log(class + 1)) / log(range_max + 1)
+$$
+
+当target classes近似遵循这样的一个分布时，该sampler很有用——例如，如果该classes表示字典中的词以词频降序排列时。如果你的classes不以词频降序排列，无需使用该op。
+
+另外，该操作会返回true_expected_count和sampled_expected_count的tensors，它们分别对应于表示每个target classes(true_classes)以及sampled classes（sampled_candidates）在sampled claases的一个平均tensor中期望出现的次数。这些值对应于在上面的$$Q(y \mid x)$$。如果unique=True，那么它是一个post-rejection概率，我们会近似计算它。
+
 # 参考
 
 [https://www.tensorflow.org/extras/candidate_sampling.pdf](https://www.tensorflow.org/extras/candidate_sampling.pdf)
