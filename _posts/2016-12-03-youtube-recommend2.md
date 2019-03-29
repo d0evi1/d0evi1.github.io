@@ -62,25 +62,25 @@ $$
 
 **Efficient Extreme Multiclass**
 
-为了有效地训练这样一个具有上百万分类的模型，我们采用的技术是：从后台分布（“候选抽样candidate sampling”）中对采样负类(sample negative classes)，接着通过按重要性加权(importance weighting)[10]来纠正这些样本。对于每个样本，为true-label和negative-label，学习目标是最小化cross-entropy loss。实际中，会抽样上千个负样本，这种方法可以比传统的softmax快100倍。另一个可选的方法是：hierarchical softmax，但这里我们不去做对比。
+为了有效地训练这样一个具有上百万分类的模型，我们采用的技术是：从后台分布（“候选抽样candidate sampling”）中抽样负类(negative classes)，接着通过按重要性加权(importance weighting)[10]来纠正这些样本。对于每个样本，为true-label和negative-label，学习目标是最小化cross-entropy loss。**实际中，会抽样上千个负样本，这种方法可以比传统的softmax快100倍**。另一个可选的方法是：hierarchical softmax，但这里我们不去做对比。
 
 在提供服务的阶段（serving time），我们需要计算最可能的N个分类（视频），以便选中其中的top N，来展现给用户。对上百w级的item进行打分，会在10ms左右的延迟内完成。之前的Youtube系统靠hashing技术[24]解决，和这里描述的分类器使用相类似的技术。**由于在serving time时并不需要对softmax输出层校准(calibrated)likelihoods，打分问题(scoring problem)可以缩减至在点乘空间中的最近邻搜索问题，可以使用[12]中提供的库来完成。**我们发现，在最近邻搜索算法上做A/B test效果并不特别明显。
 
 ## 1.1 模型架构
 
-受语言模型中的CBOW(continuous bag of words)的启发，我们为固定视频库中的每个视频学到了高维emdeddings，并将它们的emdeddings作为输入前馈(feed)给一个前馈神经网络。用户的观看历史，被表示成一个关于稀疏视频id的可变长的序列，这些id通过embeddings技术被映射到一个dense vector表示中。该网络需要固定大小的dense inputs，在不同策略中(sum, component-wise max，等)，对emdeddings的简单平均(simply averaging)效果最好。最重要的，emdeddings会和其它一些模型参数，通过普通的梯度下降后向传播更新即可学到。特征被级联到一个很宽的第一层上（wide first layer），后面跟着许多层的完全连接的ReLU层[6]。图3展示了整体架构，带有下面将要描述的额外的非视频观看特征（no-video watch features）。
+受语言模型中的CBOW(continuous bag of words)的启发，我们为固定size视频库中的每个视频学习高维emdeddings，接着将这些emdeddings前馈(feed)输入到一个前馈神经网络。一个用户的观看历史，可以被表示成一个关于稀疏视频id的可变长序列，这些id会通过embeddings被映射到一个dense vector representation上。**该网络需要固定大小的dense inputs**，最后选择对emdeddings的简单平均(simply averaging)，因为它在不同策略中(sum, component-wise max，等)效果最好。最重要的，该emdeddings会和其它一些模型参数一起通过常规的梯度下降BP更新即可学到。特征被级联到一个很宽的第一层上（wide first layer），后面跟着许多层的完全连接的ReLU层[6]。图3展示了整体架构，它带有额外的非视频观看特征（no-video watch features）。
 
 <img src="http://pic.yupoo.com/wangdren23/GkBOhLXy/medish.jpg">
 
 ## 1.2 多种信号
 
-使用深度神经网络作为普通的矩阵分解，其中一个关键优点是，任何连续的特征和类别特征都可以很方便地加进模型中。搜索历史的处理，可以与观看历史的处理方式相类似 -- 每一个查询(query)可以tokenized化成1-gram和2-gram，每一个token都可被嵌入。一旦求平均，用户的tokenized化的嵌入式query，代表了一个总结型的稠密搜索历史(summarized dense search history)。人口统计学特征（Demographic features），对于新用户的推荐很重要。用户的地域和设备信息(device)，都可以被嵌入和串联。简单的二元特征和连续特征，比如用户性别，登陆态，年龄，都可以归一化到[0,1]上的实数值，直接输入到该网络。
+将DNN作为普通的矩阵分解(MF)的一种泛化，其中一个关键优点是，任何连续的特征和类别特征都可以很方便地加进模型中。搜索历史的处理，可以与观看历史的处理方式相类似 -- 每一个查询(query)可以tokenized化成1-gram和2-gram，每一个token都可被嵌入。一旦求平均，用户的tokenized化的嵌入式query，代表了一个总结型的稠密搜索历史(summarized dense search history)。人口统计学特征（Demographic features），对于新用户的推荐很重要。用户的地域和设备信息(device)，都可以被嵌入和串联。简单的二元特征和连续特征，比如用户性别，登陆态，年龄，都可以归一化到[0,1]上的实数值，直接输入到该网络。
 
 **“样本时限”特征（"Example Age" Feature）**
 
 YouTube上，每秒都有许多视频上传上来。推荐这些最新上传的新鲜("fresh")内容，对于YouTube产品来说相当重要。**我们一致观察到：用户喜欢新鲜内容，尽管并非相关**。除了简单的推荐用户想看的新视频所带来的一次传播效果外，还存在着关键的病毒式的二次传播现象。
 
-机器学习系统经常展示出对过往内容的一个隐式偏差(implicit bias)，因为它们通常是基于历史样本的训练，来预测将来的行为。视频流行度的分布是高度不稳定的，但是由推荐系统生成的在视频库上的多项分布(multinomial distribution)，将影响在多周训练窗口上的平均观看似然。**为了纠正这一点，我们将训练样本的age，作为一个训练特征**。在serving time时，该特征被置为0(或者为一个微小的负数），反映出模型在训练窗口的最末尾正在做预测。
+**机器学习系统经常展示出对过往行为存在一个隐式偏差(implicit bias)，因为它们通常是基于历史样本的训练，来预测将来的行为**。视频流行度分布是高度不稳定(non-stationary)的，我们的推荐系统会生成在视频库上的多项分布(multinomial distribution)，将会影响在多周训练窗口上的平均观看似然。**为了纠正这一点，我们将训练样本的age，作为一个训练特征进行feed**。在serving time时，该特征被置为0(或者为一个微小的负数），反映出模型在训练窗口的最末尾正在做预测。
 
 图4展示了该方法在选择视频上的效果。
 
@@ -94,13 +94,13 @@ YouTube上，每秒都有许多视频上传上来。推荐这些最新上传的�
 
 **训练样本需要从所有YouTube观看行为（即使嵌入在别的网站上）上生成，而非仅仅只使用我们生成的推荐的观看行为。否则，新内容将很难浮现出来，推荐系统在探索（exploitation）上将过度偏差**。如果用户正通过别的方式探索发现视频，而非使用我们的推荐，我们希望能够快速通过协同过滤传播该发现给他人。 **一个关键点是，提升live metrics的目的是为每个用户生成一个固定数目的训练样本，有效地在loss function上对我们的用户做平等的加权。这可以防止一少部分高活跃度用户主宰着loss**。
 
-这在一定程度上与我们的直觉相反，必须注意：为防止模型利用网站布局，以及代理问题造成的过拟合，**需要隐瞒分类器信息(withhold information from the classifier)**。可以考虑将一个样本看成是用户已经发起的一个查询query： 比如“taylor swift”。由于我们的问题是预测下一个要看的视频。通过给定该信息，分类器将会预测要观看的最可能的视频，是那些出现在相应搜索结果页中关于"taylor swift"的视频。一点也不惊奇的是，如果重新生成用户最新的搜索页作为主页推荐，效果会很差。通过抛弃顺序信息，使用无顺序的词袋(bag of tokens)表示搜索query，该分类器不再直接认识到label的来源。
+这在一定程度上与我们的直觉相反，必须注意：为防止模型利用网站布局，以及代理问题造成的过拟合，**需要隐瞒分类器信息(withhold information from the classifier)**。可以考虑将一个样本看成是用户已经发起的一个查询query： 比如“taylor swift”。由于我们的问题是预测下一个要看的视频。通过给定该信息，分类器将会预测要观看的最可能的视频，是那些出现在相应搜索结果页中关于"taylor swift"的视频。一点也不惊奇的是，如果再次生成用户最新的搜索页作为主页推荐，效果会很差。**通过抛弃顺序信息，使用无顺序的词袋(bag of tokens)表示搜索query，该分类器不再直接认识到label的来源**。
 
 视频的自然消费模式，通常会导致非常不对称的co-watch概率。连播电视剧（Episodic series）通常被按顺序观看，用户经常发现，对于同一个流派(genre)中的艺术家们(artists)，在关注更小众的剧之前，会从最广为流行的剧开始。因此我们发现对于预测用户的下一次观看行为上有着更好的效果，而非去预测一个随机held-out观看(a randomly held-out watch)（见图5）。许多协同过滤系统隐式地选择标签和上下文，通过hold-out一个随机item，然后通过用户历史观看中的其它item来预测它(5a)。这会泄露将来的信息(future information)，并忽略任何不对称的消费模式(asymmetric consumption patterns)。相反的，我们通过选择一个随机观看(a random watch)，然后“回滚(rollback)"一个用户的历史，只输入用户在hold-out label的watch之前(5b)的动作。
 
 <img src="http://pic.yupoo.com/wangdren23/GkHBAolH/medish.jpg">
 
-图5: 选择labels和输入上下文给模型，在离线评估时很有挑战性，但对真实的效果有巨大提升。这里，实心事件•表示网络的输入特征，而空心事件◦表示排除在外。我们发现，预测一个将来的观看(5b)，在A/B test中效果更好。在(5b)中，样本的age通过\$ t_{max}-t_N \$来表示，其中$$$$t_{max}$$是训练数据中观察到的最大时间。
+图5: 选择labels和输入上下文给模型，在离线评估时很有挑战性，但对真实的效果有巨大提升。这里，实心事件•表示网络的输入特征，而空心事件◦表示排除在外。我们发现，预测一个将来的观看(5b)，在A/B test中效果更好。在(5b)中，example age通过$$ t_{max}-t_N $$来表示，其中$$t_{max}$$是训练数据中观察到的最大时间。
 
 ## 1.4 特征和深度的试验
 
