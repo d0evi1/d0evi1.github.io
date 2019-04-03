@@ -201,7 +201,16 @@ $$
 
 首先，我们为每个行为类型构建了一个user-topic矩阵，比如：creating post，resharing，commenting或+1. 每个矩阵的条目是观察值$$r_{ui}^B$$，它通过等式(2)计算，其中B是单个行为。给定$$B = \lbrace b_1, b_2, ..., b_M \rbrace$$为所有行为类型集合，我们生成以下M个SBSUM: 
 
+$$
+\begin{cases}
+R_{b_1} = \lbrace r_{ui}^B \rbrace, B=\lbrace b_1,b_1 \in B \rbrace \\
+R_{b_2} = \lbrace r_{ui}^B \rbrace, B=\lbrace b_2,b_2 \in B \rbrace \\
 ...
+R_{b_M} = \lbrace r_{ui}^B \rbrace, B=\lbrace b_M,b_M \in B \rbrace 
+\end{cases}
+$$
+
+...(3)
 
 ### 5.1.3 CBSUM（Combined Behavior Specific User-topic Matrix）
 
@@ -210,6 +219,12 @@ $$
 同时，commenting和+1两者表示用户对post的消费行为。将两者组合在一起可以表示关于用户消费（consumption）的主题兴趣。因此，给定行为类型集合，每个集合是B $$\lbrace B_1, B_2, ..., B_p \rbrace$$的一个子集，我们构建了P个矩阵，每一个均表示用户的组合行为：
 
 $$
+\begin{cases}
+R_{B_1} = \lbrace r_{ui}^B \rbrace, B=\lbrace B_1,B_1 \in \mathcal{B} \rbrace \\
+R_{B_2} = \lbrace r_{ui}^B \rbrace, B=\lbrace B_2,B_2 \in \mathcal{B} \rbrace \\
+...
+R_{B_M} = \lbrace r_{ui}^B \rbrace, B=\lbrace b_M,b_M \in \mathcal{B} \rbrace 
+\end{cases}
 $$
 
 ...(4)
@@ -228,7 +243,7 @@ $$
 给定从$$r_{ui}$$的隐式兴趣中观察到的user-item矩阵，Hu[13]将观察集划分成两个变量：偏好$$p_{ui}$$、置信度$$c_{ui}$$。这里$$p_{ui}$$是一个二值变量，它表示用户u是否对item i感兴趣：
 
 $$
-todo.
+p_{ui} = \begin{cases} 1 , r_{ui}>0 \\ 0 , r_{ui}=0 \end{cases}
 $$
 
 置信度$$c_{ui}$$表示对偏好$$p_{ui}$$的置信等级。它表示你对兴趣值有多肯定。它可以通过以下方式进行计算：$$c_{ui} = 1 + \alpha r_{ui}$$。
