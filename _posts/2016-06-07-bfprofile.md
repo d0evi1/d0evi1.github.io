@@ -17,62 +17,67 @@ google在google+这个产品上提出了《Improving User Topic Interest Profile
 
 对于许多用户而言，社交媒体上共享的信息是过饱和的。因此，主题兴趣画像(topic interest profiles)的构建是个性化推荐系统中很重要的一部分。我们的工作受关于利用行为信号的个性化研究的启发。
 
-搜索引擎研究者已经利用user profiles来提供个性化搜索结果【9,11,4,30,35】。通常，user profiles会被表示成一个在高维空间中的向量，这些向量表示了在不同items上的用户偏好（比如：网页、电影、社交媒体posts），或者在不同空间上的用户偏好（例如：表示主题的表键词、或来自类目树taxonomy的主题类别）
+搜索引擎研究者已经利用user profiles来提供个性化搜索结果【9,11,4,30,35】。通常，user profiles会被表示成一个在高维空间中的向量，这些向量表示了在不同items上的用户偏好（比如：网页、电影、社交媒体posts），或者在不同空间上的用户偏好（例如：表示主题的关键词、或来自类目树taxonomy的主题类别）
 
 ### 2.1.1 MF & Embedding模型
 
-推荐方法的一大类是CF，系统通常会使用一个user-by-item矩阵，每个条目表示用户在一个相应item上的评分。因此，在输入矩阵中的一行表示：一个特征用户对items的偏好。在一个特定item上一个用户的未知偏好，可以使用矩阵补全（matrix completion）来进行推断（infer），研究者们已经使用MF方法取得了巨大进展。
+推荐方法的一大类是CF，系统通常会使用一个user-by-item矩阵，每个条目表示用户在一个相应item上的评分。因此，在输入矩阵中的某一行表示：一个特征用户对items的偏好。关于一个用户在一个指定item上的未知偏好，可以使用矩阵补全（matrix completion）来进行推断（infer），研究者们已经使用MF方法取得了巨大进展。
 
 在我们的paper中，我们并没有使用通过items（发表：posts）偏好来表示user profile的方法，我们更关注对user的主题兴趣(topical interests)进行推断，其中主题通过Google知识图谱的条目进行表示（比如："basketball"、’video games’）。研究者已经使用MF来创建embedding模型，或者生成式模型（如：LDA）来构建user profiles[21]。MF以及生成式模型可以学到latent embedding空间，其中偏好可以通过user和item间的latent embedding factors的相似度进行计算。
 
-比起item-based方法，topic-based方法在社交媒体中更加可扩展，其中实际items（posts）数目会很大。做为替代，通过计算在user topic兴趣和item(post)兴趣间的相似度，我们可以预测在一个item上的一个用户的兴趣。
+比起item-based方法，**topic-based方法在社交媒体中更加可扩展**，其中实际items（posts）数目会很大。做为替代，通过计算在user topic兴趣和item(post)兴趣间的相似度，我们可以预测在一个item上的一个用户的兴趣。
 
 ## 2.2 社交媒体的个性化user profiles
 
 正如在其它推荐问题上一样，社交媒体研究者通常将构建一个user profile看成是构建一个个性化推荐系统的首要任务。研究者在社交媒体上已经应用MF和生成式模型(LDA)来建模user-topic矩阵，并专门构建了user profiles[8,7,34,3,6,15,33,27]。例如，Guy等人基于content和item的偏好来构建user profiles，接着为社交媒体items（比如：书签和社交软件）来提供个性化推荐[8,7]。Chen等人在twitter上构建了user topic profiles并提供了会话的个性化推荐。User profile也被用于提供好友推荐[6]，社群推荐[33]，动作推荐（mentioning推荐[33], commenting[27]）。
 
-对于一个user profile来说，用户偏好可以使用隐式反馈（比如：用户活动）进行infer[8]。作为对比，在传统的推荐系统中，CF通常需要用户具有在评分上的某些显式输入。作为对比，在传统推荐系统中，CF通常需要显式评分，这会带来用户的额外开销。例如，Hu等人提出了一个MF方法来利用稀疏数据的隐式反馈。在该思想基础上，Noel等人在MF上提出了一个新的目标函数，并考虑上在feature-based相似度、以及user-user信息。
+对于一个user profile来说，用户偏好可以使用隐式反馈（比如：用户活动）进行infer[8]。作为对比，在传统推荐系统中，CF通常需要显式评分，这会带来用户的额外开销。例如，Hu等人提出了一个MF方法来利用稀疏数据的隐式反馈。在该思想基础上，Noel等人在MF上提出了一个新的目标函数，并考虑上在**feature-based相似度、以及user-user信息**。
 
 ## 2.3 上下文个性化
 
-社交媒体平台提供了用户丰富的上下文信息，比如：用户在何时（when）对某用户发表（who's post）的某主题（what topic）进行了web评论。许多最近研究讨论了如何利用这些丰富的上下文来学习更好的user profiles。Singh等人提出的CMF（协同矩阵因子分解），目标是使用上下文信息来在异构网络上提供推荐。与该工作比较接近的有：
+社交媒体平台提供了用户丰富的上下文信息，**比如：用户在何时（when）对某用户发表（who's post）的某主题（what topic）进行了web评论**。许多最近研究讨论了如何利用这些丰富的上下文来学习更好的user profiles。Singh等人提出的CMF（协同矩阵因子分解），目标是使用上下文信息来在异构网络上提供推荐。与该工作比较接近的有：
 
 - (a) Liu提出了 a social-aided
 context-aware recommender systems for books and movies. 会利用丰富的上下文信息来将user-item矩阵划分为多个矩阵[20]
 - (b) Jamali等人提出了: a context-dependent matrix
 factorization model to create user profiles for recommendation in social network [14]。
 
-除了矩阵分解技术外，研究者提出了context-aware generative models来在Twitter上帮助创建user profiles和隐语义模型[25,32,36]。例如，Zhang等人使用生成模型提出了一个two-step framework来首先发现不同的主题域，接着使用MF方法在每个域上提供推荐[37]。不同用户可能对不同领域感兴趣，与我们工作相关，但在用户行为上有些区别。我们主要关注：每个用户的主题兴趣是如何通过不同类型的行为进行划分的。
+除了矩阵分解技术外，研究者提出了context-aware generative models来在Twitter上帮助创建user profiles和隐语义模型[25,32,36]。例如，Zhang等人使用生成模型提出了一个two-step framework来首先发现不同的主题域，接着使用MF方法在每个域上提供推荐[37]。不同用户可能对不同领域感兴趣，与我们工作相关，但在用户行为上有些区别。**我们主要关注：每个用户的主题兴趣是如何通过不同类型的行为进行划分的**。
 
 研究者们已经使用内存来构建和提升user profiles。Li等人提出了一种 transfer learning方法来对两个领域的两个向量，使用相互间的信息进行因子分解[18]。Hu等人提出了一个三元因子分解（triadic-factorization-based）方法来对user-item-domain的tensor进行因子分解，来提供跨领域的个性化推荐。
 
 ## 2.4 行为因子分解
 
-"如果你将知觉（perception）看成是一种联系和沟通的方式，那种。。。"
+"如果你将知觉（perception）看成是一种联系（contact）和洽谈(communion)的方式，那么，支配感知就是支配联系，限制和管理感知就是限制和管理联系。"---Erving Goffman, The Presentation of
+Self in Everyday Lif.
 
-最近工作表明，多种上下文可以提升user profiles的质量。在我们的paper中，展示了社交媒体用户具有不同类型的行为与不同主题进行交互，我们应使用行为类型看成是一种重要的上下文。我们也会为不同行为类型构建多个user profiles，接着在不同的行为独立的推荐中，灵活使用这些不同的profiles。例如：推荐阅读(read)的内容，推荐分享(reshare)的内容。等
+最近工作表明，多种上下文可以提升user profiles的质量。在我们的paper中，展示了社交媒体用户具有不同类型的行为与不同主题进行交互，我们应使用行为类型看成是一种重要的上下文。我们也会为不同行为类型构建多个user profiles，接着在不同行为独立的推荐中，灵活使用这些不同的profiles。例如：推荐阅读(read)的内容，推荐分享(reshare)的内容。等
 
-社会学家表明，人们在他们的每一天生活中，会呈现不同的图片给其它人；他们每天的对话会以不同主题展开，具有不同的听众。社交媒体的出现吸引了社会学家的兴趣，他们在在线社群上研究该现象。例如，社会学家建立了这样的理论：由于用户对于在公开社交媒体上的准确受众（exact audiences）没有清晰看法，他们会以模糊上下文边界而结束[22]。然而，由于不同类型的行为，比如：发表（posting）和评论（commenting），会影响非常不同的受众，我们以下的分析建议，用户在社交媒体上仍会展示出不同的“身份（’identities’）”，以及对不同的主题展示不同类型的行为。通过定量研究，Zhao等人指出：用户体验社交媒体平台（比如：Facebook），与现实中的多种身份相似。据我们所知，我们的paper是首次提出：用户在一个社交媒体上利用不同的在线表示。
+社会学家表明，人们在他们的每一天生活中，会呈现不同的画面给其它人；他们每天的对话会以不同主题展开，具有不同的听众。社交媒体的出现吸引了社会学家的兴趣，他们在网络社群上研究了该现象。例如，社会学家建立了这样的理论：由于用户对于在公开社交媒体上的准确受众（exact audiences）没有清晰看法，他们的行为具有模糊上下文边界[22]。然而，由于不同类型的行为，比如：发表（posting）和评论（commenting），会影响非常不同的受众，我们以下的分析建议，用户在社交媒体上仍会展示出不同的“身份（’identities’）”，以及对不同的主题展示不同类型的行为。通过定量研究，Zhao等人指出：用户体验社交媒体平台（比如：Facebook），与现实中的多种身份相似。据我们所知，我们的paper是首次提出：用户在一个社交媒体上利用不同的在线表示。
 
 # 3. google+行为分析
 
-我们分析了在google+上的匿名用户在线行为。我们首先抽取了在发表（posts）上的主题条目作为我们的特征，来为每个post构建特征向量。对于每个用户在posts上的行为动作，我们会聚合相应的post feature vectors来为每个**用户-行为组合(user-behavior combination)**构建一个entity vector。接着，我们对这些user-behavior entity vectors表示的不同的主题兴趣进行粗粒度的measure。我们展示了在这些向量间存在很大的不同，这启发了我们利用行为因子分解来建模不同的行为类型。
+我们分析了在google+上的匿名用户在线行为。我们首先抽取了在发表（posts）上的主题条目作为我们的特征，来为每个post构建特征向量。对于每个用户在posts上的行为动作，我们会聚合post对应的feature vectors来为每个**用户-行为组合(user-behavior combination)**构建一个entity vector。接着，我们对这些user-behavior entity vectors表示的不同的主题兴趣进行粗粒度的measure。我们展示了在这些向量间存在很大的不同，这启发了我们利用行为因子分解来建模不同的行为类型。
 
 ## 3.1 数据集描述
 
 使用了2014 五月的google+用户公开行为来进行分析。我们在所有公开发现上分析了所有用户行为，每条记录被表示为一个tuple：(u,b,E)，其中一个**用户u**（具有一个匿名id）使用**行为b**来参与一个**包含了实体集合E的post**。有4种类型的行为：发表（post），分享（reshare）、评论（comment）、+1.
 
-我们不会使用低级向量（比如：word tokens），我们会使用google知识图谱的实体形式（它包含的概念有：computer algorithms, landmarks, celebrities, cities, or movies.）来抽取更高级的语义概念。它当前包含了5亿实体，在主题覆盖上提供了广度与深度。
+我们会使用**google知识图谱的实体形式**（它包含的概念有：computer algorithms, landmarks, celebrities, cities, or movies.）来抽取更高级的语义概念，而非使用更低级向量（比如：word tokens）。它当前包含了5亿实体，在主题覆盖上提供了广度与深度。
 
 我们基于标准的实体识别方法（利用实体间的共现先验，实体间的相关度似然，实体在文本中位置，接着最终对实体主题进行最终排序），使用一个实体抽取器。
 
-对于给定的一个post，我们使用相应的知识图谱实体作为特征来表示它的主题。因此，在input tuple(u,b,E)中每个E是一个关于知识图谱实体的集合。例如，如果一个用户$$u_1$$创建了一个关于它的狗狗图片的post，与该行为对应的是：($$u_1$$, CreatePost, {"Dog", "Pet", ...})。如果另一个用户$$u_2$$在一个关于Xbox Minecraft的youtube视频post上进行了评论，该行为对应于该tuple：($$u_2$$, Comment, {"Minecraft", "Xbox", ...})。
+**对于给定的一个post，我们使用相应的知识图谱实体作为特征来表示它的主题**。因此，在input tuple(u,b,E)中每个E是一个关于知识图谱实体的集合。例如，如果一个用户$$u_1$$创建了一个关于宠物狗图片的post，与该行为对应的是：($$u_1$$, CreatePost, {"Dog", "Pet", ...})。如果另一个用户$$u_2$$在一个关于Xbox Minecraft的youtube视频post上进行了评论，该行为对应于该tuple：($$u_2$$, Comment, {"Minecraft", "Xbox", ...})。
 
 ## 3.2 衡量行为间的不同
 
 对于每个user，我们会使用一个特定类型行为来从他交互的posts中聚合实体。最后，对于每个用户，我们对应于4种不同类型的行类会获得4个主题实体集合。
 
 我们接着使用Jaccard相似度来衡量集合间的不同。
+
+<img src="http://pic.yupoo.com/wangdren23_v/855337a5/bf856990.png" alt="t1.png">
+
+表1:  Average Jaccard similarity between pairs of behavior types
 
 在我们计算了每个用户不同行为的jaccard相似得分后，我们接着在所有用户上对分数进行平均。我们过滤出：小于10个实体的用户认为是不活跃。表1展示了平均jaccard相似度的结果。我们可以看到，任意两种行为类型间的平均jaccard系统很低。以comment和+1行为为例，在这两种行为间只有9%的主题重合。我们也衡量了用户的发布(publishing)和消费(cosuming)行为上的不同。我们会将用户comment和+1行为的实体组合成一个consuming实体集合，我们将create post和reshare行为的实体组合成一个publishing实体集合。平均jaccard index为0.122. 关于jaccard得分的低重合率表明：用户在不同行为上差异很大。
 
