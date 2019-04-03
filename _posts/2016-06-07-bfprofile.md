@@ -79,13 +79,13 @@ Self in Everyday Lif.
 
 表1:  Average Jaccard similarity between pairs of behavior types
 
-在我们计算了每个用户不同行为的jaccard相似得分后，我们接着在所有用户上对分数进行平均。我们过滤出：小于10个实体的用户认为是不活跃。表1展示了平均jaccard相似度的结果。我们可以看到，任意两种行为类型间的平均jaccard系统很低。以comment和+1行为为例，在这两种行为间只有9%的主题重合。我们也衡量了用户的发布(publishing)和消费(cosuming)行为上的不同。我们会将用户comment和+1行为的实体组合成一个consuming实体集合，我们将create post和reshare行为的实体组合成一个publishing实体集合。平均jaccard index为0.122. 关于jaccard得分的低重合率表明：用户在不同行为上差异很大。
+在我们计算了每个用户不同行为的jaccard相似得分后，我们接着在所有用户上对分数进行平均。我们过滤掉了：小于10个实体的用户认为是不活跃。表1展示了平均jaccard相似度的结果。我们可以看到，任意两种行为类型间的平均jaccard系统很低。以comment和+1行为为例，在这两种行为间只有9%的主题重合。我们也衡量了用户的发布(publishing)和消费(cosuming)行为上的不同。我们会将用户comment和+1行为的实体组合成一个consuming实体集合，我们将create post和reshare行为的实体组合成一个publishing实体集合。平均jaccard index为0.122. 关于jaccard得分的低重合率表明：用户在不同行为上差异很大。
 
 ## 3.3 讨论
 
-结果分析表明，对于每个用户，他通常在每个行为上具有不同的主题兴趣。也就是说，她通常会在create posts上的主题与comments上的主题会很不同。结果表明，总的非行为指定（non-behavior-specific）的user profiles可能会在强调不同行为类型的应用上执行效果差。
+**结果分析表明，对于每个用户，他通常在每个行为上具有不同的主题兴趣**。也就是说，她通常会在create posts上的主题与comments上的主题会很不同。结果表明，常见的无指定行为（non-behavior-specific）的user profiles可能会在那些强调不同行为类型的应用上执行效果差。
 
-内容推荐者通常会对用户要消费的内容进行定向预测，它可能会受行为（comment和+1）的影响要更好。在其它上下文中，我们会替代预测：用户会创建什么主题的posts。因此，通过为每种行为类型创建主题偏好，特定行为的user profile在不同的推荐上下文上具有更好的效果。
+内容推荐者通常会对用户要消费的内容进行定向预测，它可能会受行为（comment和+1）的影响要更好。在其它上下文中，我们会替代预测：用户会创建什么主题的posts。因此，**通过为每种行为类型创建主题偏好，特定行为的user profile在不同的推荐上下文上具有更好的效果**。
 
 总之，用户在社交媒体上的不同行为包含了重要的上下文信息，它可以帮助我们提升用户个性化profiles上的效果。我们展示了，用户在G+上不同的行为类型会极大影响不同的主题兴趣，使用单独的行为类型构建不同的profiles允许我们为不同的行为上下文定制内容推荐系统。
 
@@ -101,7 +101,12 @@ $$
 I = \lbrace t_i = (u_i, b_i, E_i), i=1, ..., N \rbrace
 $$
 
-其中$$u_i \in U, b_i \in B, E_i \subset E$$。每个$$t_i$$表示一个用户在社交媒体内容的某个特定片段上的动作。例如，一个$$t_i$$可以是：创建一个post，或者对某个post进行comment。$$E_i$$是该post的特征集合。这里由于我们正构建user topic profiles，我们使用Google知识图谱的实体作为我们的特征集。然而，总体上，$$E$$可以是任意low-level（例如：words）或high-level的特征（例如：其它实体，或地理位置特征）。
+其中$$u_i \in U, b_i \in B, E_i \subset E$$。
+
+- 每个$$t_i$$表示一个用户在社交媒体内容的某个特定片段上的动作。例如，一个$$t_i$$可以是：创建一个post，或者对某个post进行comment。
+- $$E_i$$是该post的特征集合。
+
+这里由于我们正构建user topic profiles，我们使用Google知识图谱的实体作为我们的特征集。然而，总体上，$$E$$可以是任意low-level（例如：words）或high-level的特征（例如：其它实体，或地理位置特征）。
 
 ## 4.2 User profiles
 
@@ -111,12 +116,17 @@ $$
 B = \lbrace P_u = \lbrace V_{u_B} \rbrace \rbrace
 $$
 
-其中，$$u \in U, B \subset B$$，$$P_u$$是用户u的user profile，$$V_{u_B}$$是用户u在对应于她的行为类型B上的偏好向量。$$P_u$$可以被认为是一个user tensor。
+其中，$$u \in U, B \subset B$$，
+
+- $$P_u$$是用户u的user profile，
+- $$V_{u_B}$$是用户u在对应于她的行为类型B上的偏好向量。
+
+$$P_u$$可以被认为是一个user tensor。
 
 B即可以是单个行为类型（例如：创建一个post），或是一个不同行为类型的组合（例如：创建一个post和reshare一个post组合）。准确表述为：
 
 $$
-V_{u_B} = \lbrace p_{u_B}^{e_1}, p_{u_B}^{e_2}, ..., p_{u_B}^{e_k}, e_j \in E
+V_{u_B} = ( p_{u_B}^{e_1}, p_{u_B}^{e_2}, ..., p_{u_B}^{e_k} ), e_j \in E 
 $$
 
 其中，对于j=1,...,k，$$p_{u_B}^{e_j}$$是用户u的行为类型 B在特征$$e_j$$上的偏好。
