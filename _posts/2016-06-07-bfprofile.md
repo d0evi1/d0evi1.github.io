@@ -153,11 +153,11 @@ $$
 
 在常见的矩阵因子分解技术中，输入的user-item矩阵R被表示成一个$$N \times K$$的矩阵，其中N表示user的数目，K表示items的数目。R被分解成两个矩阵的乘积，矩阵X ($$N \times L$$)，矩阵Y（$$K \times L$$）。换句话说，R中的行向量和列向量被映射到一个L维的latent embedding space中。有了这个学到的隐向量，对于在user-item矩阵中任意观察到的行向量，学到的embedding空间可以被用于帮助完成特定的行向量来补全一个用户在items上的估计偏好。
 
-由于我们正构建user-topic-based profiles，而非将users在items上的兴趣（N X K user-item matrix）作为输入，我们使用users在主题的兴趣（N X K user-topic matrix）作为输入。
+由于我们正构建user-topic-based profiles，而非将users在items上的兴趣（$$N \times K$$的user-item matrix）作为输入，我们使用users在主题的兴趣（$$N \times K$$ user-topic matrix）作为输入。
 
-另外，除了使用一个 N X K矩阵作为输入之外，我们构建和因子分解成多个矩阵，包括：
+另外，除了使用一个$$N \times K$$矩阵作为输入之外，我们构建和因子分解成多个矩阵，包括：
 
-- (a) 传统的N X K矩阵，被称为Behavior Non-specific User-topic Matrix(BNUM)
+- (a) 传统的$$N \times K$$矩阵，被称为Behavior Non-specific User-topic Matrix(BNUM)
 - (b) Single Behavior-Specific User-topic Matrix(SBSUM)
 - (c) Combined Behavior-Specific User-topic Matrix(CBSUM)
 
@@ -166,7 +166,7 @@ $$
 这里，每个条目表示一个用户在特定主题上的隐式兴趣。给定输入用户tuples $$I=\lbrace t_i = (u_i, b_i, E_i), i=1, 2, ... \rbrace$$，我们首先引入涉及用户u的tuples $$I_u$$：
 
 $$
-I_u = \lbrace = (u_j, b_j, E_j) \rbrace, t_j \in I \Lambda u_j = u
+I_u = \lbrace t_j = (u_j, b_j, E_j) \rbrace, t_j \in I \wedge u_j = u
 $$
 
 接着，我们为每个user和topic pair生成观察值：
