@@ -133,11 +133,19 @@ $$
 
 # 5.我们的方法
 
+<img src="http://pic.yupoo.com/wangdren23_v/a9510872/67d59634.png" alt="1.png">
+
+图1: 生成矩阵和因子分解框架
+
 我们引入了行为因子分解法来为个性化推荐构建user profiles，它包含了三个steps，如图1和2所示。
 
 - step 1: 给定第4节中定义的input user action tuples $$I$$，我们首先构建不同行为类型的矩阵。这对应于图1中的左部分。
 - step 2: 我们对step 1中生成的矩阵进行因子分解来学到latent embedding space。这对应于图1中的右部分。
 - step 3: 最后，我们使用学到的latent space来对兴趣主题做预测来构建user profiles。这会为每个用户u创建profiles $$P_u = \lbrace V_{u_B} \rbrace$$。这对应于图2.
+
+<img src="http://pic.yupoo.com/wangdren23_v/c2bda88e/dae751f4.png" alt="2.png">
+
+图2: 使用latent embedding space构建user profiles
 
 我们会轮流做介绍。
 
