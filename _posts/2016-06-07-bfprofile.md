@@ -258,7 +258,7 @@ $$
 
 结果$$x_u$$和$$y_i$$可以被用于补全user-item矩阵，它会估计一个user会喜欢一个item有多喜欢。[13]提出的算法对于隐式feedback/interest datasets工作良好。
 
-在这一点上，我们使用等式(1)来构建user-topic矩阵，采用MF来学习一个latent embedding space。再者，我们可以通估估计用户u在所有主题上的偏好来建模任意用户u的兴趣。对于没有出现在原始user-topic matrix（用于训练该embedding space）中的任意新用户，我们仍能通过使用学到的topic embedding vectors $$y_i$$来将它们映射到该embedding space中。我们将在第5.3节中讨论。
+在这一点上，我们使用等式(1)来构建user-topic矩阵，采用MF来学习一个latent embedding space。再者，我们可以通过估计用户u在所有主题上的偏好来建模任意用户u的兴趣。对于没有出现在原始user-topic matrix（用于训练该embedding space）中的任意新用户，我们仍能通过使用学到的topic embedding vectors $$y_i$$来将它们映射到该embedding space中。我们将在第5.3节中讨论。
 
 ### 5.2.2 行为因子分解模型（BF）
 
@@ -347,8 +347,53 @@ $$\Gamma$$中不同行为类型的权重是模型级别的参数，例如：我�
 
 # 6.评估
 
+在之前章节，我们提出了行为因子分解法，它可以学习一个强大的latent space，并为多种行为类型构建user profiles。在该实验中，我们希望验证两个假设：
 
+- H1: 从我们的行为因子分解方法中学到的latent embedding模型在构建user profiles比baseline MF模型要更好
+- H2: 通过从多种行为类型中组合偏好向量，我们可以提升在特定行为类型上的user profiles的覆盖度(coverage)
 
+在乘余章节，我们首先描述了如何设置实验，例如：我们使用了什么datasets，如何评估输出的user profiles的效果。接着我们比较了行为因子模型与baseline模型。我们也比较了在构建user profiles上的我们提出的两个方法，结果表明：通过组合行为类型，可以提升高质量的用户覆盖度。
+
+## 6.1 实验设置
+
+为了评估构建user profiles的效果，我们检查了在预测用户主题兴趣的不同方法。我们将dataset划分为两部分：training set和testing set。我们使用trainingset来训练和构建user profiles，然后在testing set上比较不同模型的效果。
+
+### 6.1.1 Dataset
+
+我们的dataset包含了在2014年 5月和6月的公开的Google+ 用户行为。第3.1节描述了dataset的生成。我们会同时使用5月的数据来训练baseline和我们的MF模型。我们随机从6月的行为数据中进行20%抽样来学习5.3.2节WPB的权重。使用乘余80%行为数据来评估不同方法的效果。
+
+输入矩阵：在我们的dataset上，我们包含了所有公开5月和6月的posts数据。有4种类型关于posts的行为数据。我们构建不同的user-behavior-topic矩阵：
+
+- SBSUM
+- Publication CBSUM
+- Consumption CBSUM
+- BNUM
+
+### 6.1.2 评估指标
+
+对于一个给定的行为类型$$B_t$$，我们构建的user profile是一个关于在主题$$V_{u_{B_t}}$$上的偏好向量。在该vector上的值会估计：用户u是否会喜欢在行为$$B_t$$上的每个topic。这可以使用$$R_u^{B_t} = \lbrace r_{ui}^{B_t}, i \in E \rbrace $$在testing set上使用等式(2)计算的隐式兴趣进行评估。
+
+尽管在$$V_{u_{B_t}}$$的实际值，和$$R_u^{B_t}$$不需要是相同的，$$B_t$$的一个好的user profile，$$V_{u_{B_t}}$$主题顺序进排序，必须与我们在testing set中观察的相似。
+
+为了比较这两个vectors的顺序，我们会将$$V_{u_{B_t}}$$和$$R_{u}^{B_t}$$转换成两个关于在E中主题的排序列表：$$L_{method} = (e_{r_1}, e_{r_2}, ..., e_{r_N})$$是由profile building方法生成的关于top N主题的排序列表，$$L_{observed} = (e_{o_1}, e_{o_2}, ..., e_{o_N'})$$是所有观察到主题的排序列表。我们会使用如下指标进行评估：
+
+- Recall@N: $$L_{method}$$的top N的主题有多少出现在$$L_{observed}$$
+- NDCG@N:
+- AP@N:
+
+# 7.讨论
+
+## 7.1 潜在的应用
+
+有许多应用可以使用我们方法构建的user profiles。由于我们将用户行为（还有不同的items集合：比如：posts, communities, users）映射到相同的embedding模型上，用户行为和items间的相似度可以用于为推荐生成排序列表。对比常用的user profiles（它不会分隔用户行为），我们的方法不仅会考虑users和items间的内容相似性，也会考虑不同推荐任务的上下文。例如，consumption profile可以用于为一个正在阅读post的用户推荐相关的posts，publication profile可以用于在一个用户创建一个post后为他推荐新朋友。
+
+## 7.2 局限性和未来改进
+
+提出的行为因子分解框架确实可以提升用户兴趣画像的效果，然而仍有局限性。其中之一是，我们的框架依赖于：用户不同的行为类型天然能反映用户的不同兴趣。在构建社交媒体的用户兴趣画像（比如G+）能运行良好，但不能泛化到其它领域上（比如：不同行为类型不能反映不同的用户兴趣）。
+
+另外，结果表明我们的方法不能在用户非常稀疏、或者目标行为类型(尝试预测)没有数据的情况下。一个原因是，这些用户可能比其它用户具有更低的活跃度。另一个原因是，我们的方法会最优化多个矩阵，它们可能会对相同的用户丢失跨不同行为类型的相关性。为了解决这个问题，我们对使用tensor factorization技术（比如：PARAFAC）在行为矩阵上很感兴趣。我们的方法可以认为是一个tensor factorization上unfolding-based方法的扩展。
+
+另外，我们想直接部署该框架到现实的推荐系统上，并通过在线实验来评估。
 
 # 参考
 
