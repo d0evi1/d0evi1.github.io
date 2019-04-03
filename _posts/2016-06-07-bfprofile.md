@@ -192,7 +192,7 @@ SBSUM和CBSUM将行为类型单独划分来生成独立的user-topic矩阵。给
 我们使用与等式(1)的相同方法，但增加了限制来过滤不在B中的行为类型：
 
 $$
-r_{ui}^B = \frac{(\sum\limits_{I_u \wedge b_j \in B} \sum\limits_{e \in E_j} \simga_i(e)) + 1}{ \sum\limits_{I_u \wedge b_j \in B} \| E_j \| ) + (\|U_{I_u \wedge b_j \in B} E_j \|)}
+r_{ui}^B = \frac{(\sum\limits_{I_u \wedge b_j \in B} \sum\limits_{e \in E_j} \sigma_i(e)) + 1}{ \sum\limits_{I_u \wedge b_j \in B} \| E_j \| ) + (\|\cup_{I_u \wedge b_j \in B} E_j \|)}
 $$
 
 ...(2)
