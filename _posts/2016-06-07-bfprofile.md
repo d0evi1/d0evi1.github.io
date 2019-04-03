@@ -203,10 +203,10 @@ $$
 
 $$
 \begin{cases}
-R_{b_1} = \lbrace r_{ui}^B \rbrace, B=\lbrace b_1,b_1 \in B \rbrace \\
-R_{b_2} = \lbrace r_{ui}^B \rbrace, B=\lbrace b_2,b_2 \in B \rbrace \\
-...
-R_{b_M} = \lbrace r_{ui}^B \rbrace, B=\lbrace b_M,b_M \in B \rbrace 
+R_{b_1} = \lbrace r_{ui}^B \rbrace, B=\lbrace b_1,b_1 \in \mathscr{B} \rbrace \\
+R_{b_2} = \lbrace r_{ui}^B \rbrace, B=\lbrace b_2,b_2 \in \mathscr{B} \rbrace \\
+... \\
+R_{b_M} = \lbrace r_{ui}^B \rbrace, B=\lbrace b_M,b_M \in \mathscr{B} \rbrace 
 \end{cases}
 $$
 
@@ -220,10 +220,10 @@ $$
 
 $$
 \begin{cases}
-R_{B_1} = \lbrace r_{ui}^B \rbrace, B=\lbrace B_1,B_1 \in \mathcal{B} \rbrace \\
-R_{B_2} = \lbrace r_{ui}^B \rbrace, B=\lbrace B_2,B_2 \in \mathcal{B} \rbrace \\
-...
-R_{B_M} = \lbrace r_{ui}^B \rbrace, B=\lbrace b_M,b_M \in \mathcal{B} \rbrace 
+R_{B_1} = \lbrace r_{ui}^B \rbrace, B=\lbrace B_1,B_1 \in \mathscr{B} \rbrace \\
+R_{B_2} = \lbrace r_{ui}^B \rbrace, B=\lbrace B_2,B_2 \in \mathscr{B} \rbrace \\
+... \\
+R_{B_M} = \lbrace r_{ui}^B \rbrace, B=\lbrace b_M,b_M \in \mathscr{B} \rbrace 
 \end{cases}
 $$
 
@@ -273,7 +273,7 @@ $$
 这里$$p_{ui}^B$$和$$c_{ui}^B$$表示每个矩阵的偏好的置信度。给定所有特定的行为类型，我们使用等式(3)和(4)的$$\Gamma = \lbrace B_1, B_2, ...\rbrace$$，我们通过优化如下的等式来学习embedding space: 
 
 $$
-min_{x_*,y_*} \sum\limit_{B \in \Gamma} \sum\limits_{u,i} c_{ui}^B (p_{ui}^B - x_u^{B^T} y_i)^2 + \lambda (\sum\limits_{B \in \Gamma} \sum\limits_{u} \| x_u^B \|^2 + \sum\limits_{i} \|y_i\|^2)
+min_{x_*,y_*} \sum\limits_{B \in \Gamma} \sum\limits_{u,i} c_{ui}^B (p_{ui}^B - x_u^{B^T} y_i)^2 + \lambda (\sum\limits_{B \in \Gamma} \sum\limits_{u} \| x_u^B \|^2 + \sum\limits_{i} \|y_i\|^2)
 $$
 
 ....(6)
