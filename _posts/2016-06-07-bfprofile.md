@@ -153,9 +153,9 @@ $$
 
 在常见的矩阵因子分解技术中，输入的user-item矩阵R被表示成一个$$N \times K$$的矩阵，其中N表示user的数目，K表示items的数目。R被分解成两个矩阵的乘积，矩阵X ($$N \times L$$)，矩阵Y（$$K \times L$$）。换句话说，R中的行向量和列向量被映射到一个L维的latent embedding space中。有了这个学到的隐向量，对于在user-item矩阵中任意观察到的行向量，学到的embedding空间可以被用于帮助完成特定的行向量来补全一个用户在items上的估计偏好。
 
-由于我们正构建user-topic-based profiles，而非将users在items上的兴趣（$$N \times K$$的user-item matrix）作为输入，我们使用users在主题的兴趣（$$N \times K$$ user-topic matrix）作为输入。
+由于我们正构建user-topic-based profiles，我们使用users在主题的兴趣（$$N \times K$$ user-topic matrix）作为输入，而非将users在items上的兴趣（$$N \times K$$的user-item matrix）作为输入。
 
-另外，除了使用一个$$N \times K$$矩阵作为输入之外，我们构建和因子分解成多个矩阵，包括：
+另外，除了使用一个$$N \times K$$矩阵作为输入之外，我们构建和因子分解得到多个矩阵，包括：
 
 - (a) 传统的$$N \times K$$矩阵，被称为Behavior Non-specific User-topic Matrix(BNUM)
 - (b) Single Behavior-Specific User-topic Matrix(SBSUM)
@@ -178,7 +178,7 @@ $$
 也就是说，我们首先抽取所有涉及用户u的tuples $$I_u$$，在给定用户u涉及主题i的tuples下，使用函数r来计算隐式兴趣。该函数有许多可能的形式，对于不同行为可以训练不同的权重。我们使用以下的等式做为baseline来计算隐式兴趣：
 
 $$
-r_{ui} = \frac{\sum\limits_{I_u} \sum\limits_{e \in E_j} \sigma_i(e)) + 1}{\sum\limits_{I_u} \| E_j \|) + (\|U_{I_u} E_j)}
+r_{ui} = \frac{(\sum\limits_{I_u} \sum\limits_{e \in E_j} \sigma_i(e)) + 1}{(\sum\limits_{I_u} \| E_j \|) + (\|U_{I_u} E_j\|)}
 $$
 
 ...(1)
