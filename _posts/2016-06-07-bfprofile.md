@@ -178,7 +178,7 @@ $$
 也就是说，我们首先抽取所有涉及用户u的tuples $$I_u$$，在给定用户u涉及主题i的tuples下，使用函数r来计算隐式兴趣。该函数有许多可能的形式，对于不同行为可以训练不同的权重。我们使用以下的等式做为baseline来计算隐式兴趣：
 
 $$
-r_{ui} = \frac{(\sum\limits_{I_u} \sum\limits_{e \in E_j} \sigma_i(e)) + 1}{(\sum\limits_{I_u} \| E_j \|) + (\|U_{I_u} E_j\|)}
+r_{ui} = \frac{(\sum\limits_{I_u} \sum\limits_{e \in E_j} \sigma_i(e)) + 1}{(\sum\limits_{I_u} \| E_j \|) + (\|\cup_{I_u} E_j\|)}
 $$
 
 ...(1)
