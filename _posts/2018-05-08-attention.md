@@ -14,14 +14,14 @@ google在2017年提出了《Attention Is All You Need》，我们可以看下：
 
 recurrent模型通常会沿着输入和输出序列的符号位置(symbol position)进行因子计算。在计算时对位置（position）进行排列，他们可以生成一个hidden states $$h_t$$的序列，它是关于前一hidden state $$h_{t-1}$$和位置t做为输入的一个函数。**这种天然的序列特性排除了在训练样本中的并发性(这对于更长序列长度很重要)，因为内存约束会限制在样本上进行batching**。最近工作表明，因子分解tricks[18]和条件计算[26]可以在计算效率上进行有效提升，同时也会提升模型效果。然而，序列化计算的基本限制仍然存在。
 
-Attention机制已经在许多任务中成为序列建模（sequence modeling）和转化模型（transduction model）的一个不可欠缺的部件，它可以无需考虑在input或output序列上的距离[2,16]的情况下来建模依赖(dependencies)。除了极少的cases中，几乎所有这样的attention机制都会与一个recurrent network一起使用。
+Attention机制已经在许多任务中成为序列建模（sequence modeling）和转化模型（transduction model）的不可欠缺的一个部件，它可以在无需考虑input或output序列上的距离[2,16]的情况下来建模依赖(dependencies)。除了极少的cases外，几乎所有这样的attention机制都会与一个recurrent network一起使用。
 
 **在该工作中，我们提出了Transformer，这种模型结构可以避免recurrence，它完全依赖attention机制来抽取在input和output间的全局依赖性**。Transformer允许更大的并行度(parallelization)，在eight P100 GPUs上训练12小时后，在翻译质量上可以达到一种新的state-of-art效果。
 
 # 2.背景
 
-减小序列化计算的目标，也构成了Extended Neural GPU
-[20], ByteNet [15] and ConvS2S [8]的基础，它们都使用CNN作为基本构建块，对所有input和output positions并行计算hidden representations。在这些模型中，op的数目需要从两个专门的input或output positions的相关信号，这对于ConvS2S是线性的，对于ByteNet是成log关系。这使得很难学习在较远位置（distant positions）间的依赖[11]。在Transformer中，这减小到常数级别的操作（operations），虽然在有效识别率上会有损失的代价（因为会对attention-weighted positions进行平均），我们会使用第3.2节中的Multi-Head Attention来消除这现象。
+减小序列化计算开销的目标，也构成了Extended Neural GPU
+[20], ByteNet [15] and ConvS2S [8]的基础，它们都使用CNN作为基本构建块，对所有input和output positions并行计算hidden representations。在这些模型中，两个专门的input或output positions的相关信号所需要的ops数目，会随着positions间的距离增长而增长：这对于ConvS2S是线性的，对于ByteNet是成log关系。这使得很难学习在较远位置（distant positions）间的依赖[11]。在Transformer中，这减小到常数级别的操作（operations），虽然在有效识别率上会有损失的代价（因为会对attention-weighted positions进行平均），我们会使用第3.2节中的Multi-Head Attention来消除这现象。
 
 self-attention，有时被称为"intra-attention"，是一种与单个序列上不同位置有关的attention机制，它的目的是计算该序列的一种表示（representation）。self-attention已经被成功用于许多任务，包括：阅读理解(reading comprehension)、抽象式摘要(abstractive summarization)、文字蕴含（textual entailment）、独立句子表示任务[4,22,23,19]。
 
