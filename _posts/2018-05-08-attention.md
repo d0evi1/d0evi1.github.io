@@ -21,13 +21,13 @@ Attention机制已经在许多任务中成为序列建模（sequence modeling）
 # 2.背景
 
 减小序列化计算开销的目标，也构成了Extended Neural GPU
-[20], ByteNet [15] and ConvS2S [8]的基础，它们都使用CNN作为基本构建块，对所有input和output positions并行计算hidden representations。在这些模型中，两个专门的input或output positions的相关信号所需要的ops数目，会随着positions间的距离增长而增长：这对于ConvS2S是线性的，对于ByteNet是成log关系。这使得很难学习在较远位置（distant positions）间的依赖[11]。在Transformer中，这减小到常数级别的操作（operations），虽然在有效识别率上会有损失的代价（因为会对attention-weighted positions进行平均），我们会使用第3.2节中的Multi-Head Attention来消除这现象。
+[20], ByteNet [15] and ConvS2S [8]的基础，它们都使用CNN作为基本构建块，对所有input和output positions并行计算hidden representations。在这些模型中，两个专门的input或output positions的相关信号所需要的ops数目，会随着positions间的距离而增长：这对于ConvS2S是线性的，对于ByteNet是成log关系。**这使得很难学习在较远位置（distant positions）间的依赖[11]**。在Transformer中，这可以减小到常数级别的操作（operations），虽然在有效识别率上会有损失的代价（因为会对attention-weighted positions进行平均），我们会使用第3.2节中的Multi-Head Attention来消除这现象。
 
-self-attention，有时被称为"intra-attention"，是一种与单个序列上不同位置有关的attention机制，它的目的是计算该序列的一种表示（representation）。self-attention已经被成功用于许多任务，包括：阅读理解(reading comprehension)、抽象式摘要(abstractive summarization)、文字蕴含（textual entailment）、独立句子表示任务[4,22,23,19]。
+self-attention，有时被称为"intra-attention"，是一种与单个序列上不同位置有关的attention机制，它的目的是**计算该序列的一种表示（representation）**。self-attention已经被成功用于许多任务，包括：阅读理解(reading comprehension)、抽象式摘要(abstractive summarization)、文字蕴含（textual entailment）、独立句子表示任务[4,22,23,19]。
 
 end-to-end memory networks基于一个recurrent attention机制（而非基于sequence-aligned recurrence），已经展示出在单语言问答上和语言建模任务上很好的效果[28]。
 
-据我们所知，Transformer是首个完全依赖于self-attention的转换模型（transduction model），它无需使用sequence-aligned RNNs或convolution，就可以计算input和output的表示(representations)。在以下部分，我们会描述Transformer、motivation self-attention、以及在模型上的优点[14,15]，[8]。
+据我们所知，**Transformer是首个完全依赖于self-attention的转换模型（transduction model），它无需使用sequence-aligned RNNs或convolution，就可以计算input和output的表示(representations)**。在以下部分，我们会描述Transformer、motivation self-attention、以及在模型上的优点[14,15]，[8]。
 
 # 3.模型结构
 
@@ -35,7 +35,9 @@ end-to-end memory networks基于一个recurrent attention机制（而非基于se
 
 Transformer会遵循这样的总体架构：它使用stacked selft-attention、对于encoder-decoder使用point-wise，FC-layers，如图1的左右所示。
 
-图1
+<img src="http://pic.yupoo.com/wangdren23_v/b4bb3caf/81ba10cc.png" alt="1.png">
+
+图1 Transformer模型结构
 
 ## 3.1 Encoder Stacks和Decoder Stacks
 
@@ -46,6 +48,11 @@ Transformer会遵循这样的总体架构：它使用stacked selft-attention、�
 ## 3.2 Attention
 
 attention函数可以被描述成，将一个query和一个key-value pairs集合映射到一个output上，其中：query, keys, values和output都是向量(vectors)。output由对values进行加权计算得到，其中为每个value分配的weight通过query和对应的key的一个兼容函数计算得到。
+
+
+<img src="http://pic.yupoo.com/wangdren23_v/ba75c826/4d85c908.png" alt="2.png">
+
+图2 (左) Scaled Dot-Product Attention (右) Multi-Head Attention，包含了并行运行的多个attention layers
 
 ### 3.2.1  Scaled Dot-Product Attention
 
