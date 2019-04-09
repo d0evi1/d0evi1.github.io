@@ -10,13 +10,13 @@ google在2017年提出了《Attention Is All You Need》，我们可以看下：
 
 # 1.介绍
 
-RNN, LSTM和GRNN已经在序列建模(sequence modeling)和转换问题(transduction problems，比如：语言建模和机器翻译)上。大多数努力源自于recurrent语言模型和encoder-decoder架构的持续推动。
+在序列建模(sequence modeling)和转换问题(transduction problems，比如：语言建模和机器翻译)上，RNN, LSTM和GRNN已经成为state-of-art的方法。大多数努力源自于recurrent语言模型和encoder-decoder架构的持续推动。
 
-recurrent模型通常会沿着输入和输出序列的符号位置(symbol position)进行因子计算。在计算时对位置进行排列，他们可以生成一个hidden states $$h_t$$的序列，它是关于前一hidden state $$h_{t-1}$$和位置t做为输入的一个函数。这种天然的序列特性排除了在训练样本中的并发性(这对于更长序列长度很重要)，因为内存约束会限制在样本上进行batching。最近工作通过因子分解tricks[18]和条件计算[26]可以在计算效率上进行有效提升。同时也会提升模型效果。然而，序列化计算的基本限制仍然存在。
+recurrent模型通常会沿着输入和输出序列的符号位置(symbol position)进行因子计算。在计算时对位置（position）进行排列，他们可以生成一个hidden states $$h_t$$的序列，它是关于前一hidden state $$h_{t-1}$$和位置t做为输入的一个函数。**这种天然的序列特性排除了在训练样本中的并发性(这对于更长序列长度很重要)，因为内存约束会限制在样本上进行batching**。最近工作表明，因子分解tricks[18]和条件计算[26]可以在计算效率上进行有效提升，同时也会提升模型效果。然而，序列化计算的基本限制仍然存在。
 
-Attention机制已经在许多任务中成为序列建模和转化模型的一个完整部件，它允许建模依赖，忽略在input或output序列上的距离[2,16]。在少量cases中，这样的attention机制也与一个recurrent network一起使用。
+Attention机制已经在许多任务中成为序列建模（sequence modeling）和转化模型（transduction model）的一个不可欠缺的部件，它可以无需考虑在input或output序列上的距离[2,16]的情况下来建模依赖(dependencies)。除了极少的cases中，几乎所有这样的attention机制都会与一个recurrent network一起使用。
 
-在该工作中，我们提出了Transformer，这种模型结构可以避免recurence，它完全依赖attention机制来抽取在input和output间的全局依赖性。Transformer允许更大的并行度(parallelization)，在eight P100 GPUs上训练12小时后，在翻译质量上可以达到一种新的state-of-art效果。
+**在该工作中，我们提出了Transformer，这种模型结构可以避免recurrence，它完全依赖attention机制来抽取在input和output间的全局依赖性**。Transformer允许更大的并行度(parallelization)，在eight P100 GPUs上训练12小时后，在翻译质量上可以达到一种新的state-of-art效果。
 
 # 2.背景
 
