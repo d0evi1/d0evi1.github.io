@@ -31,19 +31,19 @@ end-to-end memory networks基于一个recurrent attention机制（而非基于se
 
 # 3.模型结构
 
-大多数比赛采用的神经序列转换模型(neural sequence transduction models)都有一个encoder-decoder结构[5,2,29]。这里，encoder会将一个关于符号表示$$(x_1, \cdots, x_n)$$的输入序列映射到一个连续表示$$z=(z_1, \cdots, z_n)$$的序列上。给定z，decoder接着生成一个关于符号(symbols)的output序列$$(y_1, \cdots, y_m)$$，一次一个元素。在每个step上，模型是自回归的（auto-regressive），当生成下一输出时，它会消费前面生成的符号作为额外输入。
+大多数比赛采用的神经序列转换模型(neural sequence transduction models)都有一个encoder-decoder结构[5,2,29]。这里，encoder会将一个关于符号表示$$(x_1, \cdots, x_n)$$的输入序列映射到一个连续表示$$z=(z_1, \cdots, z_n)$$的序列上。在给定z后，decoder接着生成一个关于符号(symbols)的output序列$$(y_1, \cdots, y_m)$$，一次一个元素。在每个step上，模型是自回归的（auto-regressive），当生成下一输出时，它会消费前面生成的符号作为额外输入。
 
-Transformer会遵循这样的总体架构：它使用stacked selft-attention、对于encoder-decoder使用point-wise，FC-layers，如图1的左右所示。
+Transformer会遵循这样的总体架构：它使用stacked self-attention、对于encoder-decoder使用point-wise，FC-layers，如图1的左右所示。
 
 <img src="http://pic.yupoo.com/wangdren23_v/b4bb3caf/81ba10cc.png" alt="1.png">
 
-图1 Transformer模型结构
+			图1 Transformer模型结构
 
 ## 3.1 Encoder Stacks和Decoder Stacks
 
-**Encoder**：encoder由一个N=6的相同层（identical layers）的stack组成。每一layer具有两个sub-layers。第1个是一个multi-head self-attention机制，第2个是一个简单的position-wise FC 前馈网络。我们在两个sub-layers的每一个上采用一个residual connection[10]，后跟着layer nomalization[1]。也就是说，每一sub-layer的output是 $$LayerNorm(x + Sublayer(x))$$，其中Sublayer(x)是通过sub-layer自射实现的函数。为了促进这些residual connections，模型中的所有sub-layers以及embedding layers会生成维度 $$d_{model}=512$$的outputs。
+**Encoder**：encoder由一个N=6的相同层（identical layers）的stack组成。每一layer具有两个sub-layers。第1个是一个multi-head self-attention机制，第2个是一个简单的position-wise FC 前馈网络。我们在两个sub-layers的每一个上采用一个residual connection[10]，后跟着layer nomalization[1]。也就是说，每一sub-layer的output是 $$LayerNorm(x + Sublayer(x))$$，其中Sublayer(x)是通过sub-layer自身实现的函数。为了促进这些residual connections，模型中的所有sub-layers以及embedding layers会生成维度 $$d_{model}=512$$的outputs。
 
-**Decoder**：该decoder也由一个N=6的相同层（identical layers）的stacks组成。除了在每个encoder layer中的两个sub-layers之外，docoder会插入第三个sub-layer，从而在encoder stack的output上执行multi-head attention。与encoder相似，我们在每个sub-layers周围采用residual connections，后跟layer normalization。我们也在docoder stack中修改了self-attention sub-layer，来阻止位置与后序位置有联系。这种masking机制，结合上output embeddings由一个位置偏移(offset by one position)的事实，可以确保对于位置i的预测只依赖于在位置小于i上的已知outputs。
+**Decoder**：该decoder也由一个N=6的相同层（identical layers）的stacks组成。除了包含在每个encoder layer中的两个sub-layers之外，decoder会插入第三个sub-layer，从而在encoder stack的output上执行multi-head attention。与encoder相似，我们在每个sub-layers周围采用residual connections，后跟layer normalization。我们也在decoder stack中修改了self-attention sub-layer，来阻止position与后序位置有联系。这种masking机制，结合上output embeddings由一个位置偏移(offset by one position)的事实，可以确保对于位置i的预测只依赖于在位置小于i上的已知outputs。
 
 ## 3.2 Attention
 
