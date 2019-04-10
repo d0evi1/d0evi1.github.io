@@ -80,15 +80,15 @@ Multi-head attention允许模型联合处理在不同位置处来自不同表示
 
 $$
 MultiHead(Q, K, V) = Concat(head_1, \cdots, head_h) W^O \\
-where head_i = Attention(Q W_i^Q, KW_i^K, V W_i^V)
+head_i = Attention(Q W_i^Q, KW_i^K, V W_i^V)
 $$
 
 其中，投影是参数矩阵：
 
 $$
-W_i^Q \in R^{d_{model} \ \times d_k}, \\
-W_i^K \in R^{d_{model} \ \times d_k}, \\
-W_i^V \in R^{d_{model} \ \times d_v}, \\
+W_i^Q \in R^{d_{model} \{  } \times d_k}, \\
+W_i^K \in R^{d_{model} \{  } \times d_k}, \\
+W_i^V \in R^{d_{model} \{  } \times d_v}, \\
 W^O \in R^{h d_v \ \times d_{model}}
 $$
 
