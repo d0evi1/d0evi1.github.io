@@ -54,9 +54,9 @@ attention函数可以被描述成，将一个query和一个key-value pairs集合
 
 图2 (左) Scaled Dot-Product Attention (右) Multi-Head Attention，包含了并行运行的多个attention layers
 
-### 3.2.1  Scaled Dot-Product Attention
+### 3.2.1  归一化点乘Attention（Scaled Dot-Product Attention）
 
-我们将这种特别的attention称为"Scaled Dot-Product Attention"（图2）。输入包含querys和维度为$$d_k$$的keys，以及维度为$$d_v$$的values。我们会计算query和所有keys的点乘（dot products），每个除以$$\sqrt{d_k}$$，并使用一个softmax函数来获取在values上的weights。
+我们将这种特别的attention称为"Scaled Dot-Product Attention"（图2）。输入包含：querys、维度为$$d_k$$的keys、以及维度为$$d_v$$的values。我们会计算query和所有keys的点乘（dot products），每个除以$$\sqrt{d_k}$$，并使用一个softmax函数来获取在values上的weights。
 
 实际上，我们会同时在一个queries集合上计算attention函数，并将它们打包成一个矩阵Q。keys和values也一起被加包成矩阵K和V。我们会计算矩阵的outputs：
 
@@ -83,7 +83,12 @@ MultiHead(Q, K, V) = Concat(head_1, \cdots, head_h) W^O \\
 where head_i = Attention(Q W_i^Q, KW_i^K, V W_i^V)
 $$
 
-其中，投影是参数矩阵$$W_i^Q \in R^{d_{model} \times d_k}, W_i^K \in R^{d_{model} \times d_k}, W_i^V \in R^{d_{model} \times d_v}, W^O \in R^{h d_v \times d_{model}}$$。
+其中，投影是参数矩阵：
+
+$$
+W_i^Q \in R^{d_{model} \times d_k}, W_i^K \in R^{d_{model} \times d_k}, W_i^V \in R^{d_{model} \times d_v}, W^O \in R^{h d_v \times d_{model}}
+$$
+
 
 在本工作中，我们使用h=8的并行attention layers或heads。对于每一者，我们会使用$$d_k = d_v = d_{model}/h = 64$$ 。由于每个head的维度缩减，总的计算开销与具有完整维度的single-head attention相似。
 
