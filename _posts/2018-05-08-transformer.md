@@ -86,10 +86,10 @@ $$
 其中，投影是参数矩阵：
 
 $$
-W_i^Q \in R^{d_{model} \times d_k}, \\
-W_i^K \in R^{d_{model} \times d_k}, \\
-W_i^V \in R^{d_{model} \times d_v}, \\
-W^O \in R^{h d_v \times d_{model}}
+W_i^Q \in R^{d_{model} \ \times d_k}, \\
+W_i^K \in R^{d_{model} \ \times d_k}, \\
+W_i^V \in R^{d_{model} \ \times d_v}, \\
+W^O \in R^{h d_v \ \times d_{model}}
 $$
 
 
