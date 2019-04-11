@@ -41,7 +41,7 @@ Transformer会遵循这样的总体架构：它使用stacked self-attention、po
 
 ## 3.1 Encoder Stacks和Decoder Stacks
 
-**Encoder**：encoder由一个N=6的相同层（identical layers）的stack组成。每一layer具有两个sub-layers。第1个是一个multi-head self-attention机制，第2个是一个简单的position-wise FC 前馈网络。我们在两个sub-layers的每一个上采用一个residual connection[10]，后跟着layer nomalization[1]。也就是说，每一sub-layer的output是 $$LayerNorm(x + Sublayer(x))$$，其中Sublayer(x)是通过sub-layer自身实现的函数。为了促进这些residual connections，模型中的所有sub-layers以及embedding layers会生成维度 $$d_{model}=512$$的outputs。
+**Encoder**：encoder由一个N=6的相同层（identical layers）的stack组成。**每一layer具有两个sub-layers。第1个是一个multi-head self-attention机制，第2个是一个简单的position-wise FC 前馈网络**。我们在两个sub-layers的每一个上采用一个residual connection[10]，后跟着layer nomalization[1]。也就是说：**每一sub-layer的output是 $$LayerNorm(x + Sublayer(x))$$**，其中Sublayer(x)是通过sub-layer自身实现的函数。为了促进这些residual connections，模型中的所有sub-layers以及embedding layers会生成维度 $$d_{model}=512$$的outputs。
 
 **Decoder**：该decoder也由一个N=6的相同层（identical layers）的stacks组成。除了包含在每个encoder layer中的两个sub-layers之外，decoder会插入第三个sub-layer，从而在encoder stack的output上执行multi-head attention。与encoder相似，我们在每个sub-layers周围采用residual connections，后跟layer normalization。我们也在decoder stack中修改了self-attention sub-layer，来阻止position与后序位置有联系。这种masking机制，结合上output embeddings由一个位置偏移(offset by one position)的事实，可以确保对于位置i的预测只依赖于在位置小于i上的已知outputs。
 
