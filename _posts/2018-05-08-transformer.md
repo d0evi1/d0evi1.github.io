@@ -142,6 +142,10 @@ $$
 - 2.**可以并行计算的计算量**，通过所需序列操作(ops)的最小数目进行衡量
 - 3.**在长范围依赖（long-range dependencies）间的路径长度**。学习长范围依赖在许多序列转换任务中是一个关键挑战。影响该能力（学习这样的依赖）一个的关键因素是，forward和backward信号的路径长度必须在网络中可穿越（traverse）。在input和output序列中任意位置组合间的路径越短，学习长范围依赖就越容易[11]。这里，我们也比较了由不同layer types构成的网络上，在任意两个input和output positions间最大路径长度。
 
+<img src="http://pic.yupoo.com/wangdren23_v/0ebdf80d/994ef067.png" alt="t1.png">
+
+表1
+
 如表1所示，**一个self-attention layer会使用常数数目的序列执行操作（sequentially executed operations）来连接所有positions**；而一个recurrent layer需要O(n)个序列操作（sequential operations）。**根据计算复杂度，当序列长度n比representation维度d要小时(通常大多数情况下，使用state-of-art模型的句子表示，比如：word-piece和byte-pair表示)，self-attention layers要比recurrent layers快**。为了提升非常长序列任务的计算性能，self-attention可以限制到只考虑在input序列中围绕各自output position为中心的一个size=r的邻居。这可以将最大路径长度增大到$$O(n/r)$$。我们在未来会计划研究该方法。
 
 kernel宽度$$k < n$$的单个convolutional layer，不会连接上input和output positions的所有pairs。在连续kernels的情况下，这样做需要一个$$O(n/k)个$$ convolutional layers的stack；在扩大卷积(dilated convoluitons)的情况下需要$$O(log_k(n))$$，这会增加在网络中任意两个positions间的最长路径的长度。卷积层(convolutional layers)通常要比recurrent layers开销更大，会乘以一个因子k。然而，可分离卷积(Separable convolutions)，将复杂度减小到$$O(k \cdot n \cdot d + n \cdot d^2)$$。有了$$k=n$$，然而，一个可分离卷积的复杂度等于一个self-attention layer和一个point-wise前馈layer，在我们的模型中采用该方法。
@@ -173,6 +177,42 @@ $$
 # 6.结果
 
 
+## 6.1 机器翻译
+
+在WMT 2014 English-to-German翻译任务上，big transformer model(见表2: Transformer(big))的效果要比之前最好的模型（包括ensembles）要好2.0 BLEU，达到一个新的state-of-art BLEU分:28.4. 该模型的配置列在了表3的底部。训练会在8张P100 GPUs上训练3.5天。我们的base model胜过之前发布的所有模型和ensembles，训练开销只是其他模型的一小部分。
+
+<img src="http://pic.yupoo.com/wangdren23_v/5a19edc7/ef7d969e.png" alt="t2.png">
+
+表2: 
+
+在WMT 2014 English-to-French翻译任务上，我们的big model的BLEU得分为41.0, 比之前发布的single models都要好，训练开销只有之前state-of-art model的1/4. 对于English-to-French所训练的Transformer(big)模型，使用dropout rate为：$$P_{drop}=0.1$$，而非0.3。
+
+对于base models，我们使用一个single model，它通过最后的5个checkpoint进行平均获得，每个checkpoint会有10分钟的时间间隔。对于big models，我们则对最后的20个checkpoints进行平均得到。我们使用的beam search的beam size为4, length penalty为 α = 0.6. 这些超参数会在实验之后选择。我们在推断(inference)期间设置最大的output length为: (input length+50)，当可能时会提前终止。
+
+表2归纳了我们的结果，并比较了与其它模型结构间的翻译质量和训练开销。我们估计了用于训练一个模型的浮点操作的数目，乘以训练时间，所使用的GPUs数目，以及每个GPU的持续的(sustained)单精度浮点能力(single-precision floating-point capacity)。
+
+
+## 6.2 模型变种
+
+为了评估Transformer中不同组件的重要性，我们以不同的方式区分我们的base model，并在数据集newstest2013上测量了在English-to-German翻译上的效果。我们使用前一节描述的beam serach，但没有进行checkpoint averaging。我们的结果在表3中。
+
+<img src="http://pic.yupoo.com/wangdren23_v/a2c0f8a3/617f5c68.png" alt="t3.png">
+
+表3
+
+在表3 rows(A)，我们会使用不同的attention heads数目、attention key和value维度，来保持常数级的计算量，如3.2.2节所描述的。而single-head attention是0.9 BLEU，它比最佳setting要差，如果有太多heads质量也会下降。
+
+在表3 rows(B)，我们观察到减小attention key size $$d_k$$会伤害模型质量。这建议我们，决定兼容并不容易，一个dot-product更复杂的兼容函数可能会更有意义。进一步观察（C）和（D），模型越大越好，dropout在避免over-fitting上更有用。在row(E)上，我们使用已经学到的positional embedding[8]来替换了我们的sinusoidal positional encoding，结果与base model几乎相同。
+
+# 7.结论
+
+Transformer是首个完全基于attention的序列转换模型（sequence transduction model），它使用multi-headed self-attention来替换在encoder-decoder架构中常用的recurrent layers。
+
+对于翻译任务，Transformer训练要比基于recurrent或convolutional layers的结构要快很多。在WMT 2014 English-to-German和WMT 2014 English-to-French翻译任务上，我们达到了一个新的state-of-the-art效果。
+
+我们对attention-based模型的将来很激动，计划应用到其它任务上。我们计划将Transformer扩展到涉及输入输出形态的非文本问题，研究local, restricted attention mechanisms以有效处理大的inputs和outputs（比如：图片、音频、视频）。生成更少序列是另一个研究目标。
+
+代码在：[https://github.com/tensorflow/tensor2tensor](https://github.com/tensorflow/tensor2tensor)
 
 
 
