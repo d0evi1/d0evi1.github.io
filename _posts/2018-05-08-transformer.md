@@ -138,15 +138,15 @@ $$
 
 在本节中，我们比较了self-attention layers与recurrent layers、convolutional layers的多个方面（它们常用于将一个变长序列的符号表示$$(x_1, \cdots, x_n)$$映射到另一个等长的序列$$(z_1, \cdots, z_n)$$上，其中：$$x_i, z_i \in R^d$$），比如：在一个常用的序列转换encoder或decoder中的一个hidden layer。**启发我们使用self-attention主要有三方面考虑**：
 
-- 1.每一layer的总体计算复杂度
-- 2.可以并行计算的计算量，通过所需序列操作(ops)的最小数目进行衡量
-- 3.在长范围依赖（long-range dependencies）间的路径长度。学习长范围依赖在许多序列转换任务中是一个关键挑战。影响该能力（学习这样的依赖）一个的关键因素是，forward和backward信号的路径长度必须在网络中可穿越（traverse）。在input和output序列中任意位置组合间的路径越短，学习长范围依赖就越容易[11]。这里，我们也比较了由不同layer types构成的网络上，在任意两个input和output positions间最大路径长度。
+- 1.**每一layer的总体计算复杂度**
+- 2.**可以并行计算的计算量**，通过所需序列操作(ops)的最小数目进行衡量
+- 3.**在长范围依赖（long-range dependencies）间的路径长度**。学习长范围依赖在许多序列转换任务中是一个关键挑战。影响该能力（学习这样的依赖）一个的关键因素是，forward和backward信号的路径长度必须在网络中可穿越（traverse）。在input和output序列中任意位置组合间的路径越短，学习长范围依赖就越容易[11]。这里，我们也比较了由不同layer types构成的网络上，在任意两个input和output positions间最大路径长度。
 
-如表1所示，一个self-attention layer会使用常数数目的序列执行操作（sequentially executed operations）来连接所有positions，其中一个recurrent layer需要O(n)个序列操作（sequential operations）。根据计算复杂度，当序列长度n比representation维度d要小时(通常大多数情况下，使用state-of-art模型的句子表示，比如：word-piece和byte-pair表示)，self-attention layers要比recurrent layers快。为了提升非常长序列任务的计算性能，self-attention可以限制到只考虑在input序列中围绕各自output position为中心的一个size=r的邻居。这可以将最大路径长度增大到$$O(n/r)$$。我们在未来会计划研究该方法。
+如表1所示，**一个self-attention layer会使用常数数目的序列执行操作（sequentially executed operations）来连接所有positions**；而一个recurrent layer需要O(n)个序列操作（sequential operations）。**根据计算复杂度，当序列长度n比representation维度d要小时(通常大多数情况下，使用state-of-art模型的句子表示，比如：word-piece和byte-pair表示)，self-attention layers要比recurrent layers快**。为了提升非常长序列任务的计算性能，self-attention可以限制到只考虑在input序列中围绕各自output position为中心的一个size=r的邻居。这可以将最大路径长度增大到$$O(n/r)$$。我们在未来会计划研究该方法。
 
 kernel宽度$$k < n$$的单个convolutional layer，不会连接上input和output positions的所有pairs。在连续kernels的情况下，这样做需要一个$$O(n/k)个$$ convolutional layers的stack；在扩大卷积(dilated convoluitons)的情况下需要$$O(log_k(n))$$，这会增加在网络中任意两个positions间的最长路径的长度。卷积层(convolutional layers)通常要比recurrent layers开销更大，会乘以一个因子k。然而，可分离卷积(Separable convolutions)，将复杂度减小到$$O(k \cdot n \cdot d + n \cdot d^2)$$。有了$$k=n$$，然而，一个可分离卷积的复杂度等于一个self-attention layer和一个point-wise前馈layer，在我们的模型中采用该方法。
 
-另一个好处是，self-attention可以生成更多可解释模型。我们从我们的模型中内省(inspect)出attention分布，并在附录部分讨论示例。单独的attention heads不仅可以很明确地学习执行不同的任务，出现在展示行为中的多个（）还可以与句子的形态结构和语义结构相关。
+另一个好处是，**self-attention可以生成更多可解释模型**。我们从我们的模型中内省(inspect)出attention分布，并在附录部分讨论示例。单独的attention heads不仅可以很明确地学习执行不同的任务，出现在展示行为中的多个（）还可以与句子的形态结构和语义结构相关。
 
 # 5.训练
 
