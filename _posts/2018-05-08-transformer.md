@@ -43,11 +43,11 @@ Transformer会遵循这样的总体架构：它使用stacked self-attention、po
 
 **Encoder**：encoder由一个N=6的相同层（identical layers）的stack组成。**每一layer具有两个sub-layers。第1个是一个multi-head self-attention机制，第2个是一个简单的position-wise FC 前馈网络**。我们在两个sub-layers的每一个上采用一个residual connection[10]，后跟着layer nomalization[1]。也就是说：**每一sub-layer的output是 $$LayerNorm(x + Sublayer(x))$$**，其中Sublayer(x)是通过sub-layer自身实现的函数。为了促进这些residual connections，模型中的所有sub-layers以及embedding layers会生成维度 $$d_{model}=512$$的outputs。
 
-**Decoder**：该decoder也由一个N=6的相同层（identical layers）的stacks组成。除了包含在每个encoder layer中的两个sub-layers之外，decoder会插入第三个sub-layer，从而在encoder stack的output上执行multi-head attention。与encoder相似，我们在每个sub-layers周围采用residual connections，后跟layer normalization。我们也在decoder stack中修改了self-attention sub-layer，来阻止position与后序位置有联系。这种masking机制，结合上output embeddings由一个位置偏移(offset by one position)的事实，可以确保对于位置i的预测只依赖于在位置小于i上的已知outputs。
+**Decoder**：该decoder也由一个N=6的相同层（identical layers）的stacks组成。除了包含在每个encoder layer中的两个sub-layers之外，**decoder会插入第三个sub-layer，从而在encoder stack的output上执行multi-head attention**。与encoder相似，我们在每个sub-layers周围采用residual connections，后跟layer normalization。**同时我们在decoder stack中修改了self-attention sub-layer，来阻止position与后序位置有联系**。这种masking机制，结合上output embeddings由一个位置偏移(offset by one position)的事实，可以确保对于位置i的预测只依赖于在位置小于i上的已知outputs。
 
 ## 3.2 Attention
 
-attention函数可以被描述成，将一个query和一个key-value pairs集合映射到一个output上，其中：query, keys, values和output都是向量(vectors)。output由对values进行加权计算得到，其中为每个value分配的weight通过query和对应的key的一个兼容函数计算得到。
+attention函数可以被描述成：将一个query和一个key-value pairs集合映射到一个output上，其中：query, keys, values和output都是向量(vectors)。output由对values进行加权计算得到，其中为每个value分配的weight通过query和对应的key的一个兼容函数计算得到。
 
 
 <img src="http://pic.yupoo.com/wangdren23_v/ba75c826/4d85c908.png" alt="2.png">
@@ -66,14 +66,14 @@ $$
 
 ...(1)
 
-两种最常用的attention函数是：additive attention[2]，dot-product（multiplicative） attention。dot-product attention等同于我们的算法，除了缩放因子$$\frac{1}{\sqrt{d_k}}$$。additive attention会使用一个单个hidden layer的前馈网络来计算兼容函数。两者在理论经复杂度上很相似，dot-product attention更快，空间效率更高，因为它使用高度优化的矩阵乘法代码来实现。
+两种最常用的attention函数是：additive attention[2]，dot-product（multiplicative） attention。**dot-product attention等同于我们的算法，除了缩放因子$$\frac{1}{\sqrt{d_k}}$$**。additive attention会使用一个单hidden layer的前馈网络来计算兼容函数。两者在理论复杂度上很相似，**dot-product attention更快，空间效率更高，因为它使用高度优化的矩阵乘法代码来实现**。
 
-对于$$d_k$$的小值，两种机制效果相似; 对于$$d_k$$放大到更大值，additive attention效果要好于dot-product attention。对于$$d_k$$的大值我们表示怀疑，dot-product在幅度上增长更大，在具有极小梯度值的区域上使用softmax函数。为了消除该影响，我们将dot-product缩放至$$\frac{1}{\sqrt{d_k}}$$。
+**如果$$d_k$$值比较小，两种机制效果相似; 如果$$d_k$$值很大，additive attention效果要好于dot-product attention**。对于$$d_k$$的大值我们表示怀疑，dot-product在幅度上增长更大，在具有极小梯度值的区域上使用softmax函数。为了消除该影响，我们将dot-product缩放至$$\frac{1}{\sqrt{d_k}}$$。
 
 
 ### 3.2.2 Multi-Head Attention
 
-我们不会使用$$d_{model}$$维的keys、values和queries来执行单个attention函数，我们发现：使用学到的不同线性投影将queries、keys和values各自投影到$$d_k$$、$$d_k$$、$$d_v$$维上是有好处的。在关于queries、keys和values的每一个这些投影版本上，我们会并行执行attention函数，生成$$d_v$$维的output values。这些值被拼接在一起(concatenated)，一旦再投影，会产生最后值，如图2所示。
+我们不会使用$$d_{model}$$维的keys、values和queries来执行单个attention函数，**我们发现：使用学到的不同线性投影将queries、keys和values各自投影到$$d_k$$、$$d_k$$、$$d_v$$维上是有好处的**。在关于queries、keys和values的每一个投影版本上，我们会并行执行attention函数，生成$$d_v$$维的output values。这些值被拼接在一起(concatenated)，再进行投影，产生最后值，如图2所示。
 
 Multi-head attention允许模型联合处理在不同位置处来自不同表示子空间的信息。使用单个attention head，求平均会禁止这样做。
 
@@ -99,13 +99,13 @@ $$
 
 Transformer以三种不同的方式使用multi-head attention：
 
-- 在"encoder-decoder attention" layers中，queries来自前一decoder layer，memory keys和values来自encoder的output。这允许在decoder中的每个position会注意(attend)在输入序列中的所有位置。这种方式模仿了在seq2seq模型中典型的encoder-decoder attention机制[31,2,8]。
-- encoder包含了self-attention layers。在一个self-attention layer中，所有的keys, values和queries来自相同的地方：在encoder中的前一layer的output。在encoder中每个position可以注意（attend）在encoder的前一layer中的所有位置。
-- 相似的，在decoder中self-attention layers允许在decoder中的每一position注意到在decoder中的所有positions，直到包含该position。我们需要阻止在decoder中的左侧信息流，来保留自回归(auto-regressive)属性。我们通过对softmax（它对应到无效连接）的输入的所有值进行掩码（masking out，设置为$$-\infinity$$）来实现该scaled dot-product attention内部。见图2.
+- **"encoder-decoder attention" layers中**：queries来自前一decoder layer，memory keys和values来自encoder的output。这允许在decoder中的每个position会注意(attend)在输入序列中的所有位置。这种方式模仿了在seq2seq模型中典型的encoder-decoder attention机制[31,2,8]。
+- **encoder中**：encoder包含了self-attention layers。在一个self-attention layer中，所有的keys, values和queries来自相同的地方：在encoder中的前一layer的output。在encoder中每个position可以注意（attend）在encoder的前一layer中的所有位置。
+- **decoder中**：相似的，在decoder中self-attention layers允许在decoder中的每一position注意到在decoder中的所有positions，直到包含该position。我们需要阻止在decoder中的左侧信息流，来保留自回归(auto-regressive)属性。我们通过对softmax（它对应到无效连接）的输入的所有值进行掩码（masking out，设置为$$-\infty$$）来实现该scaled dot-product attention内部。见图2.
 
 ## 3.3 Position-wise前馈网络
 
-除了attention sub-layers之外，在我们的encoder和decoder中的每一层，包含了一个FC前馈网络，它可以独自和等同地应用到每个position上。在两者间使用一个ReLU来包含两个线性转换。
+除了attention sub-layers之外，**在我们的encoder和decoder中的每一层，包含了一个FC前馈网络，它可以独自和等同地应用到每个position上**。在两者间使用一个ReLU来包含两个线性转换。
 
 $$
 FFN(x) = max(0, x W_1 + b_1) W_2 + b_2 
@@ -127,16 +127,16 @@ $$
 
 $$
 PE_{(pos, 2i)} = sin(pos / 10000 ^{2i/d_{model}}) \\
-PE_{(pos, 2i+1)} = cos(pos / 10000 ^{2i/d_{model}}
+PE_{(pos, 2i+1)} = cos(pos / 10000 ^{2i/d_{model}})
 $$
 
-其中，pos是position，i是维度。也就是说，positional encoding的每个维度对应于一个正弦曲线（sinusoid）。波长(wavelengths)形成了一个从$$2 \pi$$到$$10000 \cdot 2\pi$$的几何过程。我们选择该函数是因为，我们假设它允许该模型可以很容易学到通过相对位置来进行关注（attend），因为对于任意固定offset k，$$PE_{pos+k}$$可以被表示成一个关于$$PE_{pos}$$的线性函数。
+其中，**pos是position，i是维度**。也就是说：**positional encoding的每个维度对应于一个正弦曲线（sinusoid）**。波长(wavelengths)形成了一个从$$2 \pi$$到$$10000 \cdot 2\pi$$的几何过程。我们选择该函数是因为：我们假设它允许该模型可以很容易学到通过相对位置来进行关注（attend），因为对于任意固定offset k，$$PE_{pos+k}$$可以被表示成一个关于$$PE_{pos}$$的线性函数。
 
 我们也使用学到的positional embeddings进行实验，发现两者版本几乎生成相同的结果（见表3 第E行）。我们选择正弦曲线版本，是因为它可以允许模型对序列长度长于训练期遇到的长度进行推导。
 
 # 4.为什么用self-attention
 
-在本节中，我们比较了self-attention layers与recurrent layers、convolutional layers的多个方面（常用于将一个变长序列的符号表示$$(x_1, \cdots, x_n)$$映射到另一个等长的序列$$(z_1, \cdots, z_n)$$上），其中：$$x_i, z_i \in R^d$$，比如：在一个常用的序列转换encoder或decoder中的一个hidden layer。启发我们使用self-attention主要有三方面考虑：
+在本节中，我们比较了self-attention layers与recurrent layers、convolutional layers的多个方面（它们常用于将一个变长序列的符号表示$$(x_1, \cdots, x_n)$$映射到另一个等长的序列$$(z_1, \cdots, z_n)$$上，其中：$$x_i, z_i \in R^d$$），比如：在一个常用的序列转换encoder或decoder中的一个hidden layer。**启发我们使用self-attention主要有三方面考虑**：
 
 - 1.每一layer的总体计算复杂度
 - 2.可以并行计算的计算量，通过所需序列操作(ops)的最小数目进行衡量
