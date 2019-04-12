@@ -52,9 +52,9 @@ if (sample > 0) {
 
 为此，我简单地写了一个python程序，做了个测试。程序托管在github上，[点击下载](https://github.com/d0evi1/word2vec_insight/blob/master/subsampling.py)
 
-下面提供了三种方法，最终生成的图可以看下。对于前两种方法，基本能做到与原先词频正相关，最后使用时，需要设置一个阀值，砍掉高频词。而最后一种方法，效果也不错（虽然偶有会存留高频词，或者低频词也同样被砍掉）。而word2vec采用的正是第3种方法(大于0的采样点会被抛弃掉)。
+词频越大，ran值就越小。subsampling进行抽样时被抽到的概率就越低。
 
-<img src="http://pic.yupoo.com/wangdren23/G7O9UJ6m/medish.jpg">
+<img src="http://pic.yupoo.com/wangdren23_v/6f5882c5/3b9eb005.png" alt="1.png">
 
 参考：
 
