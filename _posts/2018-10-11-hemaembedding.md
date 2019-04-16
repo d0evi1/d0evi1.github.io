@@ -8,7 +8,7 @@ tags:
 
 阿里盒马团队在KDD 2018上开放了它们的方法:《Learning and Transferring IDs Representation in E-commerce》, 我们来看下paper的主要内容部分：
 
-# 3.4 
+# 3.4 联合嵌入Attribute IDs
 
 通过探索在item ID和它的attribute IDs间的结构连接，我们提出了一个hirerarchical embedding模型来联合学习item ID和attribute IDs的低维表示。模型结构如图4所示，其中item ID是核心的交互单元，它与attibute IDs间通过虚线连接。
 
