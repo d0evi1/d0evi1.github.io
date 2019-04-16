@@ -1,12 +1,12 @@
 ---
 layout: post
-title: attention介绍
+title: transformer介绍
 description: 
 modified: 2018-05-08
 tags: 
 ---
 
-google在2017年提出了《Attention Is All You Need》，我们可以看下：
+google在2017年paper《Attention Is All You Need》提出了transformer，我们可以看下：
 
 # 1.介绍
 
