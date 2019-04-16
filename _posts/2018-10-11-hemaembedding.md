@@ -6,7 +6,7 @@ modified: 2018-10-11
 tags: 
 ---
 
-阿里盒马团队在KDD 2018上开放了它们的方法:《Learning and Transferring IDs Representation in E-commerce》, 我们来看下paper的主要内容部分：
+阿里盒马团队在KDD 2018上开放了它们的方法:《Learning and Transferring IDs Representation in E-commerce》, 这个方法也很简单，我们来看下paper的主要内容部分：
 
 # 3.4 联合嵌入Attribute IDs
 
@@ -16,7 +16,7 @@ tags:
 
 图4 
 
-首先，item IDs的共现也隐含了对应attribute IDs间的共现，它通图4的实心键头表示。假设存在K个类型的IDs，并使 $$IDs(item_i) = [id_1(item_i), \cdots, id_k(item_i), \cdots, id_K(item_i)]$$，其中$$id_1(item_i)$$等于$$item_i$$，$$id_2(item_i)$$是product ID，$$id_3(item_i)$$是store ID等。我们学习目标替换成：
+首先，**item IDs的共现也隐含了对应attribute IDs间的共现**，它通过图4的实心键头表示。假设存在K个类型的IDs，并使 $$ID_s(item_i) = [id_1(item_i), \cdots, id_k(item_i), \cdots, id_K(item_i)]$$，其中$$id_1(item_i)$$等于$$item_i$$的item ID，$$id_2(item_i)$$是product ID，$$id_3(item_i)$$是store ID等。我们学习目标替换成：
 
 $$
 P(ID_s(item_j) | ID_s(item_i)) \\
@@ -27,7 +27,7 @@ $$
 
 ...(7)
 
-其中，$$e_{\cdot k}' \in E_k'(\subset R^{m_k \times D_k})$$以及$$e_{\cdot k} \in E_k(\subset R^{m_k \times D_k})$$。$$E_k'$$和$$E_k$$是分别对应于类型(type)为k的context和target representations。对于类型k，$$m_k$$是它的embedding vectors的维度，$$D_k$$是它的字典size。注意，不同类型的IDs可以被嵌入到不同的维度上。标量$$w_{ik}$$是$$id_k(item_i)$$的权重。假设每个item的贡献与$$id_k(item_i)$$相等，$$id_k(item_i)$$包含了$$V_{ik}$$个不同的items，$$w_{ik}$$与$$V_{ik}$$成反比是合理的。更正式的，我们有:
+其中，$$e_{\cdot k}' \in E_k'(\subset R^{m_k \times D_k})$$以及$$e_{\cdot k} \in E_k(\subset R^{m_k \times D_k})$$。$$E_k'$$和$$E_k$$是分别对应于类型(type)为k的context和target representations。对于类型k，$$m_k$$是它的embedding vectors的维度，$$D_k$$是它的字典size。**注意，不同类型的IDs可以被嵌入到不同的维度上**。标量$$w_{ik}$$是$$id_k(item_i)$$的权重。**假设每个item的贡献与$$id_k(item_i)$$相等，$$id_k(item_i)$$包含了$$V_{ik}$$个不同的items，$$w_{ik}$$与$$V_{ik}$$成反比是合理的**。更正式的，我们有:
 
 $$
 I(x)= 
