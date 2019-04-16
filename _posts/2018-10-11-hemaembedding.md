@@ -12,14 +12,16 @@ tags:
 
 通过探索在item ID和它的attribute IDs间的结构连接，我们提出了一个hirerarchical embedding模型来联合学习item ID和attribute IDs的低维表示。模型结构如图4所示，其中item ID是核心的交互单元，它与attibute IDs间通过虚线连接。
 
-图4
+<img src="http://pic.yupoo.com/wangdren23_v/9efa003b/a2d65368.png" alt="1.png">
+
+图4 
 
 首先，item IDs的共现也隐含了对应attribute IDs间的共现，它通图4的实心键头表示。假设存在K个类型的IDs，并使 $$IDs(item_i) = [id_1(item_i), \cdots, id_k(item_i), \cdots, id_K(item_i)]$$，其中$$id_1(item_i)$$等于$$item_i$$，$$id_2(item_i)$$是product ID，$$id_3(item_i)$$是store ID等。我们学习目标替换成：
 
 $$
 P(ID_s(item_j) | ID_s(item_i)) \\
 = \sigma(\sum\limits_{k=1}^K (w_{jk} e_{jk}')^T (w_{ik} e_{ik})) \\
-= \prod\limits_{s=1}^S \sigma(-\sum_{k=1}^K (w_{sk} e_{sk}^')^T (w_{ik} e_{ik}))
+= \prod\limits_{s=1}^S \sigma(-\sum_{k=1}^K (w_{sk} e_{sk}')^T (w_{ik} e_{ik}))
 
 $$
 
