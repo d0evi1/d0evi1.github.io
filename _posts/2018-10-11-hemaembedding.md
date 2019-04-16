@@ -12,7 +12,7 @@ tags:
 
 通过探索在item ID和它的attribute IDs间的结构连接，我们提出了一个hirerarchical embedding模型来联合学习item ID和attribute IDs的低维表示。模型结构如图4所示，其中item ID是核心的交互单元，它与attibute IDs间通过虚线连接。
 
-<img src="http://pic.yupoo.com/wangdren23_v/9efa003b/a2d65368.png" alt="1.png">
+<img src="http://pic.yupoo.com/wangdren23_v/9efa003b/a2d65368.png" alt="1.png" width="256">
 
 图4 
 
