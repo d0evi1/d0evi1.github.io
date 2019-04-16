@@ -12,7 +12,7 @@ tags:
 
 通过探索在item ID和它的attribute IDs间的结构连接，我们提出了一个hirerarchical embedding模型来联合学习item ID和attribute IDs的低维表示。模型结构如图4所示，其中item ID是核心的交互单元，它与attibute IDs间通过虚线连接。
 
-<img src="http://pic.yupoo.com/wangdren23_v/9efa003b/a2d65368.png" alt="1.png" width="256">
+<img src="http://pic.yupoo.com/wangdren23_v/9efa003b/a2d65368.png" alt="1.png" width="480">
 
 图4 
 
@@ -51,7 +51,7 @@ $$
 
 ...(10)
 
-例如，$$w_{i1}=1$$表示每个$$id_1(item_i)$$刚好包含了一个item，$$w_{i2} = \frac{1}{10}$$表示：product ID($$item_i$$)包含了10个不同的items。
+例如，**$$w_{i1}=1$$表示每个$$id_1(item_i)$$刚好包含了一个item；而$$w_{i2} = \frac{1}{10}$$表示：product ID$$(item_i)$$包含了10个不同的items**。
 
 第二，item ID和attribute IDs间的结构连接意味着限制(constraints)，例如：两个item IDs的向量应更接近，不仅是对于它们的共现，而且对于它们共享相同的product ID, store ID, brand ID或cate-level1 ID等。相反的，attribute IDs等价于包含在对应item IDs内的信息。以store ID为例，对于一个指定store ID的embedding vector，它可以看成是应该商店所售卖的所有item IDs的合适的总结(summary)。 相应的，我们定义了：
 
