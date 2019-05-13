@@ -1,6 +1,6 @@
 ---
 layout: post
-title: DIN介绍
+title: fast-map-dpp介绍
 description: 
 modified: 2018-12-01
 tags: 
@@ -23,9 +23,9 @@ DPP的基本特性是，它会为那些相互比较分散（diverse）的times�
 概念。
 
 - 集合使用大写字母表示，比如：Z。
-- $$#Z$$表示Z中的元素数。
+- $$\#Z$$表示Z中的元素数。
 - 向量和矩阵分别通过粗体小写字母和粗体大写字母表示。
-- $$(\cdot)^T$$表示向量或矩阵的转置。
+- $$(\cdot)^{\top}$$表示向量或矩阵的转置。
 - $$\langle x,y \rangle $$是向量x和y的内积。
 - 给定子集X和Y，$$L_{X,Y}$$是L的子矩阵，通过行中的X和列中的Y索引。
 
