@@ -46,7 +46,7 @@ $$
 其中L是一个实数型(real)、半正定(positive semidefinite (PSD）)的kernel matrix，它通过Z的元素进行索引。在该分布下，许多类型的inference任务（比如：marginalization, conditioning，sampling）可以在多项式时间内执行，除了MAP inference外：
 
 $$
-Y_{map} = argmax_{y \subseteq Z} det(L_Y)
+Y_{map} = \argmax\limits_{y \subseteq Z} det(L_Y)
 $$
 
 在一些应用中，我们需要引入一个在Y上的基数约束，让它返回具有最大概率的固定size的一个集合，这会为k-DPP产生MAP inference。
@@ -66,7 +66,7 @@ $$
 次模函数最大化通常是NP-hard的。一个流行的近似方法是基于贪婪算法[37]。初始化为$$\emptyset$$，在每次迭代中，一个item会最大化边际增益(marginal gain):
 
 $$
-j = argmax_{i \in Z \ Y_g} f(Y_g \cup \lbrace i \rbrace) - f(Y_g)
+j = \argmax\limits_{i \in Z \ Y_g} f(Y_g \cup \lbrace i \rbrace) - f(Y_g)
 $$
 
 它会被添加到$$Y_g$$中，直到最大边际增益(maximal marginal gain)成为负 或者 违反了基数约束。当f是单调的（monotone），例如：$$f(X) \leq f(Y)$$对于任意的$$X \subseteq Y$$，贪婪算法会遵循一个$$(1-1/e)$$的近似保证，它服从一个基数约束[37]。对于通用的无约束的次模最大化(no constraints)，一个修改版的贪婪算法会保证(1/2)近似。尽管这些理论保证，在DPP中广泛使用的贪婪算法是因为它的经验上的性能保障(promising empirical performance)。
@@ -86,7 +86,7 @@ $$
 在本节中，我们提出了一种对于DPP的greedy Map inference算法的快速实现。在每轮迭代中，item j：
 
 $$
-j = argmax_{i \in Z \backslash Y_g} log det(L_{Y_g \cup \lbrace i \rbrace}) - log det(L_{Y_g})
+j = \argmax\limits_{i \in Z \backslash Y_g} log det(L_{Y_g \cup \lbrace i \rbrace}) - log det(L_{Y_g})
 $$
 
 ...(1)
