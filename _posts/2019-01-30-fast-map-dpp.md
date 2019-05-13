@@ -20,7 +20,7 @@ DPP的基本特性是，它会为那些相互比较分散（diverse）的times�
 
 # 2.背景
 
-概念。集合使用大写字母表示，比如：Z，#Z表示Z中的元素数。向量和矩阵分别通过粗体小写字母和粗体大写字母表示。$$(\cdot)^T$$表示向量或矩阵的转置。$$<x,y>$$是向量x和y的内积。给定子集X和Y，$$L_{X,Y}$$是L的子矩阵，通过行中的X和列中的Y索引。出于简洁，我们假设$$L_{X,X} = L_X, L_{X,\lbrace i \rbrace}=L_{X,i}$$，以及$$L_{\lbrace i \rbrace, X} = L_{i,X}$$。 $$det(L)$$是L的行列式，惯例上$$det(L_\clock)=1$$。
+概念。集合使用大写字母表示，比如：Z，#Z表示Z中的元素数。向量和矩阵分别通过粗体小写字母和粗体大写字母表示。$$(\cdot)^T$$表示向量或矩阵的转置。$$<x,y>$$是向量x和y的内积。给定子集X和Y，$$L_{X,Y}$$是L的子矩阵，通过行中的X和列中的Y索引。出于简洁，我们假设$$L_{X,X} = L_X, L_{X,\lbrace i \rbrace}=L_{X,i}$$，以及$$L_{\lbrace i \rbrace, X} = L_{i,X}$$。 $$det(L)$$是L的行列式，惯例上$$det(L_\emptyset)=1$$。
 
 ## 2.1 DPP
 
@@ -50,7 +50,7 @@ $$
 
 其中，f是次模函数(submodular)。在DPP中的log概率函数$$f(Y)=log det(L_Y)$$是次模函数(submodular)，在[17]中有介绍。次模最大化（submodular maximization）对应是：寻找能让一个次模函数最大化的一个集合。DPP的MAP inference是一个次模最大化过程。
 
-次模函数最大化通常是NP-hard的。一个流行的近似方法是基于贪婪算法[37]。初始化为$$\clock$$，在每次迭代中，一个item会最大化边际增益(marginal gain):
+次模函数最大化通常是NP-hard的。一个流行的近似方法是基于贪婪算法[37]。初始化为$$\emptyset$$，在每次迭代中，一个item会最大化边际增益(marginal gain):
 
 $$
 j = argmax_{i \in Z \ Y_g} f(Y_g \cup \lbrace i \rbrace) - f(Y_g)
@@ -166,7 +166,7 @@ $$
 
 ...(9)
 
-最初，$$Y_g = \clock$$, 等式(5)意味着: $$d_i^2 = det(L_{ii}) = L_{ii}$$。完整算法会在Algorithm 1中总结。对于无约束的MAP inference来说停止条件（stopping criteria）是$$e_j^2 < 1$$，或者#Y_g > N （当使用基数约束时）。对于后者，我们引入了一个小数目$$ \epsilon > 0$$，并为$$1/d_j$$的数值稳定值将$$d_j^2 < \epsilon $$添加到停止条件（stopping criteria）上。
+最初，$$Y_g = \emptyset$$, 等式(5)意味着: $$d_i^2 = det(L_{ii}) = L_{ii}$$。完整算法会在Algorithm 1中总结。对于无约束的MAP inference来说停止条件（stopping criteria）是$$e_j^2 < 1$$，或者#Y_g > N （当使用基数约束时）。对于后者，我们引入了一个小数目$$ \epsilon > 0$$，并为$$1/d_j$$的数值稳定值将$$d_j^2 < \epsilon $$添加到停止条件（stopping criteria）上。
 
 在k次迭代中，对于每个item $$i \in Z \backslash Y_g$$，更新$$c_i$$和$$d_i$$涉及到两个长度为k的向量内积，总复杂度为$$O(kM)$$。因此，算法1对于无约束MAP inference会在$$O(M^3)$$运行，并返回N个items。注意，对于$$c_i$$和$$d_i$$通过额外的$$O(NM)$$（或者对于无约束情况下的$$O(M^2)$$）空间来达成。
 
