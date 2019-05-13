@@ -10,21 +10,21 @@ hulu在NIPS 2018上开放了它们的方法:《Fast Greedy MAP Inference for Det
 
 # 1.介绍
 
-行列式点过程（DPP： determinantal point process）首先在[33]中介绍用来给出在热平衡(thermal equilibrium)中的费米子系统的分布。除了在量子物理学和随机矩阵上的早期应用，它也可以被应用到多种机器学习任务上，比如：多人姿态估计（multiple person pose estimation），图片搜索，文档归纳，视频归纳，产品推荐，tweet timeline生成。对比其它概率模型（比如：图形模型），DPP的一个主要优点是，对于不同类型的推断（包含：conditioning和sampling），它遵循多项式时间算法（polynomial-time algorithms）。
+行列式点过程（DPP： determinantal point process）首先在[33]中介绍用来给出在热平衡(thermal equilibrium)中的费米子系统的分布。除了在量子物理学和随机矩阵上的早期应用，它也可以被应用到多种机器学习任务上，比如：多人姿态估计（multiple person pose estimation）、图片搜索、文档归纳、视频归纳、产品推荐、tweet timeline生成。对比其它概率模型（比如：图形模型），**DPP的一个主要优点是，对于不同类型的推断（包含：conditioning和sampling），它遵循多项式时间算法（polynomial-time algorithms）**。
 
-一个例外是，最大化一个后验MAP推断，例如：寻找具有最高概率的items集合，它是一个NP-hard问题。因此，具有较低计算复杂度的近似推断方法（approximate inference）更受欢迎。paper[17]提出了针对DPP的一种近似最优的MAP推断（inference）。然而，该算法是一个基于梯度的方法，它在每次迭代上评估梯度时具有较高的计算复杂度，使得它对于大规模实时应用来说不实际。另一个方法是广泛使用的贪婪算法（greedy algorithm），事实证明：DPP中的log概率是次模的（submodular）。尽管它具有相对较弱的理论保证，但它仍被广泛使用，因为它在经验上对效果有前景。贪婪算法（reedy algorithm）[17,32]的己知实现具有$$O(M^4)$$的复杂度，其中M是items的总数目。Han et al.的最近工作[20]通过引入一些近似可以将复杂度降到$$O(M^3)$$，但会牺牲accuracy。在本paper中，我们提出了关于该贪婪算法的一种准确（exact）实现，它具有$$O(M^3)$$的复杂度，它经验上比近似算法[20]要更快。
+**一个例外是，最大化一个后验MAP推断，例如：寻找具有最高概率的items集合，它是一个NP-hard问题**。因此，具有较低计算复杂度的近似推断方法（approximate inference）更受欢迎。paper[17]提出了针对DPP的一种近似最优的MAP推断（inference）。然而，该算法是一个基于梯度的方法，它在每次迭代上评估梯度时具有较高的计算复杂度，使得它对于大规模实时应用来说不实际。**另一个方法是广泛使用的贪婪算法（greedy algorithm），事实证明：DPP中的log概率是次模的（submodular）**。尽管它具有相对较弱的理论保证，但它仍被广泛使用，因为它在经验上对效果有前景。贪婪算法（reedy algorithm）[17,32]的己知实现具有$$O(M^4)$$的复杂度，其中M是items的总数目。Han et al.的最近工作[20]通过引入一些近似可以将复杂度降到$$O(M^3)$$，但会牺牲accuracy。**在本paper中，我们提出了关于该贪婪算法的一种准确（exact）实现，它具有$$O(M^3)$$的复杂度，它经验上比近似算法[20]要更快**。
 
-DPP的基本特性是，它会为那些相互比较分散（diverse）的times集合分配更高的概率。在一些应用中，选择的items是以序列方式展示的，在少量相邻items间会有负作用（negative interactions）。例如，当推荐一个关于items的长序列给用户时，每个时候只有少量序列会捕获用户的注意力。在这种场景下，要求离得较远的items相互间多性化些是没必要的。为这种情况开发快速算法。
+DPP的基本特性是，它会为那些相互比较分散（diverse）的times集合分配更高的概率。**在一些应用中，选择的items是以序列方式展示的，在少量相邻items间会有负作用（negative interactions）。例如，当推荐一个关于items的长序列给用户时，每个时候只有少量序列会捕获用户的注意力**。在这种场景下，要求离得较远的items相互间更多性些是没必要的。为这种情况开发快速算法。
 
-本文贡献。在本paper中，我们提出了一种新算法，它能极大加速DPP的greedy MAP inference。通过增量更新Cholesky因子，
+本文贡献。在本paper中，我们提出了一种新算法，它能极大加速DPP的greedy MAP inference。通过增量更新Cholesky因子，...。
 
 # 2.背景
 
-概念。集合使用大写字母表示，比如：Z，#Z表示Z中的元素数。向量和矩阵分别通过粗体小写字母和粗体大写字母表示。$$(\cdot)^T$$表示向量或矩阵的转置。$$<x,y>$$是向量x和y的内积。给定子集X和Y，$$L_{X,Y}$$是L的子矩阵，通过行中的X和列中的Y索引。出于简洁，我们假设$$L_{X,X} = L_X, L_{X,\lbrace i \rbrace}=L_{X,i}$$，以及$$L_{\lbrace i \rbrace, X} = L_{i,X}$$。 $$det(L)$$是L的行列式，惯例上$$det(L_\o)=1$$。
+概念。集合使用大写字母表示，比如：Z，#Z表示Z中的元素数。向量和矩阵分别通过粗体小写字母和粗体大写字母表示。$$(\cdot)^T$$表示向量或矩阵的转置。$$<x,y>$$是向量x和y的内积。给定子集X和Y，$$L_{X,Y}$$是L的子矩阵，通过行中的X和列中的Y索引。出于简洁，我们假设$$L_{X,X} = L_X, L_{X,\lbrace i \rbrace}=L_{X,i}$$，以及$$L_{\lbrace i \rbrace, X} = L_{i,X}$$。 $$det(L)$$是L的行列式，惯例上$$det(L_\clock)=1$$。
 
 ## 2.1 DPP
 
-DPP是一个优雅的概率模型，它可以表示负交互（negative interactions）[30]。正式的，在一个离散集合$$Z=\lbrace 1,2,...,M \rbrace$$上的一个DPP $$P$$是在$$2^Z$$（Z的所有子集集合）上的一个概率度量(probability measure)。当P会给出对于空集的非零概率，存在一个矩阵$$L \in R^{M \times M}$$，对于所有子集$$Y \subseteq Z$$，Y的概率为：
+DPP是一个优雅的概率模型，它可以表示负作用（negative interactions）[30]。正式的，在一个离散集合$$Z=\lbrace 1,2,...,M \rbrace$$上的一个DPP $$P$$是在$$2^Z$$（Z的所有子集集合）上的一个概率度量(probability measure)。当P会为空集给出非零概率时，存在一个矩阵$$L \in R^{M \times M}$$，对于所有子集$$Y \subseteq Z$$，Y的概率为：
 
 $$
 P(Y) \propto det(L_Y)
@@ -50,7 +50,7 @@ $$
 
 其中，f是次模函数(submodular)。在DPP中的log概率函数$$f(Y)=log det(L_Y)$$是次模函数(submodular)，在[17]中有介绍。次模最大化（submodular maximization）对应是：寻找能让一个次模函数最大化的一个集合。DPP的MAP inference是一个次模最大化过程。
 
-次模函数最大化通常是NP-hard的。一个流行的近似方法是基于贪婪算法[37]。初始化为$$\o$$，在每次迭代中，一个item会最大化边际增益(marginal gain):
+次模函数最大化通常是NP-hard的。一个流行的近似方法是基于贪婪算法[37]。初始化为$$\clock$$，在每次迭代中，一个item会最大化边际增益(marginal gain):
 
 $$
 j = argmax_{i \in Z \ Y_g} f(Y_g \cup \lbrace i \rbrace) - f(Y_g)
@@ -166,12 +166,15 @@ $$
 
 ...(9)
 
-最初，$$Y_g = \o$$, 等式(5)意味着: $$d_i^2 = det(L_{ii}) = L_{ii}$$。完整算法会在Algorithm 1中总结。对于无约束的MAP inference来说停止条件（stopping criteria）是$$e_j^2 < 1$$，或者#Y_g > N （当使用基数约束时）。对于后者，我们引入了一个小数目$$ \epsilon > 0$$，并为$$1/d_j$$的数值稳定值将$$d_j^2 < \epsilon $$添加到停止条件（stopping criteria）上。
+最初，$$Y_g = \clock$$, 等式(5)意味着: $$d_i^2 = det(L_{ii}) = L_{ii}$$。完整算法会在Algorithm 1中总结。对于无约束的MAP inference来说停止条件（stopping criteria）是$$e_j^2 < 1$$，或者#Y_g > N （当使用基数约束时）。对于后者，我们引入了一个小数目$$ \epsilon > 0$$，并为$$1/d_j$$的数值稳定值将$$d_j^2 < \epsilon $$添加到停止条件（stopping criteria）上。
 
 在k次迭代中，对于每个item $$i \in Z \backslash Y_g$$，更新$$c_i$$和$$d_i$$涉及到两个长度为k的向量内积，总复杂度为$$O(kM)$$。因此，算法1对于无约束MAP inference会在$$O(M^3)$$运行，并返回N个items。注意，对于$$c_i$$和$$d_i$$通过额外的$$O(NM)$$（或者对于无约束情况下的$$O(M^2)$$）空间来达成。
 
+<img src="http://pic.yupoo.com/wangdren23_v/f712c1c2/25882ce6.jpg">
 
 算法1
+
+<img src="http://pic.yupoo.com/wangdren23_v/f8a151be/6fd5d597.jpg">
 
 算法2
 
@@ -263,6 +266,9 @@ $$r_i = exp(0.01 x_i + 0.2) $$，它使用从正态分布$$N(0,1)$$上抽取的$
 
 ...
 
+<img src="http://pic.yupoo.com/wangdren23_v/04c45a5b/a77f86c0.jpg">
+图1
+
 ## 6.2 短序列推荐
 
 在本节，我们会评估：在以下两个公开数据集上，推荐items的短序列给用户的效果。
@@ -286,10 +292,23 @@ $$
 
 在第一个实验中，我们在Netflix数据集上测试了DPP的参数$$\theta \in [0,1]$$的trade-off影响。结果如图2所示。随着$$\theta$$的增加，MRR一开始会逐渐提升，当$$\theta \approx 0.7$$时达到最佳值，接着略微减小。ILAD和ILMD会随$$\theta$$的递增而单调递减。当$$\theta=1$$时，DPP会返回最高相关分值的items。因此，需要考虑采用适度的多样性，从而达到最佳效果。
 
+<img src="http://pic.yupoo.com/wangdren23_v/673a26f4/3ef3db8c.jpg">
+
+图2
+
 在第2个实验中，为了区分参数的多种trade-off，会比较在相关度和多样性间的效果trade-off，如图3所示。不同算法选择的参数几乎具有相近范围的MRR。可以看到，Cover在Netflix Prize上效果最好，但在Song数据集上最差。在其它算法间，DPP则具有最好的relevance-diversity trade-off效果。如表1所示。MMR, DSP，DPP要比Entropy和Cover快。因为DPP的运行99%概率要小于2ms，它可以用于实时场景。
+
+<img src="http://pic.yupoo.com/wangdren23_v/d7485e7e/7bbb4cbd.jpg">
+
+表1
+
+<img src="http://pic.yupoo.com/wangdren23_v/b1c10c6d/8ecd1fc7.jpg">
+
+图3
 
 我们在一个电影推荐系统中在线进行A/B test，并运行了4周。对于每个用户，候选电影的相关得分通过一个在线打分模型来生成。离线矩阵因子算法【26】每天会进行训练来生成电影表示，它可以用于计算相似度。对于控制组（control group），5%的users会被随机选中，然后展示给最高相关得分的N=8部电影。对于对照组(treatment group)，另一5%的随机users会通过一个fine-tuned的trade-off参数控制的DPP来生成N部电影。两个在线指标：观看标题数和观看时长（分钟）的提升，如表2所示。结果展示了与使用MMR的另一随机选中的users的对比。可以看到，DPP要比没有多样性算法的系统、以及使用MMR的系统上效果要好。
 
+<img src="http://pic.yupoo.com/wangdren23_v/e0c2d324/68e3a370.jpg">
 
 表2
 
@@ -305,6 +324,10 @@ ILMLD = mean_{u \in U} min_{i,j \in R^u, i \neq j, d_{ij} \leq w} (1 - S_{ij})
 $$
 
 其中，$$d_{ij}$$是在$$R_u$$中item i和j的位置距离。相似的，指标越高越好。为了做出一个公平对比，我们会修改在MMR和MSD中的多样性项（diversity terms），以便它们只考虑最近添加的w-1个items。Entropy 和 Cover是不可测的，因为他们不适合该场景。通过调节多个trade-off参数，我们可以在图4中看到MMR, MSD, DPP的相关性和多样性的trade-off效果。不同算法选中的参数与nDCG具有近似相同的范围。我们可以看到，DPP的效果在relevance-diversity上的trade-off要最好。我们也会在补充材料中比较的PW Recall的指标。
+
+<img src="http://pic.yupoo.com/wangdren23_v/95056785/6c8540ed.jpg">
+
+图4
 
 # 7.结论
 
