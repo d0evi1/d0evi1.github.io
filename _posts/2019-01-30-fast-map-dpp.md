@@ -367,3 +367,5 @@ $$
 # 参考
 
 - 1.[https://papers.nips.cc/paper/7805-fast-greedy-map-inference-for-determinantal-point-process-to-improve-recommendation-diversity.pdf](https://papers.nips.cc/paper/7805-fast-greedy-map-inference-for-determinantal-point-process-to-improve-recommendation-diversity.pdf)
+- 2.[行列式点过程](http://www.doc88.com/p-8089116412071.html)
+- 3.[https://vimeo.com/240776466](https://vimeo.com/240776466)
