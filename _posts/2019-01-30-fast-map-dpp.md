@@ -14,7 +14,7 @@ hulu在NIPS 2018上开放了它们的方法:《Fast Greedy MAP Inference for Det
 
 **一个例外是，最大化一个后验MAP推断，例如：寻找具有最高概率的items集合，它是一个NP-hard问题**。因此，具有较低计算复杂度的近似推断方法（approximate inference）更受欢迎。paper[17]提出了针对DPP的一种近似最优的MAP推断（inference）。然而，该算法是一个基于梯度的方法，它在每次迭代上评估梯度时具有较高的计算复杂度，使得它对于大规模实时应用来说不实际。**另一个方法是广泛使用的贪婪算法（greedy algorithm），事实证明：DPP中的log概率是次模的（submodular）**。尽管它具有相对较弱的理论保证，但它仍被广泛使用，因为它在经验上对效果有前景。贪婪算法（reedy algorithm）[17,32]的己知实现具有$$O(M^4)$$的复杂度，其中M是items的总数目。Han et al.的最近工作[20]通过引入一些近似可以将复杂度降到$$O(M^3)$$，但会牺牲accuracy。**在本paper中，我们提出了关于该贪婪算法的一种准确（exact）实现，它具有$$O(M^3)$$的复杂度，它经验上比近似算法[20]要更快**。
 
-DPP的基本特性是，它会为那些相互比较分散（diverse）的times集合分配更高的概率。**在一些应用中，选择的items是以序列方式展示的，在少量相邻items间会有负作用（negative interactions）。例如，当推荐一个关于items的长序列给用户时，每个时候只有少量序列会捕获用户的注意力**。在这种场景下，要求离得较远的items相互间更多性些是没必要的。为这种情况开发快速算法。
+DPP的基本特性是，它会为那些相互比较分散（diverse）的items集合分配更高的概率。**在一些应用中，选择的items是以序列方式展示的，在少量相邻items间会有负作用（negative interactions）。例如，当推荐一个关于items的长序列给用户时，每个时候只有少量序列会捕获用户的注意力**。在这种场景下，要求离得较远的items相互间更多性些是没必要的。为这种情况开发快速算法。
 
 本文贡献。在本paper中，我们提出了一种新算法，它能极大加速DPP的greedy MAP inference。通过增量更新Cholesky因子，...。
 
@@ -46,7 +46,7 @@ $$
 其中L是一个实数型(real)、半正定(positive semidefinite (PSD）)的kernel matrix，它通过Z的元素进行索引。在该分布下，许多类型的inference任务（比如：marginalization, conditioning，sampling）可以在多项式时间内执行，除了MAP inference外：
 
 $$
-Y_{map} = \argmax\limits_{y \subseteq Z} det(L_Y)
+Y_{map} = argmax\limits_{y \subseteq Z} det(L_Y)
 $$
 
 在一些应用中，我们需要引入一个在Y上的基数约束，让它返回具有最大概率的固定size的一个集合，这会为k-DPP产生MAP inference。
@@ -66,14 +66,14 @@ $$
 次模函数最大化通常是NP-hard的。一个流行的近似方法是基于贪婪算法[37]。初始化为$$\emptyset$$，在每次迭代中，一个item会最大化边际增益(marginal gain):
 
 $$
-j = \argmax\limits_{i \in Z \ Y_g} f(Y_g \cup \lbrace i \rbrace) - f(Y_g)
+j = argmax\limits_{i \in Z \ Y_g} f(Y_g \cup \lbrace i \rbrace) - f(Y_g)
 $$
 
 它会被添加到$$Y_g$$中，直到最大边际增益(maximal marginal gain)成为负 或者 违反了基数约束。当f是单调的（monotone），例如：$$f(X) \leq f(Y)$$对于任意的$$X \subseteq Y$$，贪婪算法会遵循一个$$(1-1/e)$$的近似保证，它服从一个基数约束[37]。对于通用的无约束的次模最大化(no constraints)，一个修改版的贪婪算法会保证(1/2)近似。尽管这些理论保证，在DPP中广泛使用的贪婪算法是因为它的经验上的性能保障(promising empirical performance)。
 
 ## 2.3 推荐多样性
 
-提升推荐多样性在机器学习中是一个活跃的领域。对于该问题，有一些工作在相关度和差异度间达到了较好的平衡【11,9,51,8,21】。然而，它们只使用了pairwise的差异来描述整个列表（list）的总的多样性，这不会捕获在items间的一些复杂关系（例如：一个item的特性可以通过其它两者的线性组合来描述）。一些尝试构建新的推荐系统的其它工作，提出通过学习过程来提升多样性【3，43，48】，但这会使得算法变得更不通用、更不适合于直接集成到已经存在的推荐系统中。
+提升推荐多样性在机器学习中是一个活跃的领域。对于该问题，有一些方法在相关度和差异度间达到了较好的平衡【11,9,51,8,21】。然而，这些方法只使用了成对差异（pairwise dissimilarity）来描述整个列表（list）的总的多样性，并不会捕获在items间的一些复杂关系（例如：一个item的特性可以通过其它两者的线性组合来描述）。一些尝试构建新的推荐系统的其它工作，提出通过学习过程来提升多样性【3，43，48】，但这会使得算法变得更不通用、更不适合于直接集成到已经存在的推荐系统中。
 
 在【52，2，12，45，4，44】中提出的一些工作，定义了基于类目信息（taxonomy information）的相似矩阵。然而，语义型类目信息（semantic taxonomy information）并不总是有提供，基于它们来定义相似度可能不可靠。一些其它工作提出基于解释（explanation）[50]、聚类(clustering)[7,5,31]、特征空间（feature space）[40]、或覆盖(coverage)[47,39]来定义多样性指标（diversity metric）。
 
@@ -86,7 +86,7 @@ $$
 在本节中，我们提出了一种对于DPP的greedy Map inference算法的快速实现。在每轮迭代中，item j：
 
 $$
-j = \argmax\limits_{i \in Z \backslash Y_g} log det(L_{Y_g \cup \lbrace i \rbrace}) - log det(L_{Y_g})
+j = argmax\limits_{i \in Z \backslash Y_g} log det(L_{Y_g \cup \lbrace i \rbrace}) - log det(L_{Y_g})
 $$
 
 ...(1)
