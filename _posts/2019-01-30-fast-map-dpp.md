@@ -91,7 +91,7 @@ $$
 
 # 3.Fast Greedy MAP Inference
 
-在本节中，我们提出了一种对于DPP的greedy Map inference算法的快速实现。在每轮迭代中，item j：
+在本节中，我们提出了一种对于DPP的greedy Map inference算法的快速实现。在每轮迭代中，item j满足：
 
 $$
 j = \underset{i \in Z \backslash Y_g}{argmax} \ log det(L_{Y_g \cup \lbrace i \rbrace}) - log det(L_{Y_g})
@@ -99,13 +99,13 @@ $$
 
 ...(1)
 
-会被添加到已经选中的item set $$Y_g$$中。由于L是一个半正定矩阵（PSD matrix），所有主子式都是半正定的（PSD）。假设$$det(L_{Y-g}) > 0$$，$$L_{Y_g}$$的柯列斯基分解(Cholesky decomposition)提供如下：
+那么该item就会被添加到已经选中的item set $$Y_g$$中。由于L是一个半正定矩阵（PSD matrix），所有主子式都是半正定的（PSD）。假设$$det(L_{Y_g}) > 0$$，$$L_{Y_g}$$的柯列斯基分解(Cholesky decomposition)提供如下：
 
 $$
-L_{Y-g} = V V^T
+L_{Y_g} = V V^{\top}
 $$
 
-其中V是一个可逆下三角矩阵。对于任意$$i \in Z \backslash Y_g$$，$$L_{Y_g \cup \lbrace i \rbrace}$$的Cholesky decomposition可以定为：
+其中V是一个可逆下三角矩阵。对于任意$$i \in Z \backslash Y_g$$，$$L_{Y_g \cup \lbrace i \rbrace}$$的柯列斯基分解(Cholesky decomposition)可以定为：
 
 $$
 L_{Y_g \cup \lbrace i \rbrace} = \begin{bmatrix}
@@ -117,7 +117,7 @@ L_{Y_g \cup \lbrace i \rbrace} = \begin{bmatrix}
     \end{bmatrix} \begin{bmatrix}
     V & 0 \\
     c_i & d_i \\
-    \end{bmatrix}^T
+    \end{bmatrix}^{\top}
 $$
 
 ...(2)
@@ -125,7 +125,7 @@ $$
 其中，行向量$$c_i$$和标量$$d_i \geq 0$$满足：
 
 $$
-V_{c_i}^T = L_{Y_{g,i}}
+V_{c_i}^{\top} = L_{Y_{g,i}}
 $$
 
 ...(3)
@@ -139,7 +139,7 @@ $$
 另外，根据等式(2), 它可以为：
 
 $$
-det(L_{Y_g \cup \lbrace i \rbrace}) = det(VV^T) \cdot d_i^2 = det(L_{Y_g}) \cdot d_i^2 
+det(L_{Y_g \cup \lbrace i \rbrace}) = det(VV^{\top}) \cdot d_i^2 = det(L_{Y_g}) \cdot d_i^2 
 $$
 
 ...(5)
