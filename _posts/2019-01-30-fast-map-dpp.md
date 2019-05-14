@@ -51,41 +51,41 @@ $$
 P(Y) \propto det(L_Y)
 $$
 
-其中L是一个实数型(real)、半正定(positive semidefinite (PSD）)的kernel matrix，它通过Z的元素进行索引。在该分布下，许多类型的inference任务（比如：marginalization, conditioning，sampling）可以在多项式时间内执行，除了MAP inference外：
+其中：**L是一个实数型(real)、半正定(positive semidefinite (PSD）)的kernel matrix**，它通过Z的元素进行索引。在该分布下，许多类型的推断（inference）任务（比如：marginalization, conditioning，sampling）可以在多项式时间内执行，除了后验推断（MAP inference）外：
 
 $$
 Y_{map} = \underset{y \subseteq Z}{argmax} \ det(L_Y)
 $$
 
-在一些应用中，我们需要引入一个在Y上的基数约束，让它返回具有最大概率的固定size的一个集合，这会为k-DPP产生MAP inference。
+在一些应用中，我们需要引入一个在Y上的基数约束，**让它返回具有最大概率的固定size的一个集合**，这会为k-DPP产生MAP inference。
 
-除了在第一节介绍的DPP在MAP inference上的工作外，一些其它工作也提出了抽取样本并返回最高概率的样本。在[16]中，一种快速抽样算法，它具有复杂度$$O(N^2 M)$$，其中提供了L的特征分解(eigendecomposition)。尽量[16]中的更新规则与我们的工作相似，但有两个主要的不同之处使得我们的方法更高效。首先，[16]的L的特征分解具有时间复杂度$$O(M^3)$$。当我们只需要返回较少数目的items时，该计算开销主宰着运行时开销。通过对比，我们的方法只需要$$O(N^2 M)$$的复杂度来返回N个items。第二，DPP的抽样方法通常需要执行多个样本试验来达到贪婪算法的可比的经验式性能，它会进一步增加了计算复杂度。
+除了在第一节介绍的DPP在MAP inference上的工作外，一些其它工作也提出了抽取样本并返回最高概率的样本。在[16]中，一种快速抽样算法，它具有复杂度$$O(N^2 M)$$，其中提供了L的特征分解(eigendecomposition)。尽管[16]中的更新规则与我们的工作相似，但有两个主要的不同之处使得我们的方法更高效。首先，[16]的L的特征分解具有时间复杂度$$O(M^3)$$。当我们只需要返回较少数目的items时，该计算开销主宰着运行时开销。通过对比，我们的方法只需要$$O(N^2 M)$$的复杂度来返回N个items。第二，DPP的抽样方法通常需要执行多个样本试验来达到贪婪算法的可比的经验式性能，它会进一步增加了计算复杂度。
 
 ## 2.2 贪婪次模最大化(Greedy Submodular Maximization)
 
-一个集合函数是在$$2^Z$$上定义的一个实数函数。如果一个集合函数f的边际增益(marginal gains)是非增的（no-increasing），例如：对于任意的$$i \in Z$$和任意的$$x \subseteq Y \subseteq Z \setminus \lbrace i \rbrace$$，
+一个集合函数是在$$2^Z$$上定义的一个实数函数。如果一个集合函数f的边际增益(marginal gains)是非增的（no-increasing），例如：对于任意的$$i \in Z$$和任意的$$X \subseteq Y \subseteq Z \setminus \lbrace i \rbrace$$，当新增一项i时，满足：
 
 $$
 f(X \cup \lbrace i \rbrace) - f(X) \geq f(Y \cup \lbrace i \rbrace) - f(Y)
 $$
 
-其中，f是次模函数(submodular)。在DPP中的log概率函数$$f(Y)=log det(L_Y)$$是次模函数(submodular)，在[17]中有介绍。次模最大化（submodular maximization）对应是：寻找能让一个次模函数最大化的一个集合。DPP的MAP inference是一个次模最大化过程。
+其中，f是次模函数(submodular)。**在DPP中的log概率函数$$f(Y)=log det(L_Y)$$也是次模函数(submodular)，在[17]中有介绍**。次模最大化（submodular maximization）对应是：寻找能让一个次模函数最大化的一个集合。DPP的MAP inference是一个次模最大化过程。
 
-次模函数最大化通常是NP-hard的。一个流行的近似方法是基于贪婪算法[37]。初始化为$$\emptyset$$，在每次迭代中，一个item会最大化边际增益(marginal gain):
+**次模函数最大化通常是NP-hard的。一个流行的近似方法是基于贪婪算法[37]**。初始化为$$\emptyset$$，在每次迭代中，如果增加一个item能最大化边际增益(marginal gain):
 
 $$
 j = \underset{i \in Z \ Y_g}{argmax} \ f(Y_g \cup \lbrace i \rbrace) - f(Y_g)
 $$
 
-它会被添加到$$Y_g$$中，直到最大边际增益(maximal marginal gain)成为负 或者 违反了基数约束。当f是单调的（monotone），例如：$$f(X) \leq f(Y)$$对于任意的$$X \subseteq Y$$，贪婪算法会遵循一个$$(1-1/e)$$的近似保证，它服从一个基数约束[37]。对于通用的无约束的次模最大化(no constraints)，一个修改版的贪婪算法会保证(1/2)近似。尽管这些理论保证，在DPP中广泛使用的贪婪算法是因为它的经验上的性能保障(promising empirical performance)。
+那么它就会被添加到$$Y_g$$中，**直到最大边际增益(maximal marginal gain)为负 或者 违反了基数约束**。当f是单调的（monotone），例如：$$f(X) \leq f(Y)$$对于任意的$$X \subseteq Y$$，贪婪算法会遵循一个$$(1-1/e)$$的近似保证，它服从一个基数约束[37]。对于通用的无约束的次模最大化(no constraints)，一个修改版的贪婪算法会保证(1/2)近似。尽管这些理论保证，在DPP中广泛使用的贪婪算法是因为它的经验上的性能保障(promising empirical performance)。
 
 ## 2.3 推荐多样性
 
-提升推荐多样性在机器学习中是一个活跃的领域。对于该问题，有一些方法在相关度和差异度间达到了较好的平衡【11,9,51,8,21】。然而，这些方法只使用了成对差异（pairwise dissimilarity）来描述整个列表（list）的总的多样性，并不会捕获在items间的一些复杂关系（例如：一个item的特性可以通过其它两者的线性组合来描述）。一些尝试构建新的推荐系统的其它工作，提出通过学习过程来提升多样性【3，43，48】，但这会使得算法变得更不通用、更不适合于直接集成到已经存在的推荐系统中。
+提升推荐多样性在机器学习中是一个活跃的领域。对于该问题，有一些方法在相关度和差异度间达到了较好的平衡【11,9,51,8,21】。**然而，这些方法只使用了成对差异（pairwise dissimilarity）来描述整个列表（list）的总的多样性，并不会捕获在items间的一些复杂关系**（例如：一个item的特性可以通过其它两者的线性组合来描述）。一些尝试构建新的推荐系统的其它工作，提出通过学习过程来提升多样性【3，43，48】，但这会使得算法变得更不通用、更不适合于直接集成到已经存在的推荐系统中。
 
 在【52，2，12，45，4，44】中提出的一些工作，定义了基于类目信息（taxonomy information）的相似矩阵。然而，语义型类目信息（semantic taxonomy information）并不总是有提供，基于它们来定义相似度可能不可靠。一些其它工作提出基于解释（explanation）[50]、聚类(clustering)[7,5,31]、特征空间（feature space）[40]、或覆盖(coverage)[47,39]来定义多样性指标（diversity metric）。
 
-本文中，我们使用DPP模型以及我们提出的算法来最优化在相关度和多样性间的权衡。不同于之前已经存在的成对差异（pairwise dissimilarities）的技术，我们的方法会在整个子集的特征空间（feature space）中定义多样性。注意，我们的方法本质上与推荐中DPP-based的方法不同。在[18,34,14,15]中，他们提出了在购物篮（shopping basket）中推荐商品，核心是学习DPP的kernel matrix来描述items间的关系。作为对比，我们的目标是通过MAP inference来生成一个相关度和多样性推荐列表。
+本文中，我们使用DPP模型以及我们提出的算法来最优化在相关度和多样性间的权衡。**不同于之前已经存在的成对差异（pairwise dissimilarities）的技术，我们的方法会在整个子集的特征空间（feature space）中定义多样性**。注意，我们的方法本质上与推荐中DPP-based的方法不同。在[18,34,14,15]中，他们提出了在购物篮（shopping basket）中推荐商品，核心是学习DPP的kernel matrix来描述items间的关系。作为对比，我们的目标是通过MAP inference来生成一个相关度和多样性推荐列表。
 
 本paper中考虑的diversity不同于在[1,38]中的聚合多样性（aggregate diversity）。增加聚合多样性可以提升长尾items，而提升多样性则会在每个推荐列表中更偏好于多样性的items。
 
