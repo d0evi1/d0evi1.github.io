@@ -2,7 +2,7 @@
 layout: post
 title: fast-map-dpp介绍
 description: 
-modified: 2018-12-01
+modified: 2019-01-30
 tags: 
 ---
 
@@ -211,7 +211,13 @@ $$
 
 在本节中，我们描述了一个DPP-based方法来为用户推荐相关和多样的items。对于一个用户u，profile item set $$P_u$$被定义成用户喜欢的items集合。基于$$P_u$$，推荐系统会为该用户推荐items $$R_u$$。
 
-该方法会采用三个输入：一个候选item集合$$C_u$$，一个分值向量（score vector) $$r_u$$，它表示在$$C_u$$中的items的相关性，一个半正定矩阵$$S$$表示每个items pair的相似度。前两个输入可以通过许多传统的推荐算法的内部结果中获得。第三个输入（相似矩阵S），可以基于items的属性、与用户的交互关系、或者两者组合来获得。该方法可以看成是对items相关度及它们的相似度的一个ranking算法。
+该方法会采用三个输入：
+
+- 一个候选item集合$$C_u$$
+- 一个分值向量（score vector) $$r_u$$，它表示在$$C_u$$中的items的相关性
+- 一个半正定矩阵$$S$$表示每个items pair的相似度。
+
+前两个输入可以通过许多传统的推荐算法的内部结果中获得。第三个输入（相似矩阵S），可以基于items的属性、与用户的交互关系、或者两者组合来获得。该方法可以看成是对items相关度及它们的相似度的一个ranking算法。
 
 为了在推荐任务上应用DPP模型，我们需要构建kernel matrix。在[30]中所示，kernel matrix可以写成一个格拉姆矩阵(Gram matrix): $$L=B^T B$$，其中B的列可以是表示items的向量(vectors)。我们可以将每个列向量$$B_i$$构建成item score $$r_i \geq 0$$和一个具有$$\| f_i \|_2 = 1$$的归一化向量$$f_i \in R^D$$的两者乘积。kernel L的条目可以被写成是：
 
