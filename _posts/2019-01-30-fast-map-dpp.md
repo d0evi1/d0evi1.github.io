@@ -157,12 +157,14 @@ $$
 $$
 L_{Y_g \cup \lbrace j \rbrace} = \begin{bmatrix}
     V & 0 \\
-    c_i & d_i \\
+    c_j & d_j \\
     \end{bmatrix} \begin{bmatrix}
     V & 0 \\
-    c_i & d_i \\
-    \end{bmatrix}^T
+    c_j & d_j \\
+    \end{bmatrix}^{\top}
 $$
+
+...(7)
 
 其中，$$c_j$$和$$d_j$$是已经提供的。$$L_{Y_g}$$的Cholesky因子可以在一个新item被添加到$$Y_g$$中被有效更新。
 
