@@ -8,6 +8,10 @@ tags:
 
 hulu在NIPS 2018上开放了它们的方法:《Fast Greedy MAP Inference for Determinantal Point Process to Improve Recommendation Diversity》, 来解决推荐多样性问题。我们来看下：
 
+# 
+
+DPP是一种优雅的概率模型。然而，为DPP进行最大化一个后验推断（MAP：maximum a posteriori inference），在许多应用中扮演着一个重要角色，这是一个NP-hard问题。流行的贪婪算法计算开销很大，很难用于大规模实时场景。为了克服计算挑战，在本paper中，我们提出了一种新算法，可以为极大加速DPP的贪婪后验推断（greedy MAP inference）。另外，我们的算法也会应用到以下场景：在结果序列中，只需要在附近很少的items上进行多样性排斥。我们应用该算法来生成相关性和多样性推荐。实验结果表明，我们提出的算法要比state-of-the-art的其它方法要快，并在一些公开数据集上提供了一个更好的relevance-diversity trade-off，同时也在online A/B test上要好。
+
 # 1.介绍
 
 行列式点过程（DPP： determinantal point process）首先在[33]中介绍用来给出在热平衡(thermal equilibrium)中的费米子系统的分布。除了在量子物理学和随机矩阵上的早期应用，它也可以被应用到多种机器学习任务上，比如：多人姿态估计（multiple person pose estimation）、图片搜索、文档归纳、视频归纳、产品推荐、tweet timeline生成。对比其它概率模型（比如：图形模型），**DPP的一个主要优点是，对于不同类型的推断（包含：conditioning和sampling），它遵循多项式时间算法（polynomial-time algorithms）**。
