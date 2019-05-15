@@ -236,7 +236,7 @@ $$
 
 前两个输入可以通过许多传统的推荐算法的内部结果中获得。第三个输入（相似矩阵S），可以基于items的属性、与用户的交互关系、或者两者组合来获得。该方法可以看成是对items相关度及它们的相似度的一个ranking算法。
 
-为了在推荐任务上应用DPP模型，我们需要构建kernel matrix。在[30]中所示，kernel matrix可以写成一个格拉姆矩阵(Gram matrix): $$L=B^T B$$，其中B的列可以是表示items的向量(vectors)。我们可以将每个列向量$$B_i$$构建成item score $$r_i \geq 0$$和一个具有$$\| f_i \|_2 = 1$$的归一化向量$$f_i \in R^D$$的两者乘积。kernel L的条目可以被写成是：
+为了在推荐任务上应用DPP模型，我们需要构建kernel matrix。在[30]中所示，kernel matrix可以写成一个格拉姆矩阵(Gram matrix): $$L=B^T B$$，其中B的列可以是表示items的向量(vectors)。我们可以将每个列向量$$B_i$$通过$$r_i \geq 0$$（item score）和一个$$f_i \in R^D$$（具有$$\| f_i \|_2 = 1$$的归一化向量）的两者乘积的方式来构建。kernel L的条目可以被写成是：
 
 $$
 L_{ij} = \langle B_i,B_j \rangle = \langle r_i f_i, r_j f_j \rangle = r_i r_j \langle f_i, f_j \rangle
@@ -312,7 +312,13 @@ $$r_i = exp(0.01 x_i + 0.2) $$，它使用从正态分布$$N(0,1)$$上抽取的$
 - Netflix Prize：该数据集包含了用户的电影评分。
 - Million Song Dataset：该数据集包含了用户播放歌曲的数目。
 
-对于每个数据集，我们通过为每个用户随机选择一个交互item的方式来构建测试集，接着使用剩余数据来进行训练。我们在[24]上采用一个item-based推荐算法[24]来学习一个item-item的PSD相似度矩阵S。对于每个用户，profile set P_u包含了在训练集中的交互items，候选集$$C_u$$通过在$$P_u$$中的每个item的50个最相似items进行union得到。两个数据集的$$#C_u$$的中位数(median)分别是735(netflix）和811(song). 对于在$$C_u$$中的任意item，相关分是对在$$P_u$$中所有items的聚合相似度。有了S和$$C_u$$，分值向量(score vector) $$r_u$$，算法会推荐$$N=20$$个items。
+对于每个数据集，我们通过为每个用户随机选择一个交互item的方式来构建测试集，接着使用剩余数据来进行训练。我们在[24]上采用一个item-based推荐算法[24]来学习一个item-item的PSD相似度矩阵S。对于每个用户：
+
+- profile set $$P_u$$包含了在训练集中的交互items，
+- 候选集$$C_u$$通过在$$P_u$$中的每个item的50个最相似items进行union得到。
+- 两个数据集的$$#C_u$$的中位数(median)分别是735(netflix）和811(song). 
+
+对于在$$C_u$$中的任意item，相关分是对在$$P_u$$中所有items的聚合相似度。有了S和$$C_u$$，分值向量(score vector) $$r_u$$，算法会推荐$$N=20$$个items。
 
 推荐的效果指标包含了MRR (平均倒数排名：mean reciprocal rank)、ILAD(intra-list average distance)、ILMD（intra-list minimal distance）。它们的定义如下：
 
