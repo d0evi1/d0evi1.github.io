@@ -323,9 +323,9 @@ $$r_i = exp(0.01 x_i + 0.2) $$，它使用从正态分布$$N(0,1)$$上抽取的$
 推荐的效果指标包含了MRR (平均倒数排名：mean reciprocal rank)、ILAD(intra-list average distance)、ILMD（intra-list minimal distance）。它们的定义如下：
 
 $$
-MRR = mean_{u \in U} P_u^{-1} \\
-ILAD = mean_{u \in U} mean_{i,j \in R_u, i \neq j} (1-S_{ij}) \\
-ILMD = mean_{u in U} min_{i,j \in R_u, i \neq j} (1-S_{ij})
+MRR = \underset{u \in U}{mean} P_u^{-1} \\
+ILAD = mean_{u \in U} \underset{i,j \in R_u, i \neq j}{mean} (1-S_{ij}) \\
+ILMD = \underset{u in U}{mean} \underset{i,j \in R_u, i \neq j}{min} (1-S_{ij})
 $$
 
 其中，U是所有用户的集合，$$p_u$$是在测试集中关于items的最小排序位置。MRR会测度相关度，其中ILAD和ILMD会度量多样性(diversity)。我们也会在附录中比较指标PW recall（popularityweighted recall）. 对于这些指标来说，越高越好。
