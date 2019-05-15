@@ -316,7 +316,7 @@ $$r_i = exp(0.01 x_i + 0.2) $$，它使用从正态分布$$N(0,1)$$上抽取的$
 
 - profile set $$P_u$$包含了在训练集中的交互items，
 - 候选集$$C_u$$通过在$$P_u$$中的每个item的50个最相似items进行union得到。
-- 两个数据集的$$#C_u$$的中位数(median)分别是735(netflix）和811(song). 
+- 两个数据集的$$\#C_u$$的中位数(median)分别是735(netflix）和811(song). 
 
 对于在$$C_u$$中的任意item，相关分是对在$$P_u$$中所有items的聚合相似度。有了S和$$C_u$$，分值向量(score vector) $$r_u$$，算法会推荐$$N=20$$个items。
 
