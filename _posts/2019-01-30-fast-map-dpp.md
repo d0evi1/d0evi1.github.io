@@ -182,7 +182,7 @@ $$
 
 ...(8)
 
-通过将等式(3)和等式(8)组合，我们有：
+通过将等式(3)和等式(8)组合，我们可以对$$c_i$$和$$d_i^2$$进行更新，有：
 
 $$
 c_i' = \begin{bmatrix} c_i & (L_{ji}- \langle c_j,c_i\rangle) / d_j \end{bmatrix} \doteq  \begin{bmatrix} c_i & e_i \end{bmatrix}
@@ -196,13 +196,13 @@ $$
 
 ...(9)
 
-最初，$$Y_g = \emptyset$$, 等式(5)意味着: $$d_i^2 = det(L_{ii}) = L_{ii}$$。完整算法会在Algorithm 1中总结。对于无约束的MAP inference来说停止条件（stopping criteria）是$$e_j^2 < 1$$，或者$$\#Y_g > N $$（当使用基数约束时）。对于后者，我们引入了一个小数目$$ \epsilon > 0$$，并为$$1/d_j$$的数值稳定值将$$d_j^2 < \epsilon $$添加到停止条件（stopping criteria）上。
-
-在k次迭代中，对于每个item $$i \in Z \backslash Y_g$$，更新$$c_i$$和$$d_i$$涉及到两个长度为k的向量内积，总复杂度为$$O(kM)$$。因此，算法1对于无约束MAP inference会在$$O(M^3)$$运行，并返回N个items。注意，对于$$c_i$$和$$d_i$$通过额外的$$O(NM)$$（或者对于无约束情况下的$$O(M^2)$$）空间来达成。
+最初，$$Y_g = \emptyset$$, 等式(5)意味着: $$d_i^2 = det(L_{ii}) = L_{ii}$$。完整算法会在算法1中有总结。对于无约束的MAP inference来说**停止条件（stopping criteria）**是$$e_j^2 < 1$$，或者$$\#Y_g > N $$（当使用基数约束时）。**对于后者，我们引入了一个很小的数$$ \epsilon > 0$$，并为$$1/d_j$$的数值稳定值将$$d_j^2 < \epsilon $$设置为停止条件（stopping criteria）**。
 
 <img src="http://pic.yupoo.com/wangdren23_v/f712c1c2/25882ce6.jpg">
 
 算法1
+
+在k次迭代中，对于每个item $$i \in Z \backslash Y_g$$，更新$$c_i$$和$$d_i$$涉及到两个长度为k的向量内积，总复杂度为$$O(kM)$$。因此，算法1对于无约束MAP inference会在$$O(M^3)$$运行，并返回N个items。注意，对于$$c_i$$和$$d_i$$通过额外的$$O(NM)$$（或者对于无约束情况下的$$O(M^2)$$）空间来达成。
 
 <img src="http://pic.yupoo.com/wangdren23_v/f8a151be/6fd5d597.jpg">
 
