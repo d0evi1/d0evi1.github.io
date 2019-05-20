@@ -18,7 +18,7 @@ DPP是一种优雅的概率模型。然而，为DPP进行最大化一个后验�
 
 **一个例外是，最大化一个后验MAP推断，例如：寻找具有最高概率的items集合，它是一个NP-hard问题**。因此，具有较低计算复杂度的近似推断方法（approximate inference）更受欢迎。paper[17]提出了针对DPP的一种近似最优的MAP推断（inference）。然而，该算法是一个基于梯度的方法，它在每次迭代上评估梯度时具有较高的计算复杂度，使得它对于大规模实时应用来说不实际。**另一个方法是广泛使用的贪婪算法（greedy algorithm），事实证明：DPP中的log概率是次模的（submodular）**。尽管它具有相对较弱的理论保证，但它仍被广泛使用，因为它在经验上对效果有前景。贪婪算法（reedy algorithm）[17,32]的己知实现具有$$O(M^4)$$的复杂度，其中M是items的总数目。Han et al.的最近工作[20]通过引入一些近似可以将复杂度降到$$O(M^3)$$，但会牺牲accuracy。**在本paper中，我们提出了关于该贪婪算法的一种准确（exact）实现，它具有$$O(M^3)$$的复杂度，它经验上比近似算法[20]要更快**。
 
-DPP的基本特性是，它会为那些相互比较分散（diverse）的items集合分配更高的概率。**在一些应用中，选择的items是以序列方式展示的，在少量相邻items间会有负作用（negative interactions）。例如，当推荐一个关于items的长序列给用户时，每个时候只有少量序列会捕获用户的注意力**。在这种场景下，要求离得较远的items相互间更多性些是没必要的。为这种情况开发快速算法。
+**DPP的基本特性是，它会为那些相互比较多样化（diverse）的items集合分配更高的概率**。在一些应用中，选择的items是以序列方式展示的，在少量相邻items间会有**负作用**（negative interactions）。**例如，当推荐一个关于items的长序列给用户时，每个时候只有少量序列会捕获用户的注意力**。在这种场景下，要求离得较远的items相互间更多样(diverse)些是没必要的。为这种情况开发快速算法。
 
 本文贡献。在本paper中，我们提出了一种新算法，它能极大加速DPP的greedy MAP inference。通过增量更新Cholesky因子，我们的算法可以将计算复杂度降至$$O(M^3)$$，运行$$(O(N^2 M))$$的时间来返回N个items，使它在大规模实时场景中变得可用。据我们所知，这是首个具有很低时间复杂度的greedy Map inferenece for DPP的准确实现(exact implementation)。
 
@@ -328,7 +328,12 @@ ILAD = mean_{u \in U} \underset{i,j \in R_u, i \neq j}{mean} (1-S_{ij}) \\
 ILMD = \underset{u in U}{mean} \underset{i,j \in R_u, i \neq j}{min} (1-S_{ij})
 $$
 
-其中，U是所有用户的集合，$$p_u$$是在测试集中关于items的最小排序位置。MRR会测度相关度，其中ILAD和ILMD会度量多样性(diversity)。我们也会在附录中比较指标PW recall（popularityweighted recall）. 对于这些指标来说，越高越好。
+其中，U是所有用户的集合，$$p_u$$是在测试集中关于items的最小排序位置。
+
+- MRR会测度相关度
+- ILAD和ILMD会度量多样性(diversity)
+
+我们也会在附录中比较指标PW recall（popularity weighted recall）. 对于这些指标来说，越高越好。
 
 我们的DPP-based算法(DPP)，会与MMR(最大化相关性：maximal marginal relevance)、MSD（最大化多样性：maxsum diversification）、entropy regularizer (Entropy)、基于覆盖的算法（Cover）进行比较。他们涉及到一个可调参数来调节相关性和多样性间的trade-off。对于Cover，参数为$$\gamma \in [0,1]$$，它定义了饱和函数$$f(t) = t^{\gamma}$$。
 
