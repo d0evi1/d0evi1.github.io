@@ -20,11 +20,11 @@ DPP是一种优雅的概率模型。然而，为DPP进行最大化一个后验�
 
 **DPP的基本特性是，它会为那些相互比较多样化（diverse）的items集合分配更高的概率**。在一些应用中，选择的items是以序列方式展示的，在少量相邻items间会有**负作用**（negative interactions）。**例如，当推荐一个关于items的长序列给用户时，每个时候只有少量序列会捕获用户的注意力**。在这种场景下，要求离得较远的items相互间更多样(diverse)些是没必要的。为这种情况开发快速算法。
 
-本文贡献。在本paper中，我们提出了一种新算法，它能极大加速DPP的greedy MAP inference。通过增量更新Cholesky因子，我们的算法可以将计算复杂度降至$$O(M^3)$$，运行$$(O(N^2 M))$$的时间来返回N个items，使它在大规模实时场景中变得可用。据我们所知，这是首个具有很低时间复杂度的greedy Map inferenece for DPP的准确实现(exact implementation)。
+本文贡献。在本paper中，我们提出了一种新算法，它能极大加速DPP的greedy MAP inference。通过增量更新Cholesky因子，我们的算法可以**将计算复杂度降至$$O(M^3)$$**，运行$$(O(N^2 M))$$的时间来返回N个items，使它在大规模实时场景中变得可用。据我们所知，这是首个具有很低时间复杂度的greedy Map inferenece for DPP的准确实现(exact implementation)。
 
 另外，我们也将该算法应用到以下场景：只需要在一个滑动窗口中保证多样性。假设window size为：$$w < N$$，复杂度可以减小到$$O(w N M)$$。这个特性使得它很适合用于以下场景，即：在一个短的滑动窗口内保证多样性。
 
-最后，我们将提出的算法应用到推荐任务上。推荐多样化的items可以给用户探索的机会来发现新items 和 意外发现的items，也使得该服务可以发现用户的新兴趣。正如实验结果所示，在公开数据集和online A/B test上，对比起其它已知的方法，DPP-based方法在相关性和多样性的trade-off上更好。
+最后，我们将提出的算法应用到推荐任务上。**推荐多样化的items可以给用户探索的机会来发现新items 和 意外发现的items**，也使得该服务可以发现用户的新兴趣。正如实验结果所示，在公开数据集和online A/B test上，对比起其它已知的方法，DPP-based方法在相关性和多样性的trade-off上更好。
 
 # 2.背景
 
