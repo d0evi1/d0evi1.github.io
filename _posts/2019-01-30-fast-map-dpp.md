@@ -51,6 +51,8 @@ $$
 P(Y) \propto det(L_Y)
 $$
 
+...(1)
+
 其中：**L是一个实数型(real)、半正定(positive semidefinite (PSD）)的kernel matrix**，它通过Z的元素进行索引。在该分布下，许多类型的推断（inference）任务（比如：marginalization, conditioning，sampling）可以在多项式时间内执行，除了后验推断（MAP inference）外：
 
 $$
@@ -60,6 +62,26 @@ $$
 在一些应用中，我们需要引入一个在Y上的基数约束，**让它返回具有最大概率的固定size的一个集合**，这会为k-DPP产生MAP inference。
 
 除了在第一节介绍的DPP在MAP inference上的工作外，一些其它工作也提出了抽取样本并返回最高概率的样本。在[16]中，一种快速抽样算法，它具有复杂度$$O(N^2 M)$$，其中提供了L的特征分解(eigendecomposition)。尽管[16]中的更新规则与我们的工作相似，但有两个主要的不同之处使得我们的方法更高效。首先，[16]的L的特征分解具有时间复杂度$$O(M^3)$$。当我们只需要返回较少数目的items时，该计算开销主宰着运行时开销。通过对比，我们的方法只需要$$O(N^2 M)$$的复杂度来返回N个items。第二，DPP的抽样方法通常需要执行多个样本试验来达到贪婪算法的可比的经验式性能，它会进一步增加了计算复杂度。
+
+**下一节为博主注：**
+
+## 为什么DPP会对quality和diversity进行balance?
+
+DPP如何平衡取出的子集的quality和diversity？Kulesza and Taskar[29 3.1节]提供的分解给出了一个更直观的理解：对于任意半正定矩阵(PSD)，DPP kernel L可以被分解成一个格兰姆矩阵（Gramian matrix）：$$L=B^T B$$，其中B的每一列(column)表示真实集(ground set)中N个items之一。依次会将L分解成质量项(quality terms: $$q_i \in R^+$$) 和归一化多样性特征（$$\phi_i \in R^p, \| \phi_i \| = 1$$）:
+
+$$
+L_{ij} = q_i \phi_i^T \phi_j q_j
+$$
+
+对于向量$$\phi_i (S_{ij} = \phi_i^T \phi_j)$$的Gramian矩阵S，被称为多样性模型（diversity model）；q被称为质量模型（quality model）。
+
+可以将2.1中的(1)式改写成：
+
+$$
+P(Y) \propto (\prod\limits_{i \in Y} q_i) det(S_Y)
+$$
+
+它提供了将一个关于子集Y的概率分解成：它的元素(elements)的质量(quality)和它们的多样性（diversity）的乘积。Y的概率等于 按vectors $$q_i \phi_i$$逐个平方：一个子集的概率会随着它的items的质量（quality）增加而增加，会随着两个items变得更相似而减小。
 
 ## 2.2 贪婪次模最大化(Greedy Submodular Maximization)
 
@@ -386,3 +408,5 @@ $$
 - 1.[https://papers.nips.cc/paper/7805-fast-greedy-map-inference-for-determinantal-point-process-to-improve-recommendation-diversity.pdf](https://papers.nips.cc/paper/7805-fast-greedy-map-inference-for-determinantal-point-process-to-improve-recommendation-diversity.pdf)
 - 2.[行列式点过程](http://www.doc88.com/p-8089116412071.html)
 - 3.[https://vimeo.com/240776466](https://vimeo.com/240776466)
+- 4.[Learning and Enforcing Diversity with
+Determinantal Point Processes](https://dspace.mit.edu/bitstream/handle/1721.1/103671/953457802-MIT.pdf?sequence=1)
