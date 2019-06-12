@@ -25,7 +25,7 @@ parse trees通常会通过动态内存分配即时构建。然而，根据【hin
 
 事实上，一个capsule的输出就是一个向量，使得它可以使用一个很强大的dynamic routing机制，来确保capsule的输出发送到上层(layer above)的一个合适的父胶囊(parent)上。首先，该output会被路由到所有可能的父胶囊上，但它会通过总和为1的耦合系数进行缩减。对于某个capsule的每个可能的父胶囊，该capsule通过将它的output乘以一个权重矩阵计算得到一个“预测向量（prediction vector）”。如果该预测向量与某一父胶囊的输出具有一个大的标量乘(scalar product)，那么这就存在一个自顶向下的反馈（top-down feedback），它会为该父胶囊增加耦合系数(coupling coefficient)，而对于其它父胶囊则减去该系数。这样就增加了该capsule对该父胶囊的贡献，并进一步增加该capsule的预测向量与父胶囊的输出间的标量乘积。这种类型的"routing-by-agreement"远比原始版本的通过max-pooling实现的routing机制要更有效的多。我们会进一步展示，我们的dynamic routing机制是实现该“解释消除(explaining away)”的一种有效方法，解释消除对于将高度重叠的目标进行分割是必须的。
 
-CNN会使用所学到的特征检测器的平移副本（translated replicas）。这允许他们将在一个图片中某一位置获得的好的权重值的知识平移到另一位置上。这在图片解释中被证明是相当有用的。尽管我们使用vector-output capsules来替换CNNs的scalar-output feature detectors、以及使用routing-by-agreement来替代max-pooling，我们仍希望跨空间的复用学到的知识。为了达到文具目标，我们让除了capsules的最后一层之外的所有层都是conv的。有了CNNs，我们可以让更高层级的capsules覆盖该图片的更大区域。不同于max-pooling，我们不会丢掉关于该实体在该区域内的准确位置信息。对于低级别的capsules，位置信息是由active capsule所“place-coded”。随着结构的上升，在某个capsule的output vector的实值元素（real-valued components）中，越来越多的位置信息是"rate-coded"。从place-coding到rate-coding的shift，加上更高层capsules可以以更多自由度来表示更复杂实体，表明capsules的维度应随着结构的上升而增加。
+CNN会使用所学到的特征检测器的平移副本（translated replicas）。这允许他们将在一个图片中某一位置获得的好的权重值的知识平移到另一位置上。这在图片解释中被证明是相当有用的。尽管我们使用vector-output capsules来替换CNNs的scalar-output feature detectors、以及使用routing-by-agreement来替代max-pooling，我们仍希望跨空间的复用学到的知识。为了达到该目标，我们让除了capsules的最后一层之外的所有层都是conv的。有了CNNs，我们可以让更高层级的capsules覆盖该图片的更大区域。不同于max-pooling，我们不会丢掉关于该实体在该区域内的准确位置信息。对于低级别的capsules，位置信息是由active capsule所“place-coded”。随着结构的上升，在某个capsule的output vector的实值元素（real-valued components）中，越来越多的位置信息是"rate-coded"。从place-coding到rate-coding的shift，加上更高层capsules可以以更多自由度来表示更复杂实体，表明capsules的维度应随着结构的上升而增加。
 
 # 2.一个capsule的inputs和outputs向量是如何计算的
 
