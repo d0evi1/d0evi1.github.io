@@ -12,6 +12,9 @@ hinton在《Dynamic Routing Between Capsules》中提出了“dynamic routing”
 
 一个capsule是一组neurons，它的activity vector表示了一个特定类型实体（比如：一个object或一个object part）的实例参数。我们使用activity vector的长度(length)来表示实体存在的概率，使用它的方向(orientation)表示实体参数。在一个层级上的Active capsules通过转移矩阵为高级capsules的实例参数做出预测。当多个预测达到一致时，一个更高级别的capsule会变成active态。我们会展示：当训练完后，多层capsule系统会在MNIST上达到state-of-art的效果，它在识别高度重叠的数字上要比CNN要好。为了达到这样的结果，我们使用了一个迭代式routing-by-agreement机制：一个更低层级的capsule会偏向于将它的output发送到更高层级的capsules上，它的activity vectors会与来自低层级capsule的预测做一个大的标量乘。
 
+<img src="http://pic.yupoo.com/wangdren23_v/77e8d5aa/f0d86e3b.jpeg">
+
+
 # 1.介绍
 
 人类视觉会通过使用一个关于注视点(fixation points)的很仔细的判别序列，忽略不相关细节，来确保只有一小部分的光学阵列（optic array）在最高分辨率上被处理。为了理解关于该场景有多少认识是来自该注视点序列，以及我们从单个fixation能得到多少东西，但在本paper中，我们将假设，单个fixation会比单个被识别目标和它的属性带给我们更多。我们假设，我们的multi-layer可视化系统会在每个fixation上创建一个类parse tree结构，我们会忽略：这些单个fixation parse trees是如何协调的。
@@ -62,7 +65,7 @@ $$
 
 在卷积capsule layers中，每个capsule会输出一个向量的local grid到layer above中每种类型的capsule。。。。
 
-
+<img src="http://pic.yupoo.com/wangdren23_v/d8b14ce9/ee67b84c.jpeg">
 
 算法1
 
@@ -80,6 +83,10 @@ $$
 
 # 4.CapsNet架构
 
+<img src="http://pic.yupoo.com/wangdren23_v/3fcffe15/3b65c4cc.jpeg">
+
+图1
+
 一个简单的CapsNet结构如图1所示。该结构是浅层的，只有两个卷积层和一个FC layer。Conv1具有256， 9x9的conv kernels，它的stride=1, 并使用ReLU activation。该layer会将像素强度转化到局部特征检测器的activities，接着被用于primary capsules的输入。
 
 从一个倒转图的角度看，primary capsules是最低层的多维实体，激活primary capsules对应于将渲染过程进行反转。对比起将实例部件组装成熟悉的整体，这是一个非常不同类型的计算，capsules很擅长这一点。
@@ -92,17 +99,33 @@ $$
 
 我们使用一个额外的reconstruction loss来鼓励digit capsules来编码输入数字的实例参数。在训练期间，除了正确digit capsule的activity vector外，我们会遮住所有。接着，我们使用该activity vector来重构输入图片。digit capsule的输出被feed给一个decoder（它由3个FC layer组成，会如图2所示建模像素强度）。我们会对logitsic units的输出和像素强度间的微分做最小化平方和。我们会通过0.0005将该reconstruction loss缩放，以便它在训练期间不会主导着margin loss。如图3所示，来自CapsNet的16D output的reconstructions是健壮的，它只保留重要细节。
 
+<img src="http://pic.yupoo.com/wangdren23_v/97591bd5/6723a6c6.jpeg">
+
+图2
+
+<img src="http://pic.yupoo.com/wangdren23_v/c9da7080/de29a2ef.jpeg">
+
+图3
+
 # 5.Capsules on MNIST
 
 我们在28x28 MNIST图片集上（它们会在每个方向上shift两个像素，并使用zero padding）执行训练。没有使用其它的数据扩增/变形(augmentation/deformation)。对于训练集和测试集，dataset分别具有60K和10K的图片。
 
 我们使用单一模型进行测试，没有使用任何模型平均方法(model averaging)。Wan 2013使用ensembling、并将数据进行旋转和缩放进行数据扩充，达到了0.21%的test error。如果不使用这两者，仅能达到0.39%。我们在一个3 layer网络上获得了一个较低的test error (0.25%), 该结果之前只能在更深的网络上才能达到。表1展示了不同CapsNet设置在MNIST上的test error，并展示了routing和reconstruction regularizer的重要性。通过增强在capsule vector中的pose encoding，添加reconstruction regularizer可以增强routing的效果。
 
+<img src="http://pic.yupoo.com/wangdren23_v/a1dbecb5/50fc656c.jpeg">
+
+表1
+
 baseline是一个标准的CNN，它具有(256, 256, 128)三通道的三层conv layer。每个具有5x5 kernels，stride=1。最后的conv layers会通过size为328､129的两个FC layers。最后的FC layer会使用dropout、连接到一个10分类的softmax layer上，并使用cross entropy loss。baseline也会使用Adam optimizer在2-pixel shifted MNIST上训练。baseline被设计成：计算开销接近CapsNet，在MNIST上达到最好的效果。在参数数目上，baseline具有35.4M，而CapsNet具有8.2M参数，不使用reconstruction subnetwork会有6.8M参数。
 
 ## 5.1 一个capsule表示的独立维度(individual dimensions)
 
 由于我们会将单个数字的encoding进行传递，并将其它数字置为0, 一个digit capsule的维度应学到：以该类的数字被实例化的方式跨越变种空间。这些变种（variations）包括笔划粗细、倾斜、宽度。他们也包含了特定数字的变种，比如：数字2的尾部长度. 我们可以看到，可以使用decoder网络来表示独立维度(individual dimensions)。在为正确的digit capsule计算activity后，我们可以feed一个该activity vector的扰动版本给decoder网络，并观察扰动是如何影响reconstruction的。这些扰动的示例如图4所示。我们发现，该capsule的某一维度(out of 16)几乎总是表示该数字的宽度。一些维度表示全局变种的组合，而其它维度则表示在该数字的一个局部上的变种。例如，对于数字6的上半部的长度，以及下半部圈的size，使用不同维度。
+
+<img src="http://pic.yupoo.com/wangdren23_v/cd83127f/a5fe733e.jpeg">
+
+图4
 
 ## 5.2 仿射变换的健壮性
 
@@ -121,6 +144,10 @@ dynamic routing可以被看成是一个并行注意力（parallel attention）�
 ## 6.2 MultiMNIST结果
 
 我们的3 layer CapsNet模型，重新使用MultiMNIST训练数据进行训练，它会比我们的baseline CNN模型达到更高的测试分类accuracy。我们在高度重合数字对上达到相同的分类错误率5%，而Ba 2014的sequential attention模型在一个更简单的任务上（更低重合度）才能达到。在测试图片上，它由来自测试集的成对图片组成，我们将由capsules网络生成的两个最可能active digit capsules作为分类。在reconstruction期间，我们一次选中一个数字，并使用所选数字对应的capsule的activity vector来重构所选数字的图片（我们知道该图片，因为我们使用它来生成组合图片）。与我们的MNIST模型唯一的不同之处是，对于learning rate，我们增加了decay step的周期大于10x，因为训练数据集更大。
+
+<img src="http://pic.yupoo.com/wangdren23_v/23311e18/7bc55435.jpeg">
+
+图5
 
 重构（reconstructions）如图5所示，它展示了CapsNet可以将该图片划分成两个原始的数字。由于该分割（segmentation）并不在像素级别，我们观察到：模型可以正确处理重合（同时出现在两个数字中的一个像素），从而解释所有的像素。每个数字的position和style在DigitCaps中被编码。decoder已经学到了给定该encoding，来重构一个数字。事实上，尽管有重叠它仍能够重构数字，展示了每个digit capsule可以从PrimaryCapsules layer接收到的投票中选择style和position。
 
