@@ -17,11 +17,11 @@ hinton在《Dynamic Routing Between Capsules》中提出了“dynamic routing”
 
 # 1.介绍
 
-人类视觉会通过使用一个关于注视点(fixation points)的细致判别序列，忽略掉不相关细节，来确保只有一小部分的光学阵列（optic array）在最高分辨率上被处理。内省（Introspection）对于理解以下情况效果很差：关于某个场景的知识有多少是来自该注视点序列，以及我们从单个fixation能得到多少知识。但在本paper中，我们将假设，单个fixation会比单个被识别目标和它的属性带给我们更多。我们假设，我们的multi-layer可视化系统会在每个fixation上创建一个类parse tree结构，我们会忽略：这些单个fixation parse trees是如何协调的。
+人类视觉会通过使用一个关于注视点(fixation points)的细致判别序列，忽略掉不相关细节，来确保只有一小部分的光学阵列（optic array）在最高分辨率上被处理。内省（Introspection）对于理解以下情况效果很差：关于某个场景的知识有多少是来自该注视点序列，以及我们从单个fixation能得到多少知识。但在本paper中，我们将假设，比单个已被识别的目标和它的属性，单个fixation会带给我们更多。我们假设，我们的multi-layer可视化系统会在每个fixation上创建一个类parse tree结构，我们会忽略：这些单个fixation parse trees是如何协调的。
 
 parse trees通常会通过动态内存分配即时构建。然而，根据【hinton 2000】，我们假设：对于单个fixation，一个parse tree可以从一个确定的multi-layer神经网络（比如： 雕塑从一块岩石中中雕刻出）中雕刻出。每个layer将被划分成许多被称为“capsules”的neurons小分组，在parse tree中每个node会对应一个active capsule。通过使用一个迭代路由过程（iterative routing process），每个active capsule会选择在layer中的一个capsule，作为它在树中的父节点(parent)。对于一个可视化系统中越高层级，该迭代过程会解决分配部件到整体的问题。
 
-在一个active capsule中的neurons的activities，表示出现在该图片中一个特定实体(entity)的多种属性。这些属性可能包含许多不同类型的实例参数，比如：pose（位置、大小、方向），deformation（变型）、velocity（速率）、albedo（反射率）、hue(色彩)、texture(纹理)等。一个非常特别的属性是，在图片中实例化实体的存在(existence)。表示存在的一个很明显的方式是，通过使用一个独立的logistic unit，它的输出是该实体存在的概率。在本paper中，我们会探索一个有意思的方法，它会使用实例参数向量的整体长度来表示实体的存在，并强制向量的方向来表示实体的属性。我们会确保：一个capsule的向量输出的长度不能超过1，通过使用一个非线性（non-linearity）函数来实现：它可以让向量的方向不受更改，但会在它的幅度上缩放。
+在一个active capsule中的neurons的activities，表示出现在该图片中一个特定实体(entity)的多种属性。这些属性可能包含许多不同类型的实例参数，比如：pose（位置、大小、方向），deformation（变型）、velocity（速率）、albedo（反射率）、hue(色彩)、texture(纹理)等。**一个非常特别的属性是，在图片中实例化实体(instantiated entity)的存在(existence)**。表示存在的一个很明显的方式是，通过使用一个独立的logistic unit，它的输出是该实体存在的概率。在本paper中，我们会探索一个有意思的方法，**它会使用实例参数向量的整体长度(overall length)来表示实体的存在，并强制向量的方向(orientation)来表示实体的属性**。我们会确保：一个capsule的向量输出的长度不能超过1，通过使用一个非线性（non-linearity）函数来实现：它可以让向量的方向不受更改，但会在它的幅度上缩放。
 
 事实上，一个capsule的输出是一个向量，使得它可以使用一个很强大的dynamic routing机制来确保：capsule的输出发送到一个合适的父节点上。首先，output会被路由到所有可能的父节点上，但它会通过总和为1的耦合系数进行缩放。对于每个可能的父节点，通过将它的output乘以一个权重矩阵，capsule会计算得到一个“预测向量（prediction vector）”。如果该预测向量与一个可能父节点的输出具有一个大的标量乘，那么会存在一个自顶向下的反馈（top-down feedback），它会为父节点增加耦合系数(coupling coefficient)，并为其它父节点减上它。这会增加capsule对该parent的贡献，并进一步增加capsule的预测与parent的输出间的标量乘积。这种类型的"routing-by-agreement"应远比原始版本的通过max-pooling实现的routing机制要更有效的多。我们会进一步展示，我们的dynamic routing机制是实现该“解释消除(explaining away)”的一种有效方法，它对于将高度重叠的目标进行分割是必须的。
 
