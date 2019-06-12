@@ -8,7 +8,7 @@ tags:
 
 hinton在《Dynamic Routing Between Capsules》中提出了“dynamic routing”的概念。我们来看下这篇paper：
 
-# 
+# abstract
 
 一个capsule是一组neurons，它的activity vector表示了一个特定类型实体（比如：一个object或一个object part）的实例参数。我们使用activity vector的长度(length)来表示实体存在的概率，使用它的方向(orientation)表示实体参数。在一个层级上的Active capsules通过转移矩阵为高级capsules的实例参数做出预测。当多个预测达到一致时，一个更高级别的capsule会变成active态。我们会展示：当训练完后，多层capsule系统会在MNIST上达到state-of-art的效果，它在识别高度重叠的数字上要比CNN要好。为了达到这样的结果，我们使用了一个迭代式routing-by-agreement机制：一个更低层级的capsule会偏向于将它的output发送到更高层级的capsules上，它的activity vectors会与来自低层级capsule的预测做一个大的标量乘。
 
@@ -17,7 +17,7 @@ hinton在《Dynamic Routing Between Capsules》中提出了“dynamic routing”
 
 # 1.介绍
 
-人类视觉会通过使用一个关于注视点(fixation points)的很仔细的判别序列，忽略不相关细节，来确保只有一小部分的光学阵列（optic array）在最高分辨率上被处理。为了理解关于该场景有多少认识是来自该注视点序列，以及我们从单个fixation能得到多少东西，但在本paper中，我们将假设，单个fixation会比单个被识别目标和它的属性带给我们更多。我们假设，我们的multi-layer可视化系统会在每个fixation上创建一个类parse tree结构，我们会忽略：这些单个fixation parse trees是如何协调的。
+人类视觉会通过使用一个关于注视点(fixation points)的细致判别序列，忽略掉不相关细节，来确保只有一小部分的光学阵列（optic array）在最高分辨率上被处理。内省（Introspection）对于理解以下情况效果很差：关于某个场景的知识有多少是来自该注视点序列，以及我们从单个fixation能得到多少知识。但在本paper中，我们将假设，单个fixation会比单个被识别目标和它的属性带给我们更多。我们假设，我们的multi-layer可视化系统会在每个fixation上创建一个类parse tree结构，我们会忽略：这些单个fixation parse trees是如何协调的。
 
 parse trees通常会通过动态内存分配即时构建。然而，根据【hinton 2000】，我们假设：对于单个fixation，一个parse tree可以从一个确定的multi-layer神经网络（比如： 雕塑从一块岩石中中雕刻出）中雕刻出。每个layer将被划分成许多被称为“capsules”的neurons小分组，在parse tree中每个node会对应一个active capsule。通过使用一个迭代路由过程（iterative routing process），每个active capsule会选择在layer中的一个capsule，作为它在树中的父节点(parent)。对于一个可视化系统中越高层级，该迭代过程会解决分配部件到整体的问题。
 
