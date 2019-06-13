@@ -86,7 +86,7 @@ $$
 
 - $$T_k=1$$表示某个数字分类k出现
 - $$m^+=0.9$$和$$m^-=0.1$$
-- $$\lambda$$：对于没出现的数字类别会降权(down-weighting) loss，从所有digit capsules的activity vectors的长度收缩，会停止初始化学习(initial learning)。。。。 我们使用$$\lambda=0.5$$。
+- $$\lambda$$会对于没出现的数字类别会降权(down-weighting) loss，从所有digit capsules的activity vectors的长度进行收缩(shrinking)，从而停止初始化学习(initial learning)。 我们使用$$\lambda=0.5$$。
 
 total loss可以简单认为是所有数字胶囊的losses求和。
 
