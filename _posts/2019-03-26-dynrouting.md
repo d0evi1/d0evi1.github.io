@@ -94,7 +94,7 @@ total loss可以简单认为是所有数字胶囊的losses求和。
 
 <img src="http://pic.yupoo.com/wangdren23_v/3fcffe15/3b65c4cc.jpeg">
 
-图1 一个具有3 layers的简单CapsNet。该模型会与CNN (Chang 2015)进行比较。在DigitCaps中的每个capsule的activity vector的长度，表示每个数字类别（class）的一个实例的出现，并被用于计算分类loss。$$W_{ij}$$是一个在PrimaryCapsules中每个$$u_i, i \in (1, 32 \times 32 \times 6) $$和$$v_j, i\in (1, 10)$$间的权重矩阵。
+图1 一个具有3 layers的简单CapsNet。该模型会与CNN (Chang 2015)进行比较。在DigitCaps中的每个capsule的activity vector的长度，表示每个数字类别（class）的一个实例的出现，并被用于计算分类loss。$$W_{ij}$$是一个在PrimaryCapsules中每个$$u_i, i \in (1, 32 \times 32 \times 6) $$和$$v_j, j\in (1, 10)$$间的权重矩阵。
 
 一个简单的CapsNet结构如图1所示。该结构是浅层的，只有两个卷积层和一个FC layer。Conv1具有256， 9x9的conv kernels，它的stride=1, 并使用ReLU activation。该layer会将像素强度转化到局部特征检测器的activities，接着被用于primary capsules的输入。
 
