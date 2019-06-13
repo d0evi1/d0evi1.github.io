@@ -106,7 +106,7 @@ primary capsules是最低层的多维实体，从一个倒转图的角度看，�
 
 ## 4.1 重构成一个正则方法
 
-我们使用一个额外的reconstruction loss来支持digit capsules将输入数字的实例参数进行编码(encode)。在训练期间，除了正确digit capsule的activity vector外，我们会遮住所有其它digit capsule的vector。接着，我们使用该activity vector来重构输入图片。digit capsule的输出被feed给一个decoder（它由3个FC layer组成，会如图2所示建模像素强度）。我们会对logitsic units的输出和像素强度间的微分做最小化平方和。我们会通过0.0005将该reconstruction loss缩放，以便它在训练期间不会主导着margin loss。如图3所示，来自CapsNet的16D output的reconstructions是健壮的，它只保留重要细节。
+我们使用一个额外的reconstruction loss来支持digit capsules将输入数字的实例参数进行编码(encode)。在训练期间，除了正确digit capsule的activity vector外，我们会遮住所有其它digit capsule的vector。接着，我们使用该activity vector来重构输入图片。digit capsule的输出被feed给一个decoder（它由3个FC layer组成，会如图2所示建模像素强度）。我们会对logitsic units的输出和像素强度间的微分平方和做最小化。我们使用乘0.0005将该reconstruction loss缩放，以便它在训练期间不会主导着margin loss。如图3所示，来自CapsNet的16D output的reconstructions是健壮的，它只保留重要细节。
 
 <img src="http://pic.yupoo.com/wangdren23_v/97591bd5/6723a6c6.jpeg">
 
@@ -120,11 +120,11 @@ primary capsules是最低层的多维实体，从一个倒转图的角度看，�
 
 我们在28x28 MNIST图片集上（它们会在每个方向上shift两个像素，并使用zero padding）执行训练。没有使用其它的数据扩增/变形(augmentation/deformation)。对于训练集和测试集，dataset分别具有60K和10K的图片。
 
-我们使用单一模型进行测试，没有使用任何模型平均方法(model averaging)。Wan 2013使用ensembling、并将数据进行旋转和缩放进行数据扩充，达到了0.21%的test error。如果不使用这两者，仅能达到0.39%。我们在一个3 layer网络上获得了一个较低的test error (0.25%), 该结果之前只能在更深的网络上才能达到。表1展示了不同CapsNet设置在MNIST上的test error，并展示了routing和reconstruction regularizer的重要性。通过增强在capsule vector中的pose encoding，添加reconstruction regularizer可以增强routing的效果。
+**我们使用单一模型进行测试，没有使用任何模型平均方法(model averaging)**。Wan 2013使用ensembling、并将数据进行旋转和缩放进行数据扩充，达到了0.21%的test error。如果不使用这两者，仅能达到0.39%。我们在一个3 layer网络上获得了一个较低的test error (0.25%), 该结果之前只能在更深的网络上才能达到。**表1展示了不同CapsNet设置在MNIST上的test error，并展示了routing和reconstruction regularizer的重要性**。通过增强在capsule vector中的pose encoding，添加reconstruction regularizer可以增强routing的效果。
 
 <img src="http://pic.yupoo.com/wangdren23_v/a1dbecb5/50fc656c.jpeg">
 
-表1
+表1 CapsNet分类的test arruracy。
 
 baseline是一个标准的CNN，它具有(256, 256, 128)三通道的三层conv layer。每个具有5x5 kernels，stride=1。最后的conv layers会通过size为328､129的两个FC layers。最后的FC layer会使用dropout、连接到一个10分类的softmax layer上，并使用cross entropy loss。baseline也会使用Adam optimizer在2-pixel shifted MNIST上训练。baseline被设计成：计算开销接近CapsNet，在MNIST上达到最好的效果。在参数数目上，baseline具有35.4M，而CapsNet具有8.2M参数，不使用reconstruction subnetwork会有6.8M参数。
 
