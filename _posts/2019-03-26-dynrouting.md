@@ -10,7 +10,7 @@ hinton在《Dynamic Routing Between Capsules》中提出了“dynamic routing”
 
 # abstract
 
-一个capsule是一组neurons，它的activity vector表示了一个特定类型实体（比如：一个object或一个object part）的实例参数。我们使用activity vector的长度(length)来表示实体存在的概率，使用它的方向(orientation)表示实体参数。在一个层级上的Active capsules通过转移矩阵为高级capsules的实例参数做出预测。当多个预测达到一致时，一个更高级别的capsule会变成active态。我们会展示：当训练完后，多层capsule系统会在MNIST上达到state-of-art的效果，它在识别高度重叠的数字上要比CNN要好。为了达到这样的结果，我们使用了一个迭代式routing-by-agreement机制：一个更低层级的capsule会偏向于将它的output发送到更高层级的capsules上，它的activity vectors会与来自低层级capsule的预测做一个大的标量乘。
+一个capsule是一组neurons，它的activity vector表示了一个特定类型实体（比如：一个object或一个object part）的实例参数。我们使用activity vector的长度(length)来表示实体存在的概率，使用它的方向(orientation)表示实体参数。在一个层级上的Active capsules通过转移矩阵为高级capsules的实例参数做出预测。当多个预测达到一致时，一个更高级别的capsule会变成active态。我们会展示：当训练完后，多层capsule系统会在MNIST上达到state-of-art的效果，它在识别高度重叠的数字上要比CNN要好。为了达到这样的结果，我们使用了一个迭代式routing-by-agreement机制：一个更低层级的capsule会偏向于将它的output发送到更高层级的capsules上，它的activity vectors会与来自低层级capsule的预测做一个大的点积。
 
 <img src="http://pic.yupoo.com/wangdren23_v/77e8d5aa/f0d86e3b.jpeg">
 
@@ -23,7 +23,7 @@ parse trees通常会通过动态内存分配即时构建。然而，根据【hin
 
 在一个active capsule中的neurons的activities，表示出现在该图片中一个特定实体(entity)的多种属性。这些属性可能包含许多不同类型的实例参数，比如：pose（位置、大小、方向），deformation（变型）、velocity（速率）、albedo（反射率）、hue(色彩)、texture(纹理)等。**一个非常特别的属性是，在图片中实例化实体(instantiated entity)的存在(existence)**。表示存在的一个很明显的方式是，通过使用一个独立的logistic unit，它的输出是该实体存在的概率。在本paper中，我们会探索一个有意思的方法，**它会使用实例参数向量的整体长度(overall length)来表示实体的存在，并强制向量的方向(orientation)来表示实体的属性**。我们会确保：一个capsule的向量输出(vector output)的长度不能超过1，通过使用一个非线性（non-linearity）函数，它可以保持向量方向不变，但会在幅值上缩放。
 
-事实上，一个capsule的输出就是一个向量，使得它可以使用一个很强大的dynamic routing机制，来确保capsule的输出发送到上层(layer above)的一个合适的父胶囊(parent)上。首先，该output会被路由到所有可能的父胶囊上，但它会通过总和为1的耦合系数进行缩减。对于某个capsule的每个可能的父胶囊，该capsule通过将它的output乘以一个权重矩阵计算得到一个“预测向量（prediction vector）”。如果该预测向量与某一父胶囊的输出具有一个大的标量乘(scalar product)，那么这就存在一个自顶向下的反馈（top-down feedback），它会为该父胶囊增加耦合系数(coupling coefficient)，而对于其它父胶囊则减去该系数。这样就增加了该capsule对该父胶囊的贡献，并进一步增加该capsule的预测向量与父胶囊的输出间的标量乘积。这种类型的"routing-by-agreement"远比原始版本的通过max-pooling实现的routing机制要更有效的多。我们会进一步展示，我们的dynamic routing机制是实现该“解释消除(explaining away)”的一种有效方法，解释消除对于将高度重叠的目标进行分割是必须的。
+事实上，一个capsule的输出就是一个向量，使得它可以使用一个很强大的dynamic routing机制，来确保capsule的输出发送到上层(layer above)的一个合适的父胶囊(parent)上。首先，该output会被路由到所有可能的父胶囊上，但它会通过总和为1的耦合系数进行缩减。对于某个capsule的每个可能的父胶囊，该capsule通过将它的output乘以一个权重矩阵计算得到一个“预测向量（prediction vector）”。如果该预测向量与某一父胶囊的输出具有一个大的点积(scalar product，注：标量积、点积、内积、向量的积  dot product = scalar product)，那么这就存在一个自顶向下的反馈（top-down feedback），它会为该父胶囊增加耦合系数(coupling coefficient)，而对于其它父胶囊则减去该系数。这样就增加了该capsule对该父胶囊的贡献，并进一步增加该capsule的预测向量与父胶囊的输出间的点积。这种类型的"routing-by-agreement"远比原始版本的通过max-pooling实现的routing机制要更有效的多。我们会进一步展示，我们的dynamic routing机制是实现该“解释消除(explaining away)”的一种有效方法，解释消除对于将高度重叠的目标进行分割是必须的。
 
 CNN会使用所学到的特征检测器的平移副本（translated replicas）。这允许他们将在一个图片中某一位置获得的好的权重值的知识平移到另一位置上。这在图片解释中被证明是相当有用的。尽管我们使用vector-output capsules来替换CNNs的scalar-output feature detectors、以及使用routing-by-agreement来替代max-pooling，我们仍希望跨空间的复用学到的知识。为了达到该目标，我们让除了capsules的最后一层之外的所有层都是conv的。有了CNNs，我们可以让更高层级的capsules覆盖该图片的更大区域。不同于max-pooling，我们不会丢掉关于该实体在该区域内的准确位置信息。对于低级别的capsules，位置信息是由active capsule所“place-coded”。随着结构的上升，在某个capsule的output vector的实值元素（real-valued components）中，越来越多的位置信息是"rate-coded"。从place-coding到rate-coding的转换，加上更高层capsules可以以更多自由度来表示更复杂实体，表明capsules的维度应随着结构的上升而增加。
 
@@ -62,9 +62,9 @@ $$
 
 ...(3)
 
-**该log先验(priors)可以同时与所有其它权重一起通过判别式学习学到**。他们取决于两个capsules的位置(location)和类型(type)，但不会依赖于当前输入图片。初始化的耦合系数接着通过对每个在上层(layer above)中capsule j的当前输出$$v_j$$，以及由capsule i做出的预测$$\hat{u}_{j \mid i}$$的一致性（agreement）进行衡量，来迭代式地进行提升。
+**该log先验(priors)可以同时与所有其它权重一起通过判别式学习学到**。他们取决于两个capsules的位置(location)和类型(type)，但不会依赖于当前输入图片。接着通过对每个在上层(layer above)中capsule j的当前输出$$v_j$$，以及由capsule i做出的预测$$\hat{u}_{j \mid i}$$的一致性（agreement）进行measure，以对初始化的耦合系数进行迭代式地提升。
 
-**该agreement就是简单的标量乘积$$a_{ij}=v_j \cdot \hat{u}_{j \mid i}$$**。该agreement就好像被看成是：它是一个log似然，并且在为capsule i连接到更高层级capsules上的所有耦合系数计算新值之前，被添加到initial logit $$b_{ij}$$中。
+**该agreement就是简单的点积$$a_{ij}=v_j \cdot \hat{u}_{j \mid i}$$**。该agreement就好像被看成是：它是一个log似然，并且在为capsule i连接到更高层级capsules上的所有耦合系数计算新值之前，被添加到initial logit $$b_{ij}$$中。
 
 在卷积capsule layers中，每个capsule会输出一个向量的local grid到layer above中每种类型的capsule。。。。
 
