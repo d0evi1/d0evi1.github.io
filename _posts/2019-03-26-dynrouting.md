@@ -106,7 +106,7 @@ primary capsules是最低层的多维实体，从一个倒转图的角度看，�
 
 ## 4.1 重构成一个正则方法
 
-我们使用一个额外的reconstruction loss来鼓励digit capsules来编码输入数字的实例参数。在训练期间，除了正确digit capsule的activity vector外，我们会遮住所有。接着，我们使用该activity vector来重构输入图片。digit capsule的输出被feed给一个decoder（它由3个FC layer组成，会如图2所示建模像素强度）。我们会对logitsic units的输出和像素强度间的微分做最小化平方和。我们会通过0.0005将该reconstruction loss缩放，以便它在训练期间不会主导着margin loss。如图3所示，来自CapsNet的16D output的reconstructions是健壮的，它只保留重要细节。
+我们使用一个额外的reconstruction loss来支持digit capsules将输入数字的实例参数进行编码(encode)。在训练期间，除了正确digit capsule的activity vector外，我们会遮住所有其它digit capsule的vector。接着，我们使用该activity vector来重构输入图片。digit capsule的输出被feed给一个decoder（它由3个FC layer组成，会如图2所示建模像素强度）。我们会对logitsic units的输出和像素强度间的微分做最小化平方和。我们会通过0.0005将该reconstruction loss缩放，以便它在训练期间不会主导着margin loss。如图3所示，来自CapsNet的16D output的reconstructions是健壮的，它只保留重要细节。
 
 <img src="http://pic.yupoo.com/wangdren23_v/97591bd5/6723a6c6.jpeg">
 
