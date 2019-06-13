@@ -66,11 +66,11 @@ $$
 
 **该agreement就是简单的点积$$a_{ij}=v_j \cdot \hat{u}_{j \mid i}$$**。该agreement就好像被看成是：它是一个log似然，并且在为capsule i连接到更高层级capsules上的所有耦合系数计算新值之前，被添加到initial logit $$b_{ij}$$中。
 
-在卷积capsule layers中，每个capsule会输出一个向量的local grid到layer above中每种类型的capsule。。。。
+在conv capsule layers上，每个capsule会将一个关于向量的local grid，并为grid中每个成员、以及对于每种类型的capsule使用不同的转换矩阵，输出到上层（layer above）中每种类型的capsule。
 
 <img src="http://pic.yupoo.com/wangdren23_v/d8b14ce9/ee67b84c.jpeg">
 
-算法1
+算法1 routing算法
 
 # 3.数字存在性的margin loss
 
