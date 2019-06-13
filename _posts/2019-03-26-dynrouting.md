@@ -25,13 +25,13 @@ parse trees通常会通过动态内存分配即时构建。然而，根据【hin
 
 事实上，一个capsule的输出就是一个向量，使得它可以使用一个很强大的dynamic routing机制，来确保capsule的输出发送到上层(layer above)的一个合适的父胶囊(parent)上。首先，该output会被路由到所有可能的父胶囊上，但它会通过总和为1的耦合系数进行缩减。对于某个capsule的每个可能的父胶囊，该capsule通过将它的output乘以一个权重矩阵计算得到一个“预测向量（prediction vector）”。如果该预测向量与某一父胶囊的输出具有一个大的标量乘(scalar product)，那么这就存在一个自顶向下的反馈（top-down feedback），它会为该父胶囊增加耦合系数(coupling coefficient)，而对于其它父胶囊则减去该系数。这样就增加了该capsule对该父胶囊的贡献，并进一步增加该capsule的预测向量与父胶囊的输出间的标量乘积。这种类型的"routing-by-agreement"远比原始版本的通过max-pooling实现的routing机制要更有效的多。我们会进一步展示，我们的dynamic routing机制是实现该“解释消除(explaining away)”的一种有效方法，解释消除对于将高度重叠的目标进行分割是必须的。
 
-CNN会使用所学到的特征检测器的平移副本（translated replicas）。这允许他们将在一个图片中某一位置获得的好的权重值的知识平移到另一位置上。这在图片解释中被证明是相当有用的。尽管我们使用vector-output capsules来替换CNNs的scalar-output feature detectors、以及使用routing-by-agreement来替代max-pooling，我们仍希望跨空间的复用学到的知识。为了达到该目标，我们让除了capsules的最后一层之外的所有层都是conv的。有了CNNs，我们可以让更高层级的capsules覆盖该图片的更大区域。不同于max-pooling，我们不会丢掉关于该实体在该区域内的准确位置信息。对于低级别的capsules，位置信息是由active capsule所“place-coded”。随着结构的上升，在某个capsule的output vector的实值元素（real-valued components）中，越来越多的位置信息是"rate-coded"。从place-coding到rate-coding的shift，加上更高层capsules可以以更多自由度来表示更复杂实体，表明capsules的维度应随着结构的上升而增加。
+CNN会使用所学到的特征检测器的平移副本（translated replicas）。这允许他们将在一个图片中某一位置获得的好的权重值的知识平移到另一位置上。这在图片解释中被证明是相当有用的。尽管我们使用vector-output capsules来替换CNNs的scalar-output feature detectors、以及使用routing-by-agreement来替代max-pooling，我们仍希望跨空间的复用学到的知识。为了达到该目标，我们让除了capsules的最后一层之外的所有层都是conv的。有了CNNs，我们可以让更高层级的capsules覆盖该图片的更大区域。不同于max-pooling，我们不会丢掉关于该实体在该区域内的准确位置信息。对于低级别的capsules，位置信息是由active capsule所“place-coded”。随着结构的上升，在某个capsule的output vector的实值元素（real-valued components）中，越来越多的位置信息是"rate-coded"。从place-coding到rate-coding的转换，加上更高层capsules可以以更多自由度来表示更复杂实体，表明capsules的维度应随着结构的上升而增加。
 
 # 2.一个capsule的inputs和outputs向量是如何计算的
 
-有许多可能的方法来实现capsules的通用思想。该paper的目的并不是探索整体空间，而是简单展示一种相当简单的实现，它运转良好并且dynamic routing可以用的上。
+有许多可能的方法来实现capsules的通用思想。该paper的目的并不是探索整体空间，而是提供一种可以运转良好的简单实现，并且能用上dynamic routing。
 
-我们希望：一个capsule的output vector的长度用来表示：通过该capsule表示的实体在当前输入中出现的概率。因此，我们使用一个非线性的“压制（squashing）”函数，来确保短向量长度收缩到几乎为0，长向量收缩到长度在1以下。我们使用判别式学习来充分利用该非线性。
+我们希望：一个capsule的output vector的长度用来表示：通过该capsule表示的实体在当前输入中出现的概率。因此，**我们使用一个非线性的“压扁（squashing）”函数，来确保短向量长度收缩到几乎为0，长向量收缩到长度在1以下**。我们将它留给判别式学习，以便充分利用这种非线性。
 
 $$
 v_j = \frac{\| s_j \|^2}{ 1+ \| s_j \|^2} \frac{s_j}{\|s_j\|}
@@ -39,9 +39,12 @@ $$
 
 ...(1)
 
-其中，$$v_j$$是capsule j的向量输出，$$s_j$$是它的总输入(total input)。
+其中：
 
-对于除了第一层外的其它层capsules，一个capsule的总输入$$s_j$$是一个在所有“预测向量（prediction vectors）”$$\hat{u}_{j \mid i}$$的加权求和。这些预测向量来自于layer below的capsules，通过将在layer below中的一个capsule的输出$$u_i$$乘以一个加权矩阵$$W_{ij}$$得到：
+- $$v_j$$是capsule j的向量输出
+- $$s_j$$是它的总输入(total input)
+
+对于除了第一层外的其它层capsules，一个capsule的总输入$$s_j$$是一个在所有“预测向量（prediction vectors）”$$\hat{u}_{j \mid i}$$的加权求和。这些预测向量来自于下层（layer below）的capsules，通过将在下层（layer below）中的一个capsule的输出$$u_i$$乘以一个加权矩阵$$W_{ij}$$得到：
 
 $$
 s_j = \sum\limits_i c_{ij} \hat{u}_{j \mid i}, \hat{u}_{j|i} = W_{ij} u_i
@@ -49,9 +52,9 @@ $$
 
 ...(2)
 
-其中，$$c_{ij}$$是耦和系数，它通过迭代式dynamic routing过程决定。
+其中，**$$c_{ij}$$是耦和系数，它通过迭代式dynamic routing过程决定**。
 
-在capsule i和在layer above中的所有capsules间的耦和系数，总和为1, 通过一个"routing softmax"来决定，该softmax的intial logits $$b_{ij}$$是关于capsule i与capsule j相耦合的log先验概率。
+在capsule i和在上层（layer above）中的所有capsules间的耦和系数，总和为1, 通过一个"routing softmax"来决定，**该softmax的intial logits $$b_{ij}$$是关于capsule i与capsule j相耦合的log先验概率**。
 
 $$
 c_{ij} = \frac{exp(b_{ij})}{\sum_k exp(b_{ik})}
@@ -59,9 +62,9 @@ $$
 
 ...(3)
 
-该log先验(priors)可以同时与所有其它权重一起通过判别式学习学到。他们取决于两个capsules的位置(location)和类型(type)，但不依赖于当前输入图片。该intial耦合系数接着通过对每个在layer above中capsule j的当前输出$$v_j$$，以及由capsule i做出的预测$$\hat{u}_{j \mid i}$$的一致性（agreement）进行衡量，来迭代式地进行提升。
+**该log先验(priors)可以同时与所有其它权重一起通过判别式学习学到**。他们取决于两个capsules的位置(location)和类型(type)，但不会依赖于当前输入图片。初始化的耦合系数接着通过对每个在上层(layer above)中capsule j的当前输出$$v_j$$，以及由capsule i做出的预测$$\hat{u}_{j \mid i}$$的一致性（agreement）进行衡量，来迭代式地进行提升。
 
-该一致性(agreement)是简单的标量乘积$$a_{ij}=v_j \cdot \hat{u}_{j \mid i}$$。该agreement就好像被看成是：它是一个log似然，并且在为capsule i连接到更高层级capsules上的所有耦合系数计算新值之前，被添加到initial logit $$b_{ij}$$中。
+**该agreement就是简单的标量乘积$$a_{ij}=v_j \cdot \hat{u}_{j \mid i}$$**。该agreement就好像被看成是：它是一个log似然，并且在为capsule i连接到更高层级capsules上的所有耦合系数计算新值之前，被添加到initial logit $$b_{ij}$$中。
 
 在卷积capsule layers中，每个capsule会输出一个向量的local grid到layer above中每种类型的capsule。。。。
 
