@@ -74,7 +74,7 @@ $$
 
 # 3.数字存在性的margin loss
 
-我们正使用实例向量的长度来表示一个capsule实体存在的概率。我们希望，对于数字类别k的top-level capsule，有一个长的实例向量，当且仅当该数字出现在该图片上时。为了允许多个数字，对于每个数字胶囊k，我们使用一个独立的margin loss，$$L_k$$：
+我们正使用实例向量的长度来表示一个capsule实体存在的概率。我们希望，对于数字类别k，当且仅当该数字出现在该图片上时，顶层（top-level） capsule会具有一个长的实例向量。为了允许多个数字，对于每个数字胶囊（digit capsule）k，我们使用一个独立的margin loss，$$L_k$$：
 
 $$
 L_k = T_k max(0, m^+ - \| v_k \|)^2 + \lambda(1-T_k) max(0, \|v_k \| - m^-)^2
