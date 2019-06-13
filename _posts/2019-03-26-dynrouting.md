@@ -82,13 +82,19 @@ $$
 
 ...(4)
 
-其中$$T_k=1$$表示一个数字分类k出现，$$m^+=0.9$$和$$m^-=0.1$$。$$\lambda$$ down-weighting loss对于缺失的数字类别，会停止初始化学习。。。。 我们使用$$\lambda=0.5$$。total loss可以简单认为是所有数字胶囊的losses求和。
+其中：
+
+- $$T_k=1$$表示某个数字分类k出现
+- $$m^+=0.9$$和$$m^-=0.1$$
+- $$\lambda$$：对于没出现的数字类别会降权(down-weighting) loss，从所有digit capsules的activity vectors的长度收缩，会停止初始化学习(initial learning)。。。。 我们使用$$\lambda=0.5$$。
+
+total loss可以简单认为是所有数字胶囊的losses求和。
 
 # 4.CapsNet架构
 
 <img src="http://pic.yupoo.com/wangdren23_v/3fcffe15/3b65c4cc.jpeg">
 
-图1
+图1 一个具有3 layers的简单CapsNet。该模型会与CNN (Chang 2015)进行比较。在DigitCaps中的每个capsule的activity vector的长度，表示每个数字类别（class）的一个实例的出现，并被用于计算分类loss。$$W_{ij}$$是一个在PrimaryCapsules中每个$$u_i, i \in (1, 32 \times 32 \times 6) $$和$$v_j, i\in (1, 10)$$间的权重矩阵。
 
 一个简单的CapsNet结构如图1所示。该结构是浅层的，只有两个卷积层和一个FC layer。Conv1具有256， 9x9的conv kernels，它的stride=1, 并使用ReLU activation。该layer会将像素强度转化到局部特征检测器的activities，接着被用于primary capsules的输入。
 
@@ -104,11 +110,11 @@ $$
 
 <img src="http://pic.yupoo.com/wangdren23_v/97591bd5/6723a6c6.jpeg">
 
-图2
+图2 Decoder结构，用于将来自DigitCaps layer的representation重构成一个数字. 图片和Sigmoid layer的output间的欧氏矩离(euclidean distance)，在训练期间最小化。在训练期间，我们使用true label来重构target。
 
 <img src="http://pic.yupoo.com/wangdren23_v/c9da7080/de29a2ef.jpeg">
 
-图3
+图3 一个使用3个routing迭代的CapsNet的样本MNIST test重构。(l,p,r)表示label，prediction和reconstruction。
 
 # 5.Capsules on MNIST
 
