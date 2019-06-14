@@ -96,13 +96,13 @@ total loss可以简单认为是所有数字胶囊的losses求和。
 
 图1 一个具有3 layers的简单CapsNet。该模型会与CNN (Chang 2015)进行比较。在DigitCaps中的每个capsule的activity vector的长度，表示每个数字类别（class）的一个实例的出现，并被用于计算分类loss。$$W_{ij}$$是一个在PrimaryCapsules中每个$$u_i, i \in (1, 32 \times 32 \times 6) $$和$$v_j, j\in (1, 10)$$间的权重矩阵。
 
-一个简单的CapsNet结构如图1所示。该结构是浅层的，只有两个卷积层和一个FC layer。Conv1具有256， 9x9的conv kernels，它的stride=1, 并使用ReLU activation。该layer会将像素强度转化到局部特征检测器的activities，接着被用于primary capsules的输入。
+一个简单的CapsNet结构如图1所示。该结构是浅层的，只有两个卷积层和一个FC layer。Conv1具有256个9x9的conv kernels，它的stride=1, 并使用ReLU activation。该layer会将像素强度转化到局部特征检测器的activities，接着被用于primary capsules的输入。
 
 primary capsules是最低层的多维实体，从一个倒转图的角度看，将primary capsules激活(activating)对应于将渲染过程进行反转(inverting)。比起将实例部件(instantiated parts)组装成熟悉的整体的方式，这是一种非常不同类型的计算，capsules的设计很擅长这种计算。
 
-**第二层（PrimaryCapsules）是一个convolutional capsule layer**，它使用32 channels的conv 8D capsules(例如：每个primary capsule包含了8个conv units，它具有9x9 kernel以及stride=2)。每个primary capsule的输出会看到所有256 x 81 Conv units，它们的receptive fields与capsule中心位置重叠。在总的PrimaryCapsules中，有$$[32 \times 6 \times 6]$$个capsule outputs（每个output是一个8D vector），在$$[6 \times 6]$$ grid中的每个capsule会相互共享它们的权重。你可以将PrimaryCapsules看成是Conv layer，其中等式1看成是它的block非线性。最后一层(DigitsCaps)对于每个digit类具有一个16D的capsule，这些capsules的每一个会接受来自在layer below中的所有capsules的输入。
+**第二层（PrimaryCapsules）是一个convolutional capsule layer**，它使用32 channels的conv 8D capsules(例如：每个primary capsule包含了8个conv units，它具有9x9 kernel以及stride=2)。每个primary capsule的输出会看到所有256 x 81 Conv units，它们的receptive fields与capsule中心位置重叠。在总的PrimaryCapsules中，有$$[32 \times 6 \times 6]$$个capsule outputs（每个output是一个8D vector），在$$[6 \times 6]$$ grid中的每个capsule会相互共享它们的权重。**你可以将PrimaryCapsules看成是Conv layer，其中等式1看成是它的block非线性**。最后一层(DigitsCaps)对于每个digit类具有一个16D的capsule，这些capsules的每一个会接受来自在layer below中的所有capsules的输入。
 
-我们会在两个连续的capsule layers间（比如：PrimaryCapsules和DigitCaps）进行路由（routing），由于Conv1的输出是1维的，在它的空间上没有方向取得一致(agree)。因此，在Conv1和PrimaryCapsules间不会使用routing。所有的routing logits($$b_{ij}$$)被初始化为0。因此，最初一个capsule的output($$u_i$$)会被等概率的($$c_{ij}$$)发送到所有的父胶囊（parent capsules($$v_0 \cdots v_9$$)）上，我们会使用Adam optimizer及tensorflow中的初始参数，包含exponentially decaying learning rate来最小化等式(4)的margin losses的和。
+我们会在两个连续的capsule layers间（比如：PrimaryCapsules和DigitCaps）进行路由（routing），由于Conv1的输出是1维的，在它的空间上没有方向取得一致(agree)。**因此，在Conv1和PrimaryCapsules间不会使用routing**。所有的routing logits($$b_{ij}$$)被初始化为0。因此，初始化时，一个capsule的output($$u_i$$)会被等概率的($$c_{ij}$$)发送到所有的父胶囊（parent capsules($$v_0 \cdots v_9$$)）上，我们会使用Adam optimizer及tensorflow中的初始参数，包含exponentially decaying learning rate来最小化等式(4)的margin losses的和。
 
 ## 4.1 重构成一个正则方法
 
