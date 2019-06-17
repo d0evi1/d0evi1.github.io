@@ -29,7 +29,7 @@ CNN会使用所学到的特征检测器的平移副本（translated replicas）�
 
 # 2.一个capsule的inputs和outputs向量是如何计算的
 
-有许多可能的方法来实现capsules的通用思想。该paper的目的并不是探索整体空间，而是提供一种可以运转良好的简单实现，并且能用上dynamic routing。
+有许多可能的方式来实现capsules的通用思想。该paper的目的并不是探索整个实现空间，而是提供一种可以运转良好的简单实现，并且能用上dynamic routing。
 
 我们希望：一个capsule的output vector的长度用来表示：通过该capsule表示的实体在当前输入中出现的概率。因此，**我们使用一个非线性的“压扁（squashing）”函数，来确保短向量长度收缩到几乎为0，长向量收缩到长度在1以下**。我们将它留给判别式学习，以便充分利用这种非线性。
 
@@ -44,7 +44,7 @@ $$
 - $$v_j$$是capsule j的向量输出
 - $$s_j$$是它的总输入(total input)
 
-对于除了第一层外的其它层capsules，一个capsule的总输入$$s_j$$是一个在所有“预测向量（prediction vectors）”$$\hat{u}_{j \mid i}$$的加权求和。这些预测向量来自于下层（layer below）的capsules，通过将在下层（layer below）中的一个capsule的输出$$u_i$$乘以一个加权矩阵$$W_{ij}$$得到：
+**对于除了第一层外的其它层capsules，一个capsule的总输入$$s_j$$是一个在所有“预测向量（prediction vectors）”$$\hat{u}_{j \mid i}$$的加权求和**。这些预测向量来自于下层（layer below）的capsules，通过将在下层（layer below）中的一个capsule的输出$$u_i$$乘以一个加权矩阵$$W_{ij}$$得到：
 
 $$
 s_j = \sum\limits_i c_{ij} \hat{u}_{j \mid i}, \hat{u}_{j|i} = W_{ij} u_i
