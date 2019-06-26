@@ -106,7 +106,13 @@ primary capsules是最低层的多维实体，从一个倒转图的角度看，�
 
 **第二层（PrimaryCapsules）**
 
-它是一个convolutional capsule layer，它使用32 channels的conv 8D capsules(例如：每个primary capsule包含了8个conv units，它具有9x9 kernel以及stride=2)。每个primary capsule的输出会看到所有256 x 81 Conv units，它们的receptive fields与capsule中心位置重叠。在总的PrimaryCapsules中，有$$[32 \times 6 \times 6]$$个capsule outputs（每个output是一个8D vector），在$$[6 \times 6]$$ grid中的每个capsule会相互共享它们的权重。**你可以将PrimaryCapsules看成是Conv layer，其中等式1看成是它的block非线性函数**。
+它是一个convolutional capsule layer，它使用：
+
+- 32 channels的conv 8D capsules(例如：每个primary capsule包含了8个conv units，它具有9x9 kernel以及stride=2)。
+- 每个primary capsule的输出会看到所有256 x 81 Conv units，它们的receptive fields与capsule中心位置重叠。
+- 在总的PrimaryCapsules中，有$$[32 \times 6 \times 6]$$个capsule outputs（每个output是一个8D vector），在$$[6 \times 6]$$ grid中的每个capsule会相互共享它们的权重。
+
+**你可以将PrimaryCapsules看成是Conv layer，其中等式1看成是它的block非线性函数**。
 
 **最后一层(DigitsCaps)**
 
