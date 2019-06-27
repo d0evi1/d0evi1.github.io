@@ -68,9 +68,11 @@ $$
 
 ## 1.1 模型架构
 
-受语言模型中的CBOW(continuous bag of words)的启发，我们为固定size视频库中的每个视频学习高维emdeddings，接着将这些emdeddings前馈(feed)输入到一个前馈神经网络。一个用户的观看历史，可以被表示成一个关于稀疏视频id的可变长序列，这些id会通过embeddings被映射到一个dense vector representation上。**该网络需要固定大小的dense inputs**，最后选择对emdeddings的简单平均(simply averaging)，因为它在不同策略中(sum, component-wise max，等)效果最好。最重要的，该emdeddings会和其它一些模型参数一起通过常规的梯度下降BP更新即可学到。特征被级联到一个很宽的第一层上（wide first layer），后面跟着许多层的完全连接的ReLU层[6]。图3展示了整体架构，它带有额外的非视频观看特征（no-video watch features）。
+受语言模型中的CBOW(continuous bag of words)的启发，我们为固定size视频库中的每个视频学习高维emdeddings，接着将这些emdeddings前馈(feed)输入到一个前馈神经网络。一个用户的观看历史，可以被表示成一个关于稀疏视频id的可变长序列，这些id会通过embeddings被映射到一个dense vector representation上。**该网络需要固定大小的dense inputs**，最后选择对emdeddings的简单平均(simply averaging)，因为它在不同策略中(sum, component-wise max，等)效果最好。最重要的，该emdeddings会和其它一些模型参数一起通过常规的梯度下降BP更新即可学到。特征被拼接(concatenate)到一个很宽的第一层上（wide first layer），后面跟着许多层的完全连接的ReLU层[6]。图3展示了整体架构，它带有额外的非视频观看特征（no-video watch features）。
 
-<img src="http://pic.yupoo.com/wangdren23/GkBOhLXy/medish.jpg">
+<img src="http://pic.yupoo.com/wangdren23_v/46ff9e80/6affc512.jpeg">
+
+图3: 
 
 ## 1.2 多种信号
 
@@ -84,21 +86,21 @@ YouTube上，每秒都有许多视频上传上来。推荐这些最新上传的�
 
 图4展示了该方法在选择视频上的效果。
 
-<img src="http://pic.yupoo.com/wangdren23/GkCFUKaJ/medish.jpg">
+<img src="http://pic.yupoo.com/wangdren23_v/8e91d033/51568544.jpeg">
 
 图4: 对于一个给定的视频[26]，使用样本age作为特征训练的模型能够精准表示数据的上传时间和与时间相关的流行度间的关系。如果没有该特征，模型将会预测在训练窗口上的近似平均似然(baseline)。
 
 ## 1.3 Label和Context选择
 
-需要重点强调的是，推荐(recommendation)通常涉及到求解一个替代问题（surrogate problem），并将结果转换成一个特殊上下文。一个经典的示例是，如果能准确预测rating，会产生有效的电影推荐[2]。我们已经发现，这种代理学习问题（surrogate learning problem）在A/B testing上很重要，但很难在离线试验中进行衡量。
+需要**重点**强调的是，推荐(recommendation)通常涉及到求解一个替代问题（surrogate problem），并将结果转换成一个特殊上下文。一个经典的示例是，如果能准确预测rating，会产生有效的电影推荐[2]。我们已经发现，这种代理学习问题（surrogate learning problem）在A/B testing上很重要，但很难在离线试验中进行衡量。
 
 **训练样本需要从所有YouTube观看行为（即使嵌入在别的网站上）上生成，而非仅仅只使用我们生成的推荐的观看行为。否则，新内容将很难浮现出来，推荐系统在探索（exploitation）上将过度偏差**。如果用户正通过别的方式探索发现视频，而非使用我们的推荐，我们希望能够快速通过协同过滤传播该发现给他人。 **一个关键点是，提升live metrics的目的是为每个用户生成一个固定数目的训练样本，有效地在loss function上对我们的用户做平等的加权。这可以防止一少部分高活跃度用户主宰着loss**。
 
-这在一定程度上与我们的直觉相反，必须注意：为防止模型利用网站布局，以及代理问题造成的过拟合，**需要隐瞒分类器信息(withhold information from the classifier)**。可以考虑将一个样本看成是用户已经发起的一个查询query： 比如“taylor swift”。由于我们的问题是预测下一个要看的视频。通过给定该信息，分类器将会预测要观看的最可能的视频，是那些出现在相应搜索结果页中关于"taylor swift"的视频。一点也不惊奇的是，如果再次生成用户最新的搜索页作为主页推荐，效果会很差。**通过抛弃顺序信息，使用无顺序的词袋(bag of tokens)表示搜索query，该分类器不再直接认识到label的来源**。
+这在一定程度上与我们的直觉相反，必须注意：为防止模型利用网站布局，以及代理问题造成的过拟合，**需要隐瞒分类器信息(withhold information from the classifier)**。可以考虑将一个样本看成是用户已经发起的一个查询(query)： 比如“taylor swift”。由于我们的问题是预测下一个要看的视频。通过给定该信息，分类器将会预测要观看的最可能的视频，是那些出现在相应搜索结果页中关于"taylor swift"的视频。一点也不惊奇的是，如果再次生成用户最新的搜索页作为主页推荐，效果会很差。**通过抛弃顺序信息，使用无顺序的词袋(bag of tokens)表示搜索query，该分类器不再直接认识到label的来源**。
 
 视频的自然消费模式，通常会导致非常不对称的co-watch概率。连播电视剧（Episodic series）通常被按顺序观看，用户经常发现，对于同一个流派(genre)中的艺术家们(artists)，在关注更小众的剧之前，会从最广为流行的剧开始。因此我们发现对于预测用户的下一次观看行为上有着更好的效果，而非去预测一个随机held-out观看(a randomly held-out watch)（见图5）。许多协同过滤系统隐式地选择标签和上下文，通过hold-out一个随机item，然后通过用户历史观看中的其它item来预测它(5a)。这会泄露将来的信息(future information)，并忽略任何不对称的消费模式(asymmetric consumption patterns)。相反的，我们通过选择一个随机观看(a random watch)，然后“回滚(rollback)"一个用户的历史，只输入用户在hold-out label的watch之前(5b)的动作。
 
-<img src="http://pic.yupoo.com/wangdren23/GkHBAolH/medish.jpg">
+<img src="http://pic.yupoo.com/wangdren23_v/e7eabd71/16d1418c.jpeg">
 
 图5: 选择labels和输入上下文给模型，在离线评估时很有挑战性，但对真实的效果有巨大提升。这里，实心事件•表示网络的输入特征，而空心事件◦表示排除在外。我们发现，预测一个将来的观看(5b)，在A/B test中效果更好。在(5b)中，example age通过$$ t_{max}-t_N $$来表示，其中$$t_{max}$$是训练数据中观察到的最大时间。
 
@@ -112,7 +114,7 @@ YouTube上，每秒都有许多视频上传上来。推荐这些最新上传的�
 - Depth 3: 1024 ReLU -> 512 ReLU -> 256 ReLU
 - Depth 4: 2048 ReLU -> 1024 ReLU -> 512 ReLU -> 256 ReLU
 
-<img src="http://pic.yupoo.com/wangdren23/GkHGYqVO/medish.jpg">
+<img src="http://pic.yupoo.com/wangdren23_v/03e6fd14/96028c8f.jpeg">
 
 图6 在video embeddings之外的features可以提升holdout的Mean Average Precision(MAP)以及layers的深度添加了表现力，以便模通过对这些交互建模来有效使用这些额外特征
 
@@ -122,10 +124,9 @@ Ranking的主要作用是，针对指定的UI，使用曝光数据来特化和�
 
 我们使用一个与候选生成阶段相似的架构的深度神经网络，它会使用logistic regression（图7）为每个视频的曝光分配一个独立的值。视频的列表接着会通过该分值进行排序，并返回给用户。我们最终的ranking objective会基于线上的A/B testing结果进行调整，**但总体上是一个关于每次曝光的期望观看时长(expected watch time)的简单函数**。根据ctr的排序通常会促进视频期诈现象：用户不会播放完整(标题党：点击诱惑"clickbait")，而观看时长(watch time)可以捕获更好的参与度（engagement）[13,25]。
 
-<img src="http://pic.yupoo.com/wangdren23/GkIo57Cn/medish.jpg">
+<img src="http://pic.yupoo.com/wangdren23_v/82837582/dd290ea6.jpeg">
 
 图7: 深度ranking网络架构，描绘了嵌入的类别特征（单值和多值类别都存在），与归一化的连续特征的embeddings和powers共享。所有的层都是完全连接的。惯例上，成百上千的特征都可以输入到网络中。
-
 
 ## 2.1 特征表示
 
@@ -165,7 +166,7 @@ Ranking的主要作用是，针对指定的UI，使用曝光数据来特化和�
 
 对于1024->512->256的模型，我们尝试只输入归一化连续特征，而不输入它们的powers，会增加0.2%的loss。相同的隐层配置，我们也训练了一个模型，其中正例和负例的加权相同。不令人惊讶，观看时间加权loss会增加4.1%之多。
 
-<img src="http://pic.yupoo.com/wangdren23/GkMejwGd/medish.jpg">
+<img src="http://pic.yupoo.com/wangdren23_v/563a0cfb/6a927cc0.jpeg">
 
 表1:在基于观看时长加权的pairwise loss上，更深和更宽的隐ReLU层的效果
 
