@@ -79,7 +79,7 @@ $$
 我们假设：policy的一个函数形式为$$\pi_\theta$$，参数为$$\theta \in R^d$$。根据各policy参数的期望累积回报（expected cumulative reward）的梯度，可以通过"log-trick"的方式进行解析法求导，生成以下的REINFORCE梯度：
 
 $$
-E_{\tau \sim \pi_\theta} [R(\tau) \Delta_\theta log \pi_{\theta} (\tau)]
+E_{\tau \sim \pi_\theta} [R(\tau) \nabla_\theta log \pi_{\theta} (\tau)]
 $$
 
 ...(1)
@@ -87,7 +87,7 @@ $$
 在online RL中，在由正在考虑的policy生成的轨迹(trajectories)上计算得到的policy gradient，policy gradient的估计是无偏的，可以分解成：
 
 $$
-\sum_{\tau \sim \pi_{\theta}} R(\tau) \Delta_{\theta} log \pi_{\theta}(\tau) \approx \sum_{\tau \sim \pi_{\theta}} [ \sum_{t=0}^{|\tau|} R_t \Delta_{\theta} log \pi_{\theta} (a_t | s_t)]
+\sum_{\tau \sim \pi_{\theta}} R(\tau) \nabla_{\theta} log \pi_{\theta}(\tau) \approx \sum_{\tau \sim \pi_{\theta}} [ \sum_{t=0}^{|\tau|} R_t \nabla_{\theta} log \pi_{\theta} (a_t | s_t)]
 $$
 
 ...(2)
@@ -103,7 +103,7 @@ $$
 我们会使用权重重要性（importance weighting）[31,33,34]方法来解决该分布不匹配问题（distribution）。考虑到一个轨迹 $$\tau=(s_0,a_0,s_1,...)$$，它根据一个行为策略$$\beta$$抽样得到，那么off-policy-corrected gradient estimator为：
 
 $$
-\sum_{\tau \sim \beta} \frac{\pi_{\theta}(\tau)}{\beta(\tau)} [\sum_{t=0}^{|\tau|} R_t \Delta_{\theta} log(\pi_{\theta} (a_t | s_t))]
+\sum_{\tau \sim \beta} \frac{\pi_{\theta}(\tau)}{\beta(\tau)} [\sum_{t=0}^{|\tau|} R_t \nabla_{\theta} log(\pi_{\theta} (a_t | s_t))]
 $$
 
 其中：
@@ -123,7 +123,7 @@ $$
 这会产生一个具有更低方差的关于policy gradient的有偏估计器（biased estimator）：
 
 $$
-\sum_{\tau \sim \beta} [\sum_{t=0}^{|\tau|} \frac{\pi_{\theta} (a_t |s_t)}{\beta(a_t | s_t)} R_t \Delta_{\theta} log \pi_{\theta} (a_t | s_t)]
+\sum_{\tau \sim \beta} [\sum_{t=0}^{|\tau|} \frac{\pi_{\theta} (a_t |s_t)}{\beta(a_t | s_t)} R_t \nabla_{\theta} log \pi_{\theta} (a_t | s_t)]
 $$
 
 ...(3)
@@ -197,7 +197,7 @@ $$
 在这些假设下，我们可以对该集合推荐setting采用REINFORCE算法，将在等式(2)的梯度更新修改为：
 
 $$
-\sum_{\tau \sim \pi_\theta} [ \sum_{t=0}^{|\tau|} R_t \Delta_{\theta} log \alpha_{\theta} (a_t | s_t)]
+\sum_{\tau \sim \pi_\theta} [ \sum_{t=0}^{|\tau|} R_t \nabla_{\theta} log \alpha_{\theta} (a_t | s_t)]
 $$
 
 其中，$$\alpha_{\theta} (a \mid s) = 1 - (1- \pi_{\theta}(a \mid s))^K$$是一个item a出现在最终的无重复集合A中的概率。这里，$$K = \mid A' \mid > \mid A \mid = k $$。
@@ -205,7 +205,7 @@ $$
 我们接着更新等式(3)中的off-policy corrected gradient，通过使用$$\alpha_{\theta}$$替代$$\pi_{\theta}$$，生成top-K off-policy correction factor: 
 
 $$
-\sum_{\tau \sim \beta} [ \sum_{t=0}^{|\tau|} \frac{\alpha_{\theta} (a_t |s_t)}{\beta(a_t|s_t)} R_t \Delta_{\theta} log \alpha_{\theta} (a_t | s_t)] \\
+\sum_{\tau \sim \beta} [ \sum_{t=0}^{|\tau|} \frac{\alpha_{\theta} (a_t |s_t)}{\beta(a_t|s_t)} R_t \nabla_{\theta} log \alpha_{\theta} (a_t | s_t)] \\
 
 = ...
 
