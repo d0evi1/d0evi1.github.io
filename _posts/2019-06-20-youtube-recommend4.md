@@ -80,7 +80,9 @@ $$
 
 提供了不同族的方法来解决这样的RL问题：Q-learning[38], Policy Gradient[26,36,48]以及黑盒优化（black box potimization）[15]。这里我们主要关注policy-gradient-based方法，比如：REINFORCE[48]。
 
+<div  align="center">
 <img src="http://pic.yupoo.com/wangdren23_v/07de3f1a/05058b23.jpeg" width="320">
+</div>
 
 我们假设：policy的一个函数形式为$$\pi_\theta$$，参数为$$\theta \in R^d$$。根据各policy参数的期望累积回报（expected cumulative reward）的梯度，可以通过"log-trick"的方式进行解析法求导，生成以下的REINFORCE梯度：
 
