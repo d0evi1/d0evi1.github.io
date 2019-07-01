@@ -68,7 +68,7 @@ reward）需要为一个真实用户给出一个真实推荐。作为替代，�
 - $$P: S \times A \times S \rightarrow R$$：是一个状态转移概率
 - $$R: S \times A \rightarrow R$$：回报函数(reward function)，其中$$r(s,a)$$是立即回报，它会在用户状态（user state）s上执行动作a
 - $$\rho_0$$：初始状态分布
-- $$\gamma$$：对于将来的rewards的打折因子(discount factor)
+- $$\gamma$$：对于future rewards的打折因子(discount factor)
 
 我们的目标是：**寻找一个policy $$\pi(a \mid s)$$（它会将一个在item上的分布转化成：基于用户状态$$s \in S$$的条件来推荐$$a \in A$$），以便最大化由推荐系统获得的期望累积回报(expected cumulative reward)**：
 
@@ -100,7 +100,7 @@ $$
 
 ...(2)
 
-对于一个在时间t的上动作（action），通过使用一个discouted future reward $$R_t = \sum\limits_{t'=t}^{\mid \tau \mid} \gamma^{t'-t} r(s_{t'}, a_{t'})$$将替换$$R(\tau)$$得到的该近似结果，可以减小在梯度估计时的方差（variance）。
+对于一个在时间t上的动作（action），通过使用一个discouted future reward $$R_t = \sum\limits_{t'=t}^{\mid \tau \mid} \gamma^{t'-t} r(s_{t'}, a_{t'})$$将替换$$R(\tau)$$得到的该近似结果，可以减小在梯度估计时的方差（variance）。
 
 # 4.off-policy collrection
 
@@ -166,7 +166,9 @@ $$
 
 总之，policy $$\pi_{\theta}$$的参数$$\theta$$包含了两个action embeddings：$$U \in R^{m \times \mid A \mid}$$和$$V \in R^{n \times \mid A \mid}$$，以及在RNN cell中的权重矩阵$$U_z, U_i \in R^{n \times n}, W_u, W_i, W_a \in R^{n \times m}$$，以及biases: $$b_u, b_i \in R^n$$。图1展示了一个描述main policy $$\pi_{\theta}$$的神经网络架构。给定一个观察到的轨迹 $$\tau = (s_0, a_0, s_1, ...)$$，它从一个行为策略（behavior policy）$$\beta$$中抽样得到，该新策略(new policy)首先会生成一个关于user state $$s_{t+1}$$的模型，它使用一个initial state $$s_0 \sim \rho_0$$并通过等式(4)的recurrent cell迭代得到。给定user state $$s_{t+1}$$，policy head会通过等式(5)的softmax来在action space上转化分布。有了$$\pi_{\theta}(a_{t+1} \mid s_{t+1})$$，我们接着使用等式(3)生成一个policy gradient来更新该policy。
 
-图1
+<img src="http://pic.yupoo.com/wangdren23_v/d1be870a/334d078f.jpeg">
+
+图1 该图展示了policy $$\pi_{\theta}$$的参数变量(parametrisation)以及behavior policy $$\beta_{\theta'}$$
 
 ## 4.2 估计behavior policy $$\beta$$
 
