@@ -100,7 +100,7 @@ $$
 
 ...(2)
 
-对于一个在时间t的上动作（action），通过使用一个discouted future reward $$R_t = \sum_{t'=t}^{\mid \tau \mid} \gamma^{t'-t} r(s_{t'}, a_{t'})$$将替换$$R(\tau)$$得到的该近似结果，可以减小在梯度估计时的方差（variance）。
+对于一个在时间t的上动作（action），通过使用一个discouted future reward $$R_t = \sum\limits_{t'=t}^{\mid \tau \mid} \gamma^{t'-t} r(s_{t'}, a_{t'})$$将替换$$R(\tau)$$得到的该近似结果，可以减小在梯度估计时的方差（variance）。
 
 # 4.off-policy collrection
 
