@@ -29,20 +29,21 @@ for a REINFORCE Recommender System》中提出使用强化学习来提升youtube
 
 正如上所述，推荐系统需要处理大的状态空间（state spaces）和动作空间（action spaces），在工业界尤其显著。推荐可提供的items集合是不确定的(non-stationary)，新items会不断被引入到系统中，从而产生一个**日益增长的带新items的动作空间（action space）**，这会产生更稀疏的反馈。另外，在这些items上的用户偏好是会随时间一直漂移的(shifting)，从而产生**连续演化的用户状态(user states)**。在这样一个复杂的**环境（environment）**中，通过这些大量**actions**进行reason，在应用已有RL算法时提出了独特的挑战。这里，我们共享了我们的经验：在非常大的动作空间和状态空间中，在一个**神经网络候选生成器（neural candidate generator）**上（一个top-k推荐系统）应用REINFORCE算法[48]。
 
-除了大量动作和状态空间外，推荐系统中的RL仍是有区别的：只有有限提供的数据。经典的RL应用通过self-play和仿真（simulation）生成的大量训练数据，已经克服了数据无效性（data inefficiencies）。相比较而言，**推荐系统的复杂动态性，使得对于模仿生成真实推荐数据是不可能的**。因此，我们不能轻易探索（probe for）在之前的状态和动作空间中未探索领域上的回报(reward)，因为观测到的reward需要给定一个真实推荐给一个真实用户。作为替代，该模型几乎依赖于之前推荐模型（policies）所提供的数据，大多数模型我们不能控制或不再可以控制。对于从其它policies中大多数日志反馈，我们采用一个off-policy learning方法，在该方法中我们会同时学习之前policies的一个模型，当训练我们的新policy时，在纠正数据偏差时包含它。我们也通过实验演示了在探索数据(exploratory data)上的价值(value)。
+除了大量动作和状态空间外，推荐系统中的RL仍是有区别的：只有有限提供的数据。经典的RL应用通过self-play和仿真（simulation）生成的大量训练数据，已经克服了数据无效性（data inefficiencies）。相比较而言，**推荐系统的复杂动态性，使得对于模仿生成真实推荐数据是不可能的**。因此，我们不能轻易寻找（probe for）在之前的状态和动作空间中未探索领域上的回报(reward)，因为观测到的回报（observing
+reward）需要为一个真实用户给出一个真实推荐。作为替代，该模型几乎依赖于之前**推荐模型（policies）**所提供的数据，大多数模型我们是不能控制的或不再可以控制。对于从其它policies中大多数日志反馈，我们采用一个off-policy learning方法，在该方法中我们会同时学习之前policies的一个模型，当训练我们的新policy时，在纠正数据偏差时包含它。我们也通过实验演示了在探索数据(exploratory data)上的价值(value)。
 
-最终，在RL方法中大多数研究关注于生成一个policy，它可以选择单个item。而真实世界的推荐系统，通常会一次提供用户多个推荐[44]。因此，我们为我们的top-K推荐系统定义了一个新的top-K off-policy correction。我们发现，在模拟和真实环境中，标准off-policy correction会产生一个对于top-1推荐来说最优的policy，而我们的top-K off-policy correction会生成更好的top-K推荐。我们提供了以下的贡献：
+最终，在RL方法中大多数研究主要关注于：产生一个可以选择单个item的policy。**而真实世界的推荐系统，通常会一次提供用户多个推荐[44]**。因此，我们为我们的top-K推荐系统定义了一个新的top-K off-policy correction。我们发现，在模拟和真实环境中，标准off-policy correction会产生一个对于top-1推荐来说最优的policy，而**我们的top-K off-policy correction会生成更好的top-K推荐**。我们提供了以下的贡献：
 
 - 1.REINFORCE推荐系统：我们在一个非常大的action space中，扩展了一个REINFORCE policy-gradient-based方法来学习一个神经网络推荐policy。
 - 2.Off-Policy候选生成：我们使用off-policy correction来从日志反馈中学习，这些日志从之前的model policies的一个ensemble中收集而来。我们会结合一个已经学到的关于行为策略(behavior policies)的神经网络模型来纠正数据偏差。
 - 3.Top-K Off-policy Correction：我们提供了一个新的top-K off-policy correction来说明：我们的推荐一次输出多个items。
 - 4.真实环境的提升：我们展示了在真实环境中（在RL文献中很少有这种情况），这些方法对于提升用户长期满意度的价值。
 
-我们发现，这些方法组作品对于增加用户满意度是很有用的，并相信对于在推荐中进一步使用RL仍有许多实际挑战。
+我们发现，这些方法的组合对于增加用户满意度是很有用的，并相信对于在推荐中进一步使用RL仍有许多实际挑战。
 
 # 2.相关工作
 
-增强学习：Value-based方法（比如：Q-learning），policy-based方法（比如：policy gradients constitue经典方法）来解决RL问题。现代RL方法的常见比较见于[29]，主要关注于异步学习，其关键点是扩展到更大问题上。尽管value-based方法有许多优点（比如：seamless off-policy learning），他们被证明是在函数近似上是不稳定的[41]。通常，对于这些方法来说，需要进行大量的超参数tuning才能达到稳定行为。尽管许多value-based方法（比如：Q-learning）取得了实际成功，这些算法的策略收敛（policy convergence）没有被充分研究。另外，Policy-based方法，对于函数近似来说，只要给定一个足够小的learning rate，仍然相当隐定。因此，我们选择一个policy-gradient-based方法，尤其是REINFORCE[48]，来适配这种on-policy方法，从而当训练off-policy时提供可靠的policy gradient估计。
+增强学习：Value-based方法（比如：Q-learning），policy-based方法（比如：policy gradients constitue经典方法）来解决RL问题。[29]中罗列了现代RL方法的常见比较，主要关注于异步学习，其关键点是扩展到更大问题上。尽管value-based方法有许多优点（比如：seamless off-policy learning），**他们被证明是在函数逼近(function approximation)上是不稳定的[41]**。通常，对于这些方法来说，需要进行大量的超参数调参(hyperparameter tuning)才能达到稳定行为。尽管许多value-based方法（比如：Q-learning）取得了实际成功，这些算法的策略收敛（policy convergence）没有被充分研究。另外，**对于函数逼近来说，Policy-based方法只要给定一个足够小的learning rate，仍然相当隐定**。因此，我们选择一个policy-gradient-based方法，尤其是REINFORCE[48]，来适配这种on-policy方法，从而当训练off-policy时提供可靠的policy gradient估计。
 
 神经网络推荐系统：与我们的方法紧密相关的另一条线是，在推荐系统中应用深度神经网络[11,16,37]，特别是使用RNN结合时序信息和历史事件用于推荐[6,17,20,45,49]。我们使用相似的网络结构，通过与推荐系统的交互来建模用户状态（user states）的演进。由于神经网络架构设计不是本文重点，有兴趣可以自己了解。
 
@@ -71,7 +72,7 @@ $$
 max_{\pi} E_{\tau \sim \pi} [R(\tau)], where \ R(\tau) = \sum\limits_{t=0}^{|\tau|} r(s_t, a_t)
 $$
 
-这里，在轨迹(trajectories) $$\tau = (s_0, a_0, s_1, \cdots)$$上采用的期望，它通过根据policy: $$s_0 \sim \rho_0, a_t \sim \pi(\cdot \mid s_t), s_{t+1} \sim P(\cdot|s_t, a_t)$$来获得。
+这里，在轨迹(trajectories) $$\tau = (s_0, a_0, s_1, \cdots)$$上采用的期望，它通过根据policy: $$s_0 \sim \rho_0, a_t \sim \pi(\cdot \mid s_t), s_{t+1} \sim P(\cdot \mid s_t, a_t)$$来获得。
 
 提供了不同族的方法来解决这样的RL问题：Q-learning[38], Policy Gradient[26,36,48]以及黑盒优化（black box potimization）[15]。这里我们主要关注policy-gradient-based方法，比如：REINFORCE[48]。
 
@@ -91,7 +92,7 @@ $$
 
 ...(2)
 
-对于一个在时间t的上动作（action），通过使用一个discouted future reward $$R_t = \sum_{t'=t}^{|\tau|} \gamma^{t'-t} r(s_{t'}, a_{t'})$$将替换$$R(\tau)$$得到的该近似结果，可以减小在梯度估计时的方差（variance）。
+对于一个在时间t的上动作（action），通过使用一个discouted future reward $$R_t = \sum_{t'=t}^{\mid \tau \mid} \gamma^{t'-t} r(s_{t'}, a_{t'})$$将替换$$R(\tau)$$得到的该近似结果，可以减小在梯度估计时的方差（variance）。
 
 # 4.off-policy collrection
 
@@ -127,7 +128,7 @@ $$
 
 ...(3)
 
-Achiam[1]证明了：该一阶近似对于学到的policy上的总回报的影响，会通过$$O(E_{s \sim d^{\beta}} [D_{TV}(\pi \mid \beta)[s]])$$来限定幅值，其中$$D_{TV}$$是在$$\pi(\cdot \mid s)$$和$$\beta(\cdot|s)$$间的总方差，$$d^{\beta}$$是在$$\beta$$下的discounted future state分布。该estimator会权衡精确的off-policy correction的方差，并仍能为一个non-corrected policy gradient收集大的偏差，这更适合on-policy learning。
+Achiam[1]证明了：该一阶近似对于学到的policy上的总回报的影响，会通过$$O(E_{s \sim d^{\beta}} [D_{TV}(\pi \mid \beta)[s]])$$来限定幅值，其中$$D_{TV}$$是在$$\pi(\cdot \mid s)$$和$$\beta(\cdot \mid s)$$间的总方差，$$d^{\beta}$$是在$$\beta$$下的discounted future state分布。该estimator会权衡精确的off-policy correction的方差，并仍能为一个non-corrected policy gradient收集大的偏差，这更适合on-policy learning。
 
 ## 4.1 对policy $$\pi_{\theta}$$进行参数化
 
@@ -188,7 +189,7 @@ $$
 为了让该问题可跟踪，我们假设一个**无重复（non-repetitive）** items的集合的期望回报（expected reward）等于在集合中每个item的expected reward的和。更进一步，我们通过对每个item a根据softmax policy $$\pi_\theta$$进行独立抽样，接着进行去重来限制生成action A集合。也就是：
 
 $$
-\Prod_{\theta}(A' | s) = \prod\limits_{a \in A'} \pi_{\theta} (a | s)
+\prod_{\theta}(A' | s) = \prod\limits_{a \in A'} \pi_{\theta} (a | s)
 $$
 
 注意，集合$$A'$$会包含重复的items，可以移除来形成一个无复重的集合A。
@@ -223,7 +224,7 @@ $$
 现在，我们回顾下该额外乘子：
 
 - 随着$$ \pi_{\theta}(a\mid s) \rightarrow 0, \lambda_K(s,a) \rightarrow K$$。对比起标准的off-policy correction，top-K off-policy correction会通过一个K因子来增加policy update；
-- 随着$$\pi_{\theta}(a \mid s) \rightarrow 1, \labmda_K(s,a) \rightarrow 0$$。该乘子会使policy update归0
+- 随着$$\pi_{\theta}(a \mid s) \rightarrow 1, \lambda_K(s,a) \rightarrow 0$$。该乘子会使policy update归0
 - 随着K的增加，以及$$\pi_{\theta}(a \mid s)$$会达到一个合理的范围, 该乘子会更快地将graident减小于0
 
 总之，当期望的item在softmax policy $$\pi_{\theta}(\cdot | s)$$具有一个很小的量，比起标准的correction，top-K correction会更有倾略性地推高它的likelihood。一旦softmax policy $$\pi_{\theta}(\cdot | s)$$在期望的item上转化成一个合理的量（以确认它可能出现在top-K中），correction接着会将梯度归0, 不再尝试推高它的似然。作为回报，它允许其它感兴趣的items在softmax policy中占据一定的量。我们会在仿真和真实环境中进一步演示，而标准的off-policy correction会收敛到一个当选择单个item时最优的policy，top-K correction会产生更好的top-K推荐。
