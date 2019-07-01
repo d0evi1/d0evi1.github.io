@@ -55,7 +55,7 @@ reward）需要为一个真实用户给出一个真实推荐。作为替代，�
 
 <img src="http://pic.yupoo.com/wangdren23_v/ee84ccc1/7d64150d.jpeg" width="320"><img src="http://pic.yupoo.com/wangdren23_v/2283edab/4084e8cb.jpeg" width="320"> 
 
-为便于理解，这里插入了张图。
+为便于理解，这里插入了张图(from 李宏毅课程)。
 
 我们开始描述我们的推荐系统，及我们的RL-based算法。
 
@@ -79,6 +79,8 @@ $$
 这里，在轨迹(trajectories) $$\tau = (s_0, a_0, s_1, \cdots)$$上采用的期望，它通过根据policy: $$s_0 \sim \rho_0, a_t \sim \pi(\cdot \mid s_t), s_{t+1} \sim P(\cdot \mid s_t, a_t)$$来获得。
 
 提供了不同族的方法来解决这样的RL问题：Q-learning[38], Policy Gradient[26,36,48]以及黑盒优化（black box potimization）[15]。这里我们主要关注policy-gradient-based方法，比如：REINFORCE[48]。
+
+<img src="http://pic.yupoo.com/wangdren23_v/07de3f1a/05058b23.jpeg" width="320">
 
 我们假设：policy的一个函数形式为$$\pi_\theta$$，参数为$$\theta \in R^d$$。根据各policy参数的期望累积回报（expected cumulative reward）的梯度，可以通过"log-trick"的方式进行解析法求导，生成以下的REINFORCE梯度：
 
