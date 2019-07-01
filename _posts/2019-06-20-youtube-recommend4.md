@@ -53,7 +53,9 @@ reward）需要为一个真实用户给出一个真实推荐。作为替代，�
 
 # 3.增强推荐
 
-<img src="http://pic.yupoo.com/wangdren23_v/2283edab/4084e8cb.jpeg" width="320">
+<img src="http://pic.yupoo.com/wangdren23_v/ee84ccc1/7d64150d.jpeg" width="320">
+
+<img src="http://pic.yupoo.com/wangdren23_v/2283edab/4084e8cb.jpeg" width="320"> 
 
 为便于理解，这里插入了张图。
 
