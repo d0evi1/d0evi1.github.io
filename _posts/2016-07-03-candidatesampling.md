@@ -46,7 +46,7 @@ $$
 
 参考：[http://arxiv.org/abs/1412.2007](http://arxiv.org/abs/1412.2007)
 
-假设我们有一个单标签问题（single-label）。每个训练样本$$(x_i, \lbrace t_i \rbrace)$$包含了一个context以及一个target class。我们将$$P(y \mid x)$$作为：给定context x下，一个target class y的概率。
+假设我们有一个单标签问题（single-label）。每个训练样本$$(x_i, \lbrace t_i \rbrace)$$包含了一个context以及一个target class。我们将**$$P(y \mid x)$$作为：给定context x下，一个target class y的概率**。
 
 我们可以训练一个函数F(x,y)来生成softmax logits——也就是说，给定context，该class相对log概率：
 
@@ -135,6 +135,118 @@ $$
 
 另外，该操作会返回tensors: true_expected_count， 
 
+## sampled_softmax_loss
+
+{% highlight python %}
+
+def _compute_sampled_logits(weights,
+                            biases,
+                            labels,
+                            inputs,
+                            num_sampled,
+                            num_classes,
+                            num_true=1,
+                            sampled_values=None,
+                            subtract_log_q=True,
+                            remove_accidental_hits=False,
+                            partition_strategy="mod",
+                            name=None,
+                            seed=None):
+    # 核心代码实现：
+    if isinstance(weights, variables.PartitionedVariable):
+        weights = list(weights)
+    if not isinstance(weights, list):
+        weights = [weights]
+
+    # labels_flat:  batch_size.
+    with ops.name_scope(name, "compute_sampled_logits",
+                        weights + [biases, inputs, labels]):
+        if labels.dtype != dtypes.int64:
+            labels = math_ops.cast(labels, dtypes.int64)
+
+        labels_flat = array_ops.reshape(labels, [-1])
+
+    # 抽取num_sampled个样本.
+    if sampled_values is None:
+        sampled_values = candidate_sampling_ops.log_uniform_candidate_sampler(
+            true_classes=labels,
+            num_true=num_true,
+            num_sampled=num_sampled,
+            unique=True,
+            range_max=num_classes,
+            seed=seed)
+
+    # 这三个值不会进行反向传播
+    sampled, true_expected_count, sampled_expected_count = (array_ops.stop_gradient(s) for s in sampled_values)
+
+    # 转成int64
+    sampled = math_ops.cast(sampled, dtypes.int64)
+
+    # label + sampled (labels基础上拼接上抽样出的labels)
+    all_ids = array_ops.concat([labels_flat, sampled], 0)
+
+    # 合并在一起，使用all_ids一起进行查询
+    all_w = embedding_ops.embedding_lookup(
+        weights, all_ids, partition_strategy=partition_strategy)
+
+    # 分割出label的weight.
+    true_w = array_ops.slice(all_w, [0, 0],
+                             array_ops.stack(
+                                 [array_ops.shape(labels_flat)[0], -1]))
+
+    # 分割出sampled weight.
+    sampled_w = array_ops.slice(
+        all_w, array_ops.stack([array_ops.shape(labels_flat)[0], 0]), [-1, -1])
+
+    # user_vec * item_vec
+    sampled_logits = math_ops.matmul(inputs, sampled_w, transpose_b=True)
+
+    # bias一起查询.
+    all_b = embedding_ops.embedding_lookup(
+        biases, all_ids, partition_strategy=partition_strategy)
+
+    # true_b is a [batch_size * num_true] tensor
+    # sampled_b is a [num_sampled] float tensor
+    true_b = array_ops.slice(all_b, [0], array_ops.shape(labels_flat))
+    sampled_b = array_ops.slice(all_b, array_ops.shape(labels_flat), [-1])
+
+    # element-wise product.
+    dim = array_ops.shape(true_w)[1:2]
+    new_true_w_shape = array_ops.concat([[-1, num_true], dim], 0)
+    row_wise_dots = math_ops.multiply(
+        array_ops.expand_dims(inputs, 1),
+        array_ops.reshape(true_w, new_true_w_shape))
+
+    # true label对应的logits, bias.
+    dots_as_matrix = array_ops.reshape(row_wise_dots,
+                                       array_ops.concat([[-1], dim], 0))
+    true_logits = array_ops.reshape(_sum_rows(dots_as_matrix), [-1, num_true])
+    true_b = array_ops.reshape(true_b, [-1, num_true])
+
+
+    true_logits += true_b
+    sampled_logits += sampled_b
+
+    # 减去先验概率.
+    if subtract_log_q:
+      # Subtract log of Q(l), prior probability that l appears in sampled.
+      true_logits -= math_ops.log(true_expected_count)
+      sampled_logits -= math_ops.log(sampled_expected_count)
+
+    # 输出logits，拼接在一起.
+    out_logits = array_ops.concat([true_logits, sampled_logits], 1)
+
+    # 输出的labels.
+    out_labels = array_ops.concat([
+        array_ops.ones_like(true_logits) / num_true,
+        array_ops.zeros_like(sampled_logits)
+    ], 1)
+
+    return out_logits, out_labels
+
+{% endhighlight %}
+
+得到logits和labels后，就可以计算softmax_cross_entropy_with_logits_v2了。
 
 ## log_uniform_candidate_sampler
 
