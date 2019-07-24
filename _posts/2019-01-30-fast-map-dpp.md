@@ -63,49 +63,6 @@ $$
 
 除了在第一节介绍的DPP在MAP inference上的工作外，一些其它工作也提出了抽取样本并返回最高概率的样本。在[16]中，一种快速抽样算法，它具有复杂度$$O(N^2 M)$$，其中提供了L的特征分解(eigendecomposition)。尽管[16]中的更新规则与我们的工作相似，但有两个主要的不同之处使得我们的方法更高效。首先，[16]的L的特征分解具有时间复杂度$$O(M^3)$$。当我们只需要返回较少数目的items时，该计算开销主宰着运行时开销。通过对比，我们的方法只需要$$O(N^2 M)$$的复杂度来返回N个items。第二，DPP的抽样方法通常需要执行多个样本试验来达到贪婪算法的可比的经验式性能，它会进一步增加了计算复杂度。
 
-**下一节为博主注：**
-
-## 为什么DPP会对quality和diversity进行balance?
-
-DPP如何平衡取出的子集的quality和diversity？Kulesza and Taskar在《机器学习中的DPP》[29 3.1节]提供的分解给出了一个更直观的理解：
-
-建模问题的一个非常重要的实际关注点是可解释性；实践者必须以一种直觉的方式来理解模型参数。DPP kernel的entries不全是透明的，他们可以看成是相似度的度量——受DPP的primary qualitative characterization的作为多样化过程（diversitying）影响。
-
-
-
-对于任意半正定矩阵(PSD)，DPP kernel L可以被分解成一个格兰姆矩阵（Gramian matrix）：$$L=B^T B$$，其中B的每一列(column)表示真实集(ground set)中N个items之一。接着，将每一列$$B_i$$写成是一个质量项(quality terms: $$q_i \in R^+$$，标量) 和一个归一化多样性特征（normalized diversity features: $$\phi_i \in R^D, \| \phi_i \| = 1$$）（当D=N时足够对任意DPP进行分解，单独保留D是因为实际上我们希望使用高维的特征向量）的乘积。依次会将L分解成质量项和归一化多样性特征:
-
-$$
-L_{ij} = B_i^T B_j = q_i \phi_i^T \phi_j q_j
-$$
-
-
-我们可以认为$$q_i \in R^+$$是一个item i内在“好坏（goodness）”的度量，$$\phi_i^T \phi_j)\in [-1,1]$$是item i和item j间相似度的一个带符号的measure。我们使用以下的公式来表示相似度：
-
-$$
-S_{ij} = \phi_i^T \phi_j) = \frac{L_{ij}}{\sqrt{L_ii L_jj}}
-$$
-
-对于向量$$\phi_i (S_{ij} = \phi_i^T \phi_j)$$的Gramian矩阵S，被称为多样性模型（diversity model）；q被称为质量模型（quality model）。
-
-L的这种分解有两个主要优点。第一，隐式强制了约束：L必须是正定的，可以潜在简化学习。第二，它允许我们独立建模quality和diversity，接着将它们组合成一个统一的模型。实际上：
-
-$$
-P_L(Y) \propto (\prod\limits_{i \in Y} q_i^2) det(S_Y)
-$$
-
-其中，第一项会随着选中items的quality的增加而增加，第二项会随着选中diversity的增加而增加。我们将q称为quality model，将S或$$\phi$$称为diversity model。如果没有diversity model，我们会选中高质量的items，但我们会趋向于选中相似的高质量items。如果没有qulity model，我们会获得一个非常diverse的集合，但可能不会包含在Y集合中最重要的items，反而会关注低质量的异类。通过两个models的组合我们可以达到一个更平衡的结果。
-
-从几何空间上看，$$L_y$$的行列式等于：通过对于$$i \in Y$$的vectors $$\q_i \phi_i$$展开的平行六面体的square volume。表示item i的vector的幅值为$$q_i$$，方向是$$\phi_i$$。上图清楚地表示了以这种方式分解的DPPs是如何天然做到high quality和high diversity两个目标间的balance。更进一步，我们几乎总是假设：我们的模型可被分解成：quality和diversity组件。
-
-<img src="http://pic.yupoo.com/wangdren23_v/5932c075/c77c1200.jpeg">
-
-DPP几何：(a) 一个subset Y的概率是由$$q_i \phi_i$$展开的volume的square (b) 随着item i的quality $$q_i$$增加，包含item i的集合的概率也增加 (c) 随着item i和j变得越相似，$$\phi_i^T \phi_j$$会增加，同时包含i和j的集合的概率会减小
-
-----
-
-它提供了将一个关于子集Y的概率分解成：它的元素(elements)的质量(quality)和它们的多样性（diversity）的乘积。Y的概率等于 按vectors $$q_i \phi_i$$逐个平方：一个子集的概率会随着它的items的质量（quality）增加而增加，会随着两个items变得更相似而减小。
-
 ## 2.2 贪婪次模最大化(Greedy Submodular Maximization)
 
 一个集合函数是在$$2^Z$$上定义的一个实数函数。如果一个集合函数f的边际增益(marginal gains)是非增的（no-increasing），例如：对于任意的$$i \in Z$$和任意的$$X \subseteq Y \subseteq Z \setminus \lbrace i \rbrace$$，当新增一项i时，满足：
@@ -424,6 +381,51 @@ $$
 # 7.结论
 
 在本paper中，我们介绍了一种DPP greedy MAP inference的fast和exact实现。我们的算法的时间复杂度$$O(M^3)$$，它大大低于state-of-art exact实现。我们提出的加速技术可以应用于在目标函数中PSD矩阵的log行列式的其它问题，比如entropy regularizer。我们也会将我们的快速算法应用到以下场景：只需要在一个滑动窗口中多样化。实验展示了我们的算法要比state-of-art算法要快，我们提出的方法在推荐任务上提供了更好的relevance-diversity的trade-off。
+
+# 附录
+
+博主注
+
+## 为什么DPP会对quality和diversity进行balance?
+
+DPP如何平衡取出的子集的quality和diversity？Kulesza and Taskar在《机器学习中的DPP》[29 3.1节]提供的分解给出了一个更直观的理解：
+
+建模问题的一个非常重要的实际关注点是可解释性；实践者必须以一种直觉的方式来理解模型参数。DPP kernel的entries不全是透明的，他们可以看成是相似度的度量——受DPP的primary qualitative characterization的作为多样化过程（diversitying）影响。
+
+
+
+对于任意半正定矩阵(PSD)，DPP kernel L可以被分解成一个格兰姆矩阵（Gramian matrix）：$$L=B^T B$$，其中B的每一列(column)表示真实集(ground set)中N个items之一。接着，将每一列$$B_i$$写成是一个质量项(quality terms: $$q_i \in R^+$$，标量) 和一个归一化多样性特征（normalized diversity features: $$\phi_i \in R^D, \| \phi_i \| = 1$$）（当D=N时足够对任意DPP进行分解，单独保留D是因为实际上我们希望使用高维的特征向量）的乘积。依次会将L分解成质量项和归一化多样性特征:
+
+$$
+L_{ij} = B_i^T B_j = q_i \phi_i^T \phi_j q_j
+$$
+
+
+我们可以认为$$q_i \in R^+$$是一个item i内在“好坏（goodness）”的度量，$$\phi_i^T \phi_j)\in [-1,1]$$是item i和item j间相似度的一个带符号的measure。我们使用以下的公式来表示相似度：
+
+$$
+S_{ij} = \phi_i^T \phi_j) = \frac{L_{ij}}{\sqrt{L_ii L_jj}}
+$$
+
+对于向量$$\phi_i (S_{ij} = \phi_i^T \phi_j)$$的Gramian矩阵S，被称为多样性模型（diversity model）；q被称为质量模型（quality model）。
+
+L的这种分解有两个主要优点。第一，隐式强制了约束：L必须是正定的，可以潜在简化学习。第二，它允许我们独立建模quality和diversity，接着将它们组合成一个统一的模型。实际上：
+
+$$
+P_L(Y) \propto (\prod\limits_{i \in Y} q_i^2) det(S_Y)
+$$
+
+其中，第一项会随着选中items的quality的增加而增加，第二项会随着选中diversity的增加而增加。我们将q称为quality model，将S或$$\phi$$称为diversity model。如果没有diversity model，我们会选中高质量的items，但我们会趋向于选中相似的高质量items。如果没有qulity model，我们会获得一个非常diverse的集合，但可能不会包含在Y集合中最重要的items，反而会关注低质量的异类。通过两个models的组合我们可以达到一个更平衡的结果。
+
+从几何空间上看，$$L_y$$的行列式等于：通过对于$$i \in Y$$的vectors $$\q_i \phi_i$$展开的平行六面体的square volume。表示item i的vector的幅值为$$q_i$$，方向是$$\phi_i$$。上图清楚地表示了以这种方式分解的DPPs是如何天然做到high quality和high diversity两个目标间的balance。更进一步，我们几乎总是假设：我们的模型可被分解成：quality和diversity组件。
+
+<img src="http://pic.yupoo.com/wangdren23_v/5932c075/c77c1200.jpeg">
+
+DPP几何：(a) 一个subset Y的概率是由$$q_i \phi_i$$展开的volume的square (b) 随着item i的quality $$q_i$$增加，包含item i的集合的概率也增加 (c) 随着item i和j变得越相似，$$\phi_i^T \phi_j$$会增加，同时包含i和j的集合的概率会减小
+
+----
+
+它提供了将一个关于子集Y的概率分解成：它的元素(elements)的质量(quality)和它们的多样性（diversity）的乘积。Y的概率等于 按vectors $$q_i \phi_i$$逐个平方：一个子集的概率会随着它的items的质量（quality）增加而增加，会随着两个items变得更相似而减小。
 
 
 # 参考
