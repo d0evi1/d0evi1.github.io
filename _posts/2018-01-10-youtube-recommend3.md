@@ -44,7 +44,7 @@ Recommender Systems》。
 
 **与本paper中描述的技术相似的是，乘法模型[27,44]**。这些乘法结构大多数在NLP中被使用[14,27]。该NLP方法被应用于个性化建模中[40]（使用一个有些不同的数学结构）。最近, [25]提出的乘法技术，不仅用在上下文数据上，也直接用在用户层面上，它与TF方法相似。PNN[33]和NFM[19]将该思想放在了在输入侧采用将所有特征对进行乘积，接着对结果拼接(concatenating)或者平均(averageing)，然后传给一个前馈网络。这些模型的思想与我们类似，但区别是：我们更关注在上下文数据和用户动作间的关系，我们的latent crossing机制可以在整个模型中使用，我们演示了在一个RNN推荐系统中这些交叉的重要性。
 
-**更复杂的模型结构例如attention模型[3]，记忆网络(memory networks)[38]，元学习（meta-learning）[42]也依赖于二阶关系，正变得流行**。例如：attention模型利用attention vectors来构建hidden states和一个乘法。然而，这些方法结构上更复杂，很难进行训练。相反的，latent cross技术很容易训练，在实践中很有效。
+**更复杂的模型结构例如attention模型[3]，记忆网络(memory networks)[38]，元学习（meta-learning）[42]也依赖于二阶关系，正变得流行**。例如：attention模型利用attention vectors来构建hidden states和一个乘法。然而，这些方法结构上更复杂，很难进行训练。相反的，**latent cross技术很容易训练**，在实践中很有效。
 
 # 3.Preliminaries
 
@@ -58,9 +58,9 @@ Recommender Systems》。
 
 有了该数据，我们可以构建推荐系统：在给定event的其它值时，预测event的一个值。例如：Netflix Prize说，一个tuple $$e=(i,j,R)$$，它使用(i,j)来预测R。从机器学习的角度，我们可以将我们的tuple e分割成特征x和label y，比如：$$x=(i,j)$$和label y=R。
 
-我们可以进一步对推荐问题进行重设计（reframe）：预测在某个给定时间点，一个用户会观看哪个视频；定义了$$x=(i,t)$$以及$$y=j$$。注意，如果label是类别型随机值(比如：视频ID)，可以将它看成是一个分类问题；如果label是真实值（比如：rating），可以将它看成是一个回归问题。
+我们可以进一步对推荐问题进行重设计（reframe）：预测在某个给定时间点，一个用户会观看哪个视频；定义了$$x=(i,t)$$以及$$y=j$$。注意，**如果label是类别型随机值(比如：视频ID)，可以将它看成是一个分类问题；如果label是真实值（比如：rating），可以将它看成是一个回归问题**。
 
-在因子分解模型中，所有输入值被认为是离散的，接着被嵌入、然后进行乘积。当我们“嵌入”一个离散值时，我们就学到了一个dense latent表示，例如：用户i通过dense latent vector $$u_i$$进行描述，item j通过dense latent vector $$v_j$$进行描述。**在矩阵分解模型中，预测总是基于内积$$u_i \cdot v_j$$。在TF模型中，预测基于$$\sum\limits_r u_{i,r} v_{j,r} w_{t,r}$$**，其中$$w_t$$是一个关于时间或其它上下文信息的dense vector embedding。FM[34]是这些类型模型的一个简洁抽象。出于简洁性，我们将$$\langle \cdot \rangle$$看成是一个多维的内积，例如：$$\langle u_i, v_j, w_t \rangle = \sum\limits_r u_{i,r} v_{j,r} w_{t,r}$$。
+在因子分解模型中，所有输入值被认为是离散的，接着被嵌入、然后进行乘积。当我们“嵌入”一个离散值时，我们就学到了一个dense latent表示，例如：用户i通过dense latent vector $$u_i$$进行描述，item j通过dense latent vector $$v_j$$进行描述。**在矩阵分解模型中，预测总是基于内积$$u_i \cdot v_j$$。在张量分解（TF：tensor factorization)模型中，预测基于$$\sum\limits_r u_{i,r} v_{j,r} w_{t,r}$$**，其中$$w_t$$是一个关于时间或其它上下文信息的dense vector embedding。FM[34]是这些类型模型的一个简洁抽象。出于简洁性，我们将$$\langle \cdot \rangle$$看成是一个多维的内积，例如：$$\langle u_i, v_j, w_t \rangle = \sum\limits_r u_{i,r} v_{j,r} w_{t,r}$$。
 
 神经网络通常也会嵌入离散输入。也就是说，给定一个输入$$(i,j)$$，网络的输入可以是$$x=[u_i;v_j]$$，其中$$u_i$$和$$v_j$$被拼接到一起，参数是可训练的（通过BP）。**因而，我们将NN的形式定义为：$$e_l=f(e_{\bar{l}})$$，其中，该网络会采用tuple的所有值、而非一个值来当成输入，接着我们训练f来预测tuple的最后一个值**。后续我们会将该定义展开，以允许模型来采用相关的之前事件来作为该网络的输入，正如在序列模型中一样。
 
@@ -118,7 +118,11 @@ $$
 
 ## 5.1 公式描述
 
-在我们的setting中，我们会观察：user i已经观看了video j（该视频由user $$\phi(j)$$上传）的events，在时间t时（我们后续会引入额外的上下文特征）。为了建模用户偏好和行为的演进，我们使用一个RNN模型，其中模型的输入是：对于用户$$ X_i=\lbrace e=(i,j,\phi(j),t) \in \epsilon \mid e_0 = i \rbrace$$events集合。我们会使用$$X_{i,t}$$来演示在t之前对于用户$$X_i$$的所有观看：
+在我们的setting中，我们会观察：user i已经观看了video j（该视频由user $$\phi(j)$$上传）的events，在时间t时（我们后续会引入额外的上下文特征）。为了建模用户偏好和行为的演进，我们使用一个RNN模型，其中模型的输入是：
+
+- $$ X_i=\lbrace e=(i,j,\phi(j),t) \in \epsilon \mid e_0 = i \rbrace$$：它表示用户的events集合。
+
+我们使用$$X_{i,t}$$来表示用户$$X_i$$在在时间t之前的所有观看
 
 $$
 X_{i,t} = \lbrace e = (i,j,t) \in \epsilon | e_0 = i \wedge e_3 < t \rbrace \subset X_i
@@ -126,7 +130,7 @@ $$
 
 ...(3)
 
-该模型被训练成为了生成顺序预测 $$Pr(j \mid i,t,X_{i,t})$$，例如：user i在给定时间t，基于t之前所有观看行为，会观看的video j。出于简洁性，我们会使用：
+该训练模型的目标是为了生成顺序预测概率 $$Pr(j \mid i,t,X_{i,t})$$，即：user i根据给定时间t之前所有观看行为，会观看的video j。出于简洁性，我们会使用：
 
 - $$e^{(\tau)}$$来表示在序列中的第$$\tau$$个事件，
 - $$x^{(\tau)}$$用来表示对于$$e^{(\tau)}$$的转移输入，
@@ -145,7 +149,7 @@ $$
 - $$u_{\phi(j)}$$是上传者embedding
 - $$w_t$$是上下文embedding
 
-当预测$$y^{\tau}$$时，我们当然不能使用对应event$$e^{(\tau)}$$的label作为输入，但我们可以使用$$e^{(\tau)}$$的上下文，它可以通过$$c^{(\tau)}$$来表示。例如：$$c^{(\tau)} = [w_t]$$。
+当预测$$y^{\tau}$$时，我们当然不能使用对应event $$e^{(\tau)}$$的label作为输入，但我们可以使用$$e^{(\tau)}$$的上下文，它可以通过$$c^{(\tau)}$$来表示。例如：$$c^{(\tau)} = [w_t]$$。
 
 ## 5.2 Baseline RNN的结构
 
@@ -169,11 +173,11 @@ $$
 
 也就是说，当事件$$e^{(\tau)}$$发生时，到下一事件时或者到做出预测时有多久。这与[25]和[49]中对时间表示大致相同。
 
-**软件客户端**：youtube视频会在多种设备上进行观看：在浏览器端、IOS、Android、Roku、chromecast，等等。将这些上下文看成是等价缺失的相关关联。例如，用户在手机端要比在一个Roku设备上更低可能查看一个完整版的电影。相似的，像trailers这样的短视频更可能在手机端观看。对软件客户端建模，特别是它是如何与观看决策相交互的，十分重要。
+**软件客户端**：youtube视频会在多种设备上进行观看：在浏览器端、IOS、Android、Roku、chromecast，等等。将这些上下文看成是等价缺失的相关关联。例如，用户在手机端完整观看一个电影的可能性要比在一个Roku设备上更低。相似的，像trailers这样的短视频更可能在手机端观看。对软件客户端建模，特别是它是如何与观看决策相交互的，十分重要。
 
-**页面(Page)**。我也也记录了最初的一个观看。例如，我们会区分是来自主页的观看（例如：home page watches），还是来自用户观看了一个视频后的来自推荐的观看(例如：Watch Next Watches)。这很重要，因为来自主页的观看可能对新内容更开放，而从一个之前观看后接着观看很可能归因于用户想对一个主题更深入。
+**页面(Page)**。我们也会记录一个观看初始来自于系统的哪个地方。例如，我们会区分是来自主页的观看（例如：home page watches），还是来自用户观看了一个视频后由推荐带来的观看(例如：Watch Next Watches)。这很重要，因为来自主页的观看可能对新内容更开放，而从一个之前观看后接着观看很可能归因于用户想对一个主题更深入。
 
-**Pre-Fusion和Post-Fusion**。我们可以使用这些上下文特征，可以称为$$c^{(\tau)}$$，以两种方式作为直接输入。如图1所示，我们可以将context当成是在该网络底部的一个输入，或者与RNN cell的output进行拼接。我们将在RNN之前的context features包含机制称为“pre-fustion”，在RNN cell之后的context features包含机制称为“post-fusion”[12]。尽管很微妙，该决策对RNN的影响很大。尤其是，通过将pre-fusion中包含一个feature，该feature会在修改RNN的state期间影响预测。然而，通过在post-fusion期间包含一个特征，该特征可以更直接的影响在该step上的预测。
+**Pre-Fusion和Post-Fusion**。我们可以使用这些上下文特征，可以称为$$c^{(\tau)}$$，以两种方式作为直接输入。如图1所示，我们可以将context当成是在该网络底部的一个输入，或者与RNN cell的output进行拼接。我们将在RNN之前的context features包含机制称为“pre-fusion”，在RNN cell之后的context features包含机制称为“post-fusion”[12]。尽管很微妙，该决策对RNN的影响很大。尤其是，通过将pre-fusion中包含一个feature，该feature会在修改RNN的state期间影响预测。然而，通过在post-fusion期间包含一个特征，该特征可以更直接的影响在该step上的预测。
 
 <img src="http://pic.yupoo.com/wangdren23_v/5cbee72e/94f7e8bb.png" alt="1.png">
 
@@ -191,9 +195,9 @@ $$
 
 我们的baseline模型的描述已经很清楚了，使用上下文特征通常作为拼接输入到简单的FC layers中。然而，正如第4节所述，神经网络在对拼接输入特征间的交叉建模效率很低。这里我们提出了一种可选方案。
 
-## 6.1 单一Feature
+## 6.1 单个Feature
 
-我们以一个单一context feature的示例开始。我们将使用时间作为一个示例版的context feature。我们不会将特征合并成另一个输入与其它相关特征进行拼接，我们会在网络中执行一个element-wise product。也就是说，我们会执行：
+我们以单个context feature的一个示例开始。我们将使用时间作为一个示例版的context feature。我们不会将特征合并成另一个输入与其它相关特征进行拼接，我们会在网络中执行一个element-wise product。也就是说，我们会执行：
 
 $$
 h_0^{(\tau)} = (1+w_t) * h_0^{(\tau)}
@@ -213,7 +217,7 @@ $$
 
 ## 6.2 使用多种Features
 
-在许多case中，我们会希望包含多个contextual feature。当包含多个ocntextual features时（比如：time t和device d），我们会执行：
+在许多case中，我们会希望包含多个contextual feature。当包含多个contextual features时（比如：time t和device d），我们会执行：
 
 $$
 h^{(\tau)} = (1+w_t + w_d) * h^{(\tau)}
