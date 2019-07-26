@@ -155,6 +155,11 @@ $$
 
 我们的RNN模型图如图1所示。RNN网络会建模一个动作序列。对于每个event $$e^{(\tau)}$$，该模型会采用一个step forward，处理$$x^{(\tau)}$$并更新一个hidden state vector $$z^{(\tau-1)}$$。为了更精准，每个event首先会通过一个神经网络$$h_0^{(\tau)} = f_i(x^{(\tau)})$$。在我们的setting中，这将会是一个identity函数或者fully-connected ReLU layers。
 
+<img src="http://pic.yupoo.com/wangdren23_v/5cbee72e/94f7e8bb.png" alt="1.png">
+
+图1: 
+
+
 该网络的recurrent部分是一个函数$$h_1^{(\tau)}$$，$$z^{(\tau)} = f_r(h_0^{(\tau)}, z^{(\tau-1)})$$。也就是说，我们会使用一个recurrent cell，比如一个LSTM或GRU，它会采用state。
 
 为了预测$$y^{(\tau)}$$，我们使用$$f_o(h_1^{(\tau-1)}, c^{(\tau)})$$，它是另一个可训练的神经网络可以产生在可能值$$y^{\tau}$$上的一个概率分布。在我们的setting中，该网络会采用RNN的output作为它的输入以及将来预测的上下文，最后会以一个在所有视频上的softmax layer做为结尾。该网络可以包含多个FC layers。
@@ -178,10 +183,6 @@ $$
 **页面(Page)**。我们也会记录一个观看初始来自于系统的哪个地方。例如，我们会区分是来自主页的观看（例如：home page watches），还是来自用户观看了一个视频后由推荐带来的观看(例如：Watch Next Watches)。这很重要，因为来自主页的观看可能对新内容更开放，而从一个之前观看后接着观看很可能归因于用户想对一个主题更深入。
 
 **Pre-Fusion和Post-Fusion**。我们可以使用这些上下文特征，可以称为$$c^{(\tau)}$$，以两种方式作为直接输入。如图1所示，我们可以将context当成是在该网络底部的一个输入，或者与RNN cell的output进行拼接。我们将在RNN之前的context features包含机制称为“pre-fusion”，在RNN cell之后的context features包含机制称为“post-fusion”[12]。尽管很微妙，该决策对RNN的影响很大。尤其是，通过将pre-fusion中包含一个feature，该feature会在修改RNN的state期间影响预测。然而，通过在post-fusion期间包含一个特征，该特征可以更直接的影响在该step上的预测。
-
-<img src="http://pic.yupoo.com/wangdren23_v/5cbee72e/94f7e8bb.png" alt="1.png">
-
-图1: 
 
 为了管理这个问题，当预测$$y^{(\tau)}$$时，我们通常会使用$$c^{(\tau)}$$作为一个post-fusion特征，并使用$$c^{(\tau-1)}$$作为一个pre-fusion特征。这意味着，$$c^{(\tau-1)}$$会影响RNN state，而$$c^{(\tau)}$$会用于预测$$y^{(\tau)}$$。接着，在下一step，当预测$$y^{(\tau-1)}$$时，$$c^{(\tau)}$$会是一个pre-fusion特征，它会从该time forward上影响RNN的state。
 
