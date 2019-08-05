@@ -33,15 +33,15 @@ $$
 - (i) arm set $$A_t$$保持不变，对于所有t都包含K个arms
 - (ii) user $$u_t$$（或者相等的，context $$x_{t,1}, \cdots, x_{t,K}$$）对于所有t都相同
 
-因此，在每个实验中的arm set和contexts两者都是常数，对于一个bandit算法来说没啥区别，因此我们可以将该类型的bandit称为是一个context-free bandit。
+因此，在每个实验中的arm set和contexts两者都是常数，对于一个bandit算法来说没啥区别，因此我们可以将该类型的bandit称为是一个**context-free bandit**。
 
-在文章推荐的场景中（context），我们将池子中的文章(articles)看成是arms。当一篇曝光的文章被点击时，会带来一个等于1的payoff；否则payoff为0. 有了关于payoff的该定义，一篇文章的期望(expected)payoff就是它的点击率（ctr），使用最大CTR来选择一篇文章等价于从用户中最大化点击数的期望值，这与在我们的bandit公式中最大化总期望payoff（total expected payoff）相同。
+**在文章推荐的场景中（context），我们将池子中的文章(articles)看成是arms**。当一篇曝光的文章被点击时，会带来一个等于1的payoff；否则payoff为0。有了关于payoff的该定义，**一篇文章的期望(expected)payoff就是它的点击率（ctr）**，使用最大CTR来选择一篇文章等价于从用户中最大化点击数的期望值，这与在我们的bandit公式中最大化总期望payoff（total expected payoff）相同。
 
 再者，在网络服务中，我们通常会访问用户信息，它们被用于推断一个用户的兴趣，并用来选择他可能感兴趣的新闻文章。例如，对于一个男青年来说，他很可能对iPod产品的文章感兴趣，而非对退休计划的文章感兴趣。因此，我们会通过一个可以密切描述它们的关于信息特征的集合来“总结(summarize)”用户(users)和文章(articles)。通过这样做，一个bandit算法可以从一个 文章/用户 泛化(generalize) CTR信息给另一个文章/用户，并能学到更快地选择好的文章，特别是对于新用户和新文章。
 
 ## 2.2 已存在的Bandit算法
 
-bandit problems的基本挑战是，需要对exploration和exploitation做平衡。为了最小化等式(1)中的regret，一个算法A会exploits它过往经验来选择看起来最好的arm。另一方面，看起来最优的arm可能在实际上是次优的，因为在算法A的知识中是不精准的（imprecision）。为了避免这种不希望的情况，算法A必须通过实择选择看起来次优的arms来进行explore，以便收集关于它们的更多信息（在bandit过程中的step 3在之前的章节已定义）。Exploration可以增加short-term regret，因为会选到一些次优的arms。然而，获得关于arms的平均payoffs信息（例如：exploration）可以重新定义(refine)算法A的arms payoffs，反之减小long-term regret。通常，即不会存在一个纯粹的exploring，也不会存在一个纯粹的exploiting算法，需要对两者做平衡。
+**bandit problems的基本挑战是，需要对exploration和exploitation做平衡**。为了最小化等式(1)中的regret（越小表示两者越接近），一个算法A会利用（exploits）它的过往经验来选择看起来最好的arm。另一方面，看起来最优的arm可能在实际上是次优的，因为在算法A的知识(knowledge)中是不精准的（imprecision）。为了避免这种不希望的情况，算法A必须通过实择选择看起来次优的arms来进行explore，以便收集关于它们的更多信息（在bandit过程中的step 3在之前的章节已定义）。Exploration可以增加short-term regret，因为会选到一些次优的arms。然而，获得关于arms的平均payoffs信息（例如：exploration）可以重新定义(refine)算法A的arms payoffs，反之减小long-term regret。通常，即不会存在一个纯粹的exploring，也不会存在一个纯粹的exploiting算法，需要对两者做平衡。
 
 context-free K-armed bandit问题已经被统计学家研究过许多。一种最简单和最直接的算法是e-greedy。在每个实验t中，该算法会首先估计每个arm a的平均payoff $$\hat{\mu}_{t,a}$$。接着使用概率$$1 - e$$来选择greedy arm（例如：具有最高payoff估计的arm）；使用概率e来选择一个random arm。在极限上，每个arm会尝试无限次，以便payoff估计$$\hat{\mu_{t,a}}$$会收敛到具有概率为1的真值(true value)$$\mu_a$$。另外，通过对e进行适当的衰减(decaying)，每一step的regret $$R_A(T)/T$$会收敛到0, 概率为1.
 
