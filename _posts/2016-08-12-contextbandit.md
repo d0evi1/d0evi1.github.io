@@ -16,11 +16,11 @@ yahoo在2010年在《A contextual-bandit approach to personalized news article r
 
 个性化新闻推荐的问题可以天然建模成：带context信息的multi-armded bandit问题。根据[18]，我们称之为"contextual bandit"。正式的，一个contextual-bandit算法A会以离散方式处理实验(trials) t=1,2,3,...，在试验t上，有：
 
-- 1.该算法会观察当前用户$$u_t$$和一个关于arms或actions的$$A_t$$集合，以及对于$$a \in A_t$$的它们的特征向量(feature vectors) $$x_{t,a}$$。 vector $$x_{t,a}$$会同时总结用户$$u_t$$和arm a的信息，被称为context。
-- 2.基于在之前实验中的观察结果(observed payoffs)，算法A会选择一个arm $$a_t \in A_t$$，接收结果(payoffs) $$r_{t,a_t}$$，它的期望取决于user $$u_t$$和arm $$a_t$$两者
-- 3.算法接着使用新的observation $$(x_{t,a_t}, a_t, r_{t,a_t})$$提升它的arm-selection策略。这里需要重点强调的是：对于未选中的arms $$a \neq a_t$$，此处没有观察到feedback（也就是：payoff $$r_{t,a}$$）。
+- 1.该算法会观察当前用户$$u_t$$和一个关于arms或actions的$$A_t$$集合，以及对于arm $$a \in A_t$$的它们的特征向量(feature vectors) $$x_{t,a}$$。 **vector $$x_{t,a}$$会同时总结用户$$u_t$$和arm a的信息，被称为context**。
+- 2.基于在之前实验中的已观察收益(observed payoffs)，算法A会选择一个arm $$a_t \in A_t$$，并得到新的收益(payoffs): $$r_{t,a_t}$$，它的期望取决于user $$u_t$$和arm $$a_t$$两者
+- 3.算法接着使用新的observation $$(x_{t,a_t}, a_t, r_{t,a_t})$$提升它的arm-selection策略。**这里需要重点强调的是：对于未选中的arms $$a \neq a_t$$，此处没有观察到feedback（也就是：payoff $$r_{t,a}$$）**。
 
-上述过程中，算法A的total T-trial payoff被定义成：$$\sum_{t=1}^T r_{t,a_t}$$。相似的，我们将它的最优期望定义为：$$E[\sum_{t=1}^T r_{t,a_t^*}]$$，其中$$a_t^*$$是在实验t中具有最大期望payoff的arm。我们的目标是，设计算法A以便total payoff期望最大化。相等的，我们会发现一个算法，以便对应各最优的arm-selection策略的regret最小化。这里，T-trail regret $$R_A(T)$$被定义为：
+上述过程中，算法A的total T-trial payoff被定义成：$$\sum_{t=1}^T r_{t,a_t}$$。相似的，我们将它的最优期望定义为：$$E[\sum_{t=1}^T r_{t,a_t^*}]$$，其中$$a_t^*$$是在实验t中具有最大期望payoff的arm。我们的目标是：设计一个算法A以便total payoff期望最大化。也相当于：我们会发现一个算法，以便对应各最优的arm-selection策略的regret最小化。这里，T-trail regret $$R_A(T)$$被定义为：
 
 $$
 R_A(T) \equiv E[\sum\limits_{t=1}^T r_{t,a_t^*}] - E[\sum\limits_{t=1}^T r_{t,a_t}]
@@ -28,14 +28,14 @@ $$
 
 ...(1)
 
-一般的contextual bandit问题的一个重要特例是，著名的K-armed bandit，其中:
+一般的contextual bandit问题的一个重要特例是：**著名的K-armed bandit**，其中:
 
 - (i) arm set $$A_t$$保持不变，对于所有t都包含K个arms
 - (ii) user $$u_t$$（或者相等的，context $$x_{t,1}, \cdots, x_{t,K}$$）对于所有t都相同
 
 因此，在每个实验中的arm set和contexts两者都是常数，对于一个bandit算法来说没啥区别，因此我们可以将该类型的bandit称为是一个**context-free bandit**。
 
-**在文章推荐的场景中（context），我们将池子中的文章(articles)看成是arms**。当一篇曝光的文章被点击时，会带来一个等于1的payoff；否则payoff为0。有了关于payoff的该定义，**一篇文章的期望(expected)payoff就是它的点击率（ctr）**，使用最大CTR来选择一篇文章等价于从用户中最大化点击数的期望值，这与在我们的bandit公式中最大化总期望payoff（total expected payoff）相同。
+**在文章推荐的场景中（context），我们将池子中的文章(articles)看成是arms**。当一篇曝光的文章被点击时，会带来一个等于1的payoff；否则payoff为0。有了关于payoff的该定义，**一篇文章的期望(expected)payoff就是它的点击率（ctr）**，使用最大CTR来选择一篇文章等价于从最大化用户点击数目的期望，这与在我们的bandit公式中最大化总期望payoff（total expected payoff）相同。
 
 再者，在网络服务中，我们通常会访问用户信息，它们被用于推断一个用户的兴趣，并用来选择他可能感兴趣的新闻文章。例如，对于一个男青年来说，他很可能对iPod产品的文章感兴趣，而非对退休计划的文章感兴趣。因此，我们会通过一个可以密切描述它们的关于信息特征的集合来“总结(summarize)”用户(users)和文章(articles)。通过这样做，一个bandit算法可以从一个 文章/用户 泛化(generalize) CTR信息给另一个文章/用户，并能学到更快地选择好的文章，特别是对于新用户和新文章。
 
@@ -43,11 +43,11 @@ $$
 
 **bandit problems的基本挑战是，需要对exploration和exploitation做平衡**。为了最小化等式(1)中的regret（越小表示两者越接近），一个算法A会利用（exploits）它的过往经验来选择看起来最好的arm。另一方面，看起来最优的arm可能在实际上是次优的，因为在算法A的知识(knowledge)中是不精准的（imprecision）。为了避免这种不希望的情况，算法A必须通过实择选择看起来次优的arms来进行explore，以便收集关于它们的更多信息（在bandit过程中的step 3在之前的章节已定义）。Exploration可以增加short-term regret，因为会选到一些次优的arms。然而，获得关于arms的平均payoffs信息（例如：exploration）可以重新定义(refine)算法A的arms payoffs，反之减小long-term regret。通常，即不会存在一个纯粹的exploring，也不会存在一个纯粹的exploiting算法，需要对两者做平衡。
 
-context-free K-armed bandit问题已经被统计学家研究过许多。一种最简单和最直接的算法是e-greedy。在每个实验t中，该算法会首先估计每个arm a的平均payoff $$\hat{\mu}_{t,a}$$。接着使用概率$$1 - e$$来选择greedy arm（例如：具有最高payoff估计的arm）；使用概率e来选择一个random arm。在极限上，每个arm会尝试无限次，以便payoff估计$$\hat{\mu_{t,a}}$$会收敛到具有概率为1的真值(true value)$$\mu_a$$。另外，通过对e进行适当的衰减(decaying)，每一step的regret $$R_A(T)/T$$会收敛到0, 概率为1.
+context-free K-armed bandit问题已经被统计学家研究过许多。一种最简单和最直接的算法是ε-greedy。在每个实验t中，该算法会首先估计每个arm a的平均payoff $$\hat{\mu}_{t,a}$$。接着使用概率$$1 - e$$来选择greedy arm（例如：具有最高payoff估计的arm）；使用概率e来选择一个random arm。在极限上，每个arm会尝试无限次，以便payoff估计$$\hat{\mu_{t,a}}$$会收敛到具有概率为1的真值(true value)$$\mu_a$$。另外，通过对e进行适当的衰减(decaying)，每一step的regret $$R_A(T)/T$$会收敛到0, 概率为1.
 
-对比于e-greedy所采用的不能控制的exploration策略，另一类算法通常被称为UCB算法（upper confidence bound算法），它使用一个更聪明的方式来对E&E进行平衡。特别的，在实验t中，这些算法会同时估计：每个arm a的平均payoff $$\hat{\mu}_{t,a}$$、以及一个相应的置信区间$$c_{t,a}$$，以便$$\mid \hat{\mu}_{t,a} - \mu_a \mid < c_{t,a}$$具有较高的概率。它们接着选接arm来达到一个最高的上限置信边界(UCB)：$$a_t = argmax_a (\hat{\mu}_{t,a} + c_{t,a})$$。由于合理地定义了置信区间，这样的算法具有一个较小的total T-trail regret，它是trials T的总数的log倍，看起来是最优的。
+对比于ε-greedy所采用的不能控制的exploration策略，另一类算法通常被称为UCB算法（upper confidence bound算法），它使用一个更聪明的方式来对E&E进行平衡。特别的，在实验t中，这些算法会同时估计：每个arm a的平均payoff $$\hat{\mu}_{t,a}$$、以及一个相应的置信区间$$c_{t,a}$$，以便$$\mid \hat{\mu}_{t,a} - \mu_a \mid < c_{t,a}$$具有较高的概率。它们接着选接arm来达到一个最高的上限置信边界(UCB)：$$a_t = argmax_a (\hat{\mu}_{t,a} + c_{t,a})$$。由于合理地定义了置信区间，这样的算法具有一个较小的total T-trail regret，它是trials T的总数的log倍，看起来是最优的。
 
-而context-free K-armed bandits最近被广泛研究，最通用的contextual bandit问题仍然充满挑战。EXP4算法[8]使用指数加权技术来达到一个$$\hat{O}(\sqrt{T})$$的regret，但计算复杂度是特征数的指数倍。另一个常用的contextual bandit算法是epoch-greedy算法[18]，它与使用shrinking e的e-greedy相似。该算法计算更高效，给定一个oracle optimizer，但具有更弱的regret guarantee：$$O(T^{2/3})$$。
+而context-free K-armed bandits最近被广泛研究，最通用的contextual bandit问题仍然充满挑战。EXP4算法[8]使用指数加权技术来达到一个$$\hat{O}(\sqrt{T})$$的regret，但计算复杂度是特征数的指数倍。另一个常用的contextual bandit算法是epoch-greedy算法[18]，它与使用shrinking ε的ε-greedy相似。该算法计算更高效，给定一个oracle optimizer，但具有更弱的regret guarantee：$$O(T^{2/3})$$。
 
 具有更强regret guarantees的算法可以在关于bandit的许多建模假设下被设计。假设一个arm的期望payoff在它的特征中是线性的，Auer[6]描述了LinRel算法，它本质上是一种UCB-type方法，并展示了它的变种之一具有一个regret：$$\hat{O}(\sqrt{T})$$，比其它算法有极大提升。
 
@@ -231,15 +231,15 @@ Today模块是在Yahoo! Front Page（流量最大）的最显著位置的panel�
 这对应于context-free K-armed bandit算法，它们会忽略所有contexts（例如：user/article信息）
 
 - random: random policy总是会以等概率的方式从池子中选中候选文章之一。该算法无需参数，不会一直学习
-- e-greedy：在第2.2节所述，它会估计每篇文章的CTR；接着，它会选择具有概率e的一篇随机文章，接着选择具有概率1-e的最高CTR估计的文章。该policy只有一个参数e。
+- ε-greedy：在第2.2节所述，它会估计每篇文章的CTR；接着，它会选择具有概率e的一篇随机文章，接着选择具有概率1-e的最高CTR估计的文章。该policy只有一个参数e。
 - ucb: 如2.2节所述，policy会估计每篇文章的CTR，也会估计它的置信区间，总是会选择具有最高UCB的文章。特别的，根据UCB1[7]，我们会通过$$c_{t,a} = \frac{a}{\sqrt{n_{t,a}}}$$来计算一篇文章a的置信区间，其中$$n_{t,a}$$是在实验t之前a被选中的次数，$$\alpha>0$$是一个参数
 - omniscient(无所不知的): 这样的一个policy会从后见之明（from hindsight）达到最好的经验型的context-free CTR。它首先会从日志事件(logged events)中计算每篇文章的经验CTR，当使用相同的logged events评估时，接着总是选择具有最高经验CTR的文章。该算法无需参数，不需要学习。
 
 **II.热启动（warm start）算法**
 
-个性化服务的一种中间步骤。它的思想是，在文章的整个流量上的context-free CTR提供一种offline估计的特定用户的调整。该offset会为新内容对CTR估计的实始化，也称为：“warm start”。我们在2008九月的随机流量数据上，使用特征$$z_{t,a}$$重新训练了bilinear LR模型。选择原则接着变成context-free CTR估计与一个user-specific CTR adujstment的bilinear项的和。在训练中，CTR估计使用context-free e-greedy，其中e=1.
+个性化服务的一种中间步骤。它的思想是，在文章的整个流量上的context-free CTR提供一种offline估计的特定用户的调整。该offset会为新内容对CTR估计的实始化，也称为：“warm start”。我们在2008九月的随机流量数据上，使用特征$$z_{t,a}$$重新训练了bilinear LR模型。选择原则接着变成context-free CTR估计与一个user-specific CTR adujstment的bilinear项的和。在训练中，CTR估计使用context-free ε-greedy，其中e=1.
 
-- e-greedy(warm):
+- ε-greedy(warm):
 - ucb(warm):
 
 **III.在线学习user-specific CTR的算法**
@@ -248,4 +248,6 @@ Today模块是在Yahoo! Front Page（流量最大）的最显著位置的panel�
 
 # 参考
 
-[https://github.com/rohitkumar07/AI-Paper-Reviews/blob/master/Contextual%20Bandits/Li10Contextual.pdf](https://github.com/rohitkumar07/AI-Paper-Reviews/blob/master/Contextual%20Bandits/Li10Contextual.pdf)
+- [https://github.com/rohitkumar07/AI-Paper-Reviews/blob/master/Contextual%20Bandits/Li10Contextual.pdf](https://github.com/rohitkumar07/AI-Paper-Reviews/blob/master/Contextual%20Bandits/Li10Contextual.pdf)
+- [http://hunch.net/~coms-4771/lecture20.pdf](http://hunch.net/~coms-4771/lecture20.pdf)
+- [https://lilianweng.github.io/lil-log/2018/01/23/the-multi-armed-bandit-problem-and-its-solutions.html](https://lilianweng.github.io/lil-log/2018/01/23/the-multi-armed-bandit-problem-and-its-solutions.html)
