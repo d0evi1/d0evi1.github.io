@@ -41,11 +41,11 @@ $$
 
 ## 2.2 已存在的Bandit算法
 
-**bandit problems的基本挑战是，需要对exploration和exploitation做平衡**。为了最小化等式(1)中的regret（越小表示两者越接近），一个算法A会利用（exploits）它的过往经验来选择看起来最好的arm。另一方面，看起来最优的arm可能在实际上是次优的，因为在算法A的知识(knowledge)中是不精准的（imprecision）。为了避免这种不希望的情况，算法A必须通过实择选择看起来次优的arms来进行explore，以便收集关于它们的更多信息（在bandit过程中的step 3在之前的章节已定义）。Exploration可以增加short-term regret，因为会选到一些次优的arms。然而，获得关于arms的平均payoffs信息（例如：exploration）可以重新定义(refine)算法A的arms payoffs，反之减小long-term regret。通常，即不会存在一个纯粹的exploring，也不会存在一个纯粹的exploiting算法，需要对两者做平衡。
+**bandit problems的基本挑战是，需要对exploration和exploitation做平衡**。为了最小化等式(1)中的regret（越小表示两者越接近），一个算法A会利用（exploits）它的过往经验来选择看起来最好的arm。另一方面，看起来最优的arm可能在实际上是次优的，因为在算法A的知识(knowledge)中是不精准的（imprecision）。**为了避免这种不希望的情况，算法A必须通过实际选择看起来次优的arms来进行explore，以便收集关于它们的更多信息**（在bandit过程中的step 3在之前的章节已定义）。Exploration可以增加short-term regret，因为会选到一些次优的arms。然而，获得关于arms的平均payoffs信息（例如：exploration）可以重新定义(refine)算法A的arms payoffs，从而减小long-term regret。通常，即不会存在一个纯粹的exploring，也不会存在一个纯粹的exploiting算法，需要对两者做平衡。
 
 context-free K-armed bandit问题已经被统计学家研究过许多。一种最简单和最直接的算法是ε-greedy。在每个实验t中，该算法会首先估计每个arm a的平均payoff $$\hat{\mu}_{t,a}$$。接着使用概率$$1 - e$$来选择greedy arm（例如：具有最高payoff估计的arm）；使用概率e来选择一个random arm。在极限上，每个arm会尝试无限次，以便payoff估计$$\hat{\mu_{t,a}}$$会收敛到具有概率为1的真值(true value)$$\mu_a$$。另外，通过对e进行适当的衰减(decaying)，每一step的regret $$R_A(T)/T$$会收敛到0, 概率为1.
 
-对比于ε-greedy所采用的不能控制的exploration策略，另一类算法通常被称为UCB算法（upper confidence bound算法），它使用一个更聪明的方式来对E&E进行平衡。特别的，在实验t中，这些算法会同时估计：每个arm a的平均payoff $$\hat{\mu}_{t,a}$$、以及一个相应的置信区间$$c_{t,a}$$，以便$$\mid \hat{\mu}_{t,a} - \mu_a \mid < c_{t,a}$$具有较高的概率。它们接着选接arm来达到一个最高的上限置信边界(UCB)：$$a_t = argmax_a (\hat{\mu}_{t,a} + c_{t,a})$$。由于合理地定义了置信区间，这样的算法具有一个较小的total T-trail regret，它是trials T的总数的log倍，看起来是最优的。
+对比于ε-greedy所采用的无向导(unguided)的exploration策略，另一类算法通常被称为UCB算法（upper confidence bound算法），它使用一个更聪明的方式来对E&E进行平衡。特别的，在实验t中，这些算法会同时估计：每个arm a的平均payoff $$\hat{\mu}_{t,a}$$、以及一个相应的置信区间$$c_{t,a}$$，以便$$\mid \hat{\mu}_{t,a} - \mu_a\mid < c_{t,a}$$具有较高的概率。**它们接着选接arm来达到一个最高的上限置信边界(UCB)**：$$a_t = argmax_a (\hat{\mu}_{t,a} + c_{t,a})$$。由于合理地定义了置信区间，这样的算法具有一个较小的total T-trail regret，它是trials T的总数的log倍，看起来是最优的。
 
 而context-free K-armed bandits最近被广泛研究，最通用的contextual bandit问题仍然充满挑战。EXP4算法[8]使用指数加权技术来达到一个$$\hat{O}(\sqrt{T})$$的regret，但计算复杂度是特征数的指数倍。另一个常用的contextual bandit算法是epoch-greedy算法[18]，它与使用shrinking ε的ε-greedy相似。该算法计算更高效，给定一个oracle optimizer，但具有更弱的regret guarantee：$$O(T^{2/3})$$。
 
