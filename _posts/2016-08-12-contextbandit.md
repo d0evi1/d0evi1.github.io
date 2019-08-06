@@ -55,9 +55,9 @@ context-free K-armed bandit问题已经被统计学家研究过许多。一种�
 
 # 3.算法
 
-对于context-free bandit算法，给定了渐定最优性（asymptotic optimality）以及较强的regret bound UCB方法；我们可以为contextual bandit问题尝试设计相似的算法。给定关于payoff函数的参数形式，存在许多方法来从数据中估计参数的置信区间，从而我们可以计算估计后的arm payoff的一个UCB。然而，通常这样的方法代价高。
+对于context-free bandit算法，给定了渐定最优性（asymptotic optimality）以及较强的regret bound UCB方法；我们可以为contextual bandit问题尝试设计相似的算法。给定关于payoff函数的参数形式，存在许多方法来从数据中估计参数的置信区间，从而我们可以计算估计后的arm payoff的一个UCB。**然而，通常这样的方法代价高**。
 
-在该工作中，我们展示了：当payoff模型是线性时，一个置信区间可以以closed form的形式高效计算，我们称该算法为LinUCB。出于展览(exposition)的需要，我们首先描述了disjoint线性模型的更简单形式，接着将在3.2节中考虑hybird模型的一般形式。我们注意到，LinUCB是一个通用的contextual bandit算法，它可以应用到其它应用中，而非个性化新闻推荐上。
+在该工作中，我们展示了：**当payoff模型是线性时，一个置信区间可以以closed form的形式高效计算，我们称该算法为LinUCB**。出于表述(exposition)的需要，我们首先描述了disjoint线性模型的更简单形式，接着将在3.2节中考虑hybird模型的一般形式。我们注意到：**LinUCB是一个通用的contextual bandit算法，它可以应用到其它应用中，而非个性化新闻推荐上**。
 
 ## 3.1 使用disjoint线性模型的LinUCB
 
