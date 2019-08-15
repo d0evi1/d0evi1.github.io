@@ -149,7 +149,7 @@ $$
 我们使用了许多流行的RNN cells(比如：LSTM, GRU)进行实验，最终使用一个简单的cell，称为：Chaos Free RNN (CFN)[24]，因为它的稳定性和计算高效性。该state会被递归更新：
 
 $$
-s_{t+1} = z_t \bigodot tanh(s_t) + i_t \bigodot tanh(W_a u_{a_t}) \\
+s_{t+1} = z_t \odot tanh(s_t) + i_t \odot tanh(W_a u_{a_t}) \\
 z_t = \sigma(U_z s_t + W_z U_{a_t} + b_z) \\
 i_t = \sigma(U_i s_t + W_i u_{a_t} + b_i)
 $$
