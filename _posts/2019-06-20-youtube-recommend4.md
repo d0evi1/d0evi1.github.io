@@ -106,9 +106,9 @@ $$
 
 因为学习和基础设施的限制，我们的学习器（learner）没有与推荐系统的实时交互控制，这不同于经典的增强学习。换句话说，我们不能执行对policy的在线更新，以及立即根据更新后的policy来生成轨迹（trajectories）。作为替代，我们会接收由一个历史policy（或者一个policies组合）选中的关于actions的日志反馈，对比时立即更新policy，这种方式在action space上会具有一个不同的分布。
 
-我们主要关注解决：当在该环境中应用policy gradient方法时所带来的数据偏差。特别的，我们会收集包含多个小时的一个周期性数据，在生产环境中在部署一个新版本的policy前，计算许多policy参数更新，这意味着我们用来估计policy gradient的轨迹集合是由一个不同的policy生成的。再者，我们会从其它推荐(它们采用弹性的不同policies)收集到的成批的反馈数据中学习。一个原本的policy gradient estimator不再是无偏的，因为在等式(2)中的梯度需要从更新后的policy $$\pi_\theta$$中抽取轨迹（trajectories），而我们收集的轨迹会从一个历史policies $$\beta$$的一个组合中抽取。
+我们主要关注解决：当在该环境中应用policy gradient方法时所带来的数据偏差。**特别的，我们会收集包含多个小时的一个周期性数据，在生产环境中在部署一个新版本的policy前，计算许多policy参数更新，这意味着我们用来估计policy gradient的轨迹集合是由一个不同的policy生成的**。再者，我们会从其它推荐(它们采用弹性的不同policies)收集到的成批的反馈数据中学习。一个原本的policy gradient estimator不再是无偏的，因为在等式(2)中的梯度需要从更新后的policy $$\pi_\theta$$中抽取轨迹（trajectories），而我们收集的轨迹会从一个历史policies $$\beta$$的一个组合中抽取。
 
-我们会使用权重重要性（importance weighting）[31,33,34]方法来解决该分布不匹配问题（distribution）。考虑到一个轨迹 $$\tau=(s_0,a_0,s_1,...)$$，它根据一个行为策略$$\beta$$抽样得到，那么off-policy-corrected gradient estimator为：
+我们会使用按重要性权重（importance weighting）[31,33,34]的方法来解决该分布不匹配问题（distribution）。考虑到一个轨迹 $$\tau=(s_0,a_0,s_1,...)$$，它根据一个行为策略$$\beta$$抽样得到，那么off-policy-corrected gradient estimator为：
 
 $$
 \sum_{\tau \sim \beta} \frac{\pi_{\theta}(\tau)}{\beta(\tau)} [\sum_{t=0}^{|\tau|} R_t \nabla_{\theta} log(\pi_{\theta} (a_t | s_t))]
@@ -149,9 +149,9 @@ $$
 我们使用了许多流行的RNN cells(比如：LSTM, GRU)进行实验，最终使用一个简单的cell，称为：Chaos Free RNN (CFN)[24]，因为它的稳定性和计算高效性。该state会被递归更新：
 
 $$
-s_{t+1} = 
-z_t = 
-i_t = 
+s_{t+1} = z_t \bigodot tanh(s_t) + i_t \bigodot tanh(W_a u_{a_t}) \\
+z_t = \sigma(U_z s_t + W_z U_{a_t} + b_z) \\
+i_t = \sigma(U_i s_t + W_i u_{a_t} + b_i)
 $$
 
 其中，$$z_t, i_t \in R^n$$分别是update gate和input gate。
