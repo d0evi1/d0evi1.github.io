@@ -192,7 +192,7 @@ $$
 尽管在两个policy head $$\pi_{\theta}$$和$$\beta_{\theta'}$$间存在大量参数共享，**但两者间还是有两个明显的不同之处**：
 
 - (1) main policy $$\pi_{\theta}$$会使用一个weighted softmax进行有效训练，会重点考虑长期回报(long term reward)；而behavior policy head $$\beta_{\theta'}$$只会使用state-action pairs进行训练
-- (2) main policy head $$\pi_\theta$$只使用非零回报（non-zero reward）在该轨迹上的items进行训练；而behavior policy $$\beta_{\theta'}$$使用在该轨迹上的所有items进行训练，从而避免引入在$$\beta$$估计时的bias。
+- (2) main policy head $$\pi_\theta$$只使用在该轨迹上具有非零回报（non-zero reward）的items进行训练；而behavior policy $$\beta_{\theta'}$$使用在该轨迹上的所有items进行训练，从而避免引入在$$\beta$$估计时的bias
 
 在[39]中，给定在time $$t_1$$上的state s，以及在time $$t_2$$上的action b，假定一个behavior policy会确定式的选中一个action a，可以看成是通过日志的时间间隔，在action a和b间随机进行选择。这里，我们会，这解释了：对于一个确定的(deterministic) policy，为什么behavior policy即可以是0也可以是1. 另外，因为我们有多个policies同时进行动作，如果一个policy是在给定user state s的情况下确定选中action a，另一个policy会确定性选中action b，接着以这样的方式估计$$hat{\beta}_{\theta'}$$会近似action a的期望频率（expected frequency），会在给定user state s下通过这些behavior policies的混合选中（todo.）。
 
