@@ -174,7 +174,7 @@ $$
 - 在RNN cell中的权重矩阵：$$U_z, U_i \in R^{n \times n}, W_u, W_i, W_a \in R^{n \times m}$$
 - biases：$$b_u, b_i \in R^n$$
 
-图1展示了一个描述main policy $$\pi_{\theta}$$的神经网络架构。给定一个观察到的轨迹 $$\tau = (s_0, a_0, s_1, ...)$$，它从一个行为策略（behavior policy）$$\beta$$中抽样得到，该新策略(new policy)首先会生成一个关于user state $$s_{t+1}$$的模型，它使用一个initial state $$s_0 \sim \rho_0$$并通过等式(4)的recurrent cell迭代得到。给定user state $$s_{t+1}$$，policy head会通过等式(5)的softmax来在action space上转化分布。有了$$\pi_{\theta}(a_{t+1} \mid s_{t+1})$$，我们接着使用等式(3)生成一个policy gradient来更新该policy。
+图1展示了一个描述main policy $$\pi_{\theta}$$的神经网络架构。给定一个观察到的轨迹 $$\tau = (s_0, a_0, s_1, ...)$$，它从一个行为策略（behavior policy）$$\beta$$中抽样得到，该新策略(new policy)首先会生成一个关于user state $$s_{t+1}$$的模型，它使用一个initial state $$s_0 \sim \rho_0$$并通过等式(4)的recurrent cell迭代得到。给定user state $$s_{t+1}$$，policy head会通过等式(5)的softmax来转化在action space分布。有了$$\pi_{\theta}(a_{t+1} \mid s_{t+1})$$，我们接着使用等式(3)生成一个policy gradient来更新该policy。
 
 <img src="http://pic.yupoo.com/wangdren23_v/d1be870a/334d078f.jpeg">
 
@@ -182,14 +182,14 @@ $$
 
 ## 4.2 估计behavior policy $$\beta$$
 
-伴随等式(3)的off-policy corrected estimator出现的一个难题是，得到行为策略(hehavior policy)$$\beta$$。理想状态下，对于一个选中action的日志反馈，我们希望也能记录behavior policy选中该action的概率。直接记录该behavior policy在我们的情况下是不可行的，因为：
+伴随等式(3)的off-policy corrected estimator出现的一个难题是：**得到behavior policy $$\beta$$**。理想状态下，对于一个选中action的日志反馈，我们希望也能记录behavior policy选中该action的概率。**直接记录该behavior policy在我们的情况下是不可行的**，因为：
 
 - (1) 在我们的系统中有许多agents，许多是不可控的
 - (2) 一些agents具有一个deterministic policy，将$$\beta$$设置成0或1并不是使用这些日志反馈的最有效方式
 
-作为替代，我们采用[39]中首先引入的方法，并估计行为策略$$\beta$$，在我们的情况中它是一个多种agents的policies的混合，它们使用该记录下来的actions。给定一个记录的反馈集合 $$D = \lbrace (s_i, a_i), i=1, \cdots, N \rbrace$$，Strehlet[39]会独立用户状态的方式，通过对整个语料的action频率进行聚合来估计$$\hat{\beta}(a)$$。对于每个state-action pair(s, a)，我们会估计概率$$\hat{\beta}_{\theta'}(a \mid s)$$，该hehavior policies的组合体会使用另一个使用$$\theta'$$作为参数的softmax来选中该action。如图1所示，我们会复用该user state s（它由main policy的RNN model生成），接着使用另一个softmax layer来建模该mixed behavior policy。为了阻止该hehavior head干扰到该main policy的该user state，我们会阻止该gradient反向传播回该RNN。我们也对将$$\pi_{\theta}$$和$$\beta_{\theta'}$$的estimators进行隔离作为实验，对于计算另一个state representation来说这会增加计算开销，但在离线和在线实验中不会产生任何指标提升。
+作为替代，**我们采用[39]中首先引入的方法，并估计行为策略$$\beta$$**，在我们的情况中它是一个多种agents的policies的混合，它们使用该记录下来的actions。给定一个已记录的反馈集合 $$D = \lbrace (s_i, a_i), i=1, \cdots, N \rbrace$$，Strehlet[39]会独立用户状态的方式，**通过对整个语料的action频率进行聚合来估计$$\hat{\beta}(a)$$**。对于每个state-action pair(s, a)，我们会估计概率$$\hat{\beta}_{\theta'}(a \mid s)$$，该behavior policies的组合体会使用另一个使用$$\theta'$$作为参数的softmax来选中该action。**如图1所示，我们会复用该user state s（它由main policy的RNN model生成），接着使用另一个softmax layer来建模该mixed behavior policy**。为了阻止该behavior head干扰到该main policy的该user state，**我们会阻止该gradient反向传播回该RNN**。我们也对将$$\pi_{\theta}$$和$$\beta_{\theta'}$$的estimators进行隔离作为实验，对于计算另一个state representation来说这会增加计算开销，但在离线和在线实验中不会产生任何指标提升。
 
-尽管在两个policy head $$\pi_{\theta}$$和$$\beta_{\theta'}$$间存在大量参数共享，但两者间还是有两个明显的不同之处：
+尽管在两个policy head $$\pi_{\theta}$$和$$\beta_{\theta'}$$间存在大量参数共享，**但两者间还是有两个明显的不同之处**：
 
 - (1) main policy $$\pi_{\theta}$$会使用一个weighted softmax进行有效训练，会重点考虑长期回报(long term reward)；而behavior policy head $$\beta_{\theta'}$$只会使用state-action pairs进行训练
 - (2) main policy head $$\pi_\theta$$只使用非零回报（non-zero reward）在该轨迹上的items进行训练；而behavior policy $$\beta_{\theta'}$$使用在该轨迹上的所有items进行训练，从而避免引入在$$\beta$$估计时的bias。
