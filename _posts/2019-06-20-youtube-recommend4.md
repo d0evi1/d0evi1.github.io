@@ -140,7 +140,7 @@ Achiam[1]证明了：该一阶近似对于学到的policy上的总回报的影�
 
 ## 4.1 对policy $$\pi_{\theta}$$进行参数化
 
-我们将我们的观点在每个时间t上建模，这样可以同时捕获用户兴趣的演进，它使用n维向量$$s_t \in R^n$$来表示。沿着该轨迹（trajectory）在每个时间t上采用的action，会使用一个m维向量$$u_{a_t} \in R^m$$进行嵌入。我们会使用一个RNN [6, 49]来建模状态转移$$P: S \times A \times S$$：
+我们对**每个时间t上的user state**建模，这可以同时捕获用户兴趣的演进，它使用**n维向量$$s_t \in R^n$$**来表示。沿着该轨迹（trajectory）**每个时间t上的action**会使用一个**m维向量$$u_{a_t} \in R^m$$**进行嵌入。我们会使用一个RNN [6, 49]来建模状态转移$$P: S \times A \times S$$：
 
 $$
 s_{t+1} = f(s_t, u_{a_t})
