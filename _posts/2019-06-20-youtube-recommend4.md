@@ -104,7 +104,7 @@ $$
 
 # 4.off-policy collrection
 
-因为学习和基础设施的限制，我们的学习器（learner）没有与推荐系统的实时交互控制，这不同于经典的增强学习。换句话说，我们不能执行对policy的在线更新，以及立即根据更新后的policy来生成轨迹（trajectories）。作为替代，我们会接收由一个历史policy（或者一个policies组合）选中的关于actions的日志反馈，对比时立即更新policy，这种方式在action space上会具有一个不同的分布。
+因为学习和基础设施的限制，我们的学习器（learner）没有与推荐系统的实时交互控制，这不同于经典的增强学习。**换句话说，我们不能执行对policy的在线更新，以及立即根据更新后的policy来生成轨迹（trajectories）**。作为替代，我们会接收由一个历史policy（或者一个policies组合）选中的关于actions的日志反馈，对比时立即更新policy，这种方式在action space上会具有一个不同的分布。
 
 我们主要关注解决：当在该环境中应用policy gradient方法时所带来的数据偏差。**特别的，我们会收集包含多个小时的一个周期性数据，在生产环境中在部署一个新版本的policy前，计算许多policy参数更新，这意味着我们用来估计policy gradient的轨迹集合是由一个不同的policy生成的**。再者，我们会从其它推荐(它们采用弹性的不同policies)收集到的成批的反馈数据中学习。一个原本的policy gradient estimator不再是无偏的，因为在等式(2)中的梯度需要从更新后的policy $$\pi_\theta$$中抽取轨迹（trajectories），而我们收集的轨迹会从一个历史policies $$\beta$$的一个组合中抽取。
 
@@ -117,7 +117,7 @@ $$
 其中：
 
 $$
-\frac{\pi_{\theta}(\tau)}{\beta_{\tau}} = \frac{\rho(s_0) \prod_{t=0}^{|\tau|} P(s_{t+1}|s_t, a_t) \pi(a_t|s_t)}{\rho(s_0) \prod_{t=0}^{|\tau|} P(s_{t+1}|s_t, a_t) \beta(a_t | s_t)} = \prod_{t=0}^{|\tau|} \frac{\pi(a_t | s_t)}{\beta(a_t | s_t)}
+\frac{\pi_{\theta}(\tau)}{\beta(\tau)} = \frac{\rho(s_0) \prod_{t=0}^{|\tau|} P(s_{t+1}|s_t, a_t) \pi(a_t|s_t)}{\rho(s_0) \prod_{t=0}^{|\tau|} P(s_{t+1}|s_t, a_t) \beta(a_t | s_t)} = \prod_{t=0}^{|\tau|} \frac{\pi(a_t | s_t)}{\beta(a_t | s_t)}
 $$
 
 是importance weight。该correction会生成一个无偏估计器(unbiased estimator)，其中：轨迹(trajectories)会使用根据$$\beta$$抽样到的actions进行收集得到。然而，由于链式乘积（chained products），该estimator的方差是很大的，这会快速导致非常低或非常高的importance weights值。
@@ -125,7 +125,7 @@ $$
 为了减少在时间t时该轨迹上的每个gradient项的方差，我们会首先忽略在该链式乘法中时间t后的项，并在将来时间采用一个一阶近似来对importance weights进行近似：
 
 $$
-\prod_{t'=0}^{|\tau|} \frac{\pi(a_{t'} | s_{t'})}{\beta(a_{t'} | s_{t'})} \approx \prod_{t'=0}^{t} \frac{\pi(a_{t'} | s_{t'})}{a_{t'}|s_{t'}} = \frac{P_{\pi_{\theta}}(s_t)}{P_{\beta}(s_t)} \frac{\pi(a_t | s_t)}{a_t|s_t} \ approx \frac{\pi(a_t|s_t)}{\beta(a_t | s_t)}
+\prod_{t'=0}^{|\tau|} \frac{\pi(a_{t'} | s_{t'})}{\beta(a_{t'} | s_{t'})} \approx \prod_{t'=0}^{t} \frac{\pi(a_{t'} | s_{t'})}{\beta(a_{t'}|s_{t'})} = \frac{P_{\pi_{\theta}}(s_t)}{P_{\beta}(s_t)} \frac{\pi(a_t | s_t)}{\beta(a_t|s_t)} \approx \frac{\pi(a_t|s_t)}{\beta(a_t | s_t)}
 $$
 
 这会产生一个具有更低方差的关于policy gradient的有偏估计器（biased estimator）：
