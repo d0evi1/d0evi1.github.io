@@ -140,7 +140,7 @@ Achiam[1]证明了：该一阶近似对于学到的policy上的总回报的影�
 
 ## 4.1 对policy $$\pi_{\theta}$$进行参数化
 
-我们将我们的观点在每个时间t上建模，这样可以同时捕获用户兴趣的演进，它使用n维向量$$s_t \in R^n$$来表示。沿着该轨迹在每个时间t上采用的action，会使用一个m维向量$$u_{a_t} \in R^m$$进行嵌入。我们会使用一个RNN [6, 49]来建模状态转移$$P: S \times A \times S$$：
+我们将我们的观点在每个时间t上建模，这样可以同时捕获用户兴趣的演进，它使用n维向量$$s_t \in R^n$$来表示。沿着该轨迹（trajectory）在每个时间t上采用的action，会使用一个m维向量$$u_{a_t} \in R^m$$进行嵌入。我们会使用一个RNN [6, 49]来建模状态转移$$P: S \times A \times S$$：
 
 $$
 s_{t+1} = f(s_t, u_{a_t})
@@ -159,7 +159,7 @@ $$
 考虑到一个user state s， policy $$\pi_{\theta}( a \mid s) $$接着使用一个简单的softmax进行建模：
 
 $$
-\pi_{\theta}(a | s) = \frac{exp(s^T v_a / T)}{\sum_{a' \in R} exp(s^T v_{a'} / T)}
+\pi_{\theta}(a | s) = \frac{exp(s^T v_a / T)}{\sum_{a' \in A} exp(s^T v_{a'} / T)}
 $$
 
 其中，$$v_a \in R^n $$是对于在action space A中的每个action a的另一个embedding，T是时序(通常设置为1)。在T上使用一个更高的值会在action space上产生一个更平滑的policy。在softmax中的归一化项需要检查所有可能的动作，在我们的环境中有数百万量级。为了加速计算，我们会在训练中使用sampled softmax。在serving时，我们使用一个高效的最近邻查寻算法来检索top actions，并使用这些actions来近似softmax概率，如第5节所述。
