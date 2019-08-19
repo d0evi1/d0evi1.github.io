@@ -162,7 +162,7 @@ $$
 \pi_{\theta}(a | s) = \frac{exp(s^T v_a / T)}{\sum\limits_{a' \in A} exp(s^T v_{a'} / T)}
 $$
 
-其中，$$v_a \in R^n $$是对于在action space A中的每个action a的另一个embedding，T是时序(通常设置为1)。在T上使用一个更高的值会在action space上产生一个更平滑的policy。在softmax中的归一化项需要检查所有可能的动作，在我们的环境中有数百万量级。为了加速计算，我们会在训练中使用sampled softmax。在serving时，我们使用一个高效的最近邻查寻算法来检索top actions，并使用这些actions来近似softmax概率，如第5节所述。
+其中，**$$v_a \in R^n $$是对于在action space A中的每个action a的另一个embedding**，T是时序(通常设置为1)。T值越大会在action space上产生一个更平滑的policy。在softmax中的归一化项需要检查所有可能的动作，在我们的环境中有数百万量级。为了加速计算，我们会在训练中使用sampled softmax。**在serving时，我们使用一个高效的最近邻查寻算法来检索top actions，并使用这些actions来近似softmax概率**，如第5节所述。
 
 总之，policy $$\pi_{\theta}$$的参数$$\theta$$包含了两个action embeddings：$$U \in R^{m \times \mid A \mid}$$和$$V \in R^{n \times \mid A \mid}$$，以及在RNN cell中的权重矩阵$$U_z, U_i \in R^{n \times n}, W_u, W_i, W_a \in R^{n \times m}$$，以及biases: $$b_u, b_i \in R^n$$。图1展示了一个描述main policy $$\pi_{\theta}$$的神经网络架构。给定一个观察到的轨迹 $$\tau = (s_0, a_0, s_1, ...)$$，它从一个行为策略（behavior policy）$$\beta$$中抽样得到，该新策略(new policy)首先会生成一个关于user state $$s_{t+1}$$的模型，它使用一个initial state $$s_0 \sim \rho_0$$并通过等式(4)的recurrent cell迭代得到。给定user state $$s_{t+1}$$，policy head会通过等式(5)的softmax来在action space上转化分布。有了$$\pi_{\theta}(a_{t+1} \mid s_{t+1})$$，我们接着使用等式(3)生成一个policy gradient来更新该policy。
 
