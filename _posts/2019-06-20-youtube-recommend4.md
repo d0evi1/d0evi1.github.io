@@ -249,7 +249,7 @@ $$
 - 随着$$\pi_{\theta}(a \mid s) \rightarrow 1, \lambda_K(s,a) \rightarrow 0$$。该乘子会使policy update归0
 - 随着K的增加，以及$$\pi_{\theta}(a \mid s)$$会达到一个合理的范围, 该乘子会更快地将graident减小于0
 
-总之，当期望的item在softmax policy $$\pi_{\theta}(\cdot | s)$$具有一个很小的量，比起标准的correction，top-K correction会更有倾略性地推高它的likelihood。一旦softmax policy $$\pi_{\theta}(\cdot | s)$$在期望的item上转化成一个合理的量（以确认它可能出现在top-K中），correction接着会将梯度归0, 不再尝试推高它的似然。作为回报，它允许其它感兴趣的items在softmax policy中占据一定的量。我们会在仿真和真实环境中进一步演示，而标准的off-policy correction会收敛到一个当选择单个item时最优的policy，top-K correction会产生更好的top-K推荐。
+总之，当期望的item在softmax policy $$\pi_{\theta}(\cdot \mid s)$$具有一个很小的量，比起标准的correction，top-K correction会更有倾略性地推高它的likelihood。一旦softmax policy $$\pi_{\theta}(\cdot \mid s)$$在期望的item上转化成一个合理的量（以确认它可能出现在top-K中），correction接着会将梯度归0, 不再尝试推高它的似然。作为回报，它允许其它感兴趣的items在softmax policy中占据一定的量。我们会在仿真和真实环境中进一步演示，而标准的off-policy correction会收敛到一个当选择单个item时最优的policy，top-K correction会产生更好的top-K推荐。
 
 ## 4.4 方差减小技术
 
