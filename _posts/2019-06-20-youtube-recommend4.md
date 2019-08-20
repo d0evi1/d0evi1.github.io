@@ -227,9 +227,11 @@ $$
 $$
 \sum_{\tau \sim \beta} [ \sum_{t=0}^{|\tau|} \frac{\alpha_{\theta} (a_t |s_t)}{\beta(a_t|s_t)} R_t \nabla_{\theta} log \alpha_{\theta} (a_t | s_t)] \\
 
-= ...
+= \sum_{\tau \sim \beta} [\sum_{t=0}^{|\tau|}  \frac{\pi_{\theta}(a_t|s_t)}{\beta(a_t|s_t)} \frac{\partial \alpha(a_t|s_t)}{\partial \pi(a_t|s_t)} R_t \nabla_{\theta} log \pi_{\theta} (a_t | s_t)]
 
 $$
+
+...(6)
 
 对比等式(6)和等式(3)，top-K policy会增加一个额外的乘子：
 
