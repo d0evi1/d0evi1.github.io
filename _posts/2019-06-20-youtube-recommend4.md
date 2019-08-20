@@ -274,7 +274,7 @@ c的值越小，会减小在梯度估计时的方差，但会引入更大的bias
 我们使用的第二种技术是引入一个ratio来控制变量，其中我们使用经典的权重归一化，如下：
 
 $$
-\hat{\w}(s, a) = \frac{w(s,a)}{\sum_{(s',a') \sim \beta} w(s', a')}
+\bar{\omega}(s, a) = \frac{w(s,a)}{\sum_{(s',a') \sim \beta} w(s', a')}
 $$
 
 由于$$E_{\beta}[w(s,a)] = 1$$，归一化常数等于n，batch size在预期之中。随着n的增大，NIS的效果等价于调低learning rate。
