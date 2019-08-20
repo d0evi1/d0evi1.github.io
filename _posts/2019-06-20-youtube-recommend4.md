@@ -220,7 +220,7 @@ $$
 \sum_{\tau \sim \pi_\theta} [ \sum_{t=0}^{|\tau|} R_t \nabla_{\theta} log \alpha_{\theta} (a_t | s_t)]
 $$
 
-其中，$$\alpha_{\theta} (a \mid s) = 1 - (1- \pi_{\theta}(a \mid s))^K$$是一个item a出现在最终的无重复集合A中的概率。这里，$$K = \mid A' \mid > \mid A \mid = k $$。
+其中，$$\alpha_{\theta} (a \mid s) = 1 - (1- \pi_{\theta}(a \mid s))^K$$表示的是一个item a出现在最终的无重复集合A中的概率。这里，$$K = \midA'\mid >\midA\mid = k $$。
 
 我们接着更新等式(3)中的off-policy corrected gradient，通过使用$$\alpha_{\theta}$$替代$$\pi_{\theta}$$，生成top-K off-policy correction factor: 
 
