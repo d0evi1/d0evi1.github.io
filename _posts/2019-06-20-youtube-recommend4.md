@@ -253,7 +253,7 @@ $$
 
 ## 4.4 方差减小技术
 
-在本节开始，我们会采用一个一阶近似来减小在梯度估计时的方差。尽管如此，梯度仍会有较大方差，因为等式(3)中展示的$$\omiga(s,a) = \frac{\pi(a \mid s)}{\beta(a \mid s)}$$的大的importance weight，这与top-K off-policy correction相似。大的importance weight会从(1)中产生较大的来自behavior policy的new policy $$\pi(\cdot \mid s)$$的导数，特别的，new policy会探索那些被behavior policy很少探索过的区域。也就是说，$$ \pi(a \mid s) \gg \beta(a \mid s)$$和(2)在$$\beta$$估计中有大的方差。
+在本节开始，我们会采用一个一阶近似来减小在梯度估计时的方差。尽管如此，梯度仍会有较大方差，因为等式(3)中展示的$$\omega(s,a) = \frac{\pi(a \mid s)}{\beta(a \mid s)}$$的大的importance weight，这与top-K off-policy correction相似。大的importance weight会从(1)中产生较大的来自behavior policy的new policy $$\pi(\cdot \mid s)$$的导数，特别的，new policy会探索那些被behavior policy很少探索过的区域。也就是说，$$ \pi(a \mid s) \gg \beta(a \mid s)$$和(2)在$$\beta$$估计中有大的方差。
 
 我们测试了在counterfactual learning和RL文献中提出的许多技术来控制在梯度估计时的方差。大多数这些技术会减小方差，但在梯度估计时会引入一些bias。
 
@@ -262,7 +262,7 @@ $$
 我们测试的第一种方法会简单的将weight设置上限：
 
 $$
-\omiga_c(s,a) = min(\frac{\pi(a|s)}{\beta(a|s)}, c)
+\omega_c(s,a) = min(\frac{\pi(a|s)}{\beta(a|s)}, c)
 $$
 
 ...(8)
