@@ -363,7 +363,9 @@ $$
 
 根据使用一个stochastic policy，我们在训练期间测试了incorporating off-policy correction。这里，我们根据一个更传统的A/B testing setup使用所有流量来训练两个模型。控制模型(control model)会根据等式(2)进行训练，通过reward对样本进行加权。测试模型（test model）会根据图1的结构，其中该模型会同时学习一个serving policy $$\pi_\theta$$以及behavior policy $$\beta_{\theta}'$$。该serving policy会使用等式(3)描述的off-policy correction进行训练，其中每个样本会同时使用reward以及importance weight $$\frac{\pi_\theta}{\beta_{\theta}'}$$进行加权来解决数据偏差。
 
-在实验期间，我们观察到，学到的policy(test)会偏离behavior policy(control)（它被用于获取流量）。图4展示了通过我们控制的nominator所选中的视频(videos)的CDF，
+在实验期间，我们观察到，学到的policy(test)会偏离behavior policy(control)（它被用于获取流量）。图4展示了通过我们控制的nominator所选中的视频(videos)的CDF，实验对应于在控制流量中的videos的排序(rank)，（rank 1是由控制模型最nominated的视频，最右表示最小的nominated）。
+
+。。。
 
 
 
