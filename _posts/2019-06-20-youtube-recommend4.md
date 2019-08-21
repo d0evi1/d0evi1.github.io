@@ -274,7 +274,7 @@ c的值越小，会减小在梯度估计时的方差，但会引入更大的bias
 我们使用的第二种技术是引入一个ratio来控制变量，其中我们使用经典的权重归一化，如下：
 
 $$
-\bar{\omega}(s, a) = \frac{w(s,a)}{\sum_{(s',a') \sim \beta} w(s', a')}
+\bar{\omega}(s, a) = \frac{w(s,a)}{\sum\limits_{(s',a') \sim \beta} w(s', a')}
 $$
 
 由于$$E_{\beta}[w(s,a)] = 1$$，归一化常数等于n，batch size在预期之中。随着n的增大，NIS的效果等价于调低learning rate。
@@ -283,15 +283,87 @@ $$
 
 # 5.探索（EXPLORATION）
 
-这一点很明确，训练数据的分布对于学习一个好的policy来说很重要。探索策略（exploration policies）很少会询问由存在的系统用采用的actions，这已经被广泛研究过。实际上，暴力探索（brute-force exploration），比如：$$\epsilon-greedy$$，对于像Youtube这样的生产系统来说并不是可行的，这很可能产生不合适的推荐和一个较差的用户体验。例如，Schnabel【35】研究了探索的代价。
+有一点很明确：训练数据的分布对于学习一个好的policy来说很重要。现有的推荐系统很少采用会询问actions的探索策略（exploration policies），这已经被广泛研究过。实际上，暴力探索（brute-force exploration），比如：$$\epsilon-greedy$$，对于像Youtube这样的生产系统来说并不是可行的，这很可能产生不合适的推荐和一个较差的用户体验。例如，Schnabel【35】研究了探索(exploration)的代价。
 
-作为替代，我们使用Boltzmann exploration[12]来获取探索数据的收益，不会给用户体验带来负面影响。我们会考虑使用一个随机policy，其中推荐会从$$\pi_{\theta}$$中抽样，而非采用最高概率的K个items。由于计算低效这是个挑战，因为我们需要计算整个softmax，这对于考虑我们的action space来说开销过于高昂。另外，我们会利用高效的ANN-based系统来查询在softmax中的top M个items。我们接着会feed这些M个items的logits到一个更小的softmax中来归一化该概率，接着从该分布中抽样。通过设置$$M \gg K$$，我们仍可以检索大多数概率块，限制了生成坏的推荐的风险，并允许计算高效的抽样。实际上，我们会通过返回top $$K'$$个最大概率的items，以及从剩余的$$M-K'$$个items中抽取$$K-K'$$个items，来进一步平衡exploration和exploitation。
+**作为替代，我们使用Boltzmann exploration[12]来获取探索数据(exploratory data)的收益，不会给用户体验带来负面影响**。我们会考虑使用一个随机policy，其中推荐会从$$\pi_{\theta}$$中抽样，而非采用最高概率的K个items。由于计算低效性（我们需要计算full softmax），这对于考虑我们的action space来说开销过于高昂。另外，我们会利用高效的ANN-based系统来查询在softmax中的top M个items。我们接着会feed这些M个items的logits到一个更小的softmax中来归一化该概率，接着从该分布中抽样。通过设置$$M \gg K$$，我们仍可以检索大多数概率块，限制了生成坏的推荐的风险，并允许计算高效的抽样。实际上，我们会通过返回top $$K'$$个最大概率的items，以及从剩余的$$M-K'$$个items中抽取$$K-K'$$个items，来进一步平衡exploration和exploitation。
 
 # 6.实验结果
 
+我们展示了：在一个工业界规模的推荐系统中，在一系列仿真实验和真实实验中，这些用于解决数据偏差(data biases)的方法的效果。
+
 ## 6.1 仿真
 
+我们设计了仿真实验来阐明：在更多受控环境下off-policy correction的思想。为了简化我们的仿真，我们假设：该问题是无状态的（stateless），换句话说，回报（reward）R与用户状态（user states）是相互独立的，action不会改变user states。作为结果，在一个trajectory上的每个action可以被独立选中。
+
+### 6.1.1 off-policy correction
+
+在第一个仿真中，我们假设存在10个items：$$A=\lbrace a_i, i=1, \cdots, 10 \rbrace$$。每个action的reward等于它的index，也就是说：$$r(a_i)=i$$。当我们选中单个item时，在该setting下最优的policy总是会选中第10个item（因为它的reward最大），也就是说：
+
+$$
+\pi^* (a_i) = I(i=10)
+$$
+
+我们使用一个无状态的softmax来参数化$$\pi_{\theta}$$：
+
+$$
+\pi(a_i) = \frac{e^{\theta_i}}{\sum_j e^{\theta_j}}
+$$
+
+给定从behavior policy $$\beta$$中抽样得到的观察数据（observations），可以天然地应用policy gradient（无需解释数据偏差），因为等式(1)会收敛到一个policy：
+
+$$
+\pi(a_i) = \frac{r(a_i)\beta(a_i)}{\sum_j r(a_j) \beta(a_j)}
+$$
+
+这具有一个明显的下降(downside)：behavior policy越选择一个次优（sub-optimal）的item，new policy越偏向于选择相同的item。
+
+图2比较了policies $$\pi_{\theta}$$，分别使用/不使用 off-policy correction及SGD进行学习，behavior policy $$\beta$$倾向于最少回报的items。如图2(左)所示，天然使用behavior policy，无需解释数据偏差会导致一个sub-optimal policy。在最坏的情况下，如果behavior policy总是选择具有最低回报的action，我们将以一个很弱的policy结束，并模仿该behavior policy（例如：收敛到选择最少回报的item）。换句话说，应用该off-policy correction允许我们收敛到最优policy $$\pi^*$$，无需关注数据是如何收集的，见图2(右）。
+
+### 6.1.2 Top-K-policy correction
+
+为了理解标准off-policy correction和top-K off-policy correction间的不同，我们设计了另一个仿真实验，它可以推荐多个items。我们假设有10个items，其中$$r(a_1)=10, r(a_2)=9$$，具有更低reward的其余items为：$$r(a_i)=1, \forall i=3,\cdots,10$$。这里，我们关注推荐两个items，即K=2. behavior policy $$\beta$$会符合一个均匀分布(uniform distribution)，例如：以平等的机率选择每个item。
+
+给定从$$\beta$$中抽样到的一个observation $$(a_i, r_i)$$，标准的off-policy correction具有一个SGD，以如下形式进行更新：
+
+$$
+\theta_j = \theta_j + \eta \frac{\pi_{\theta}(a_j)}{\beta(a_j)} r(a_i) [ I(j=i) - \pi_{\theta}(a_j)]
+, \forall j = 1, \cdots, 10
+
+$$
+
+其中，$$\eta$$是learning rate。SGD会根据在$$\pi_\theta$$下的expected reward的比例继续增加item $$a_i$$的似然(likelihood)，直到$$\pi_{\theta}(a_i)=1$$，此时的梯度为0。换句话说，top-K off-policy correction以如下形式进行更新：
+
+$$
+\theta_j = \theta_j + \eta \lambda_K(a_i) \frac{\pi_\theta(a_j)}{\beta(a_j)} r(a_i) [I(j=i) - \pi_{\theta}(a_j)], \forall  j=1, \cdots, 10
+$$
+
+其中，$$\lambda_K(a_i)$$是在第4.3节定义的乘子。当$$\pi_{\theta}(a_i)$$很小时，$$\lambda_K(a_i) \approx K$$，SGD会更强烈地增加item $$a_i$$的似然。由于$$\pi_\theta(a_i)$$会达到一个足够大的值，$$\lambda_K(a_i)$$会趋向于0. 作为结果，SGD不再强制增加该item的likelihood，**即使当$$\pi_\theta(a_i)$$仍小于1时**。作为回报(in return)，这会允许第二好（second-best）的item在所学到的policy上占据一些位置。
+
+图3展示了使用标准(left) off-policy correction和top-k off  policy correction)(右)学到的policies $$\pi_{\theta}$$。我们可以看到，使用标准的off-policy correction，尽管学到的policy会校准(calibrated)，从某种意义上说，它仍会维持items关于expected reward的顺序，它会收敛到一个policy：它能在top-1 item上将整个mass转换（cast），也就是：$$\pi(a_1) \approx 1.0$$。作为结果，学到的policy会与在次优item(本例中的$$a_2$$)和其余items间的差异失去联系。换句话说，该top-K correction会收敛到一个在第二优item上具有较大mass的policy，而维持在items间optimality的次序。作为结果，我们可以推荐给用户两个高回报(high-reward) items，并在整体上聚合更多reward。
+
 ## 6.2 真实环境
+
+具有仿真实验对于理解新方法有价值，任何推荐系统的目标最终都是提升真实用户体验。我们因此在真实系统中运行A/B test实验。
+
+我们在Youtube中所使用的生产环境上的 RNN candidate genreation model上评估这了些方法，相似的描述见[6,11]。该模型是生产环境推荐系统的众多候选生成器（candidate generators）之一，它们会进行打分（scored）然后通过一个独立的ranking模型进行排序(ranked)，之后再在Youtube主页或视频观看页的侧边栏上展示给用户视频。如上所述，该模型的训练会采用REINFORCE算法。该立即回报(immediate reward) r被设计成影响不同的用户活动（user activities）；被推荐的视频如果没有点击会收到零回报(zero reward)。长期回报（long-term reward）r会在4-10小时的时间范围内进行聚合。在每个实验中，控制模型（control model）和测试模型（test model）会使用相同的reward function。实验会运行多天，在这期间模型会每隔24小时使用新事件作为训练数据进行持续训练。我们可以查看推荐系统的多种在线指标，我们主要关注用户观看视频时长，被称为：ViewTime。
+
+这里的实验描述了在生产系统中的多个顺序提升。不幸的是，在这样的setting中，最新(latest)的推荐系统提供了对于下一实验的训练数据，后续的实验不能与之前系统进行比较。因此，每个后续的实验都应该为每个组件采用独立分析。
+
+### 6.2.1 Exploration
+
+我们开始理解探索数据(exploratory data)在提升模型质量上的价值。特别的，我们会measure是否服务一个随机策略（stochastic policy），在该policy下我们会在第5节中描述的softmax模型进行抽样，其中模型总是根据softmax使用最高概率来推荐K个items。
+
+我们开展了一系列实验来理解：serving一个随机策略(stochastic policy) vs. 一个确定策略(deterministic policy)的影响，并保持训练过程不变。在该实验中，控制流量（control）使用一个deterministic policy进行serving，测试流量(test traficc)的一小部分使用第5节描述的stochastic policy进行serving。两种policies都基于等式(2)相同softmax model进行训练。为了控制在serving时stochastic policy的随机量，我们使用等式(5)的不同时间(temperature)来区分。T值越低，会将stochastic policy降为一个deterministic policy，而一个更高的T会产生一个random policy，它以相等的机会推荐任意item。T设置为1, 我们可以观察到，在实验期间ViewTime在统计上没有较大变化，这意味着从sampling引入的随机量不会直接伤害用户体验。
+
+然而，该实验的setup不会说明，在训练期间提供探索数据的好处。从日志数据中学习的一个主要偏差之一是，该模型不会观察未被之前推荐policy所选中actions的反馈(feedback)，探索数据会缓和该问题。我们展开了以下实验，其中，我们将探索数据引入到训练中。为了这样做，我们将平台上的用户分成三个buckets：90%，5%，5%。前两个buckets使用一个deterministic policy并基于一个deterministic model进行serving，最后一个bucket的用户使用一个基于一个使用exploratory data训练的模型得到的stochastic policy进行serving。deterministic model只使用由前两个分桶的数据进行训练，而stochastic model则使用第一和第三个buckets的数据进行训练。作为结果，这两个模型会接收相同量的训练数据，由于exploration，stochastic model更可能观察到一些更罕见state、action pairs的结果。
+
+根据该实验过程，我们观察到在test流量中，在ViewTime上一个很大的增长。尽管提升并不大，它由一个相当小量的探索数据（只有5%的用户体验了该stochastic policy）所带来。我们期待stochastic policy被全量后所能带来的更高增益。
+
+### 6.2.2 Off-policy Correction
+
+根据使用一个stochastic policy，我们在训练期间测试了incorporating off-policy correction。这里，我们根据一个更传统的A/B testing setup使用所有流量来训练两个模型。控制模型(control model)会根据等式(2)进行训练，通过reward对样本进行加权。测试模型（test model）会根据图1的结构，其中该模型会同时学习一个serving policy $$\pi_\theta$$以及behavior policy $$\beta_{\theta}'$$。该serving policy会使用等式(3)描述的off-policy correction进行训练，其中每个样本会同时使用reward以及importance weight $$\frac{\pi_\theta}{\beta_{\theta}'}$$进行加权来解决数据偏差。
+
+在实验期间，我们观察到，学到的policy(test)会偏离behavior policy(control)（它被用于获取流量）。图4展示了通过我们控制的nominator所选中的视频(videos)的CDF，
 
 
 
