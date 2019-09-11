@@ -156,17 +156,25 @@ $$
 
 ...(4)
 
-其中，$$z_t, i_t \in R^n$$分别是update gate和input gate。
+其中：
+
+- $$z_t \in R^n$$是update gate
+- $$i_t \in R^n$$是input gate
 
 考虑到一个user state s， policy $$\pi_{\theta}( a \mid s) $$接着使用一个简单的softmax进行建模：
 
 $$
-\pi_{\theta}(a | s) = \frac{exp(s^T v_a / T)}{\sum\limits_{a' \in A} exp(s^T v_{a'} / T)}
+\pi_{\theta}(a | s) = \frac{exp(s^{\top} v_a / T)}{\sum\limits_{a' \in A} exp(s^{\top} v_{a'} / T)}
 $$
 
 ...(5)
 
-其中，**$$v_a \in R^n $$是每个action a在action space A中的另一个embedding**，T是时序(通常设置为1)。T值越大会在action space上产生一个更平滑的policy。在softmax中的归一化项需要检查所有可能的动作，在我们的环境中有数百万量级。为了加速计算，我们会在训练中使用sampled softmax。**在serving时，我们使用一个高效的最近邻查寻算法来检索top actions，并使用这些actions来近似softmax概率**，如第5节所述。
+其中：
+
+- **$$v_a \in R^n $$是每个action a在action space A中的另一个embedding**
+- T是时序(通常设置为1)。T值越大会在action space上产生一个更平滑的policy。
+
+在softmax中的归一化项需要检查所有可能的动作，在我们的环境中有数百万量级。为了加速计算，我们会在训练中使用sampled softmax。**在serving时，我们使用一个高效的最近邻查寻算法来检索top actions，并使用这些actions来近似softmax概率**，如第5节所述。
 
 总之，policy $$\pi_{\theta}$$的参数$$\theta$$包含了：
 
@@ -374,3 +382,4 @@ $$
 # 参考
 
 - 1.[https://arxiv.org/pdf/1812.02353.pdf](https://arxiv.org/pdf/1812.02353.pdf)
+- 2.[CFNRNN](https://openreview.net/pdf?id=S1dIzvclg)
