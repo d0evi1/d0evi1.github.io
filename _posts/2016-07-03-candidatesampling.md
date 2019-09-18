@@ -22,13 +22,13 @@ tags:
 - candidate classes（候选样本）: $$C_i$$
 - randomly chosen sample of classes（负样本）: $$S_i$$
 
-“候选采样（Candidate Sampling）”训练法，涉及到构建这样一个训练任务：对于每个训练样本$$(x_i, T_i)$$，我们只需要为**候选类（candidate classes）$$C_i \subset L$$**评估F(x,y)。通常，候选集合$$C_i$$是target classes的union，它是一个随机选中抽样的classes(非正例) $$S_i \subset L$$。
+“候选采样（Candidate Sampling）”训练法，涉及到构建这样一个训练任务：对于每个训练样本$$(x_i, T_i)$$，我们只需要为**候选类（candidate classes）$$C_i \subset L$$**评估F(x,y)。通常，候选集合$$C_i$$是target classes和随机选中抽样的classes(非正例) $$S_i \subset L$$的合集(union)。
 
 $$
 C_i = T_i \cup S_i
 $$
 
-随机样本$$S_i$$可能或不可能依赖于$$x_i$$和/或$$T_i$$。
+随机样本$$S_i$$可以依赖（或者不依赖）$$x_i$$和/或$$T_i$$。
 
 训练算法会采用神经网络的形式，其中表示F(x,y)的layer会通过BP算法从一个loss function中进行训练。
 
