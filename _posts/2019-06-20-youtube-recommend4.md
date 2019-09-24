@@ -205,7 +205,9 @@ $$
 尽管在两个policy head $$\pi_{\theta}$$和$$\beta_{\theta'}$$间存在大量参数共享，**但两者间还是有两个明显的不同之处**：
 
 - (1) main policy $$\pi_{\theta}$$会使用一个weighted softmax进行有效训练，会重点考虑长期回报(long term reward)；而behavior policy head $$\beta_{\theta'}$$只会使用state-action pairs进行训练
-- (2) main policy head $$\pi_\theta$$只使用在该轨迹上具有非零回报（non-zero reward）的items进行训练；而behavior policy $$\beta_{\theta'}$$使用在该轨迹上的所有items进行训练，从而避免引入在$$\beta$$估计时的bias
+- (2) **main policy head $$\pi_\theta$$只使用在该轨迹上具有非零回报（non-zero reward）的items进行训练**(注3)；而behavior policy $$\beta_{\theta'}$$使用在该轨迹上的所有items进行训练，从而避免引入在$$\beta$$估计时的bias
+
+注3：1.具有零回报(zero-reward)的Actions不会对$$\pi_{\theta}$$中的梯度更新有贡献；2.我们会在user state update中忽略它们，因为用户不可能会注意到它们，因此，我们假设user state不会被这些actions所影响 3.它会节约计算开销
 
 在[39]中主张：给定在time $$t_1$$上的state s，一个behavior policy会确定式选中(deterministically choosing)一个action a；**在time $$t_2$$上的action b，可以看成是：在action a和action b间在日志的时间间隔上的随机化(randomizing)**。这里，在同一点上是有争议的，这也解释了：给定一个确定的(deterministic) policy，为什么behavior policy即可以是0也可以是1。另外，因为我们有多个policies同时进行动作，如果一个policy是在给定user state s的情况下确定选中（determinstically choosing）action a，另一个policy会确定性选中action b，在给定user state s下通过这些混合behavior policies，接着以这样的方式估计$$\hat{\beta}_{\theta'}$$会逼近：action a被选中的期望频率（expected frequency）。
 
@@ -329,6 +331,10 @@ $$
 $$
 
 这具有一个明显的下降(downside)：behavior policy越选择一个次优（sub-optimal）的item，new policy越偏向于选择相同的item。
+
+<img src="http://pic.yupoo.com/wangdren23_v/ac961a9b/ff3997ee.jpg">
+
+图2: 所学到的policy $$\pi_{\theta}$$，当behavior policy $$\beta$$倾向于喜欢最小reward的actions时，比如：$$\beta(a_i)=\frac{11-i}{55}, \forall i = 1, \cdots, 10$$，(左)：没有使用off-policy correction; (右): 使用off-policy correction
 
 图2比较了policies $$\pi_{\theta}$$，分别使用/不使用 off-policy correction及SGD进行学习，behavior policy $$\beta$$倾向于最少回报的items。如图2(左)所示，天然使用behavior policy，无需解释数据偏差会导致一个sub-optimal policy。在最坏的情况下，如果behavior policy总是选择具有最低回报的action，我们将以一个很弱的policy结束，并模仿该behavior policy（例如：收敛到选择最少回报的item）。换句话说，应用该off-policy correction允许我们收敛到最优policy $$\pi^*$$，无需关注数据是如何收集的，见图2(右）。
 
