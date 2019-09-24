@@ -187,7 +187,7 @@ $$
 - 在RNN cell中的权重矩阵：$$U_z, U_i \in R^{n \times n}, W_u, W_i, W_a \in R^{n \times m}$$
 - biases：$$b_u, b_i \in R^n$$
 
-图1展示了一个描述main policy $$\pi_{\theta}$$的神经网络架构。给定一个观察到的轨迹 $$\tau = (s_0, a_0, s_1, ...)$$，它从一个行为策略（behavior policy）$$\beta$$中抽样得到，该新策略(new policy)首先会生成一个关于user state $$s_{t+1}$$的模型，它使用一个initial state $$s_0 \sim \rho_0$$并通过等式(4)的recurrent cell迭代得到。给定user state $$s_{t+1}$$，policy head会通过等式(5)的softmax来转化在action space分布。有了$$\pi_{\theta}(a_{t+1} \mid s_{t+1})$$，我们接着使用等式(3)生成一个policy gradient来更新该policy。
+图1展示了一个描述main policy $$\pi_{\theta}$$的神经网络架构。给定一个观察到的轨迹 $$\tau = (s_0, a_0, s_1, ...)$$，**它从一个行为策略（behavior policy）$$\beta$$中抽样得到**，该新策略(new policy)首先会生成一个关于user state $$s_{t+1}$$的模型，它使用一个initial state $$s_0 \sim \rho_0$$并通过等式(4)的recurrent cell迭代得到。给定user state $$s_{t+1}$$，policy head会通过等式(5)的softmax来转化在action space分布。有了$$\pi_{\theta}(a_{t+1} \mid s_{t+1})$$，我们接着使用等式(3)生成一个policy gradient来更新该policy。
 
 <img src="http://pic.yupoo.com/wangdren23_v/d1be870a/334d078f.jpeg">
 
