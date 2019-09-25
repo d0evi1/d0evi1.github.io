@@ -393,4 +393,6 @@ $$
 # 参考
 
 - 1.[https://arxiv.org/pdf/1812.02353.pdf](https://arxiv.org/pdf/1812.02353.pdf)
-- 2.[CFNRNN](https://openreview.net/pdf?id=S1dIzvclg)
+- 2.[Minmin Chen video](https://www.youtube.com/watch?v=HEqQ2_1XRTs)
+- 3.[Minmin Chen ppt](https://coladrill.github.io/2019/03/30/Youtube案例研究/)
+- 4.[CFNRNN](https://openreview.net/pdf?id=S1dIzvclg)
