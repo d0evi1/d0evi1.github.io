@@ -11,7 +11,7 @@ for a REINFORCE Recommender System》中提出使用强化学习来提升youtube
 
 # 摘要
 
-工业界推荐系统会处理非常大的动作空间(action spaces)——数百万items来进行推荐。同时，他们需要服务数十亿的用户，这些用户在任意时间点都是唯一的，使得用户状态空间（user state space）很复杂。幸运的是，存在海量的隐式反馈日志（比如：用户点击，停留时间等）可用于学习。从日志反馈中学习是有偏的（biases），这是因为只有在推荐系统上观察到的反馈是由之前版本的推荐系统(previous versions)选中的。在本文中，我们提出了一种通用的方法，在youtube生产环境上的top-k推荐系统中，使用一个基于策略梯度的算法（policy-gradient-based algorithm，比如：REINFORCE），来解决这样的偏差。该paper的主要贡献有：
+工业界推荐系统会处理**非常大的动作空间(action spaces)——数百万items**来进行推荐。同时，他们需要服务**数十亿的用户**，这些用户在任意时间点都是唯一的，使得用户状态空间（user state space）很复杂。幸运的是，存在海量的隐式反馈日志（比如：用户点击，停留时间等）可用于学习。从日志反馈中学习是有偏的（biases），这是因为只有在推荐系统上观察到的反馈是由之前版本的推荐系统(previous versions)选中的。在本文中，我们提出了一种通用的方法，在youtube生产环境上的top-k推荐系统中，使用一个基于策略梯度的算法（policy-gradient-based algorithm，比如：REINFORCE），来解决这样的偏差。该paper的主要贡献有：
 
 - 1.将REINFORCE扩展到生产环境推荐系统上，动作空间有数百万；
 - 2.使用off-policy correction来解决在从多种行为策略中收集的日志反馈的数据偏差（data biases）
@@ -23,20 +23,20 @@ for a REINFORCE Recommender System》中提出使用强化学习来提升youtube
 
 # 1.介绍
 
-在工业界，通过推荐系统来帮助用户从海量内容中挑选和发现用户感兴趣的少部分内容。该问题十分具有挑战性，因为要推荐海量的items数目。另一方面，将合适的item在合适的时间上曝光给正确的用户，需要推荐系统能基于历史交互，不断地适应用户的兴趣漂移。不幸的是，对于一个大的状态空间(state space)和动作空间(action space)，我们只观察到相对少量的数据，大多数用户只被曝光了少量items，只有更少比例的数据提供了显式反馈。也就是说，推荐系统在训练时只能接受相当稀疏的数据，例如：Netflix Prize Dataset只有0.1%的数据是dense的。因此，推荐系统的大量研究会探索不同的机制来处理相当稀疏的情况。从隐式用户反馈（比如：点击、停留时间）中学习，对未观察到的交互进行填充，对于提升推荐是很重要的一步。
+在工业界，通过推荐系统来帮助用户从海量内容中挑选和发现用户感兴趣的少部分内容。该问题十分具有挑战性，因为要推荐海量的items数目。另一方面，将合适的item在合适的时间上曝光给正确的用户，需要推荐系统能基于历史交互，不断地适应用户的兴趣漂移。不幸的是，对于一个大的状态空间(state space)和动作空间(action space)，我们只观察到相对少量的数据，大多数用户只被曝光了少量items，而显式反馈的数据占比更少。也就是说，推荐系统在训练时只能接受相当稀疏的数据，例如：Netflix Prize Dataset只有0.1%的数据是dense的。因此，推荐系统的大量研究会探索不同的机制来处理相当稀疏的情况。从隐式用户反馈（比如：点击、停留时间）中学习，对未观察到的交互进行填充，对于提升推荐是很重要的一步。
 
 大多数独立的研究线上，增强学习(RL)已经在游戏、机器人领域取得了相当大的进步。**RL通常聚焦于构建agents，在一个环境(environment)中采取哪些动作(action)来最大化一些长期收益（long term reward）**。这里，我们探索了将推荐解析成：构建RL agents来最大化每个用户使用该系统的长期满意度。在推荐问题上，这提供给我们一个新的视角和机会来基于在RL最新进展之上进行构建。然而，将这些新东西应用于实际还是有许多挑战。
 
-正如上所述，推荐系统需要处理大的状态空间（state spaces）和动作空间（action spaces），在工业界尤其显著。推荐可提供的items集合是不确定的(non-stationary)，新items会不断被引入到系统中，从而产生一个**日益增长的带新items的动作空间（action space）**，这会产生更稀疏的反馈。另外，在这些items上的用户偏好是会随时间一直漂移的(shifting)，从而产生**连续演化的用户状态(user states)**。在这样一个复杂的**环境（environment）**中，通过这些大量**actions**进行reason，在应用已有RL算法时提出了独特的挑战。这里，我们分享了我们的实践：在非常大的动作空间和状态空间中，在一个**神经网络候选生成器（neural candidate generator）**上（一个top-k推荐系统）应用REINFORCE算法[48]。
+如上所述，推荐系统需要处理大的状态空间（state spaces）和动作空间（action spaces），在工业界尤其显著。推荐可提供的items集合是不确定的(non-stationary)，新items会不断被引入到系统中，从而产生一个**日益增长的带新items的动作空间（action space）**，这会产生更稀疏的反馈。另外，在这些items上的用户偏好是会随时间一直漂移的(shifting)，从而产生**连续演化的用户状态(user states)**。在这样一个复杂的**环境（environment）**中，通过这些大量**actions**进行reason，在应用已有RL算法时提出了独特的挑战。这里，我们分享了我们的实践：在非常大的动作空间和状态空间中，在一个**神经网络候选生成器（neural candidate generator）**上（一个top-k推荐系统）应用REINFORCE算法[48]。
 
 除了大量动作和状态空间外，推荐系统中的RL仍是有区别的：只有有限提供的数据。经典的RL应用通过self-play和仿真（simulation）生成的大量训练数据，已经克服了数据无效性（data inefficiencies）。相比较而言，**推荐系统的复杂动态性，使得对于模仿生成真实推荐数据是不可能的**。因此，我们不能轻易寻找（probe for）在之前的状态和动作空间中未探索领域上的回报(reward)，因为观测到的回报（observing
 reward）需要为一个真实用户给出一个真实推荐。作为替代，该模型几乎依赖于之前**推荐模型（policies）**所提供的数据，大多数模型我们是不能控制的或不再可以控制。对于从其它policies中大多数日志反馈，我们采用一个off-policy learning方法，在该方法中我们会同时学习之前policies的一个模型，当训练我们的新policy时，在纠正数据偏差时包含它。我们也通过实验演示了在探索数据(exploratory data)上的价值(value)。
 
 最终，在RL方法中大多数研究主要关注于：产生一个可以选择单个item的policy。**而真实世界的推荐系统，通常会一次提供用户多个推荐[44]**。因此，我们为我们的top-K推荐系统定义了一个新的top-K off-policy correction。我们发现，在模拟和真实环境中，标准off-policy correction会产生一个对于top-1推荐来说最优的policy，而**我们的top-K off-policy correction会生成更好的top-K推荐**。我们提供了以下的贡献：
 
-- 1.REINFORCE推荐系统：我们在一个非常大的action space中，扩展了一个REINFORCE policy-gradient-based方法来学习一个神经网络推荐policy。
-- 2.Off-Policy候选生成：我们使用off-policy correction来从日志反馈中学习，这些日志从之前的model policies的一个ensemble中收集而来。我们会结合一个已经学到的关于行为策略(behavior policies)的神经网络模型来纠正数据偏差。
-- 3.Top-K Off-policy Correction：我们提供了一个新的top-K off-policy correction来说明：我们的推荐一次输出多个items。
+- 1.**REINFORCE推荐系统**：我们在一个非常大的action space中，扩展了一个REINFORCE policy-gradient-based方法来学习一个神经网络推荐policy。
+- 2.**Off-Policy候选生成**：我们使用off-policy correction来从日志反馈中学习，这些日志从之前的model policies的一个ensemble中收集而来。我们会结合一个已经学到的关于行为策略(behavior policies)的神经网络模型来纠正数据偏差。
+- 3.**Top-K Off-policy Correction**：我们提供了一个新的top-K off-policy correction来说明：我们的推荐一次输出多个items。
 - 4.真实环境的提升：我们展示了在真实环境中（在RL文献中很少有这种情况），这些方法对于提升用户长期满意度的价值。
 
 我们发现，这些方法的组合对于增加用户满意度是很有用的，并相信对于在推荐中进一步使用RL仍有许多实际挑战。
@@ -45,11 +45,11 @@ reward）需要为一个真实用户给出一个真实推荐。作为替代，�
 
 增强学习：Value-based方法（比如：Q-learning），policy-based方法（比如：policy gradients constitue经典方法）来解决RL问题。[29]中罗列了现代RL方法的常见比较，主要关注于异步学习，其关键点是扩展到更大问题上。尽管value-based方法有许多优点（比如：seamless off-policy learning），**他们被证明是在函数逼近(function approximation)上是不稳定的[41]**。通常，对于这些方法来说，需要进行大量的超参数调参(hyperparameter tuning)才能达到稳定行为。尽管许多value-based方法（比如：Q-learning）取得了实际成功，这些算法的策略收敛（policy convergence）没有被充分研究。另外，**对于函数逼近来说，Policy-based方法只要给定一个足够小的learning rate，仍然相当稳定**。因此，我们选择一个policy-gradient-based方法，尤其是REINFORCE[48]，来适配这种on-policy方法，从而当训练off-policy时提供可靠的policy gradient估计。
 
-神经网络推荐系统：与我们的方法紧密相关的另一条线是，在推荐系统中应用深度神经网络[11,16,37]，特别是使用RNN结合时序信息和历史事件用于推荐[6,17,20,45,49]。我们使用相似的网络结构，通过与推荐系统的交互来建模用户状态（user states）的演进。由于神经网络架构设计不是本文重点，有兴趣可以自己了解。
+**神经网络推荐系统**：与我们的方法紧密相关的另一条线是，在推荐系统中应用深度神经网络[11,16,37]，特别是使用RNN结合时序信息和历史事件用于推荐[6,17,20,45,49]。我们使用相似的网络结构，通过与推荐系统的交互来建模用户状态（user states）的演进。由于神经网络架构设计不是本文重点，有兴趣可以自己了解。
 
-推荐系统中的Bandit问题：在线学习方法很流行，由于新的用户反馈是可提供的，可以快速被适配到推荐系统中。Bandit算法比如（UCB）[3]，会以一种解析可跟踪的方式（它在regret上提供了很强的保证）来权衡exploration和exploitation。不同的算法，比如：Thomson sampling【9】，已经被成功应用于新闻推荐和展示广告。Contextual bandits提供了一种关于基础在线学习方法的context-aware refinement，并会将推荐系统朝着用户兴趣的方向裁减[27]。Agarwal【2】使得contextual bandits可跟踪，并且很容易实现。MF和bandits的混合方法被开发出来用于解决cold-start问题[28]。
+**推荐系统中的Bandit问题**：在线学习方法很流行，由于新的用户反馈是可提供的，可以快速被适配到推荐系统中。Bandit算法比如（UCB）[3]，会以一种解析可跟踪的方式（它在regret上提供了很强的保证）来权衡exploration和exploitation。不同的算法，比如：Thomson sampling【9】，已经被成功应用于新闻推荐和展示广告。Contextual bandits提供了一种关于基础在线学习方法的context-aware refinement，并会将推荐系统朝着用户兴趣的方向裁减[27]。Agarwal【2】使得contextual bandits可跟踪，并且很容易实现。MF和bandits的混合方法被开发出来用于解决cold-start问题[28]。
 
-推荐系统中的倾向评分（Propensity Scoring）和增强学习(Reinforcement learning)：学习off-policy的问题在RL中是很普遍的，通常会影响policy gradient。由于一个policy会演进，因此在对应梯度期望下的分布需要重新计算。在机器人领域的标准方法[1,36]，会通过限制policy更新的方式来绕过，以便在某一更新policy下新数据被收集之前，不能从实质上变更policy，作为回报，它会提供关于RL目标函数的单调提升保证。**这样的近似(proximal)算法很不幸不能应用于item目录和用户行为快速变化的推荐情景中，因此大量的policy会发生变更**。同时，对于大的状态空间和动作空间规模来说，收集日志反馈很慢。事实上，在推荐系统环境中，对于一个给定policy的离线评估已经是个挑战。多个off-policy estimators会利用逆倾向得分（inverse-propensity scores）、上限反倾向得分（capped inverse-propensity scores）、以及许多变量控制的measures已经被开发出[13,42,43,47]。Off-policy评估会将一个相似的数据框架纠正为off-policy RL，相似的方法会被应用于两个问题上。逆倾向评分已经被大规模的用于提升一个serving policy【39】。Joachims[21]为一个无偏排序模型学习了一个日志反馈的模型；我们采用一个相似的方式，但使用一个DNN来建模日志行为策略(logged behavior policy)，它对于off-policy learning来说是必需的。更常见的是，off-policy方法已经被适配到更复杂的问题上（比如：[44]为石板推荐）。
+**推荐系统中的倾向评分（Propensity Scoring）和增强学习(Reinforcement learning)**：学习off-policy的问题在RL中是很普遍的，通常会影响policy gradient。由于一个policy会演进，因此在对应梯度期望下的分布需要重新计算。在机器人领域的标准方法[1,36]，会通过限制policy更新的方式来绕过，以便在某一更新policy下新数据被收集之前，不能从实质上变更policy，作为回报，它会提供关于RL目标函数的单调提升保证。**这样的近似(proximal)算法很不幸不能应用于item目录和用户行为快速变化的推荐情景中，因此大量的policy会发生变更**。同时，对于大的状态空间和动作空间规模来说，收集日志反馈很慢。事实上，在推荐系统环境中，对于一个给定policy的离线评估已经是个挑战。多个off-policy estimators会利用逆倾向得分（inverse-propensity scores）、上限反倾向得分（capped inverse-propensity scores）、以及许多变量控制的measures已经被开发出[13,42,43,47]。Off-policy评估会将一个相似的数据框架纠正为off-policy RL，相似的方法会被应用于两个问题上。逆倾向评分已经被大规模的用于提升一个serving policy【39】。Joachims[21]为一个无偏排序模型学习了一个日志反馈的模型；我们采用一个相似的方式，但使用一个DNN来建模日志行为策略(logged behavior policy)，它对于off-policy learning来说是必需的。更常见的是，off-policy方法已经被适配到更复杂的问题上（比如：[44]为石板推荐）。
 
 # 3.增强推荐
 
@@ -66,9 +66,9 @@ reward）需要为一个真实用户给出一个真实推荐。作为替代，�
 - S：用于描述用户状态(user states)的一个连续状态空间（state space）
 - A：一个离散的动作空间(action space)，它包含了推荐可提供的items
 - $$P: S \times A \times S \rightarrow R$$：是一个状态转移概率
-- $$R: S \times A \rightarrow R$$：回报函数(reward function)，其中$$r(s,a)$$是立即回报，它会在用户状态（user state）s上执行动作a
-- $$\rho_0$$：初始状态分布
-- $$\gamma$$：对于future rewards的打折因子(discount factor)
+- $$R: S \times A \rightarrow R$$：回报函数(reward function)，其中$$r(s,a)$$是立即回报(immediate reward)，它通过在用户状态（user state）s上执行动作a得到
+- $$\rho_0$$：初始state分布
+- $$\gamma$$：对于future rewards的discount factor
 
 我们的目标是：**寻找一个policy $$\pi(a \mid s)$$（它会将一个在item上的分布转化成：基于用户状态$$s \in S$$的条件来推荐$$a \in A$$），以便最大化由推荐系统获得的期望累积回报(expected cumulative reward)**：
 
@@ -213,7 +213,7 @@ $$
 
 ## 4.3 Top-K off-policy Correction
 
-在我们的setting中存在的另一个挑战是：**我们的系统会一次推荐一个包含k个items的页面**。由于用户会浏览我们的推荐（整个集合或部分集合），会与超过一个item存在潜在交互，我们需要选择一个相关items集合，而非单个item。换句话说，我们会寻找一个policy $$\prod\limits_{\theta} (A \mid s)$$，这样每个action A会选择一个包含k items的集合，来最大化期望累积回报（expected cumulative reward）：
+在我们的setting中存在的另一个挑战是：**我们的系统会一次推荐一个包含k个items的页面**。由于用户会浏览我们的推荐（整个集合或部分集合），会与多个item存在潜在交互，我们需要选择一个相关items集合，而非单个item。换句话说，**我们会寻找一个policy $$\prod\limits_{\theta} (A \mid s)$$**，这样每个action A会选择一个包含k items的集合，来最大化期望累积回报（expected cumulative reward）：
 
 $$
 max_{\theta} E_{\tau \sim \prod_{\theta}} [ \sum\limits_t r(s_t, A_t)]
@@ -266,9 +266,9 @@ $$
 
 总之，当期望的item在softmax policy $$\pi_{\theta}(\cdot \mid s)$$具有一个很小的量，比起标准的correction，top-K correction会更有倾略性地推高它的likelihood。一旦softmax policy $$\pi_{\theta}(\cdot \mid s)$$在期望的item上转化成一个合理的量（以确认它可能出现在top-K中），correction接着会将梯度归0, 不再尝试推高它的似然。作为回报，它允许其它感兴趣的items在softmax policy中占据一定的量。我们会在仿真和真实环境中进一步演示，而标准的off-policy correction会收敛到一个当选择单个item时最优的policy，top-K correction会产生更好的top-K推荐。
 
-## 4.4 方差减小技术
+## 4.4 Variance Reduction技术
 
-在本节开始，我们会采用一个一阶近似来减小在梯度估计时的方差。尽管如此，梯度仍会有较大方差，因为等式(3)中展示的$$\omega(s,a) = \frac{\pi(a \mid s)}{\beta(a \mid s)}$$的大的importance weight，这与top-K off-policy correction相似。大的importance weight会从(1)中产生较大的来自behavior policy的new policy $$\pi(\cdot \mid s)$$的导数，特别的，new policy会探索那些被behavior policy很少探索过的区域。也就是说，$$ \pi(a \mid s) \gg \beta(a \mid s)$$和(2)在$$\beta$$估计中有大的方差。
+在本节开始，我们会采用一个一阶近似来减小在梯度估计时的方差(Variance)。尽管如此，梯度仍会有较大的方差，因为等式(3)中展示的$$\omega(s,a) = \frac{\pi(a \mid s)}{\beta(a \mid s)}$$的大的importance weight，这与top-K off-policy correction相似。大的importance weight会从(1)中产生较大的来自behavior policy的new policy $$\pi(\cdot \mid s)$$的导数，特别的，new policy会探索那些被behavior policy很少探索过的区域。也就是说，$$ \pi(a \mid s) \gg \beta(a \mid s)$$和(2)在$$\beta$$估计中有大的方差。
 
 我们测试了在counterfactual learning和RL文献中提出的许多技术来控制在梯度估计时的方差。大多数这些技术会减小方差，但在梯度估计时会引入一些bias。
 
