@@ -26,7 +26,7 @@ Drop是深度网络中很流行的正则技术，其中在训练期间network un
 
 <img src="http://pic.yupoo.com/wangdren23_v/9fc782c8/642b6fd3.jpg">
 
-图1 dropout技术。**(左)：标准dropout (右): Bayesian解释的dropout**. 每个方块表示一个RNN unit，水平键头表示时间依存关系（recurrent connections）。垂直键头表示每个RNN unit的input和output。带颜色的连接（connections）表示dropped-out inputs；不同颜色表示不同的dropout masks。虚线表示没有dropout的标准connections。当前技术（naive dropout, 左）在不同time steps上使用不同的masks，而在recurrent layers上没有dropout。提出的技术（Variational RNN, 右）在每个timestep上使用相同的dropout mask，包括recurrent layers
+图1 dropout技术。**(左)：标准dropout (右): Bayesian解释的dropout**. 每个方块表示一个RNN unit，水平键头表示时间依存关系（recurrent connections）。垂直键头表示每个RNN unit的input和output。**带颜色的连接（connections）表示dropped-out inputs；不同颜色表示不同的dropout masks**。虚线表示没有dropout的标准connections。当前技术（naive dropout, 左）在不同time steps上使用不同的masks，而在recurrent layers上没有dropout。提出的技术（Variational RNN, 右）在每个timestep上使用相同的dropout mask，包括recurrent layers
 
 我们接着研究了相关的文献和资料，将我们的Variational RNN的近似推断进行公式化，产生提出的dropout变种。实验结果在随后给出。
 
@@ -38,13 +38,18 @@ Drop是深度网络中很流行的正则技术，其中在训练期间network un
 
 ## 3.1 Bayesian神经网络
 
-给定训练输入：$$X = \lbrace x_1, \cdots, x_N\rbrace$$以及它相应的outputs：$$Y = \lbrace y_1, \cdots, y_N\rbrace$$，在Bayesian(parametrics) regression中，我们希望推断一个函数$$y=f^w(x)$$（生成我们的outputs的可能性）的参数w。什么样的参数可能会生成我们的数据？根据Bayesian方法，我们想将一些先验分布放置在参数空间上：$$p(w)$$。该分布表示了先验，表示哪些参数可能会生成我们的数据。我们进一步需要定义一个likelihood分布$$p(y \mid x, w)$$。对于分类任务，我们会假设一个softmax likelihood：
+给定：
+
+- 训练输入：$$X = \lbrace x_1, \cdots, x_N\rbrace$$
+- 相应的输出：$$Y = \lbrace y_1, \cdots, y_N\rbrace$$
+
+在Bayesian(parametrics) regression中，**我们希望推断一个函数$$y=f^w(x)$$（用于生成我们的outputs的可能性）的参数w**。什么样的参数可能会生成我们的数据？根据Bayesian方法，我们想将一些先验分布放置在参数空间上：$$p(w)$$。该分布表示了先验，表示哪些参数可能会生成我们的数据。我们进一步需要定义一个likelihood分布$$p(y \mid x, w)$$。对于分类任务，我们会假设一个softmax likelihood：
 
 $$
-p(y=d \mid x,w) = Categorical(exp(f_d^w(x)) / \sum\limits_{d'} exp(f_{d'}^w(x)))
+p(y=d \mid x,w) = Categorical(\frac{exp(f_d^w(x))} { \sum\limits_{d'} exp(f_{d'}^w(x))})
 $$
 
-或者一个关于regression的高斯似然。给定一个数据集X,Y，我们接着寻找在参数空间上的一个后验：$$p(w \mid X,Y)$$。该分布会捕获多个函数参数生成我们所观察到的数据的可能性。有了它，我们可以为一个新的input point $$x^*$$通过下式连续积分来预测一个output：
+或者一个关于regression的高斯似然。给定一个数据集X,Y，**我们接着寻找在参数空间上的一个后验：$$p(w \mid X,Y)$$**。该分布会捕获多个函数参数生成我们所观察到的数据的可能性。有了它，我们可以为一个新的input point $$x^*$$通过下式连续积分来预测一个output：
 
 $$
 p(y^* | x^*, X, Y) = \int p(y^*|x^*, w) p(w|X,Y) dw
@@ -52,11 +57,11 @@ $$
 
 ...(1)
 
-定义在函数参数集合上的分布的一种方式是，在一个神经网络的权重上放置一个先验分布，生成一个Bayesian NN。对于layer i给定权重矩阵$$W_i$$以及bias vectors $$b_i$$，我们经常在该权重矩阵上放置标准矩阵高斯先验分布，$$p(W_i)=N(0,I)$$，并出于简洁性经常为bias vectors的假设一个点估计(point estimate)。
+定义在函数参数集合上的分布的一种方式是：在一个神经网络的权重上放置一个先验分布，生成一个Bayesian NN。对于layer i给定权重矩阵$$W_i$$以及bias vectors $$b_i$$，我们经常在该权重矩阵上放置标准矩阵高斯先验分布，$$p(W_i)=N(0,I)$$，并出于简洁性经常为bias vectors的假设一个点估计(point estimate)。
 
 ## 3.2 Bayesian NN中的近似变分推断
 
-我我们感兴趣的是，发现权重矩阵的分布（参数化我们的参数）来生成我们的数据。这也是在给定我们的观察 $$X,Y: p(w \mid X, Y)$$在权重上的后验。该后验在总体上是不可跟踪的，我们会使用变分推断来近似它。我们需要定义一个近似变分分布$$q(w)$$，接着最小化在近似分布和完整后验间的KL divergence：
+我们感兴趣的是，发现权重矩阵的分布（参数化我们的参数）来生成我们的数据。这也是在给定我们的观察 $$X,Y: p(w \mid X, Y)$$在权重上的后验。该后验在总体上是不可跟踪的，我们会使用变分推断来近似它。我们需要定义一个近似变分分布$$q(w)$$，接着最小化在近似分布和完整后验间的KL divergence：
 
 $$
 KL(q(w) || p(w|X,Y)) \propto \int q(w) log p(Y|X,w)dw + KL(q(w)||p(w)) \\
