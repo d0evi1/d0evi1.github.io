@@ -1,6 +1,6 @@
 ---
 layout: post
-title: RNN dropout介绍
+title: RNN dropout介绍二
 description: 
 modified: 2018-02-01
 tags:
@@ -180,7 +180,7 @@ $$
 
 ...(6)
 
-其中：$$w = \lbrace W \rbrace$$，W是一个2K x 4K的矩阵（K是$$x_t$$的维度）。我们将该参数命名为：tied-weights LSTM（对比于等式(5)中的untied-weights LSTM）
+**其中：$$w = \lbrace W \rbrace$$，W是一个2K x 4K的矩阵（K是$$x_t$$的维度）。我们将该参数命名为：tied-weights LSTM**（对比于等式(5)中的untied-weights LSTM）
 
 尽管这两个参数会产生相同的deterministic模型，它们会产生不同的近似分布$$q(w)$$。有了第一个参数，对于不同gates可以使用不同的dropout masks（即使当使用相同input $$x_t$$时）。这是因为，近似分布会放在在矩阵上而非inputs上：我们会drop掉一个权重矩阵W中特定的行，并将它应用在$$w_t$$上；在另一矩阵$$W'$$上drop掉不同的行，并应用到$$x_t$$上。第二个参数，我们会在单个矩阵W上放置一个分布。这会产生一个更快的forward-pass，但是会轻微减弱实验的效果。
 
@@ -253,6 +253,14 @@ $$
 # 5.评估
 
 略。
+
+#6.DropoutWrapper
+
+这里再说一下tensorflow中的tf.nn.rnn_cell.DropoutWrapper。里面有一个比较重要的参数：variational_recurrent（缺省为False）。
+
+如果设置为True，它就会在每个step上使用相同的dropout mask，如上面的paper描述。如果设置为False，则会在每个timestep上设置一个不同的dropout mask。
+
+注意，缺省情况下（除排提供一个定制的dropout_state_filter），经过DropoutWrapper 的memory state（LSTMStateTuple中的component c）不会被更改。该行为在上述文章中有描述。
 
 # 参考
 
