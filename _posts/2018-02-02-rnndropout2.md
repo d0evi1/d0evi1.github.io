@@ -136,14 +136,14 @@ $$
 \underline{f} = sigm(h_{t-1} U_f + x_t W_f) \\
 \underline{o} = sigm(h_{t-1} U_o + x_t W_o) \\
 \underline{g} = sigm(h_{t-1} U_g + x_t W_g) \\
-c_t = \underline{f} \degree c_{t-1} + \underline{i} \degree \underline{g} \\
-h_t = \underline{o} \degree tanh(c_t)
+c_t = \underline{f} \circ c_{t-1} + \underline{i} \circ \underline{g} \\
+h_t = \underline{o} \circ tanh(c_t)
 $$
 
 其中：
 
 - $$w = \lbrace W_i, U_i, W_f, U_f, W_o, U_o, W_g, U_g\rbrace$$为权重矩阵
-- $$\degree$$为element-wise product
+- $$\circ$$为element-wise product
 
 这里，内部state $$c_t$$（被称为cell）被求和式的更新。
 
@@ -179,21 +179,21 @@ $$
 
 $$
 \begin{pmatrix}
-\underline{i} 
-\underline{f}
-\underline{o}
-\underline{g}   
+\underline{i} \\
+\underline{f} \\
+\underline{o} \\
+\underline{g} 
 \end{pmatrix} = 
 \begin{pmatrix}
-sigm
-sigm
-sigm
+sigm	\\
+sigm	\\
+sigm	\\
 tanh   
 \end{pmatrix}
 (
 \begin{pmatrix}
-x_t \degree z_x
-h_{t-1} \degree z_h
+x_t \circ z_x		\\
+h_{t-1} \circ z_h
 \end{pmatrix} 
 \cdot W)
 $$
@@ -206,20 +206,20 @@ $$
 
 $$
 \begin{pmatrix}
-\underline{i} 
-\underline{f}
-\underline{o}
+\underline{i} 	\\
+\underline{f}		\\
+\underline{o}		\\
 \underline{g}   
 \end{pmatrix} = 
 \begin{pmatrix}
-sigm
-sigm
-sigm
+sigm	\\
+sigm	\\
+sigm	\\
 tanh   
 \end{pmatrix}
 (
 \begin{pmatrix}
-x_t \degree z_x^t
+x_t \circ z_x^t	\\
 h_{t-1}
 \end{pmatrix} 
 \cdot W)
@@ -228,7 +228,7 @@ $$
 另外，Moon[20]的dropout变种则将等式(5)进行变化，会采用internal cell：
 
 $$
-c_t = c_t \degree z_c
+c_t = c_t \circ z_c
 $$
 
 其中，在所有time steps上会使用相同的mask $$z_c$$。注意，不同于[20]，通过将dropout看成是一个在权重上的operation，我们的技术可以很容易扩展到RNNs和GRUs上。
