@@ -20,9 +20,13 @@ Drop是深度网络中很流行的正则技术，其中在训练期间network un
 
 最近在Bayesian和深度学习的交叉研究的最新结果提供了：通过Bayesian视角来解释常见的deep learning技术[11-16]。深度学习的Baeysian视度将这些新技术引入到该领域，比如：从深度学习网络中获得原则不确定估计（principled uncertainty estimates）。例如，Gal and Ghahramani展示了dropout可以被解释成一个Bayesian NN的后验的变分近似。这种变化近似分布是两个具有较小方差的高斯分布的混合，其中一个Gaussian的均值固定为0. 在approximate Bayesian inference中的dropout的基础扩展了理论，提供了新的视角来在RNN模型上使用这些技术。
 
-这里我们关注常见的RNN模型（LSTM, GRU），并将它们解释成概率模型，比如：RNN的网络权重看成是随机变量，并定义了likelihood函数。我们接着在这些概率Bayesian模型上执行近似变化推断（我们称之为：Variational RNNs）。使用高斯混合的在权重的后验分布上的近似，会产生一个可跟踪的最优化目标函数。对该objective最优化等同于在各自RNNs上执行一个新的dropout变种。
+这里我们关注常见的RNN模型（LSTM, GRU），**并将它们解释成概率模型，比如：RNN的网络权重看成是随机变量，并定义了likelihood函数。我们接着在这些概率Bayesian模型上执行近似变化推断（我们称之为：Variational RNNs）**。使用高斯混合的在权重的后验分布上的近似，会产生一个可跟踪的最优化目标函数。对该objective最优化等同于在各自RNNs上执行一个新的dropout变种。
 
-在新的dropout variant中，我们会在每个timestep上对inputs、outputs、recurrent layers（在每个time step上drop相同的network units）重复相同的dropout mask。与已经存在的专有（ad-hoc）技术相比，在每个timestep上，对inputs、outputs各自采用不同的dropout masks抽样（在recurrent connections上不使用dropout，因为在这些connections上使用不同的masks会导致很差的效果）。我们的方法和与现有技术的关系如图1所示。当使用离散输入（比如：words）时，我们也会在word embeddings上放置一个分布。在word-based模型中的dropout接着会随机drop掉句子中的word types，并被解释成：对于该任务，强制该模型不依赖于单个words。
+**在新的dropout variant中，我们会在每个timestep上对inputs、outputs、recurrent layers（在每个time step上drop相同的network units）重复相同的dropout mask**。与已经存在的专有（ad-hoc）技术相比，在每个timestep上，对inputs、outputs各自采用不同的dropout masks抽样（在recurrent connections上不使用dropout，因为在这些connections上使用不同的masks会导致很差的效果）。我们的方法和与现有技术的关系如图1所示。当使用离散输入（比如：words）时，我们也会在word embeddings上放置一个分布。在word-based模型中的dropout接着会随机drop掉句子中的word types，并被解释成：对于该任务，强制该模型不依赖于单个words。
+
+<img src="http://pic.yupoo.com/wangdren23_v/9fc782c8/642b6fd3.jpg">
+
+图1 dropout技术。**(左)：标准dropout (右): Bayesian解释的dropout**. 每个方块表示一个RNN unit，水平键头表示时间依存关系（recurrent connections）。垂直键头表示每个RNN unit的input和output。带颜色的连接（connections）表示dropped-out inputs；不同颜色表示不同的dropout masks。虚线表示没有dropout的标准connections。当前技术（naive dropout, 左）在不同time steps上使用不同的masks，而在recurrent layers上没有dropout。提出的技术（Variational RNN, 右）在每个timestep上使用相同的dropout mask，包括recurrent layers
 
 我们接着研究了相关的文献和资料，将我们的Variational RNN的近似推断进行公式化，产生提出的dropout变种。实验结果在随后给出。
 
