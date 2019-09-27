@@ -61,7 +61,7 @@ $$
 
 ## 3.2 Bayesian NN中的近似变分推断
 
-我们感兴趣的是，发现权重矩阵的分布（参数化我们的参数）来生成我们的数据。这也是在给定我们的观察 $$X,Y: p(w \mid X, Y)$$在权重上的后验。该后验在总体上是不可跟踪的，我们会使用变分推断来近似它。我们需要定义一个近似变分分布$$q(w)$$，接着最小化在近似分布和完整后验间的KL divergence：
+我们感兴趣的是，发现权重矩阵的分布（参数化我们的参数）来生成我们的数据。这也是在给定我们的观察 $$X,Y: p(w \mid X, Y)$$在权重上的后验。**该后验在总体上是不可跟踪的，我们会使用变分推断来近似它**。我们需要定义一个近似变分分布$$q(w)$$，接着最小化在近似分布和完整后验间的KL divergence：
 
 $$
 KL(q(w) || p(w|X,Y)) \propto \int q(w) log p(Y|X,w)dw + KL(q(w)||p(w)) \\
@@ -80,7 +80,7 @@ $$
 h_t = f_h(x_h, h_{t-1}) = \sigma(x_t W_h + h_{t-1} U_h + b_h)
 $$
 
-$$\sigma$$为非线性函数。该模型可以定义成：$$f_y(h_T) = h_T W_y + b_y$$。我们将该RNN看成是一个概率模型，将参数$$w = \lbrace W_h,U_h,b_h,W_y,b_y \rbrace$$看成是随机变量（遵循正态先验分布）。为了使在w上的依赖更清晰些，我们将$$f_y$$重写成$$f_y^w$$，同理$$f_h^w$$。我们定义了我们的概率模型的likelihood。在随机变量w的后验是相当复杂的，我们使用变分推断以及近似分布$$q(w)$$来近似它。
+$$\sigma$$为非线性函数。该模型可以定义成：$$f_y(h_T) = h_T W_y + b_y$$。**我们将该RNN看成是一个概率模型，将参数$$w = \lbrace W_h,U_h,b_h,W_y,b_y \rbrace$$看成是随机变量（遵循正态先验分布）**。为了使在w上的依赖更清晰些，我们将$$f_y$$重写成$$f_y^w$$，同理$$f_h^w$$。我们定义了我们的概率模型的likelihood。在随机变量w的后验是相当复杂的，我们使用变分推断以及近似分布$$q(w)$$来近似它。
 
 在等式(2)中对每个sum term进行evaluating，我们可以得到：
 
@@ -105,9 +105,9 @@ $$
 
 ...(3)
 
-注意，对于每个序列$$x_i$$，我们会抽样一个新的实现$$\hat{w}_i = \lbrace \hat{W}_h^i, \hat{U}_h^i, \hat{b}_h^i, \hat{W}_y^i, \hat{b}_y^i \rbrace$$，在序列$$x_i = [x_{i,1}, \cdots, x_{i,T}]$$中的每个symbol会通过函数$$f_h^{\hat{w}_i}$$进行传递，并且在每个timestep $$t \leq T$$上使用相同的weight realisations $$\hat{W}_h^i, \hat{U}_h^i, \hat{b}_h^i$$。
+注意：**对于每个序列$$x_i$$，我们会抽样一个新的实现$$\hat{w}_i = \lbrace \hat{W}_h^i, \hat{U}_h^i, \hat{b}_h^i, \hat{W}_y^i, \hat{b}_y^i \rbrace$$**，在序列$$x_i = [x_{i,1}, \cdots, x_{i,T}]$$中的每个symbol会通过函数$$f_h^{\hat{w}_i}$$进行传递，并且在每个timestep $$t \leq T$$上使用相同的weight实现 $$\hat{W}_h^i, \hat{U}_h^i, \hat{b}_h^i$$。
 
-根据[17]，我们定义了我们的近似分布来对权重矩阵和在w中的行进行因式分解（factorise）。对于每个权重矩阵的行$$w_k$$，近似分布为：
+根据[17]，我们定义了我们的近似分布来对权重矩阵和在w中的行进行因式分解（factorise）。**对于每个权重矩阵的行$$w_k$$，近似分布为**：
 
 $$
 q(w_k) = p N(w_k; 0, \sigma^2 I) + (1-p) N(w_k; m_k, \sigma^2 I)
@@ -121,7 +121,7 @@ $$
 
 我们在$$m_k$$上最优化；这些对应于在标准视图中RNN的权重矩阵。等式(3)的KL可以被近似成在变分参数$$m_k$$上的$$L_2$$正则。
 
-样本$$\hat{w} \sim q(w)$$，评估模型的output $$f_y^{\hat{w}}(\cdot)$$对应于在forward pass期间在每个权重矩阵W上的行进行随机零化（masking）——例如：执行dropout。我们的目标函数L等同于标准RNN。在我们的RNN setting中，对于一个序列input，每个权重矩阵行会被随机masked一次，**很重要的是：在所有time steps上会使用相同的mask**。
+**样本$$\hat{w} \sim q(w)$$，评估模型的output $$f_y^{\hat{w}}(\cdot)$$对应于在forward pass期间在每个权重矩阵W上的行进行随机零化（masking）——例如：执行dropout**。我们的目标函数L等同于标准RNN。在我们的RNN setting中，对于一个序列input，每个权重矩阵行会被随机masked一次，**很重要的是：在所有time steps上会使用相同的mask**。
 
 预测可以被近似成：即会将每个layer的均值(mean)的传播给下一layer（被称为标准的dropout approximation），或者通过等式(1)中q(w)的后验进行近似：
 
@@ -136,7 +136,7 @@ $$
 
 ## 4.1 在RNNs中dropout的实现与关系
 
-实现我们的近似推断等同于以这种方式在RNNs中实现dropout：在每个timestep上drop掉相同的network units，随机drop掉：inputs、outputs、recurrent connections。对比起已经存在的技术：在不同的timesteps上drop掉不同的network units、在recurrent connections上不使用dropout（见图1）。
+实现我们的近似推断等同于以这种方式在RNNs中实现dropout：**在每个timestep上drop掉相同的network units，随机drop掉：inputs、outputs、recurrent connections**。对比起已经存在的技术：在不同的timesteps上drop掉不同的network units、在recurrent connections上不使用dropout（见图1）。
 
 特定RNN模型，比如：LSTMs和GRUs，在RNN units上使用不同的gates。例如：LSTM使用4个gates来定义："input"、"forget"、“output”、"input modulation".
 
@@ -160,19 +160,19 @@ $$
 
 $$
 \begin{pmatrix}
-\underline{i} 
-\underline{f}
-\underline{o}
+\underline{i}  \\
+\underline{f}  \\
+\underline{o}  \\
 \underline{g}   
 \end{pmatrix} = \begin{pmatrix}
-sigm
-sigm
-sigm
+sigm \\
+sigm \\
+sigm \\
 tanh  
 \end{pmatrix} 
 (
 \begin{pmatrix}
-x_t
+x_t  \\
 h_{t-1}
 \end{pmatrix} 
 ) \cdot W
