@@ -312,7 +312,7 @@ $$
 
 ### 6.1.1 off-policy correction
 
-在第一个仿真中，我们假设存在10个items：$$A=\lbrace a_i, i=1, \cdots, 10 \rbrace$$。每个action的reward等于它的index，也就是说：$$r(a_i)=i$$。当我们选中单个item时，在该setting下最优的policy总是会选中第10个item（因为它的reward最大），也就是说：
+在第一个仿真中，我们假设存在10个items：$$A=\lbrace a_i, i=1, \cdots, 10 \rbrace$$。**每个action的reward等于它的index，也就是说：$$r(a_i)=i$$（简化仿真设定）**。当我们选中单个item时，在该setting下最优的policy总是会选中第10个item（因为它的reward最大），也就是说：
 
 $$
 \pi^* (a_i) = I(i=10)
@@ -340,7 +340,7 @@ $$
 
 ### 6.1.2 Top-K-policy correction
 
-为了理解标准off-policy correction和top-K off-policy correction间的不同，我们设计了另一个仿真实验，它可以推荐多个items。我们假设有10个items，其中$$r(a_1)=10, r(a_2)=9$$，具有更低reward的其余items为：$$r(a_i)=1, \forall i=3,\cdots,10$$。这里，我们关注推荐两个items，即K=2. behavior policy $$\beta$$会符合一个均匀分布(uniform distribution)，例如：以平等的机率选择每个item。
+为了理解标准off-policy correction和top-K off-policy correction间的不同，我们设计了另一个仿真实验，它可以推荐多个items。我们假设有10个items，其中$$r(a_1)=10, r(a_2)=9$$，具有更低reward的其余items为：$$r(a_i)=1, \forall i=3,\cdots,10$$。**这里，我们关注推荐两个items的问题，即K=2**。 behavior policy $$\beta$$会符合一个均匀分布(uniform distribution)，例如：以平等的机率选择每个item。
 
 给定从$$\beta$$中抽样到的一个observation $$(a_i, r_i)$$，标准的off-policy correction具有一个SGD，以如下形式进行更新：
 
@@ -357,6 +357,10 @@ $$
 $$
 
 其中，$$\lambda_K(a_i)$$是在第4.3节定义的乘子。当$$\pi_{\theta}(a_i)$$很小时，$$\lambda_K(a_i) \approx K$$，SGD会更强烈地增加item $$a_i$$的似然。由于$$\pi_\theta(a_i)$$会达到一个足够大的值，$$\lambda_K(a_i)$$会趋向于0. 作为结果，SGD不再强制增加该item的likelihood，**即使当$$\pi_\theta(a_i)$$仍小于1时**。作为回报(in return)，这会允许第二好（second-best）的item在所学到的policy上占据一些位置。
+
+<img src="http://pic.yupoo.com/wangdren23_v/249f8f5f/368955dd.jpg">
+
+图3 学到的policy $$\pi_{\theta}$$. (左): 标准的off-policy correction; (右): 对于top-2推荐，使用top-k correction.
 
 图3展示了使用标准(left) off-policy correction和top-k off  policy correction)(右)学到的policies $$\pi_{\theta}$$。我们可以看到，使用标准的off-policy correction，尽管学到的policy会校准(calibrated)，从某种意义上说，它仍会维持items关于expected reward的顺序，它会收敛到一个policy：它能在top-1 item上将整个mass转换（cast），也就是：$$\pi(a_1) \approx 1.0$$。作为结果，学到的policy会与在次优item(本例中的$$a_2$$)和其余items间的差异失去联系。换句话说，该top-K correction会收敛到一个在第二优item上具有较大mass的policy，而维持在items间optimality的次序。作为结果，我们可以推荐给用户两个高回报(high-reward) items，并在整体上聚合更多reward。
 
