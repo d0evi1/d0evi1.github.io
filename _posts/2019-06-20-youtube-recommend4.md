@@ -227,7 +227,7 @@ $$
 \prod_{\theta}(A' | s) = \prod\limits_{a \in A'} \pi_{\theta} (a | s)
 $$
 
-注意，集合$$A'$$会包含重复的items，可以移除重复项来形成一个无重复的集合A。
+注意：集合$$A'$$会包含重复的items，可以移除重复项来形成一个无重复的集合A。
 
 在这些假设下，我们可以对该集合推荐setting采用REINFORCE算法，将在等式(2)的梯度更新修改为：
 
@@ -235,7 +235,9 @@ $$
 \sum_{\tau \sim \pi_\theta} [ \sum_{t=0}^{|\tau|} R_t \nabla_{\theta} log \alpha_{\theta} (a_t | s_t)]
 $$
 
-其中，$$\alpha_{\theta} (a \mid s) = 1 - (1- \pi_{\theta}(a \mid s))^K$$表示的是一个item a出现在最终的无重复集合A中的概率。这里，$$K = \mid A'\mid >\mid A\mid = k $$。
+其中：
+
+- $$\alpha_{\theta} (a \mid s) = 1 - (1- \pi_{\theta}(a \mid s))^K$$：表示的是一个item a出现在最终的无重复集合A中的概率。这里，$$K = \mid A'\mid >\mid A\mid = k $$。
 
 我们接着更新等式(3)中的off-policy corrected gradient，通过使用$$\alpha_{\theta}$$替代$$\pi_{\theta}$$，生成top-K off-policy correction factor: 
 
@@ -248,7 +250,7 @@ $$
 
 ...(6)
 
-对比等式(6)和等式(3)，top-K policy会增加一个额外的乘子：
+对比等式(6)和等式(3)，top-K policy会增加一个额外的乘子$$\lambda_K(s_t, a_t)$$到original off-policy correction factor的$$\frac{\pi(a \mid s)}{\beta(a \mid s)}$$中：
 
 $$
 \lambda_K(s_t, a_t) = \frac{\partial \alpha(a_t | s_t)}{\partial \pi(a_t | s_t)} = K(1-\pi_{\theta} (a_t | s_t))^{K-1}
@@ -256,25 +258,23 @@ $$
 
 ...(7)
 
-到original off-policy correction factor的$$\frac{\pi(a \mid s)}{\beta(a \mid s)}$$中。
-
 现在，我们回顾下该额外乘子：
 
 - 随着$$ \pi_{\theta}(a\mid s) \rightarrow 0, \lambda_K(s,a) \rightarrow K$$。对比起标准的off-policy correction，top-K off-policy correction会通过一个K因子来增加policy update；
 - 随着$$\pi_{\theta}(a \mid s) \rightarrow 1, \lambda_K(s,a) \rightarrow 0$$。该乘子会使policy update归0
 - 随着K的增加，以及$$\pi_{\theta}(a \mid s)$$会达到一个合理的范围, 该乘子会更快地将graident减小于0
 
-总之，当期望的item在softmax policy $$\pi_{\theta}(\cdot \mid s)$$具有一个很小的量，比起标准的correction，top-K correction会更有倾略性地推高它的likelihood。一旦softmax policy $$\pi_{\theta}(\cdot \mid s)$$在期望的item上转化成一个合理的量（以确认它可能出现在top-K中），correction接着会将梯度归0, 不再尝试推高它的似然。作为回报，它允许其它感兴趣的items在softmax policy中占据一定的量。我们会在仿真和真实环境中进一步演示，而标准的off-policy correction会收敛到一个当选择单个item时最优的policy，top-K correction会产生更好的top-K推荐。
+总之，当期望的item在softmax policy $$\pi_{\theta}(\cdot \mid s)$$具有一个很小的量，比起标准的correction，top-K correction会更可能推高它的likelihood。一旦softmax policy $$\pi_{\theta}(\cdot \mid s)$$在期望的item上转化成一个合理的量（以确认它可能出现在top-K中），correction接着会将梯度归0, 不再尝试推高它的似然。作为回报，它允许其它感兴趣的items在softmax policy中占据一定的量。我们会在仿真和真实环境中进一步演示，而标准的off-policy correction会收敛到一个当选择单个item时最优的policy，top-K correction会产生更好的top-K推荐。
 
 ## 4.4 Variance Reduction技术
 
-在本节开始，我们会采用一个一阶近似来减小在梯度估计时的方差(Variance)。尽管如此，梯度仍会有较大的方差，因为等式(3)中展示的$$\omega(s,a) = \frac{\pi(a \mid s)}{\beta(a \mid s)}$$的大的importance weight，这与top-K off-policy correction相似。大的importance weight会从(1)中产生较大的来自behavior policy的new policy $$\pi(\cdot \mid s)$$的导数，特别的，new policy会探索那些被behavior policy很少探索过的区域。也就是说，$$ \pi(a \mid s) \gg \beta(a \mid s)$$和(2)在$$\beta$$估计中有大的方差。
+在本节开始，我们会采用一个一阶近似来减小在梯度估计时的方差(Variance)。尽管如此，梯度仍会有较大的方差，因为等式(3)中展示的$$\omega(s,a) = \frac{\pi(a \mid s)}{\beta(a \mid s)}$$具有很大的importance weight，这与top-K off-policy correction相类似。具有较大值的importance weight是因为由(1)中来自behavior policy的new policy $$\pi(\cdot \mid s)$$的导数具有较大值所产生，特别的，new policy会探索那些被behavior policy很少探索过的区域。也就是说，**$$ \pi(a \mid s) \gg \beta(a \mid s)$$和(2)在$$\beta$$估计中有大的方差**。
 
 我们测试了在counterfactual learning和RL文献中提出的许多技术来控制在梯度估计时的方差。大多数这些技术会减小方差，但在梯度估计时会引入一些bias。
 
 **Weight Capping。**
 
-我们测试的第一种方法会简单的将weight设置上限：
+我们测试的第一种方法**会简单的将weight设置上限**：
 
 $$
 \omega_c(s,a) = min(\frac{\pi(a|s)}{\beta(a|s)}, c)
@@ -286,7 +286,7 @@ c的值越小，会减小在梯度估计时的方差，但会引入更大的bias
 
 **NIS(归一化重要性抽样：Normalized Importance Sampling)**
 
-我们使用的第二种技术是引入一个ratio来控制变量，其中我们使用经典的权重归一化，如下：
+我们使用的第二种技术是**引入一个ratio来控制变量，其中我们使用经典的权重归一化**，如下：
 
 $$
 \bar{\omega}(s, a) = \frac{w(s,a)}{\sum\limits_{(s',a') \sim \beta} w(s', a')}
@@ -300,7 +300,7 @@ $$
 
 有一点很明确：训练数据的分布对于学习一个好的policy来说很重要。现有的推荐系统很少采用会询问actions的探索策略（exploration policies），这已经被广泛研究过。实际上，暴力探索（brute-force exploration），比如：$$\epsilon-greedy$$，对于像Youtube这样的生产系统来说并不是可行的，这很可能产生不合适的推荐和一个较差的用户体验。例如，Schnabel【35】研究了探索(exploration)的代价。
 
-**作为替代，我们使用Boltzmann exploration[12]来获取探索数据(exploratory data)的收益，不会给用户体验带来负面影响**。我们会考虑使用一个随机policy，其中推荐会从$$\pi_{\theta}$$中抽样，而非采用最高概率的K个items。由于计算低效性（我们需要计算full softmax），这对于考虑我们的action space来说开销过于高昂。另外，我们会利用高效的ANN-based系统来查询在softmax中的top M个items。我们接着会feed这些M个items的logits到一个更小的softmax中来归一化该概率，接着从该分布中抽样。通过设置$$M \gg K$$，我们仍可以检索大多数概率块，限制了生成坏的推荐的风险，并允许计算高效的抽样。实际上，我们会通过返回top $$K'$$个最大概率的items，以及从剩余的$$M-K'$$个items中抽取$$K-K'$$个items，来进一步平衡exploration和exploitation。
+**作为替代，我们使用Boltzmann exploration[12]来获取探索数据(exploratory data)的收益，不会给用户体验带来负面影响**。我们会考虑使用一个随机policy，其中推荐会从$$\pi_{\theta}$$中抽样，而非采用最高概率的K个items。由于计算低效性（我们需要计算full softmax），这对于考虑我们的action space来说开销过于高昂。另外，我们会利用高效的ANN-based系统来查询在softmax中的top M个items。我们接着会feed这些M个items的logits到一个更小的softmax中来归一化该概率，接着从该分布中抽样。通过设置$$M \gg K$$，我们仍可以检索大多数概率块，限制了生成坏的推荐的风险，并允许计算高效的抽样。**实际上，我们会通过返回top $$K'$$个最大概率的items，以及从剩余的$$M-K'$$个items中抽取$$K-K'$$个items，来进一步平衡exploration和exploitation**。
 
 # 6.实验结果
 
