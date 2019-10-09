@@ -176,7 +176,7 @@ $$
 
 其中：
 
-- **$$v_a \in R^n $$是每个action a在action space A中的另一个embedding**（注：前面的$$U_{a_t} \in R^m$$是m维，而这个是与$$s_t$$相同维度）
+- **$$v_a \in R^n $$是每个action a在action space A中的另一个embedding**（注：前面的$$u_{a_t} \in R^m$$是m维，而$$v_a$$是与$$s_t$$相同维度）
 - T是时序(通常设置为1)。T值越大会在action space上产生一个更平滑的policy。
 
 在softmax中的归一化项需要检查所有可能的动作，在我们的环境中有数百万量级。为了加速计算，我们会在训练中使用sampled softmax。**在serving时，我们使用一个高效的最近邻查寻算法来检索top actions，并使用这些actions来近似softmax概率**，如第5节所述。
@@ -209,7 +209,7 @@ $$
 
 注3：1.具有零回报(zero-reward)的Actions不会对$$\pi_{\theta}$$中的梯度更新有贡献；2.我们会在user state update中忽略它们，因为用户不可能会注意到它们，因此，我们假设user state不会被这些actions所影响 3.它会节约计算开销
 
-在[39]中是有争议的：一个behavior policy（在给定在time $$t_1$$上的state s，它会确定式选中(deterministically choosing)一个action a；在time $$t_2$$上的action b），可以看成是：在action a和action b间在日志的时间间隔上的随机化(randomizing)**。这里，在同一点上是有争议的，这也解释了：给定一个确定的(deterministic) policy，为什么behavior policy即可以是0也可以是1。另外，因为我们有多个policies同时进行动作，如果一个policy是在给定user state s的情况下确定选中（determinstically choosing）action a，另一个policy会确定性选中action b，在给定user state s下通过这些混合behavior policies，接着以这样的方式估计$$\hat{\beta}_{\theta'}$$会逼近：action a被选中的期望频率（expected frequency）。
+在[39]中是有争议的：**一个behavior policy（在给定在time $$t_1$$上的state s，它会确定式选中(deterministically choosing)一个action a；同理在time $$t_2$$上的action b），可以看成是：在action a和action b间在日志的时间间隔上的随机化(randomizing)**。这里，在同一点上是有争议的，这也解释了：给定一个确定的(deterministic) policy，为什么behavior policy即可以是0也可以是1。另外，因为我们有多个policies同时进行动作，如果一个policy是在给定user state s的情况下确定选中（determinstically choosing）action a，另一个policy会确定性选中action b，在给定user state s下通过这些混合behavior policies，接着以这样的方式估计$$\hat{\beta}_{\theta'}$$会逼近：action a被选中的期望频率（expected frequency）。
 
 ## 4.3 Top-K off-policy Correction
 
