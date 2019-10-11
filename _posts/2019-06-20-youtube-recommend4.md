@@ -6,7 +6,7 @@ modified: 2019-06-20
 tags: 
 ---
 
-Alex Beutel等在《Top-K Off-Policy Correction
+Minmin Chen、Alex Beutel等在《Top-K Off-Policy Correction
 for a REINFORCE Recommender System》中提出使用强化学习来提升youtube推荐。主要是从bias/variance的角度出发，具体方法如下：
 
 # 摘要
