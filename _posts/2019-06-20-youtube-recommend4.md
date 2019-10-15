@@ -195,21 +195,21 @@ $$
 
 ## 4.2 估计behavior policy $$\beta$$
 
-伴随等式(3)的off-policy corrected estimator出现的一个难题是：**得到behavior policy $$\beta$$**。理想状态下，对于一个选中action的日志反馈，我们希望也能记录behavior policy选中该action的概率。**直接记录该behavior policy在我们的情况下是不可行的**，因为：
+伴随等式(3)的off-policy corrected estimator出现的一个难题是：**得到behavior policy $$\beta$$**。理想状态下，对于一个选中action的日志反馈(logged feedback)，我们希望也能记录(log)下选中该action的behavior policy概率。**直接记录该behavior policy在我们的情况下是不可行的**，因为：
 
 - (1) 在我们的系统中有许多agents，许多是不可控的
-- (2) 一些agents具有一个deterministic policy，将$$\beta$$设置成0或1并不是使用这些日志反馈的最有效方式
+- (2) 一些agents具有一个deterministic policy，将$$\beta$$设置成0或1并不是使用这些日志反馈(logged feedback)的最有效方式
 
-作为替代，**我们采用[39]中首先引入的方法，并估计行为策略$$\beta$$**，在我们的情况中它是一个多种agents的policies的混合，它们使用该记录下来的actions。给定一个已记录的反馈集合 $$D = \lbrace (s_i, a_i), i=1, \cdots, N \rbrace$$，Strehlet[39]会独立用户状态的方式，**通过对整个语料的action频率进行聚合来估计$$\hat{\beta}(a)$$**。对于每个state-action pair(s, a)，我们会估计概率$$\hat{\beta}_{\theta'}(a \mid s)$$，该behavior policies的组合体会使用另一个使用$$\theta'$$作为参数的softmax来选中该action。**如图1所示，我们会复用该user state s（它由main policy的RNN model生成），接着使用另一个softmax layer来建模该mixed behavior policy**。为了阻止该behavior head干扰到该main policy的该user state，**我们会阻止该gradient反向传播回该RNN**。我们也对将$$\pi_{\theta}$$和$$\beta_{\theta'}$$的estimators进行隔离作为实验，对于计算另一个state representation来说这会增加计算开销，但在离线和在线实验中不会产生任何指标提升。
+作为替代，**我们采用[39]中首先引入的方法，并估计行为策略$$\beta$$**，在我们的情况中$$\beta$$是在系统中一个多种agents的policies的混合（它们使用logged actions）。给定一个logged feedback集合 $$D = \lbrace (s_i, a_i), i=1, \cdots, N \rbrace$$，Strehlet[39]会以不依赖user state的方式，**通过对整个语料的action频率进行聚合来估计$$\hat{\beta}(a)$$**。作为对比，我们会采用一个上下文独立的（context-dependent）neural estimator。对于收集到的每个state-action pair(s, a)，我们会估计概率$$\hat{\beta}_{\theta'}(a \mid s)$$，它指的是该behavior policies的混合体来选中该action的概率，使用另一个softmax来计算，参数为$$\theta'$$。**如图1所示，我们会复用该user state s（它由main policy的RNN model生成），接着使用另一个softmax layer来建模该mixed behavior policy**。为了阻止该behavior head干扰到该main policy的该user state，**我们会阻止该gradient反向传播回该RNN**。我们也对将$$\pi_{\theta}$$和$$\beta_{\theta'}$$的estimators进行隔离作为实验，对于计算另一个state representation来说这会增加计算开销，但在离线和在线实验中不会产生任何指标提升。
 
 尽管在两个policy head $$\pi_{\theta}$$和$$\beta_{\theta'}$$间存在大量参数共享，**但两者间还是有两个明显的不同之处**：
 
-- (1) main policy $$\pi_{\theta}$$会使用一个weighted softmax进行有效训练，会重点考虑长期回报(long term reward)；而behavior policy head $$\beta_{\theta'}$$只会使用state-action pairs进行训练
-- (2) **main policy head $$\pi_\theta$$只使用在该轨迹上具有非零回报（non-zero reward）的items进行训练**(注3)；而behavior policy $$\beta_{\theta'}$$使用在该轨迹上的所有items进行训练，从而避免引入在$$\beta$$估计时的bias
+- (1) main policy $$\pi_{\theta}$$会使用一个weighted softmax、考虑上长期回报(long term reward)来进行有效训练；而behavior policy head $$\beta_{\theta'}$$只会使用state-action pairs进行训练
+- (2) **main policy head $$\pi_\theta$$只使用在该trajectory上具有非零回报（non-zero reward）的items进行训练**(注3)；而behavior policy $$\beta_{\theta'}$$使用在该轨迹上的所有items进行训练，从而避免引入在$$\beta$$估计时的bias
 
 注3：1.具有零回报(zero-reward)的Actions不会对$$\pi_{\theta}$$中的梯度更新有贡献；2.我们会在user state update中忽略它们，因为用户不可能会注意到它们，因此，我们假设user state不会被这些actions所影响 3.它会节约计算开销
 
-在[39]中是有争议的：**一个behavior policy（在给定在time $$t_1$$上的state s，它会确定式选中(deterministically choosing)一个action a；同理在time $$t_2$$上的action b），可以看成是：在action a和action b间在日志的时间间隔上的随机化(randomizing)**。这里，在同一点上是有争议的，这也解释了：给定一个确定的(deterministic) policy，为什么behavior policy即可以是0也可以是1。另外，因为我们有多个policies同时进行动作，如果一个policy是在给定user state s的情况下确定选中（determinstically choosing）action a，另一个policy会确定性选中action b，在给定user state s下通过这些混合behavior policies，接着以这样的方式估计$$\hat{\beta}_{\theta'}$$会逼近：action a被选中的期望频率（expected frequency）。
+在[39]中是有争议的：**一个behavior policy（在给定state s，在time $$t_1$$上的它会确定式选中(deterministically choosing)一个action a；在time $$t_2$$上选中action b），可以看成是：在日志的时间间隔上，在action a和action b间的随机化(randomizing)**。这里，在同一点上是有争议的，这也解释了：给定一个deterministic policy，为什么behavior policy可以不同于0或1。另外，因为我们有多个policies同时进行动作，在给定user state s的情况下，如果一个policy会确定式选中（determinstically choosing）action a，另一个policy会确定式选中action b，那么，在给定user state s下通过这些混合的behavior policies，以这样的方式估计$$\hat{\beta}_{\theta'}$$会逼近：action a被选中的期望频率（expected frequency）。
 
 ## 4.3 Top-K off-policy Correction
 
@@ -330,11 +330,11 @@ $$
 \pi(a_i) = \frac{r(a_i)\beta(a_i)}{\sum_j r(a_j) \beta(a_j)}
 $$
 
-这具有一个明显的下降(downside)：behavior policy越选择一个次优（sub-optimal）的item，new policy越偏向于选择相同的item。
+这具有一个明显的缺点(downside)：**behavior policy越选择一个次优（sub-optimal）的item，new policy越偏向于选择相同的item**。
 
 <img src="http://pic.yupoo.com/wangdren23_v/ac961a9b/ff3997ee.jpg">
 
-图2: 所学到的policy $$\pi_{\theta}$$，当behavior policy $$\beta$$倾向于喜欢最小reward的actions时，比如：$$\beta(a_i)=\frac{11-i}{55}, \forall i = 1, \cdots, 10$$，(左)：没有使用off-policy correction; (右): 使用off-policy correction
+图2: 当behavior policy $$\beta$$倾向于喜欢最小reward的actions时，所学到的policy $$\pi_{\theta}$$，（比如：$$\beta(a_i)=\frac{11-i}{55}, \forall i = 1, \cdots, 10$$），(左)：没有使用off-policy correction; (右): 使用off-policy correction
 
 图2比较了policies $$\pi_{\theta}$$，分别使用/不使用 off-policy correction及SGD进行学习，behavior policy $$\beta$$倾向于最少回报的items。如图2(左)所示，天然使用behavior policy，无需解释数据偏差会导致一个sub-optimal policy。在最坏的情况下，如果behavior policy总是选择具有最低回报的action，我们将以一个很弱的policy结束，并模仿该behavior policy（例如：收敛到选择最少回报的item）。换句话说，应用该off-policy correction允许我们收敛到最优policy $$\pi^*$$，无需关注数据是如何收集的，见图2(右）。
 
