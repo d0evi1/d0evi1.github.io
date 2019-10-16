@@ -312,7 +312,7 @@ $$
 
 ### 6.1.1 off-policy correction
 
-在第一个仿真中，我们假设存在10个items：$$A=\lbrace a_i, i=1, \cdots, 10 \rbrace$$。**每个action的reward等于它的index，也就是说：$$r(a_i)=i$$（简化仿真设定）**。当我们选中单个item时，在该setting下最优的policy总是会选中第10个item（因为它的reward最大），也就是说：
+在第一个仿真中，我们假设存在10个items：$$A=\lbrace a_i, i=1, \cdots, 10 \rbrace$$。**每个action的reward等于它的index，也就是说：$$r(a_i)=i$$（可以理解成按reward大小排好序）**。当我们选中单个item时，在该setting下最优的policy总是会选中第10个item（因为它的reward最大），也就是说：
 
 $$
 \pi^* (a_i) = I(i=10)
@@ -324,7 +324,7 @@ $$
 \pi(a_i) = \frac{e^{\theta_i}}{\sum_j e^{\theta_j}}
 $$
 
-给定从behavior policy $$\beta$$中抽样得到的观察（observations），天然使用policy gradient（无需解释如等式(1)中的数据偏差），会收敛到以下的一个policy：
+如果observations是从behavior policy $$\beta$$中抽样得到的，那么等式(1)中不对数据偏差负责的naively使用policy gradient的方式，会收敛到以下的一个policy：
 
 $$
 \pi(a_i) = \frac{r(a_i)\beta(a_i)}{\sum_j r(a_j) \beta(a_j)}
@@ -336,7 +336,20 @@ $$
 
 图2: 当behavior policy $$\beta$$倾向于喜欢最小reward的actions时，（比如：$$\beta(a_i)=\frac{11-i}{55}, \forall i = 1, \cdots, 10$$），所学到的policy $$\pi_{\theta}$$，(左)：没有使用off-policy correction; (右): 使用off-policy correction
 
-图2比较了：当behavior policy $$\beta$$倾向于最少回报的items，分别使用/不使用 off-policy correction及SGD所学到的policies $$\pi_{\theta}$$。如图2(左)所示，没有对数据偏差负责天然使用behavior policy的方式，会导致一个sub-optimal policy。在最坏的case下，如果behavior policy总是选择具有最低回报的action，我们将以一个任意弱(poor)的policy结束，并模仿该behavior policy（例如：收敛到选择最少回报的item）。另外一方面，使用off-policy correction则允许我们收敛到最优policy $$\pi^*$$，无需关注数据是如何收集的，如图2(右）。
+这里我附上了我的理解代码：
+
+{% highlight python %}
+
+actions = [1,2,3,4,5,6,7,8,9,10]
+b = lambda x: (11-x)/55.0
+beta = [b(i) for i in actions]
+rxb = [(i+1)*j for i, j in enumerate(beta)]
+total = sum(rxb)
+pi = [i/total for i in rxb]
+
+{% highlight end %}
+
+图2比较了：当behavior policy $$\beta$$倾向于最少回报的items，分别使用/不使用 off-policy correction及SGD所学到的policies $$\pi_{\theta}$$。如图2(左)所示，没有对数据偏差负责naivly使用behavior policy的方式，会导致一个sub-optimal policy。在最坏的case下，如果behavior policy总是选择具有最低回报的action，我们将以一个任意差(poor)的policy结束，并模仿该behavior policy（例如：收敛到选择最少回报的item）。另外一方面，使用off-policy correction则允许我们收敛到最优policy $$\pi^*$$，无需关注数据是如何收集的，如图2(右）。
 
 ### 6.1.2 Top-K-policy correction
 
