@@ -200,7 +200,7 @@ $$
 - (1) 在我们的系统中有许多agents，许多是不可控的
 - (2) 一些agents具有一个deterministic policy，将$$\beta$$设置成0或1并不是使用这些日志反馈(logged feedback)的最有效方式
 
-作为替代，**我们采用[39]中首先引入的方法，并估计行为策略$$\beta$$**，在我们的情况中$$\beta$$是在系统中一个多种agents的policies的混合（它们使用logged actions）。给定一个logged feedback集合 $$D = \lbrace (s_i, a_i), i=1, \cdots, N \rbrace$$，Strehlet[39]会以不依赖user state的方式，**通过对整个语料的action频率进行聚合来估计$$\hat{\beta}(a)$$**。作为对比，我们会采用一个依赖上下文（context-dependent）的neural estimator。对于收集到的每个state-action pair(s, a)，我们会估计概率$$\hat{\beta}_{\theta'}(a \mid s)$$，它指的是该behavior policies的混合体来选中该action的概率，使用另一个softmax来计算，参数为$$\theta'$$。**如图1所示，我们会复用该user state s（它由main policy的RNN model生成），接着使用另一个softmax layer来建模该mixed behavior policy**。为了阻止该behavior head干扰到该main policy的该user state，**我们会阻止该gradient反向传播回该RNN**。我们也对将$$\pi_{\theta}$$和$$\beta_{\theta'}$$的estimators进行隔离作为实验，对于计算另一个state representation来说这会增加计算开销，但在离线和在线实验中不会产生任何指标提升。
+作为替代，**我们采用[39]中首先引入的方法，并估计行为策略$$\beta$$**，在我们的情况中$$\beta$$是在系统中一个多种agents的policies的混合（它们使用logged actions）。给定一个logged feedback集合 $$D = \lbrace (s_i, a_i), i=1, \cdots, N \rbrace$$，Strehlet[39]会以不依赖user state的方式，**通过对整个语料的action频率进行聚合来估计$$\hat{\beta}(a)$$**。作为对比，我们会采用一个依赖上下文（context-dependent）的neural estimator。对于收集到的每个state-action pair(s, a)，我们会估计概率$$\hat{\beta}_{\theta'}(a \mid s)$$，它指的是该behavior policies的混合体来选中该action的概率，使用另一个softmax来计算，参数为$$\theta'$$。**如图1所示，我们会复用该user state s（它由main policy的RNN model生成），接着使用另一个softmax layer来建模该mixed behavior policy**。为了阻止该behavior head干扰到该main policy的该user state，**我们会阻止该gradient反向传播回该RNN**。我们也对将$$\pi_{\theta}$$和$$\beta_{\theta'}$$的estimators**分开进行实验**，由于会计算另一个state representation，这会增加计算开销，但在离线和在线实验中不会产生任何指标提升。
 
 尽管在两个policy head $$\pi_{\theta}$$和$$\beta_{\theta'}$$间存在大量参数共享，**但两者间还是有两个明显的不同之处**：
 
