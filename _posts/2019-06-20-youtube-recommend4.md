@@ -397,21 +397,33 @@ $$
 
 ### 6.2.2 Off-policy Correction
 
-使用一个stochastic policy之后，我们在训练期间测试了合并的（incorporating）off-policy correction。这里，我们根据一个更传统的A/B testing setup使用所有流量来训练两个模型。控制模型(control model)会根据等式(2)进行训练，通过reward对样本进行加权。测试模型（test model）会根据图1的结构，其中该模型会同时学习一个serving policy $$\pi_\theta$$以及behavior policy $$\beta_{\theta}'$$。该serving policy会使用等式(3)描述的off-policy correction进行训练，其中每个样本会同时使用reward以及importance weight $$\frac{\pi_\theta}{\beta_{\theta}'}$$进行加权来解决数据偏差。
+在使用一个stochastic policy之后，我们会在训练期间对合并进的（incorporating）off-policy correction进行测试。这里，我们遵循一个更传统的A/B testing setup【注6】，我们会训练两个模型，它们均会使用所有流量。**控制模型（control model）会根据等式(2)进行训练，通过reward对样本进行加权。测试模型（test model）会遵循图1的结构，其中该模型会同时学习一个serving policy $$\pi_\theta$$以及behavior policy $$\beta_{\theta}'$$**。serving policy会使用等式(3)描述的off-policy correction进行训练，其中每个样本会同时使用reward以及importance weight $$\frac{\pi_\theta}{\beta_{\theta}'}$$进行加权来解决数据偏差。
 
-在实验期间，我们观察到，学到的policy(test)会偏离behavior policy(control)（它被用于获取流量）。图4展示了通过我们控制的nominator所选中的视频(videos)的CDF，实验对应于在控制流量中的videos的排序(rank)，（rank 1是由控制模型最nominated的视频，最右表示最小的nominated）。我们看到，使用收集数据模仿模型（如蓝色所示），test model（绿色所示）会倾向于那些通过control model更少曝光的视频。我们，。
+【注6】：实际中，我们使用一个相当小比例的用户做为test polulation；作为结果，我们记录的feedback则几乎通过control model获取
 
-<img src="">
+在实验期间，我们观察到，学到的policy(test)会开始偏离behavior policy(control)（它被用于获取流量）。图4画出了：根据在控制流量中视频的排序(rank)，对应在control/experiment流量中nominator所选中的视频(videos)的CDF(累积分布函数)（rank 1是由控制模型最可能指定的视频，最右表示最小可能指定）。我们看到，test model并不会模仿收集数据所用的模型（如蓝色所示），test model（绿色所示）会更喜欢那些被control model更少曝光的视频。我们观察到：来自top ranks之外视频的nominations的比例，在experiment流量中以几倍的因子递增。这与我们在图2仿真中观察到的现象一致。当忽略在数据收集过程中的偏差时，会创建一个“rich get richer”现象，其中，在学到的policy所指定(nominated)的一个视频，会只因为它在behavior policy上很难指定，采用off-policy correction可以减小该效应。
+
+<img src="http://pic.yupoo.com/wangdren23_v/16e5c770/13fda1b9.jpg">
 
 图4: 根据在control population中视频的排序(rank)，在control 和test population中nominated的视频的CDF。标准的off-policy correction会解决"rich get richer"现象
 
-有意思的是，在真实环境中，我们没有观察：control和test polulation间在ViewTime上有一个大的改变。
+有意思的是，在真实环境中，我们不会观察到control和test 流量(polulation)间在ViewTime上有一个大的改变。然而，我们看到，在视频观看(vv)数上有0.53%的提升，这在统计上是很大的，表明用户确实获得了更大的enjoyment。
 
+### 6.2.3 top-k off-policy
 
+...
 
-。。。
+### 理解超参数
 
+最后，我们直接比较了超参数的不同选择对top-k off-policy correction的影响，以及在用户体验上的不同。我们会在top-k off-policy correction成为生产模型之后执行这些测试。
 
+**actions数目**。
+
+我们首先探索了在top-K off-policy correction中K的选择。我们训练了三个结构相同的模型，分别使用：$$K \in \lbrace 1,2,16,32 \rbrace$$。控制(生产)模型(control(production) model)是top-K off-policy model，它使用K=16. 我们在图5中绘制了在5天实验中的结果。如第4.3节所示，K=1时，top-K off-policy correction会变成标准的off-policy correction。当K=1时，会失去0.66%的ViewTime（对比baseline K=16）。这进一步证明，该收益是由top-K off-policy correction带来的。设置K=2时，效果比生产模型还差，但gap降到了0.35%。K=32时效果与baseline相当。K=8时，有+0.15%的提升。
+
+**Capping**
+
+这里，我们在所学推荐器的最终质量上考虑了variance reduction技术。如4.4节所述，weight capping可以在初始实验中带来最大的online收益。我们不会观察到从归一化importance sampling或TRPO中进一步的metric提升。我们使用一个回归测试来学习weight capping的影响。我们比较了一个模型，它使用等式(8)中cap $$c=e^3$$，以及$$c=e^5$$进行训练。正如我们在importance weight上提出的限制，学到的policy $$\pi_\theta$$可以潜在overfit到一个更少记录的actions，它们可能接收高的reward。在真实实验中，我们观察到使用importance weight在ViewTime中有0.52的损失。
 
 
 
