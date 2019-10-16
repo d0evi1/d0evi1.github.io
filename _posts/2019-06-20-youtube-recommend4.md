@@ -334,7 +334,7 @@ $$
 
 <img src="http://pic.yupoo.com/wangdren23_v/ac961a9b/ff3997ee.jpg">
 
-图2: 当behavior policy $$\beta$$倾向于喜欢最小reward的actions时，所学到的policy $$\pi_{\theta}$$，（比如：$$\beta(a_i)=\frac{11-i}{55}, \forall i = 1, \cdots, 10$$），(左)：没有使用off-policy correction; (右): 使用off-policy correction
+图2: 当behavior policy $$\beta$$倾向于喜欢最小reward的actions时，（比如：$$\beta(a_i)=\frac{11-i}{55}, \forall i = 1, \cdots, 10$$），所学到的policy $$\pi_{\theta}$$，(左)：没有使用off-policy correction; (右): 使用off-policy correction
 
 图2比较了：当behavior policy $$\beta$$倾向于最少回报的items，分别使用/不使用 off-policy correction及SGD所学到的policies $$\pi_{\theta}$$。如图2(左)所示，没有对数据偏差负责天然使用behavior policy的方式，会导致一个sub-optimal policy。在最坏的case下，如果behavior policy总是选择具有最低回报的action，我们将以一个任意弱(poor)的policy结束，并模仿该behavior policy（例如：收敛到选择最少回报的item）。另外一方面，使用off-policy correction则允许我们收敛到最优policy $$\pi^*$$，无需关注数据是如何收集的，如图2(右）。
 
