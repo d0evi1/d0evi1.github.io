@@ -200,7 +200,7 @@ $$
 - (1) 在我们的系统中有许多agents，许多是不可控的
 - (2) 一些agents具有一个deterministic policy，将$$\beta$$设置成0或1并不是使用这些日志反馈(logged feedback)的最有效方式
 
-作为替代，**我们采用[39]中首先引入的方法，并估计行为策略$$\beta$$**，在我们的情况中$$\beta$$是在系统中一个多种agents的policies的混合（它们使用logged actions）。给定一个logged feedback集合 $$D = \lbrace (s_i, a_i), i=1, \cdots, N \rbrace$$，Strehlet[39]会以不依赖user state的方式，**通过对整个语料的action频率进行聚合来估计$$\hat{\beta}(a)$$**。作为对比，我们会采用一个上下文独立的（context-dependent）neural estimator。对于收集到的每个state-action pair(s, a)，我们会估计概率$$\hat{\beta}_{\theta'}(a \mid s)$$，它指的是该behavior policies的混合体来选中该action的概率，使用另一个softmax来计算，参数为$$\theta'$$。**如图1所示，我们会复用该user state s（它由main policy的RNN model生成），接着使用另一个softmax layer来建模该mixed behavior policy**。为了阻止该behavior head干扰到该main policy的该user state，**我们会阻止该gradient反向传播回该RNN**。我们也对将$$\pi_{\theta}$$和$$\beta_{\theta'}$$的estimators进行隔离作为实验，对于计算另一个state representation来说这会增加计算开销，但在离线和在线实验中不会产生任何指标提升。
+作为替代，**我们采用[39]中首先引入的方法，并估计行为策略$$\beta$$**，在我们的情况中$$\beta$$是在系统中一个多种agents的policies的混合（它们使用logged actions）。给定一个logged feedback集合 $$D = \lbrace (s_i, a_i), i=1, \cdots, N \rbrace$$，Strehlet[39]会以不依赖user state的方式，**通过对整个语料的action频率进行聚合来估计$$\hat{\beta}(a)$$**。作为对比，我们会采用一个依赖上下文（context-dependent）的neural estimator。对于收集到的每个state-action pair(s, a)，我们会估计概率$$\hat{\beta}_{\theta'}(a \mid s)$$，它指的是该behavior policies的混合体来选中该action的概率，使用另一个softmax来计算，参数为$$\theta'$$。**如图1所示，我们会复用该user state s（它由main policy的RNN model生成），接着使用另一个softmax layer来建模该mixed behavior policy**。为了阻止该behavior head干扰到该main policy的该user state，**我们会阻止该gradient反向传播回该RNN**。我们也对将$$\pi_{\theta}$$和$$\beta_{\theta'}$$的estimators进行隔离作为实验，对于计算另一个state representation来说这会增加计算开销，但在离线和在线实验中不会产生任何指标提升。
 
 尽管在两个policy head $$\pi_{\theta}$$和$$\beta_{\theta'}$$间存在大量参数共享，**但两者间还是有两个明显的不同之处**：
 
@@ -308,7 +308,7 @@ $$
 
 ## 6.1 仿真
 
-我们设计了仿真实验来阐明：在更多受控环境下off-policy correction的思想。为了简化我们的仿真，我们假设：该问题是无状态的（stateless），换句话说，回报（reward）R与用户状态（user states）是相互独立的，action不会改变user states。作为结果，在一个trajectory上的每个action可以被独立选中。
+我们设计了仿真实验来阐明：在更多受控环境下off-policy correction的思想。为了简化我们的仿真，我们假设：该问题是无状态的（stateless），换句话说，reward R与user states是相互独立的，action不会改变user states。作为结果，在一个trajectory上的每个action可以被独立选中。
 
 ### 6.1.1 off-policy correction
 
@@ -368,25 +368,33 @@ $$
 
 具有仿真实验对于理解新方法有价值，任何推荐系统的目标最终都是提升真实用户体验。我们因此在真实系统中运行A/B test实验。
 
-我们在Youtube中所使用的生产环境上的 RNN candidate genreation model上评估这了些方法，相似的描述见[6,11]。该模型是生产环境推荐系统的众多候选生成器（candidate generators）之一，它们会进行打分（scored）然后通过一个独立的ranking模型进行排序(ranked)，之后再在Youtube主页或视频观看页的侧边栏上展示给用户视频。如上所述，该模型的训练会采用REINFORCE算法。该立即回报(immediate reward) r被设计成影响不同的用户活动（user activities）；被推荐的视频如果没有点击会收到零回报(zero reward)。长期回报（long-term reward）r会在4-10小时的时间范围内进行聚合。在每个实验中，控制模型（control model）和测试模型（test model）会使用相同的reward function。实验会运行多天，在这期间模型会每隔24小时使用新事件作为训练数据进行持续训练。我们可以查看推荐系统的多种在线指标，我们主要关注用户观看视频时长，被称为：ViewTime。
+我们在Youtube中所使用的生产环境上的 RNN candidate genreation model上评估这了些方法，相似的描述见[6,11]。该模型是生产环境推荐系统的众多候选生成器（candidate generators）之一，它们会进行打分（scored）然后通过一个独立的ranking模型进行排序(ranked)，之后再在Youtube主页或视频观看页的侧边栏上展示给用户视频。如上所述，该模型的训练会采用REINFORCE算法。**该立即回报(immediate reward) r被设计来反应不同的用户活动（user activities）；被推荐的视频如果没有点击会收到零回报(zero reward)。长期回报（long-term reward）r会在4-10小时的时间范围内进行聚合**。在每个实验中，控制模型（control model）和测试模型（test model）会使用相同的reward function。实验会运行多天，在这期间模型会每隔24小时使用新事件作为训练数据进行持续训练。**我们可以查看推荐系统的多种在线指标，我们主要关注用户观看视频时长，被称为：ViewTime**。
 
 这里的实验描述了在生产系统中的多个顺序提升。不幸的是，在这样的setting中，最新(latest)的推荐系统提供了对于下一实验的训练数据，后续的实验不能与之前系统进行比较。因此，每个后续的实验都应该为每个组件采用独立分析。
 
 ### 6.2.1 Exploration
 
-我们开始理解探索数据(exploratory data)在提升模型质量上的价值。特别的，我们会measure是否服务一个随机策略（stochastic policy），在该policy下我们会在第5节中描述的softmax模型进行抽样，其中模型总是根据softmax使用最高概率来推荐K个items。
+我们开始理解探索数据(exploratory data)在提升模型质量上的价值。特别的，我们会measure是否服务(serving)一个随机策略（stochastic policy），在该policy下我们使用在第5节中描述的softmax模型进行抽样，从而比起serving一个确定策略（deterministic policy）（这种模型总是推荐根据softmax使用最高概率的K个items）来产生成好的推荐。
 
-我们开展了一系列实验来理解：serving一个随机策略(stochastic policy) vs. 一个确定策略(deterministic policy)的影响，并保持训练过程不变。在该实验中，控制流量（control）使用一个deterministic policy进行serving，测试流量(test traficc)的一小部分使用第5节描述的stochastic policy进行serving。两种policies都基于等式(2)相同softmax model进行训练。为了控制在serving时stochastic policy的随机量，我们使用等式(5)的不同时间(temperature)来区分。T值越低，会将stochastic policy降为一个deterministic policy，而一个更高的T会产生一个random policy，它以相等的机会推荐任意item。T设置为1, 我们可以观察到，在实验期间ViewTime在统计上没有较大变化，这意味着从sampling引入的随机量不会直接伤害用户体验。
+我们开展了一系列实验来理解：serving一个随机策略(stochastic policy) vs. serving一个确定策略(deterministic policy)的影响，并保持训练过程不变。在该实验中，控制流量（control polulation）使用一个deterministic policy进行serving，测试流量(test traffic)的一小部分使用第5节描述的stochastic policy进行serving。两种policies都基于等式(2)相同softmax model进行训练。**为了控制在serving时stochastic policy的随机量，我们使用等式(5)的不同时间(temperature) T来区分**。T值越低，会将stochastic policy降为一个deterministic policy，而一个更高的T会产生一个random policy，它以相等的机会推荐任意item。T设置为1, 我们可以观察到，在实验期间ViewTime在统计上没有较大变化，这意味着从sampling引入的随机量不会直接伤害用户体验。
 
-然而，该实验的setup不会说明，在训练期间提供探索数据的好处。从日志数据中学习的一个主要偏差之一是，该模型不会观察未被之前推荐policy所选中actions的反馈(feedback)，探索数据会缓和该问题。我们展开了以下实验，其中，我们将探索数据引入到训练中。为了这样做，我们将平台上的用户分成三个buckets：90%，5%，5%。前两个buckets使用一个deterministic policy并基于一个deterministic model进行serving，最后一个bucket的用户使用一个基于一个使用exploratory data训练的模型得到的stochastic policy进行serving。deterministic model只使用由前两个分桶的数据进行训练，而stochastic model则使用第一和第三个buckets的数据进行训练。作为结果，这两个模型会接收相同量的训练数据，由于exploration，stochastic model更可能观察到一些更罕见state、action pairs的结果。
+然而，该实验的setup不会说明，在训练期间提供探索数据的好处。从日志数据中学习的一个主要偏差之一是，该模型不会观察未被之前推荐policy所选中actions的反馈(feedback)，对数据进行探索会缓和该问题。我们展开了以下实验，其中，我们将探索数据引入到训练中。为了这样做，我们将平台上的用户分成三个buckets：90%，5%，5%。前两个buckets使用一个deterministic policy并基于一个deterministic model进行serving，最后一个bucket的用户使用一个基于一个使用exploratory data训练的模型得到的stochastic policy进行serving。deterministic model只使用由前两个分桶的数据进行训练，而stochastic model则使用第一和第三个buckets的数据进行训练。这两个模型会接收相同量的训练数据，结果表明，由于存在exploration，stochastic model更可能观察到一些更罕见state、action pairs的结果。
 
 根据该实验过程，我们观察到在test流量中，在ViewTime上一个很大的增长。尽管提升并不大，它由一个相当小量的探索数据（只有5%的用户体验了该stochastic policy）所带来。我们期待stochastic policy被全量后所能带来的更高增益。
 
 ### 6.2.2 Off-policy Correction
 
-根据使用一个stochastic policy，我们在训练期间测试了incorporating off-policy correction。这里，我们根据一个更传统的A/B testing setup使用所有流量来训练两个模型。控制模型(control model)会根据等式(2)进行训练，通过reward对样本进行加权。测试模型（test model）会根据图1的结构，其中该模型会同时学习一个serving policy $$\pi_\theta$$以及behavior policy $$\beta_{\theta}'$$。该serving policy会使用等式(3)描述的off-policy correction进行训练，其中每个样本会同时使用reward以及importance weight $$\frac{\pi_\theta}{\beta_{\theta}'}$$进行加权来解决数据偏差。
+使用一个stochastic policy之后，我们在训练期间测试了合并的（incorporating）off-policy correction。这里，我们根据一个更传统的A/B testing setup使用所有流量来训练两个模型。控制模型(control model)会根据等式(2)进行训练，通过reward对样本进行加权。测试模型（test model）会根据图1的结构，其中该模型会同时学习一个serving policy $$\pi_\theta$$以及behavior policy $$\beta_{\theta}'$$。该serving policy会使用等式(3)描述的off-policy correction进行训练，其中每个样本会同时使用reward以及importance weight $$\frac{\pi_\theta}{\beta_{\theta}'}$$进行加权来解决数据偏差。
 
-在实验期间，我们观察到，学到的policy(test)会偏离behavior policy(control)（它被用于获取流量）。图4展示了通过我们控制的nominator所选中的视频(videos)的CDF，实验对应于在控制流量中的videos的排序(rank)，（rank 1是由控制模型最nominated的视频，最右表示最小的nominated）。
+在实验期间，我们观察到，学到的policy(test)会偏离behavior policy(control)（它被用于获取流量）。图4展示了通过我们控制的nominator所选中的视频(videos)的CDF，实验对应于在控制流量中的videos的排序(rank)，（rank 1是由控制模型最nominated的视频，最右表示最小的nominated）。我们看到，使用收集数据模仿模型（如蓝色所示），test model（绿色所示）会倾向于那些通过control model更少曝光的视频。我们，。
+
+<img src="">
+
+图4: 根据在control population中视频的排序(rank)，在control 和test population中nominated的视频的CDF。标准的off-policy correction会解决"rich get richer"现象
+
+有意思的是，在真实环境中，我们没有观察：control和test polulation间在ViewTime上有一个大的改变。
+
+
 
 。。。
 
