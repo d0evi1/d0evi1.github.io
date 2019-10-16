@@ -338,7 +338,7 @@ $$
 
 这里我附上了我的理解代码（本节的目的，主要是为说明：当存在behavior policy倾向喜欢选择较小reward actions时，不使用off-policy correction效果会差）：
 
-{% highlight python %}
+```key
 
 actions = [1,2,3,4,5,6,7,8,9,10]
 b = lambda x: (11-x)/55.0
@@ -347,7 +347,7 @@ rxb = [(i+1)*j for i, j in enumerate(beta)]
 total = sum(rxb)
 pi = [i/total for i in rxb]
 
-{% highlight end %}
+```
 
 图2比较了：当behavior policy $$\beta$$倾向于最少回报的items，分别使用/不使用 off-policy correction及SGD所学到的policies $$\pi_{\theta}$$。如图2(左)所示，没有对数据偏差负责naivly使用behavior policy的方式，会导致一个sub-optimal policy。在最坏的case下，如果behavior policy总是选择具有最低回报的action，我们将以一个任意差(poor)的policy结束，并模仿该behavior policy（例如：收敛到选择最少回报的item）。另外一方面，使用off-policy correction则允许我们收敛到最优policy $$\pi^*$$，无需关注数据是如何收集的，如图2(右）。
 
