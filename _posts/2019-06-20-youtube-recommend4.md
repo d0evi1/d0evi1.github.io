@@ -336,7 +336,7 @@ $$
 
 图2: 当behavior policy $$\beta$$倾向于喜欢最小reward的actions时，（比如：$$\beta(a_i)=\frac{11-i}{55}, \forall i = 1, \cdots, 10$$），所学到的policy $$\pi_{\theta}$$，(左)：没有使用off-policy correction; (右): 使用off-policy correction
 
-这里我附上了我的理解代码：
+这里我附上了我的理解代码（本节的目的，主要是为说明：当存在behavior policy倾向喜欢选择较小reward actions时，不使用off-policy correction效果会差）：
 
 {% highlight python %}
 
