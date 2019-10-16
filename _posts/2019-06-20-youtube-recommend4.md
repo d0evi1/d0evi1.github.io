@@ -338,7 +338,7 @@ $$
 
 这里我附上了我的理解代码（本节的目的，主要是为说明：当存在behavior policy倾向喜欢选择较小reward actions时，不使用off-policy correction效果会差）：
 
-```key
+```python
 
 actions = [1,2,3,4,5,6,7,8,9,10]
 b = lambda x: (11-x)/55.0
@@ -381,13 +381,13 @@ $$
 
 具有仿真实验对于理解新方法有价值，任何推荐系统的目标最终都是提升真实用户体验。我们因此在真实系统中运行A/B test实验。
 
-我们在Youtube中所使用的生产环境上的 RNN candidate genreation model上评估这了些方法，相似的描述见[6,11]。该模型是生产环境推荐系统的众多候选生成器（candidate generators）之一，它们会进行打分（scored）然后通过一个独立的ranking模型进行排序(ranked)，之后再在Youtube主页或视频观看页的侧边栏上展示给用户视频。如上所述，该模型的训练会采用REINFORCE算法。**该立即回报(immediate reward) r被设计来反应不同的用户活动（user activities）；被推荐的视频如果没有点击会收到零回报(zero reward)。长期回报（long-term reward）r会在4-10小时的时间范围内进行聚合**。在每个实验中，控制模型（control model）和测试模型（test model）会使用相同的reward function。实验会运行多天，在这期间模型会每隔24小时使用新事件作为训练数据进行持续训练。**我们可以查看推荐系统的多种在线指标，我们主要关注用户观看视频时长，被称为：ViewTime**。
+我们在Youtube中所使用的生产环境上的 RNN candidate genreation model上评估这了些方法，相似的描述见[6,11]。该模型是生产环境推荐系统的众多候选生成器（candidate generators）之一，它们会进行打分（scored）然后通过一个独立的ranking模型进行排序(ranked)，之后再在Youtube主页或视频观看页的侧边栏上展示给用户视频。如上所述，该模型的训练会采用REINFORCE算法。**该立即回报(immediate reward) r被设计来体现不同的用户活动（user activities）；被推荐的视频如果没有点击会收到零回报(zero reward)。长期回报（long-term reward）r会在4-10小时的时间范围内进行聚合**。在每个实验中，控制模型（control model）和测试模型（test model）会使用相同的reward function。**实验会运行许多天，在这期间模型会每隔24小时使用新事件作为训练数据进行持续训练**。我们可以查看推荐系统的多种在线指标，我们主要关注用户观看视频时长，被称为：ViewTime。
 
-这里的实验描述了在生产系统中的多个顺序提升。不幸的是，在这样的setting中，最新(latest)的推荐系统提供了对于下一实验的训练数据，后续的实验不能与之前系统进行比较。因此，每个后续的实验都应该为每个组件采用独立分析。
+这里的实验描述了在生产系统中的多个顺序提升。不幸的是，在这样的setting中，最新(latest)的推荐系统会为下一次实验提供训练数据，结果是，一旦生产系统包含了一个新方法，后续的实验就不能与之前的系统相进行比较。因此，后续的每个实验都应该看成是为每个(compoenent)单独分析，我需要在每一部分声明：在从新方法接收数据起，之前的推荐系统是什么。
 
 ### 6.2.1 Exploration
 
-我们开始理解探索数据(exploratory data)在提升模型质量上的价值。特别的，我们会measure是否服务(serving)一个随机策略（stochastic policy），在该policy下我们使用在第5节中描述的softmax模型进行抽样，从而比起serving一个确定策略（deterministic policy）（这种模型总是推荐根据softmax使用最高概率的K个items）来产生成好的推荐。
+我们开始理解探索数据(exploratory data)在提升模型质量上的价值。特别的，我们会measure是否服务(serving)一个随机策略（stochastic policy），在该policy下我们使用在第5节中描述的softmax模型进行抽样，可以比serving一个确定策略（deterministic policy）（这种模型总是推荐根据softmax使用最高概率的K个items）来产生成好的推荐。
 
 我们开展了一系列实验来理解：serving一个随机策略(stochastic policy) vs. serving一个确定策略(deterministic policy)的影响，并保持训练过程不变。在该实验中，控制流量（control polulation）使用一个deterministic policy进行serving，测试流量(test traffic)的一小部分使用第5节描述的stochastic policy进行serving。两种policies都基于等式(2)相同softmax model进行训练。**为了控制在serving时stochastic policy的随机量，我们使用等式(5)的不同时间(temperature) T来区分**。T值越低，会将stochastic policy降为一个deterministic policy，而一个更高的T会产生一个random policy，它以相等的机会推荐任意item。T设置为1, 我们可以观察到，在实验期间ViewTime在统计上没有较大变化，这意味着从sampling引入的随机量不会直接伤害用户体验。
 
