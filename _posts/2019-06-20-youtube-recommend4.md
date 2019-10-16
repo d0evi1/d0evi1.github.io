@@ -318,25 +318,25 @@ $$
 \pi^* (a_i) = I(i=10)
 $$
 
-我们使用一个无状态的softmax来参数化$$\pi_{\theta}$$：
+我们使用一个无状态的softmax来对$$\pi_{\theta}$$参数化：
 
 $$
 \pi(a_i) = \frac{e^{\theta_i}}{\sum_j e^{\theta_j}}
 $$
 
-给定从behavior policy $$\beta$$中抽样得到的观察数据（observations），可以天然地应用policy gradient（无需解释数据偏差），因为等式(1)会收敛到一个policy：
+给定从behavior policy $$\beta$$中抽样得到的观察（observations），天然使用policy gradient（无需解释如等式(1)中的数据偏差），会收敛到以下的一个policy：
 
 $$
 \pi(a_i) = \frac{r(a_i)\beta(a_i)}{\sum_j r(a_j) \beta(a_j)}
 $$
 
-这具有一个明显的缺点(downside)：**behavior policy越选择一个次优（sub-optimal）的item，new policy越偏向于选择相同的item**。
+这具有一个明显的缺点(downside)：**behavior policy越选择一个次优（sub-optimal）的item，new policy越会朝着选择相同的item偏移**。
 
 <img src="http://pic.yupoo.com/wangdren23_v/ac961a9b/ff3997ee.jpg">
 
 图2: 当behavior policy $$\beta$$倾向于喜欢最小reward的actions时，所学到的policy $$\pi_{\theta}$$，（比如：$$\beta(a_i)=\frac{11-i}{55}, \forall i = 1, \cdots, 10$$），(左)：没有使用off-policy correction; (右): 使用off-policy correction
 
-图2比较了policies $$\pi_{\theta}$$，分别使用/不使用 off-policy correction及SGD进行学习，behavior policy $$\beta$$倾向于最少回报的items。如图2(左)所示，天然使用behavior policy，无需解释数据偏差会导致一个sub-optimal policy。在最坏的情况下，如果behavior policy总是选择具有最低回报的action，我们将以一个很弱的policy结束，并模仿该behavior policy（例如：收敛到选择最少回报的item）。换句话说，应用该off-policy correction允许我们收敛到最优policy $$\pi^*$$，无需关注数据是如何收集的，见图2(右）。
+图2比较了：当behavior policy $$\beta$$倾向于最少回报的items，分别使用/不使用 off-policy correction及SGD所学到的policies $$\pi_{\theta}$$。如图2(左)所示，没有对数据偏差负责天然使用behavior policy的方式，会导致一个sub-optimal policy。在最坏的case下，如果behavior policy总是选择具有最低回报的action，我们将以一个任意弱(poor)的policy结束，并模仿该behavior policy（例如：收敛到选择最少回报的item）。另外一方面，使用off-policy correction则允许我们收敛到最优policy $$\pi^*$$，无需关注数据是如何收集的，如图2(右）。
 
 ### 6.1.2 Top-K-policy correction
 
