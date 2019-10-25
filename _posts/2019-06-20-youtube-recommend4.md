@@ -29,8 +29,7 @@ for a REINFORCE Recommender System》中提出使用强化学习来提升youtube
 
 如上所述，推荐系统需要处理大的状态空间（state spaces）和动作空间（action spaces），在工业界尤其显著。推荐可提供的items集合是不确定的(non-stationary)，新items会不断被引入到系统中，从而产生一个**日益增长的带新items的动作空间（action space）**，这会产生更稀疏的反馈。另外，在这些items上的用户偏好是会随时间一直漂移的(shifting)，从而产生**连续演化的用户状态(user states)**。在这样一个复杂的**环境（environment）**中，通过这些大量**actions**进行reason，在应用已有RL算法时提出了独特的挑战。这里，我们分享了我们的实践：在非常大的动作空间和状态空间中，在一个**神经网络候选生成器（neural candidate generator）**上（一个top-k推荐系统）应用REINFORCE算法[48]。
 
-除了大量动作和状态空间外，推荐系统中的RL仍是有区别的：只有有限提供的数据。经典的RL应用通过self-play和仿真（simulation）生成的大量训练数据，已经克服了数据无效性（data inefficiencies）。相比较而言，**推荐系统的复杂动态性，使得对于模仿生成真实推荐数据是不可能的**。因此，我们不能轻易寻找（probe for）在之前的状态和动作空间中未探索领域上的回报(reward)，因为观测到的回报（observing
-reward）需要为一个真实用户给出一个真实推荐。作为替代，该模型几乎依赖于之前**推荐模型（policies）**所提供的数据，大多数模型我们是不能控制的或不再可以控制。对于从其它policies中大多数日志反馈，我们采用一个off-policy learning方法，在该方法中我们会同时学习之前policies的一个模型，当训练我们的新policy时，在纠正数据偏差时包含它。我们也通过实验演示了在探索数据(exploratory data)上的价值(value)。
+除了大量动作和状态空间外，推荐系统中的RL仍是有区别的：只有有限提供的数据。经典的RL应用通过self-play和仿真（simulation）生成的大量训练数据，已经克服了数据无效性（data inefficiencies）。相比较而言，**推荐系统的复杂动态性，使得对于仿真生成真实推荐数据是不可能的**。因此，我们不能轻易寻找（probe for）关于之前的state和action space的未探索领域上的回报(reward)，因为观测到的回报（observing reward）需要为一个真实用户给出一个真实推荐。作为替代，该模型几乎依赖于之前**推荐模型们（models即policies）**所提供的数据，大多数模型我们是不能控制的或不再可以控制。对于从其它policies中大多数日志反馈，我们采用一个off-policy learning方法，在该方法中我们会同时学习之前policies的一个模型，当训练我们的新policy时，在纠正数据偏差时包含它。我们也通过实验演示了在探索数据(exploratory data)上的价值(value)。
 
 最终，在RL方法中大多数研究主要关注于：产生一个可以选择单个item的policy。**而真实世界的推荐系统，通常会一次提供用户多个推荐[44]**。因此，我们为我们的top-K推荐系统定义了一个新的top-K off-policy correction。我们发现，在模拟和真实环境中，标准off-policy correction会产生一个对于top-1推荐来说最优的policy，而**我们的top-K off-policy correction会生成更好的top-K推荐**。我们提供了以下的贡献：
 
@@ -43,7 +42,7 @@ reward）需要为一个真实用户给出一个真实推荐。作为替代，�
 
 # 2.相关工作
 
-增强学习：Value-based方法（比如：Q-learning），policy-based方法（比如：policy gradients constitue经典方法）来解决RL问题。[29]中罗列了现代RL方法的常见比较，主要关注于异步学习，其关键点是扩展到更大问题上。尽管value-based方法有许多优点（比如：seamless off-policy learning），**他们被证明是在函数逼近(function approximation)上是不稳定的[41]**。通常，对于这些方法来说，需要进行大量的超参数调参(hyperparameter tuning)才能达到稳定行为。尽管许多value-based方法（比如：Q-learning）取得了实际成功，这些算法的策略收敛（policy convergence）没有被充分研究。另外，**对于函数逼近来说，Policy-based方法只要给定一个足够小的learning rate，仍然相当稳定**。因此，我们选择一个policy-gradient-based方法，尤其是REINFORCE[48]，来适配这种on-policy方法，从而当训练off-policy时提供可靠的policy gradient估计。
+增强学习：Value-based方法（比如：Q-learning），policy-based方法（比如：policy gradients constitue经典方法）来解决RL问题。[29]中罗列了现代RL方法的常见比较，主要关注于异步学习，其关键点是扩展到更大问题上。尽管value-based方法有许多优点（比如：seamless off-policy learning），**他们被证明是在函数逼近(function approximation)上是不稳定的[41]**。通常，对于这些方法来说，需要进行大量的超参数调参(hyperparameter tuning)才能达到稳定行为。尽管许多value-based方法（比如：Q-learning）取得了实际成功，这些算法的策略收敛（policy convergence）没有被充分研究。另外，**对于函数逼近来说，Policy-based方法只要给定一个足够小的learning rate，仍然相当稳定**。因此，我们选择一个policy-gradient-based方法（尤其是REINFORCE[48]），并在当训练off-policy时，采用on-policy方法提供可靠的policy gradient估计。
 
 **神经网络推荐系统**：与我们的方法紧密相关的另一条线是，在推荐系统中应用深度神经网络[11,16,37]，特别是使用RNN结合时序信息和历史事件用于推荐[6,17,20,45,49]。我们使用相似的网络结构，通过与推荐系统的交互来建模用户状态（user states）的演进。由于神经网络架构设计不是本文重点，有兴趣可以自己了解。
 
@@ -104,7 +103,7 @@ $$
 
 # 4.off-policy collrection
 
-因为学习和基础设施的限制，**我们的学习器（learner）没有与推荐系统的实时交互控制**，这不同于经典的增强学习。**换句话说，我们不能执行对policy的在线更新，以及立即根据更新后的policy来生成轨迹（trajectories）**。作为替代，我们会接收由一个历史policy（或者一个policies组合）选中的关于actions的日志反馈，对比时立即更新policy，这种方式在action space上会具有一个不同的分布。
+由于学习和基础设施的限制，**我们的学习器（learner）没有与推荐系统的实时交互控制**，这不同于经典的增强学习。**换句话说，我们不能执行对policy的在线更新，以及立即根据更新后的policy来生成轨迹（trajectories）**。作为替代，我们会接收的的关于actions的日志反馈由一个历史policy（或者一个policies组合）选中，这些policies在action space上会具有一个与正在更新的policy不同的分布。
 
 我们主要关注解决：当在该环境中应用policy gradient方法时所带来的数据偏差。**特别的，在生产环境中在部署一个新版本的policy前，我们会收集包含多个小时的一个周期性数据，并计算许多policy参数更新，这意味着我们用来估计policy gradient的轨迹集合是由一个不同的policy生成的**。再者，我们会从其它推荐(它们采用弹性的不同policies)收集到的成批的反馈数据中学习。一个原本的policy gradient estimator不再是无偏的，因为在等式(2)中的梯度需要从更新后的policy $$\pi_\theta$$中抽取轨迹（trajectories），而**我们收集的轨迹会从一个历史policies $$\beta$$的一个组合中抽取**。
 
@@ -209,7 +208,7 @@ $$
 
 注3：1.具有零回报(zero-reward)的Actions不会对$$\pi_{\theta}$$中的梯度更新有贡献；2.我们会在user state update中忽略它们，因为用户不可能会注意到它们，因此，我们假设user state不会被这些actions所影响 3.它会节约计算开销
 
-在[39]中是有争议的：**一个behavior policy（在给定state s，在time $$t_1$$上的它会确定式选中(deterministically choosing)一个action a；在time $$t_2$$上选中action b），可以看成是：在日志的时间间隔上，在action a和action b间的随机化(randomizing)**。这里，在同一点上是有争议的，这也解释了：给定一个deterministic policy，为什么behavior policy可以不同于0或1。另外，因为我们有多个policies同时进行动作，在给定user state s的情况下，如果一个policy会确定式选中（determinstically choosing）action a，另一个policy会确定式选中action b，那么，在给定user state s下通过这些混合的behavior policies，以这样的方式估计$$\hat{\beta}_{\theta'}$$会逼近：action a被选中的期望频率（expected frequency）。
+在[39]中是有争议的：**一个behavior policy（在给定state s，在time $$t_1$$上的它会确定式选中(deterministically choosing)一个action a；在time $$t_2$$上选中action b），可以看成是：在日志的时间间隔上，在action a和action b间的随机化(randomizing)**。这里，在同一点上是有争议的，这也解释了：给定一个deterministic policy，为什么behavior policy可以是0或1。另外，由于我们有多个policies同时进行acting，在给定user state s的情况下，如果一个policy会确定式选中（determinstically choosing）action a，另一个policy会确定式选中action b，那么，以这样的方式估计$$\hat{\beta}_{\theta'}$$可以近似成：在给定user state s下通过这些混合的behavior policies，action a被选中的期望频率（expected frequency）。
 
 ## 4.3 Top-K off-policy Correction
 
