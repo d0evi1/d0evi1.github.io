@@ -1,6 +1,6 @@
 ---
 layout: post
-title: youtube多目标排序系统
+title: youtube MMoE排序系统
 description: 
 modified: 2019-10-11
 tags: 
@@ -8,7 +8,7 @@ tags:
 
 # 介绍
 
-youtube在2019公布了它的多目标排序系统《Recommending What Video to Watch Next: A Multitask Ranking System》。
+youtube在2019公布了它的MMoE多目标排序系统《Recommending What Video to Watch Next: A Multitask Ranking System》。
 
 # 摘要
 
@@ -147,6 +147,12 @@ Youtube的规模和复杂度是一个完美的测试。它有19亿月活用户�
 图4 在youtube上推荐watch next
 
 ## ...
+
+
+### 5.2.3 Gating Network分布
+
+为了进一步理解MMoE是如何帮助multi-objective optimization的，我们为在每个expert上的每个task在softmax gating network中绘制了累积概率。
+
 
 ## 5.3 建模和减小Position Bias
 
