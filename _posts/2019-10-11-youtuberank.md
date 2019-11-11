@@ -25,6 +25,10 @@ youtube在2019公布了它的多目标排序系统《Recommending What Video to 
 
 为了解决这样的挑战，我们为ranking system提出了一个有效的多任务神经网络架构，如图1所示。它会扩展Wide&Deep模型，通过采用Multi-gate Mixture-of-Experts(MMoE) [30]来进行多任务学习。另外，它会引入一个浅层塔结构（shallow tower）来建模和移除选择偏差。我们会应用该结构到视频推荐中：给定当前用户观看的视频，推荐下一个要观看的视频。我们在实验和真实环境中均有较大提升。
 
+<img src="http://pic.yupoo.com/wangdren23_v/1be77f49/1dec8cbc.jpg">
+
+图1 我们提出的ranking系统的模型架构。它会消费user logs作为训练数据，构建Multi-gate Mixture-of-Experts layers来预测两类user behaviors，比如：engagement和satisfaction。它会使用一个side-tower来纠正ranking selection bias。在顶部，会组合多个预测到一个最终的ranking score
+
 特别的，我们首先将我们的多任务目标分组成两类：
 
 - 1) 参与度目标(engagement objectives)，比如：用户点击(user clicks)，推荐视频的参与度
@@ -97,6 +101,10 @@ MMoE是一个soft-parameter sharing模型结构，它的设计是为了建模任
 
 对于我们的ranking system，我们提出在一个共享的hidden layer的top上添加experts，如图2b所示。这是因为MoE layer可以帮助学习来自input的模态信息（modularized information）。当在input layer的top上、或lower hidden layers上直接使用它时，它可以更好地建模多模态特征空间。然而，直接在input layer上应用MoE layer将极大增加模型training和serving的开销。这是因为，通常input layer的维度要比hidden layers的要更高。
 
+<img src="http://pic.yupoo.com/wangdren23_v/ee35bbe0/8294e851.jpg">
+
+图2 使用MMoE来替换shared-bottom layers
+
 我们关于expert networks的实现，等同于使用ReLU activations的multilayer perceptrons。给定task k， prediction $$y_k$$，以及最后的hidden layer $$h^k$$，对于task k的具有n个experts output的MMoE layer为：$$f^k(x)$$，可以用以下的等式表示：
 
 $$
@@ -124,11 +132,19 @@ $$
 
 我们提出的模型结构与Wide&Deep模型结构相似。我们将模型预测分解为两个components：来自main tower的一个user-utility component，以及来自shallow tower的一个bias component。特别的，我们使用对selection bias有贡献的features来训练了一个shallow tower，比如：position bias的position feature，接着将它添加到main model的最终logit中，如图3所示。在训练中，所有曝光（impressions）的positions都会被使用，有10%的feature drop-out rate来阻止模型过度依赖于position feature。在serving时，position feature被认为是缺失的(missing)。为什么我们将position feature和device feature相交叉(cross)的原因是，不同的position biases可以在不同类型的devices上观察到。
 
+<img src="http://pic.yupoo.com/wangdren23_v/bf2e9999/53795a2d.jpg">
+
+图3 添加一个shallow side tower来学习selection bias（比如：position bias）
+
 # 5.实验结果
 
 本节我们描述了我们的ranking system实验，它会在youtube上推荐next watch的视频。使用由YouTube提供的隐式反馈，我们可以训练我们的ranking models，并进行offline和live实验。
 
 Youtube的规模和复杂度是一个完美的测试。它有19亿月活用户。每天会有数千亿的user logs关于推荐结果与用户活动的交互。Youtube的一个核心产品是，提供推荐功能：为给定一个观看过的视频推荐接下来要看的，如图4所示。
+
+<img src="http://pic.yupoo.com/wangdren23_v/4c6e2cc5/eb2856bb.jpg">
+
+图4 在youtube上推荐watch next
 
 ## ...
 
@@ -141,6 +157,10 @@ Youtube的规模和复杂度是一个完美的测试。它有19亿月活用户�
 ### 5.3.1 用户隐反馈分析
 
 为了验证在我们训练数据中存在的position bias，我们对不同位置做了CTR分析。图6表明，在相对位置1-9的CTR分布。所图所示，我们看到，随着位置越来越低，CTR也会降得越来越低。在更高位置上的CTR越高，这是因为推荐更相关items和position bias的组合效果。我们提出的方法会采用一个shallow tower，我们展示了该方法可以分离user utility和position bias的学习。
+
+<img src="http://pic.yupoo.com/wangdren23_v/a576ccc3/cbdb0559.jpg">
+
+图6 位置1-9的CTR
 
 ### 5.3.2 Baseline方法
 
@@ -156,6 +176,10 @@ Youtube的规模和复杂度是一个完美的测试。它有19亿月活用户�
 ### 5.3.4 学到的position biases
 
 图7展示了每个position学到的position biases。从图中可知，越低的position，学到的bias越小。学到的biases会使用有偏的隐式反馈（biased implicit feedback）来估计倾向评分（propensity scores）。使用足够训练数据通过模型训练运行，可以使我们有效学到减小position biases。
+
+<img src="http://pic.yupoo.com/wangdren23_v/43d44382/a90f8afb.jpg">
+
+图7 每个position上学到的position bias
 
 # 5.4 讨论
 
