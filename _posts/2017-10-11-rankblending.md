@@ -146,7 +146,7 @@ $$
 
 ## 4.1 数据
 
-我们对提出的算法进行了评估，所使用数据为：使用web搜索结果与Yahoo！Answers domain产生的垂直搜索结果进行blending。1300个queries从一个商业搜索引擎的query logs中抽样得到，800个queries被用于训练，500个用于validation。对于每个query，我们具有两个集合的文档：普通web文档、Yahoo! Answers文档。每个文档会被5种标签标记：Perfect、Excellent、Good、Fair和Bad，以相关度的递减序排列。我们在每个domain上具有预生成的ranking functions，并于rank score $$r_{1m}^i$$或$$r_{2n}^i$$可以通过在每个domain上对相应domain的文档使用ranking function生成。给定$$R_1^i$$和$$R_2^i$$，QP问题的constrains可以通过应用merge-sort到两个rank lists上进行构建，并在web文档和Answers文档间保留paired score perference。
+我们对提出的算法进行了评估，所使用数据为：使用web搜索结果与Yahoo！Answers domain产生的垂直搜索结果进行blending。1300个queries从一个商业搜索引擎的query logs中抽样得到，800个queries被用于训练，500个用于validation。对于每个query，我们具有两个集合的文档：普通web文档、Yahoo! Answers文档。每个文档会被5种label之一进行标记(label)：Perfect、Excellent、Good、Fair和Bad，以相关度的递减序排列。我们在每个domain上具有预生成的ranking functions，并于rank score $$r_{1m}^i$$或$$r_{2n}^i$$可以通过在每个domain上对相应domain的文档使用ranking function生成。给定$$R_1^i$$和$$R_2^i$$，QP问题的constrains可以通过应用merge-sort到两个rank lists上进行构建，并在web文档和Answers文档间保留paired score perference。
 
 ## 4.2 实验
 
