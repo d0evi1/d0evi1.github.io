@@ -52,7 +52,8 @@ for a REINFORCE Recommender System》中提出使用强化学习来提升youtube
 
 # 3.增强推荐
 
-<img src="http://pic.yupoo.com/wangdren23_v/ee84ccc1/7d64150d.jpeg" width="320"><img src="http://pic.yupoo.com/wangdren23_v/2283edab/4084e8cb.jpeg" width="320"> 
+<img src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/064fbd5b9bafe6470ede2f8954eb0eef761f8a9d56c5b19706d7f6beb80a6d0d847d850748f484ddad00f713ebd79505?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.png&amp;size=750" width="320">
+<img src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/2e4d5029e495ccf0035da49f4180a50a9bdbe3ee925d6e64a7d2e82a1fed5dddea09247710d82b377435d7f7be5ca71e?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.png&amp;size=750" width="320"> 
 
 为便于理解，这里插入了张图(from 李宏毅课程)。
 
@@ -80,7 +81,7 @@ $$
 提供了不同族的方法来解决这样的RL问题：Q-learning[38], Policy Gradient[26,36,48]以及黑盒优化（black box potimization）[15]。这里我们主要关注policy-gradient-based方法，比如：REINFORCE[48]。
 
 <div  align="center">
-<img src="http://pic.yupoo.com/wangdren23_v/07de3f1a/05058b23.jpeg" width="320">
+<img src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/93c84636283f91ed39eb5a8f5bcb5221e8bde10f55a053fa8d5812cf3b3cb222bcac60eea784451d79ce0378632b76a5?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.png&amp;size=750" width="320">
 </div>
 
 我们假设：policy的一个函数形式为$$\pi_\theta$$，参数为$$\theta \in R^d$$。根据各policy参数的期望累积回报（expected cumulative reward）的梯度，可以通过"log-trick"的方式进行解析法求导，生成以下的REINFORCE梯度：
@@ -91,7 +92,7 @@ $$
 
 ...(1)
 
-在online RL中，在由正在考虑的policy生成的轨迹(trajectories)上计算得到的policy gradient，policy gradient的估计是无偏的，可以分解成：
+在online RL中，policy gradient由正在更新的policy生成的轨迹(trajectories)上计算得到，policy gradient的估计是无偏的，可以分解成：
 
 $$
 \sum_{\tau \sim \pi_{\theta}} R(\tau) \nabla_{\theta} log \pi_{\theta}(\tau) \approx \sum_{\tau \sim \pi_{\theta}} [ \sum_{t=0}^{|\tau|} R_t \nabla_{\theta} log \pi_{\theta} (a_t | s_t)]
@@ -103,9 +104,9 @@ $$
 
 # 4.off-policy collrection
 
-由于学习和基础设施的限制，**我们的学习器（learner）没有与推荐系统的实时交互控制**，这不同于经典的增强学习。**换句话说，我们不能执行对policy的在线更新，以及立即根据更新后的policy来生成轨迹（trajectories）**。作为替代，我们会接收的的关于actions的日志反馈由一个历史policy（或者一个policies组合）选中，这些policies在action space上会具有一个与正在更新的policy不同的分布。
+由于学习和基础设施的限制，**我们的学习器（learner）没有与推荐系统的实时交互控制**，这不同于经典的增强学习。**换句话说，我们不能执行对policy的在线更新，以及立即根据updated policy来生成轨迹（trajectories）**。作为替代，我们会接收的的关于actions的日志反馈由一个历史policy（或者一个policies组合）选中，它们在action space上会具有一个与正在更新的policy不同的分布。
 
-我们主要关注解决：当在该环境中应用policy gradient方法时所带来的数据偏差。**特别的，在生产环境中在部署一个新版本的policy前，我们会收集包含多个小时的一个周期性数据，并计算许多policy参数更新，这意味着我们用来估计policy gradient的轨迹集合是由一个不同的policy生成的**。再者，我们会从其它推荐(它们采用弹性的不同policies)收集到的成批的反馈数据中学习。一个原本的policy gradient estimator不再是无偏的，因为在等式(2)中的梯度需要从更新后的policy $$\pi_\theta$$中抽取轨迹（trajectories），而**我们收集的轨迹会从一个历史policies $$\beta$$的一个组合中抽取**。
+我们主要关注解决：当在该环境中应用policy gradient方法时所带来的数据偏差。**特别的，在生产环境中在部署一个新版本的policy前，我们会收集包含多个小时的一个周期性数据，并计算许多policy参数更新，这意味着我们用来估计policy gradient的轨迹集合是由一个不同的policy生成的**。再者，我们会从其它推荐(它们采用弹性的不同policies)收集到的成批的反馈数据中学习。一个navie policy gradient estimator不再是无偏的，因为在等式(2)中的gradient需要从updated policy $$\pi_\theta$$中抽取轨迹（trajectories），而**我们收集的轨迹会从一个历史policies $$\beta$$的一个组合中抽取**。
 
 我们会使用importance weighting[31,33,34]的方法来解决该分布不匹配问题（distribution）。考虑到一个轨迹 $$\tau=(s_0,a_0,s_1,...)$$，它根据一个行为策略$$\beta$$抽样得到，那么off-policy-corrected gradient estimator为：
 
@@ -188,7 +189,7 @@ $$
 
 图1展示了一个描述main policy $$\pi_{\theta}$$的神经网络架构。给定一个观察到的轨迹 $$\tau = (s_0, a_0, s_1, ...)$$，**它从一个行为策略（behavior policy）$$\beta$$中抽样得到**，该新策略(new policy)首先会生成一个关于user state $$s_{t+1}$$的模型，它使用一个initial state $$s_0 \sim \rho_0$$并通过等式(4)的recurrent cell迭代得到。给定user state $$s_{t+1}$$，policy head会通过等式(5)的softmax来转化在action space分布。有了$$\pi_{\theta}(a_{t+1} \mid s_{t+1})$$，我们接着使用等式(3)生成一个policy gradient来更新该policy。
 
-<img src="http://pic.yupoo.com/wangdren23_v/d1be870a/334d078f.jpeg">
+<img src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/4814d2a20509bf7edf008b5b5b475a47d77952bf653dfc15667c720ed91d672a31fab14fc03888fcc04e2977001517b2?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=4.png&amp;size=750">
 
 图1 该图展示了policy $$\pi_{\theta}$$的参数变量(parametrisation)以及behavior policy $$\beta_{\theta'}$$
 
@@ -199,16 +200,16 @@ $$
 - (1) 在我们的系统中有许多agents，许多是不可控的
 - (2) 一些agents具有一个deterministic policy，将$$\beta$$设置成0或1并不是使用这些日志反馈(logged feedback)的最有效方式
 
-作为替代，**我们采用[39]中首先引入的方法，并估计行为策略$$\beta$$**，在我们的情况中$$\beta$$是在系统中一个多种agents的policies的混合（它们使用logged actions）。给定一个logged feedback集合 $$D = \lbrace (s_i, a_i), i=1, \cdots, N \rbrace$$，Strehlet[39]会以不依赖user state的方式，**通过对整个语料的action频率进行聚合来估计$$\hat{\beta}(a)$$**。作为对比，我们会采用一个依赖上下文（context-dependent）的neural estimator。对于收集到的每个state-action pair(s, a)，我们会估计概率$$\hat{\beta}_{\theta'}(a \mid s)$$，它指的是该behavior policies的混合体来选中该action的概率，使用另一个softmax来计算，参数为$$\theta'$$。**如图1所示，我们会复用该user state s（它由main policy的RNN model生成），接着使用另一个softmax layer来建模该mixed behavior policy**。为了阻止该behavior head干扰到该main policy的该user state，**我们会阻止该gradient反向传播回该RNN**。我们也对将$$\pi_{\theta}$$和$$\beta_{\theta'}$$的estimators**分开进行实验**，由于会计算另一个state representation，这会增加计算开销，但在离线和在线实验中不会产生任何指标提升。
+作为替代，**我们采用[39]中首先引入的方法，并估计行为策略$$\beta$$**，在我们的情况中$$\beta$$是在系统中一个多种agents的policies的混合（它们使用logged actions）。给定一个logged feedback集合 $$D = \lbrace (s_i, a_i), i=1, \cdots, N \rbrace$$，Strehlet[39]会以不依赖user state的方式，**通过对整个语料的action频率进行聚合来估计$$\hat{\beta}(a)$$**。作为对比，我们会采用一个依赖上下文（context-dependent）的neural estimator。对于收集到的每个state-action pair(s, a)，我们会估计概率$$\hat{\beta}_{\theta'}(a \mid s)$$，它指的是该behavior policies的混合体来选中该action的概率，使用另一个softmax来计算，参数为$$\theta'$$。**如图1所示，我们会复用该user state s（它由main policy的RNN model生成），接着使用另一个softmax layer来建模该mixed behavior policy**。为了阻止该behavior head干扰到该main policy的该user state，**我们会阻止该gradient反向传播回该RNN**。我们也进行了将$$\pi_{\theta}$$和$$\beta_{\theta'}$$的estimators**分离开的实验**，由于会计算另一个state representation，这会增加计算开销，但在离线和在线实验中不会产生任何指标提升。
 
 尽管在两个policy head $$\pi_{\theta}$$和$$\beta_{\theta'}$$间存在大量参数共享，**但两者间还是有两个明显的不同之处**：
 
-- (1) main policy $$\pi_{\theta}$$会使用一个weighted softmax、考虑上长期回报(long term reward)来进行有效训练；而behavior policy head $$\beta_{\theta'}$$只会使用state-action pairs进行训练
+- (1) main policy $$\pi_{\theta}$$会使用一个weighted softmax来考虑长期回报(long term reward)进行有效训练；而behavior policy head $$\beta_{\theta'}$$只会使用state-action pairs进行训练（言下之意，不考虑reward?）
 - (2) **main policy head $$\pi_\theta$$只使用在该trajectory上具有非零回报（non-zero reward）的items进行训练**(注3)；而behavior policy $$\beta_{\theta'}$$使用在该轨迹上的所有items进行训练，从而避免引入在$$\beta$$估计时的bias
 
 注3：1.具有零回报(zero-reward)的Actions不会对$$\pi_{\theta}$$中的梯度更新有贡献；2.我们会在user state update中忽略它们，因为用户不可能会注意到它们，因此，我们假设user state不会被这些actions所影响 3.它会节约计算开销
 
-在[39]中是有争议的：**一个behavior policy（在给定state s，在time $$t_1$$上的它会确定式选中(deterministically choosing)一个action a；在time $$t_2$$上选中action b），可以看成是：在日志的时间间隔上，在action a和action b间的随机化(randomizing)**。这里，在同一点上是有争议的，这也解释了：给定一个deterministic policy，为什么behavior policy可以是0或1。另外，由于我们有多个policies同时进行acting，在给定user state s的情况下，如果一个policy会确定式选中（determinstically choosing）action a，另一个policy会确定式选中action b，那么，以这样的方式估计$$\hat{\beta}_{\theta'}$$可以近似成：在给定user state s下通过这些混合的behavior policies，action a被选中的期望频率（expected frequency）。
+在[39]中是有争议的：**一个behavior policy（在给定state s，在time $$t_1$$上的它会确定式选中(deterministically choosing)一个action a；在time $$t_2$$上选中action b），可以看成是：在日志的时间间隔上，在action a和action b间的随机化(randomizing)**。这里，我们在同一点上是有争议的，这也解释了：给定一个deterministic policy，为什么behavior policy可以是0或1。另外，由于我们有多个policies同时进行acting，在给定user state s的情况下，如果一个policy会确定式选中（determinstically choosing）action a，另一个policy会确定式选中action b，那么，以这样的方式估计$$\hat{\beta}_{\theta'}$$可以近似成：在给定user state s下通过这些混合的behavior policies，action a被选中的期望频率（expected frequency）。
 
 ## 4.3 Top-K off-policy Correction
 
@@ -331,7 +332,7 @@ $$
 
 这具有一个明显的缺点(downside)：**behavior policy越选择一个次优（sub-optimal）的item，new policy越会朝着选择相同的item偏移**。
 
-<img src="http://pic.yupoo.com/wangdren23_v/ac961a9b/ff3997ee.jpg">
+<img src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/39b5f419397b4ff1cba6ff1c0dc7e13481b456e65a816aa465ef20c61d5ae85db4b656031dd9a5bc488c919af89055e8?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=5.png&amp;size=750">
 
 图2: 当behavior policy $$\beta$$倾向于喜欢最小reward的actions时，（比如：$$\beta(a_i)=\frac{11-i}{55}, \forall i = 1, \cdots, 10$$），所学到的policy $$\pi_{\theta}$$，(左)：没有使用off-policy correction; (右): 使用off-policy correction
 
@@ -370,7 +371,8 @@ $$
 
 其中，$$\lambda_K(a_i)$$是在第4.3节定义的乘子。当$$\pi_{\theta}(a_i)$$很小时，$$\lambda_K(a_i) \approx K$$，SGD会更强烈地增加item $$a_i$$的似然。由于$$\pi_\theta(a_i)$$会达到一个足够大的值，$$\lambda_K(a_i)$$会趋向于0. 作为结果，SGD不再强制增加该item的likelihood，**即使当$$\pi_\theta(a_i)$$仍小于1时**。作为回报(in return)，这会允许第二好（second-best）的item在所学到的policy上占据一些位置。
 
-<img src="http://pic.yupoo.com/wangdren23_v/249f8f5f/368955dd.jpg">
+
+<img src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/d0e4a5c6db056dd98c9492eabba1fd5839290eb903591ad82a4e0f4e2439eac8c53eea7424b9d16d84425d648257aa61?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=6.png&amp;size=750">
 
 图3 学到的policy $$\pi_{\theta}$$. (左): 标准的off-policy correction; (右): 对于top-2推荐，使用top-k correction.
 
@@ -402,7 +404,8 @@ $$
 
 在实验期间，我们观察到，学到的policy(test)会开始偏离behavior policy(control)（它被用于获取流量）。图4画出了：根据在控制流量中视频的排序(rank)，对应在control/experiment流量中nominator所选中的视频(videos)的CDF(累积分布函数)（rank 1是由控制模型最可能指定的视频，最右表示最小可能指定）。我们看到，test model并不会模仿收集数据所用的模型（如蓝色所示），test model（绿色所示）会更喜欢那些被control model更少曝光的视频。我们观察到：来自top ranks之外视频的nominations的比例，在experiment流量中以几倍的因子递增。这与我们在图2仿真中观察到的现象一致。当忽略在数据收集过程中的偏差时，会创建一个“rich get richer”现象，其中，在学到的policy所指定(nominated)的一个视频，会只因为它在behavior policy上很难指定，采用off-policy correction可以减小该效应。
 
-<img src="http://pic.yupoo.com/wangdren23_v/16e5c770/13fda1b9.jpg">
+
+<img src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/549e09d4204d9c2c3b16895d384550520a71e63f85c5ad69ab1eeb3ef32c228544210de7d2d1cdb2556140facb5969b1?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=7.png&amp;size=750" width="320">
 
 图4: 根据在control population中视频的排序(rank)，在control 和test population中nominated的视频的CDF。标准的off-policy correction会解决"rich get richer"现象
 
