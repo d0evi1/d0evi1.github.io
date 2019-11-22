@@ -52,8 +52,7 @@ for a REINFORCE Recommender System》中提出使用强化学习来提升youtube
 
 # 3.增强推荐
 
-<img src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/064fbd5b9bafe6470ede2f8954eb0eef761f8a9d56c5b19706d7f6beb80a6d0d847d850748f484ddad00f713ebd79505?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.png&amp;size=750" width="320">
-<img src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/2e4d5029e495ccf0035da49f4180a50a9bdbe3ee925d6e64a7d2e82a1fed5dddea09247710d82b377435d7f7be5ca71e?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.png&amp;size=750" width="320"> 
+<img src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/064fbd5b9bafe6470ede2f8954eb0eef761f8a9d56c5b19706d7f6beb80a6d0d847d850748f484ddad00f713ebd79505?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.png&amp;size=750" width="320"><img src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/2e4d5029e495ccf0035da49f4180a50a9bdbe3ee925d6e64a7d2e82a1fed5dddea09247710d82b377435d7f7be5ca71e?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.png&amp;size=750" width="320"> 
 
 为便于理解，这里插入了张图(from 李宏毅课程)。
 
