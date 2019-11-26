@@ -366,8 +366,9 @@ $$
 $$
 Q_i(y_i) = 
 \begin{cases}
-\frac{1}{|V_i'|} & \text{if $y_t$ \in $V_i'$}
-\end{cases} 	& otherwise.
+\frac{1}{|V_i'|} & \text{if $y_t$ \in $ V_i^'$} \\
+0	& otherwise.
+\end{cases} 
 $$
 
 提议分布(proposal distribution)的选择会抵消掉correction term——来自等式(10)-(11)中importance weight的$$log Q(y_k)$$，使得该方法等价于，使用下式来逼近等式(6)中的准确output probability：
