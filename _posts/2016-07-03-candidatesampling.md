@@ -102,8 +102,8 @@ $$
 
 $$
 \begin{align}
-P(t_i=y|x_i, C_i) & = P(y|x_i) \prod_{y \in C_i - \lbrace y \rbrace} Q({y'}|x_i) \prod_{y \in (L-C_i)} (1-Q({y'}|x_i)) / P(C_i | x_i) \\
-& = \frac{P(y|x_i)}{Q(y|x_i)} \prod_{ {y'} \in C_i} Q({y'}|x_i) \prod_{ {y'} \in (L-C_i)} (1-Q({y'}|x_i))/P(C_i|x_i) \\
+P(t_i=y|x_i, C_i) & = P(y|x_i) \prod_{y \in C_i - \lbrace y \rbrace} Q({y'}|x_i) \prod_{y \in (L-C_i)} (1-Q({y'}|x_i)) / P(C_i | x_i) \nonumber\\
+& = \frac{P(y|x_i)}{Q(y|x_i)} \prod_{ {y'} \in C_i} Q({y'}|x_i) \prod_{ {y'} \in (L-C_i)} (1-Q({y'}|x_i))/P(C_i|x_i) \nonumber\\
 & = \frac{P(y|x_i)}{Q(y|x_i)} / K(x_i,C_i)
 \end{align}
 $$
