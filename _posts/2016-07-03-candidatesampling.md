@@ -105,7 +105,7 @@ $$
 P(t_i=y|x_i, C_i) & = P(y|x_i) \prod_{y \in C_i - \lbrace y \rbrace} Q({y'}|x_i) \prod_{y \in (L-C_i)} (1-Q({y'}|x_i)) / P(C_i | x_i) \nonumber\\
 & = \frac{P(y|x_i)}{Q(y|x_i)} \prod_{ {y'} \in C_i} Q({y'}|x_i) \prod_{ {y'} \in (L-C_i)} (1-Q({y'}|x_i))/P(C_i|x_i) \nonumber\\
 & = \frac{P(y|x_i)}{Q(y|x_i)} / K(x_i,C_i)
-\end{align} \nonumber
+\end{align} \nonumber\\
 $$
 
 其中，$$K(x_i,C_i)$$是一个与y无关的函数。因而：
