@@ -366,7 +366,7 @@ $$
 $$
 Q_i(y_i) = 
 \begin{cases}
-\frac{1}{|V_i'|} & \text{if $y_t$ \in $ V_i'$} \\
+\frac{1}{|V_i'|} & \text{if $y_t \in  V_i'$} \\
 0	& otherwise.
 \end{cases} 
 $$
