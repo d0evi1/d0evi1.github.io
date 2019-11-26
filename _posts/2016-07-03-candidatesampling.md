@@ -30,7 +30,7 @@ $$
 
 随机样本$$S_i$$可以依赖（或者不依赖）$$x_i$$和/或$$T_i$$。
 
-训练算法会采用神经网络的形式，其中表示F(x,y)的layer会通过BP算法从一个loss function中进行训练。
+训练算法会采用神经网络的形式训练，其中：用于表示F(x,y)的layer会通过BP算法从一个loss function中进行训练。
 
 <img src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/7fd6372a58aaf13d8a89f379634b9a132d357cd795084da410793d51219da5cba916c10b9ff6eae38eeb612a114cf7ab?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
 
@@ -58,15 +58,15 @@ $$
 
 假设我们有一个单标签问题（single-label）。每个训练样本$$(x_i, \lbrace t_i \rbrace)$$包含了一个context以及一个target class。我们将**$$P(y \mid x)$$作为：给定context x下，一个target class y的概率**。
 
-我们可以训练一个函数F(x,y)来生成softmax logits——也就是说，给定context，该class相对log概率：
+我们可以训练一个函数F(x,y)来生成softmax logits——也就是说，该class在给定context上的相对log概率（relative log probabilities）：
 
 $$
 F(x,y) \leftarrow log(P(y|x)) + K(x)
 $$
 
-其中，K(x)是一个任意函数，它不依赖于y。
+其中，K(x)是一个不依赖于y的任意函数(arbitrary function)。
 
-在full softmax训练中，对于每个训练样本$$(x_i,\lbrace t_i \rbrace)$$，我们会为在$$y \in L$$中的所有类计算logits $$F(x_i,y)$$。**如果类L很大，计算很会昂贵**。
+在full softmax训练中，对于每个训练样本$$(x_i,\lbrace t_i \rbrace)$$，我们会为在$$y \in L$$中的所有类计算logits $$F(x_i,y)$$。**如果类L总数很大，计算很会昂贵**。
 
 在"Sampled Softmax"中，对于每个训练样本$$(x_i, \lbrace t_i \rbrace)$$，**我们会根据一个选择抽样函数$$Q(y \mid x)$$来选择一个关于“sampled” classese的小集合$$S_i \subset L$$**。每个被包含在$$S_i$$中的类，它与概率$$Q(y \mid x_i)$$完全独立。
 
@@ -84,9 +84,7 @@ $$
 
 对于每个类$$y \in C_i$$，给定我们的先验$$x_i$$和$$C_i$$，我们希望计算target class y的后验概率。
 
-使用Bayes' rule：
-
-[bayes]{https://math.stackexchange.com/questions/549887/bayes-theorem-with-multiple-random-variables}
+使用Bayes' rule：[bayes](https://math.stackexchange.com/questions/549887/bayes-theorem-with-multiple-random-variables)
 
 $$
 P(Z|X,Y) = P(Y,Z|X) P(X) / P(X,Y) = P(Y,Z|X) P(Y|X)
@@ -103,9 +101,11 @@ $$
 接着，为了计算$$P(C_i \mid t_i=y,x_i)$$，我们注意到为了让它发生，$$S_i$$可以包含y或也可以不包含y，但必须包含$$C_i$$所有其它元素，并且必须不包含在$$C_i$$任意classes。因此：
 
 $$
-P(t_i=y|x_i, C_i) = P(y|x_i) \prod_{y \in C_i - \lbrace y \rbrace} Q({y'}|x_i) \prod_{y \in (L-C_i)} (1-Q({y'}|x_i)) / P(C_i | x_i) \\
-= \frac{P(y|x_i)}{Q(y|x_i)} \prod_{ {y'} \in C_i} Q({y'}|x_i) \prod_{ {y'} \in (L-C_i)} (1-Q({y'}|x_i))/P(C_i|x_i) \\
-=\frac{P(y|x_i)}{Q(y|x_i)} / K(x_i,C_i)
+\begin{align}
+P(t_i=y|x_i, C_i) & = P(y|x_i) \prod_{y \in C_i - \lbrace y \rbrace} Q({y'}|x_i) \prod_{y \in (L-C_i)} (1-Q({y'}|x_i)) / P(C_i | x_i) \\
+& = \frac{P(y|x_i)}{Q(y|x_i)} \prod_{ {y'} \in C_i} Q({y'}|x_i) \prod_{ {y'} \in (L-C_i)} (1-Q({y'}|x_i))/P(C_i|x_i) \\
+& = \frac{P(y|x_i)}{Q(y|x_i)} / K(x_i,C_i)
+\end{align}
 $$
 
 其中，$$K(x_i,C_i)$$是一个与y无关的函数。因而：
