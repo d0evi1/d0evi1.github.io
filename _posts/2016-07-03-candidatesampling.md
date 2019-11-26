@@ -32,18 +32,19 @@ $$
 
 训练算法会采用神经网络的形式，其中表示F(x,y)的layer会通过BP算法从一个loss function中进行训练。
 
-<img src="http://pic.yupoo.com/wangdren23_v/b3d02b58/79854e95.png">
+<img src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/7fd6372a58aaf13d8a89f379634b9a132d357cd795084da410793d51219da5cba916c10b9ff6eae38eeb612a114cf7ab?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
 
 图1
 
 - $$Q(y \mid x)$$: 被定义为：给定context x，根据抽样算法在sampled classes的集合中得到class y的概率（或：expected count）。
 - $$K(x)$$：是一个任意函数（arbitrary function），不依赖于候选类（candidate class）。由于softmax涉及到一个归一化（normalization），加上这种函数不会影响到计算概率。
 - logistic training loss =：
+
 $$
  \sum\limits_i (\sum\limits_{y \in POS_i} log(1+exp(-G(x,y)) + \sum\limits_{y \in NEG_i} log(1+exp(G(x_i,y)) )
 $$
  
-- softmax \ training \ loss =：
+- softmax training loss =：
 
 $$
 \sum\limits_i (-G(x_i,t_i) + log (\sum\limits_{y \in POS_i \cap NEG_i} exp(G(x_i,y))))
@@ -137,7 +138,7 @@ sampled_candidates的元素会使用base分布被无放回投样（如果：uniq
 对于该操作，基础分布是log-uniform或Zipf分布的一个近似：
 
 $$
-P(class) = (log(class+2) - log(class+1)) / log(range_max + 1)
+P(class) = (log(class+2) - log(class+1)) / log(range\_max + 1)
 $$
 
 当target classes近似遵循这样的一个分布时，该sampler很有用——例如，如果该classes以一个字母序表示的词语，并以频率降序排列。如果你的classes没有通过词频降序排列，就不需要使用该op。
