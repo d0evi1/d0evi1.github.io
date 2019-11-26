@@ -38,13 +38,13 @@ $$
 
 - $$Q(y \mid x)$$: 被定义为：给定context x，根据抽样算法在sampled classes的集合中得到class y的概率（或：expected count）。
 - $$K(x)$$：是一个任意函数（arbitrary function），不依赖于候选类（candidate class）。由于softmax涉及到一个归一化（normalization），加上这种函数不会影响到计算概率。
-- logistic training loss =：
+- logistic training loss为：
 
 $$
  \sum\limits_i (\sum\limits_{y \in POS_i} log(1+exp(-G(x,y)) + \sum\limits_{y \in NEG_i} log(1+exp(G(x_i,y)) )
 $$
  
-- softmax training loss =：
+- softmax training loss为：
 
 $$
 \sum\limits_i (-G(x_i,t_i) + log (\sum\limits_{y \in POS_i \cap NEG_i} exp(G(x_i,y))))
@@ -68,7 +68,9 @@ $$
 
 在full softmax训练中，对于每个训练样本$$(x_i,\lbrace t_i \rbrace)$$，我们会为在$$y \in L$$中的所有类计算logits $$F(x_i,y)$$。**如果类L总数很大，计算很会昂贵**。
 
-在"Sampled Softmax"中，对于每个训练样本$$(x_i, \lbrace t_i \rbrace)$$，**我们会根据一个选择抽样函数$$Q(y \mid x)$$来选择一个关于“sampled” classese的小集合$$S_i \subset L$$**。每个被包含在$$S_i$$中的类，它与概率$$Q(y \mid x_i)$$完全独立。
+## 抽样函数：$$Q(y \mid x)$$
+
+在"Sampled Softmax"中，对于每个训练样本$$(x_i, \lbrace t_i \rbrace)$$，**我们会根据一个选择抽样函数：$$Q(y \mid x)$$来选择一个关于“sampled” classese的小集合$$S_i \subset L$$**。每个被包含在$$S_i$$中的类，它与概率$$Q(y \mid x_i)$$完全独立。
 
 $$
 P(S_i = S|x_i) = \prod_{y \in S} Q(y|x_i) \prod_{y \in (L-S)} (1-Q(y|x_i))
@@ -102,13 +104,13 @@ $$
 
 $$
 \begin{align}
-P(t_i=y|x_i, C_i) & = P(y|x_i) \prod_{y \in C_i - \lbrace y \rbrace} Q({y'}|x_i) \prod_{y \in (L-C_i)} (1-Q({y'}|x_i)) / P(C_i | x_i) \nonumber\\
+P(t_i=y|x_i, C_i) & = P(y|x_i) \prod_{y' \in C_i - \lbrace y \rbrace} Q({y'}|x_i) \prod_{y' \in (L-C_i)} (1-Q({y'}|x_i)) / P(C_i | x_i) \nonumber\\
 & = \frac{P(y|x_i)}{Q(y|x_i)} \prod_{ {y'} \in C_i} Q({y'}|x_i) \prod_{ {y'} \in (L-C_i)} (1-Q({y'}|x_i))/P(C_i|x_i) \nonumber\\
 & = \frac{P(y|x_i)}{Q(y|x_i)} / K(x_i,C_i)
 \end{align} \nonumber\\
 $$
 
-其中，$$K(x_i,C_i)$$是一个与y无关的函数。因而：
+其中：**$$K(x_i,C_i)$$是一个与y无关的函数**。因而：
 
 $$
 log(P(t_i=y | x_i, C_i)) = log(P(y|x_i)) - log(Q(y|x_i)) + {K'} (x_i,C_i)
@@ -116,10 +118,10 @@ $$
 
 这些是relative logits，应feed给一个softmax classifier，来预测在$$C_i$$中的哪个candidates是正样本（true）。
 
-因此，我们尝试训练函数F(x,y)来逼近$$log(P(y \mid x))$$，它会采用在我们的网络中表示F(x,y)的layer，减去$$log(Q(y \mid x))$$，然后将结果传给一个softmax classifier来预测哪个candidate是true样本。
+因此，我们尝试训练函数F(x,y)来逼近$$log(P(y \mid x))$$，它会采用在我们的网络中的layer来表示F(x,y)，减去$$log(Q(y \mid x))$$，然后将结果传给一个softmax classifier来预测哪个candidate是true样本。
 
 $$
-training-softmax-input = F(x,y) - log(Q(y|x))
+training \ softmax \ input = F(x,y) - log(Q(y|x))
 $$
 
 从该classifer对梯度进行BP，可以训练任何我们想到的F。
@@ -287,7 +289,98 @@ $$
 
 另外，该操作会返回true_expected_count和sampled_expected_count的tensors，它们分别对应于表示每个target classes(true_classes)以及sampled classes（sampled_candidates）在sampled classes的一个平均tensor中期望出现的次数。这些值对应于在上面的$$Q(y \mid x)$$。如果unique=True，那么它是一个post-rejection概率，我们会近似计算它。
 
+# paper2
+
+另外在paper 2《On Using Very Large Target Vocabulary for Neural Machine Translation》的第3节部分，也做了相应的讲解。
+
+## paper2 第3节
+
+在该paper中，提出了一种model-specific的方法来训练具有一个非常大的目标词汇表（target vocabulary）的一个神经网络机器翻译（NMT）模型。使用这种方法，训练的计算复杂度会是target vocabulary的size的常数倍。另外，该方法允许我们高效地使用一个具有有限内存的快速计算设备(比如：一个GPU)，来训练一个具有更大词汇表的NMT模型。
+
+训练一个NMT的计算低效性，是由等式(6)的归一化常数引起的。为了避免计算该归一化常数的成长复杂度(growing complexity)，我们这里提出：在每次更新时使用target vocab的一个小子集$$V'$$。提出的方法基于早前Bengio 2008的工作。
+
+等式(6), next target word的概率：
+
+$$
+p(y_t | y_{<t},x) = \frac{1}{Z} exp \lbrace w_t^T \phi(y_{t-1}, z_t, c_t) + b_t \rbrace
+$$
+
+...(6)
+
+其中Z是归一化常数（normalization constant）：
+
+$$
+Z = \sum\limits_{k:y_k \in V} exp \lbrace w_k^T \phi (y_{t-1}, z_t, c_t) + b_k \rbrace
+$$
+
+...(7)
+
+假设我们考虑在等式(6)中output的log-probability。梯度的计算由一个正部分(positive part)和负部分(negative part)组成：
+
+$$
+\nabla log p(y_t \mid y_{<t}, x) = \nabla \epsilon(y_t) - \sum\limits_{k:y_k \in V} p(y_k | y_{<t}, x) \nabla \epsilon(y_k)
+$$
+
+...(8)
+
+其中，我们将energy $$\epsilon$$定义为：
+
+$$
+\epsilon(y_i) = w_j^T \phi(y_{i-1}, z_j, c_j) + b_j
+$$
+
+梯度的第二项（negative）本质上是energy的期望梯度：
+
+$$
+E_p[\nabla \epsilon(y)]
+$$
+
+...(9)
+
+其中P表示$$p(y \mid y_{<t}, x)$$。
+
+提出的方法主要思想是，通过使用少量samples进行importance sampling来逼近该期望，或者该梯度的负项。给定一个预定义的分布Q和从Q中抽取的一个$$V'$$样本集合，我们使用下式来逼近等式(9)中的期望：
+
+$$
+E_P [\nabla \epsilon(y)] \approx \frac{w_k}{\sum_{k':y_{k'} \in V'} w_{k'}} \nabla \epsilon(y_k)
+$$
+
+...(10)
+
+其中：
+
+$$
+w_k = exp \lbrace \epsilon(y_k) - log Q(y_k) \rbrace
+$$
+
+...(11)
+
+该方法允许我们在训练期间，使用target vocabulary的一个小子集来计算归一化常数，每次参数更新时复杂度更低。直觉上，在每次参数更新时，我们只会更新与correct word $$w_t$$以及在$$V'$$中的sampled words相关的vectors。一旦训练完成，我们可以使用full target vocabulary来计算每个target word的output probability。
+
+尽管提出的方法可以天然地解决计算复杂度，使用该方法本质上不能在每个句子对(sentance pair：它们包含了多个target words)更新时保证参数数目。
+
+实际上，我们会对training corpus进行分区(partition)，并在训练之前为每个分区（partition）定义一个target vocabulary子集$$V'$$。在训练开始之前，我们会顺序检查训练语料中的每个target sentence，并累积唯一的target word，直到唯一的target words达到了预定义的阀值$$\tau$$。然后在训练期间将累积的vocabulary用于corpus的partition。我们会重复该过程，直到达到训练集的结尾。假设对于第i个partition的target words的子集用$$V_i'$$表示。
+
+这可以理解成，对于训练语料的每个partition具有一个单独的分布$$Q_i$$。该分布$$Q_i$$会为在子集$$V_i'$$中包含的所有target words分配相等的概率质量(probability mass)，其它words则具有为0的概率质量，例如：
+
+$$
+Q_i(y_i) = 
+\begin{cases}
+\frac{1}{|V_i'|} & \text{if $y_t$ \in $V_i'$}
+\end{cases} 	& otherwise.
+$$
+
+提议分布(proposal distribution)的选择会抵消掉correction term——来自等式(10)-(11)中importance weight的$$log Q(y_k)$$，使得该方法等价于，使用下式来逼近等式(6)中的准确output probability：
+
+$$
+p(y_t | y_{<t}, x) = \frac{exp \lbrace w_t^T \phi(y_{t-1}, z_t, c_t) + b_t) \rbrace}{ \sum_{k:y_k \in V'} exp \lbrace w_k^T \phi(y_{t-1}, z_t, c_t) + b_k \rbrace}
+$$
+
+需要注意的是，Q的这种选择会使得estimator有偏。
+
+对比常用的importance sampling，提出的该方法可以用来加速，它会利用上现代计算机的优势来完成matrix-matrix vs. matrix-vector乘法。
+
 # 参考
 
-[https://www.tensorflow.org/extras/candidate_sampling.pdf](https://www.tensorflow.org/extras/candidate_sampling.pdf)
-
+- [https://www.tensorflow.org/extras/candidate_sampling.pdf](https://www.tensorflow.org/extras/candidate_sampling.pdf)
+- [On Using Very Large Target Vocabulary for Neural Machine Translation](https://arxiv.org/pdf/1412.2007.pdf)
