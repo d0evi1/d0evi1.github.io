@@ -140,7 +140,7 @@ sampled_candidates的元素会使用base分布被无放回投样（如果：uniq
 对于该操作，基础分布是log-uniform或Zipf分布的一个近似：
 
 $$
-P(class) = (log(class+2) - log(class+1)) / log(range\_max + 1)
+P(class) = \frac{(log(class+2) - log(class+1))} { log(range\_max + 1)}
 $$
 
 当target classes近似遵循这样的一个分布时，该sampler很有用——例如，如果该classes以一个字母序表示的词语，并以频率降序排列。如果你的classes没有通过词频降序排列，就不需要使用该op。
