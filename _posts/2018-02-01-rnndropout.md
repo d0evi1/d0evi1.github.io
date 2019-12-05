@@ -31,7 +31,7 @@ RNN是神经序列模型，并在多个重要任务上达到了state-of-the-art�
 - $$h_t^l \in R^n$$是在timestep t时在layer l上的一个hidden state。
 - $$T_{n,m}: R^n \rightarrow R^m$$是一个仿射变换（Wx+b, 对于一些W和b）。
 - $$\odot$$是element-wise乘法，
-- $$h_t^0$$是一个在timestep k上的input word vector。
+- $$h_t^0$$是一个在timestep t上的input word vector。
 
 我们使用activations $$h_t^L$$来预测$$y_t$$，因为L是在我们的deep LSTM中的layers数目。
 
@@ -50,7 +50,7 @@ h_t^l = f(T_{n,n} h_t^{l-1} + T_{n,n} h_{t-1}^l), where \ f \in \lbrace sigm, ta
 $$
 
 LSTM具有复杂的动态性，使得它对于可以轻易地“记住（memorize）”
-一段时间内的信息。“lont term” memory被存储在memory cells $$c_t^l \in R^n$$的一个vector中。尽管许多LSTM的架构在它们的连接结构和激活函数上有所区别，所有的LSTM结构都具有显式的memory cells来存储长期的信息。LSTM可以决定是否overwrite memory cell，或者检索它，或者在下一time step上继续保留它。LSTM的结构如下：
+一段时间内的信息。“long term” memory被存储在memory cells $$c_t^l \in R^n$$的一个vector中。尽管许多LSTM的架构在它们的连接结构和激活函数上有所区别，所有的LSTM结构都具有显式的memory cells来存储长期的信息。LSTM可以决定是否overwrite memory cell，或者检索它，或者在下一time step上继续保留它。LSTM的结构如下：
 
 $$
 LSTM: h_t^{l-1}, h_{t-1}^l, c_{t-1}^l \rightarrow h_t^l,c_t^l \\
@@ -82,11 +82,11 @@ $$
 
 ## 3.2 使用dropout正则化
 
-该paper的主要贡献是，应用dropout到LSTMs中，并成功地减小了overfitting。主要思想是，**将dropout operator只应用在非递回连接（non-recurrent connections）(图2)上**。
+该paper的主要贡献是：应用dropout到LSTMs中，并成功地减小了overfitting。主要思想是：**将dropout operator只应用在非递回连接（non-recurrent connections）(图2)上**。
 
 <img src="http://pic.yupoo.com/wangdren23_v/5074d637/117eacbf.jpg">
 
-图2: 多层RNN的正则化。虚线键头表示dropout所应用的connections，实线表示不使用dropout的connections
+图2: 多层RNN的正则化。**虚线键头表示dropout所应用的connections**，实线表示不使用dropout的connections
 
 下面的等式可以更精确地描述该过程。其中D是dropout operator，它会将参数的一个随机子集设置为0:
 
@@ -112,7 +112,7 @@ h_t^l = o \odot tanh(c_t^l)
 
 $$
 
-我们的方法如下运行。dropout operator会使得units所携带的信息不纯（corrupts），强制它们更健壮地执行它们的中间计算。同时，我们不希望抹掉来自该units的所有信息。特别重要的是，该units会记住：过去多个timesteps上发生的events。图3展示了，在我们的dropout实现中，信息是如何从timestep t-2发生的event流向在timestep t+2上的预测的。我们可以看到，通过dropout operator所corrupt的信息也哈好是L+1 times，该数目与该信息所经过的timesteps数目是相互独立的。标准的dropout会扰乱（perturb）recurrent connections，这使得它对于LSTM很难学习如何来存储长期信息。通过不在recurrent connections上使用dropout的这种方式，LSTM可以受益于dropout regularization、又可以不牺牲它的记忆特质。
+我们的方法如下运行。**dropout operator会使得units所携带的信息不纯（corrupts），强制它们更健壮地执行它们的中间计算**。同时，我们不希望抹掉来自该units的所有信息。特别重要的是，该units会记住：过去多个timesteps上发生的events。图3展示了在我们的dropout实现中，信息是如何从timestep t-2发生的event流向在timestep t+2上的预测的。我们可以看到，通过dropout operator所corrupt的信息也恰好是L+1 times，该数目与该信息所经过的timesteps数目是相互独立的。**标准的dropout会扰乱（perturb）recurrent connections，这使得使用标准dropout的LSTM很难学习如何来存储长期信息**。通过不在recurrent connections上使用dropout的这种方式，LSTM可以受益于dropout regularization、又可以不牺牲它的记忆特质。
 
 <img src="http://pic.yupoo.com/wangdren23_v/a45d852b/1be89610.jpg">
 
