@@ -16,7 +16,7 @@ RNN是深度学习许多研究的前研。这些模型的主要难点是容易ov
 
 RNN是基于序列的模型，是NLP、语言生成、视频处理、以及许多其它任务上的关键。模型的输入是一个符号序列，在每个timestep上，会将一个RNN unit应用于单个symbol，该网络的输出会使用来自之前的time step的信息。RNN很强，但很容易overfit。由于在RNN模型中缺乏正则化，使得它很难处理小数据，为了避免overfitting，研究者们通常会使用：early-stopping、或者小模型。
 
-Drop是深度网络中很流行的正则技术，其中在训练期间network units会被随机masked(dropped)，但该技术从未在RNNs上成功应用过。经验表明，添加到recurrent layers上的噪声（在RNN units间的connections）会因序列过长而被放大，从而盖过信号本身。因而，一些研究得出结论：该技术只能在RNN的inputs和outputs上使用[4,7,10]。但这种方法在我们的实验中仍会导致overfitting。
+Dropout是深度网络中很流行的正则技术，其中在训练期间network units会被随机masked(dropped)，但该技术从未在RNNs上成功应用过。经验表明：**添加到recurrent layers上的噪声（在RNN units间的connections）会因序列过长而被放大，从而盖过信号本身**。因而，一些研究得出结论：该技术只能在**RNN的inputs和outputs上**使用[4,7,10]。但这种方法在我们的实验中仍会导致overfitting。
 
 最近在Bayesian和深度学习的交叉研究的最新结果提供了：通过Bayesian视角来解释常见的deep learning技术[11-16]。深度学习的Baeysian视度将这些新技术引入到该领域，比如：从深度学习网络中获得原则不确定估计（principled uncertainty estimates）。例如，Gal and Ghahramani展示了dropout可以被解释成一个Bayesian NN的后验的变分近似。这种变化近似分布是两个具有较小方差的高斯分布的混合，其中一个Gaussian的均值固定为0. 在approximate Bayesian inference中的dropout的基础扩展了理论，提供了新的视角来在RNN模型上使用这些技术。
 
@@ -26,7 +26,7 @@ Drop是深度网络中很流行的正则技术，其中在训练期间network un
 
 <img src="http://pic.yupoo.com/wangdren23_v/9fc782c8/642b6fd3.jpg">
 
-图1 dropout技术。**(左)：标准dropout (右): Bayesian解释的dropout**. 每个方块表示一个RNN unit，水平键头表示时间依存关系（recurrent connections）。垂直键头表示每个RNN unit的input和output。**带颜色的连接（connections）表示dropped-out inputs；不同颜色表示不同的dropout masks**。虚线表示没有dropout的标准connections。当前技术（naive dropout, 左）在不同time steps上使用不同的masks，而在recurrent layers上没有dropout。提出的技术（Variational RNN, 右）在每个timestep上使用相同的dropout mask，包括recurrent layers
+图1 dropout技术。**(左)：标准dropout (右): Bayesian解释的dropout**. 每个方块表示一个RNN unit，水平键头表示时间依存关系（recurrent connections）。垂直键头表示每个RNN unit的input和output。**带颜色的连接（connections）表示dropped-out inputs；不同颜色表示不同的dropout masks**。虚线表示没有dropout的标准connections。当前技术（naive dropout, 左）在不同time steps上使用不同的masks，而在recurrent layers上没有dropout。提出的技术（Variational RNN, 右）**在每个timestep上使用相同的dropout mask，包括recurrent layers**
 
 我们接着研究了相关的文献和资料，将我们的Variational RNN的近似推断进行公式化，产生提出的dropout变种。实验结果在随后给出。
 
