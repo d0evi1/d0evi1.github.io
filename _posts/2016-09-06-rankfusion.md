@@ -59,7 +59,7 @@ ranking fusion的理想场景是，每个judge（search engine）给出对所有
 - U表示在$$\tau_1, \cdots, \tau_n$$中的items的union，例如：$$U = \cup_{\tau \in R, i \in \tau} \lbrace i \rbrace $$。
 - $$\hat{\tau}$$表示ranking（被称为fused ranking或fused rank list），它是一个rank fusion方法应用到在R中的rank lists之后得到的结果。
 
-为了完全指明$$\hat{\tau}$$，它足够决定得分$$s^{\tau}(i)$$（称为：fused score），对于每个item $$i \in U$$，由于$$\hat{\tau}$$根据$$s^{\hat{\tau}}$$的值递减进行排序。我们认为：
+为了彻底说明$$\hat{\tau}$$，它足够决定分值$$s^{\tau}(i)$$（称为：fused score）(对于每个item $$i \in U$$)，因为$$\hat{\tau}$$会根据$$s^{\hat{\tau}}$$的值递减进行排序。我们认为：
 
 - 如果两个fused ranking $$\hat{\tau}_1, \hat{\tau}_2$$是**相等的（equal）**，则：$$\hat{\tau}_1 = \hat{\tau}_2$$
 - 如果$$\hat{\tau}_1$$和$$\hat{\tau}_2$$是**等价的(equivalent)**，那么对于$$i \in U$$，有$$\hat{\tau}_1(i) = \hat{\tau}_2(i)$$（他们具有相同的顺序）
@@ -94,7 +94,7 @@ $$
 
 ### 2.2.2 Markovchain-based方法
 
-rank fusion的一个吸引人的方法在[7]中提出，它基于Markov chains。一个系统的一个(齐次：homogeneous)Markov chain可以通过一个状态集$$S=\lbrace 1,2, \cdots, \mid S \mid \rbrace$$以及一个$$\mid S \mid \times \mid S \mid $$的非负随机矩阵M（例如：每行的求和为1）来指定。该系统从S中的某个状态开始，并在每个step时会从一个state转移到另一个state。转移(transition)通过矩阵M来指导：在每个tep上，如果系统在状态i，它移到状态j的概率为$$M_{ij}$$。如果给定当前状态作为概率分布，下一状态的概率分布通过表示当前状态的该vector与M相乘得到。总之，系统的起始状态（start state）根据在S上的一些分布x被选中。在m个steps后，该系统的状态会根据$$xM^m$$进行分布。在一些条件下，不需要考虑起始分布x，该系统最终会达到一个唯一确定点（状态分布不再变化）。该分布称为“稳态分布(stationary distribution)”。该分布可以通过M的左主特征向量（principal left eigenvector）y给出，例如：$$yM = \lambda y$$。实际上，一个简单的power-iteration算法可以快速获得关于y的一个合理近似。y中的entries定义了在S上的一个天然顺序。我们称这样的顺序为M的马尔可夫序（Markov chain ordering）。
+[7]中提出一种关于rank fusion的有意思的方法，它基于Markov chains实现。一个系统的一个(齐次：homogeneous)Markov chain可以通过一个状态集$$S=\lbrace 1,2, \cdots, \mid S \mid \rbrace$$以及一个$$\mid S \mid \times \mid S \mid $$的非负随机矩阵M（例如：每行的求和为1）来指定。该系统从S中的某个状态开始，并在每个step时会从一个state转移到另一个state。转移(transition)通过矩阵M来指导：在每个step上，如果**系统从状态i移到状态j的概率为$$M_{ij}$$**。如果给定当前状态作为概率分布，下一状态的概率分布通过表示当前状态的该vector与M相乘得到。总之，系统的起始状态（start state）根据在S上的一些分布x被选中。在m个steps后，该系统的状态会根据$$xM^m$$进行分布。在一些条件下，不需要考虑**起始分布x**，该系统最终会达到一个唯一确定点（状态分布不再变化）。该分布称为“**稳态分布(stationary distribution)**”。该分布可以通过M的左主特征向量（principal left eigenvector）y给出，例如：$$yM = \lambda y$$。实际上，一个简单的power-iteration算法可以快速获得关于y的一个合理近似。y中的entries定义了在S上的一个天然顺序。我们称这样的顺序为M的马尔可夫序（Markov chain ordering）。
 
 对rank fusion问题使用Markov chains如下所示。状态集合S对应于待排序(rank)的所有candidates的list，例如：在$$R=\lbrace \tau_1, \cdots, \tau_2 \rbrace$$中的所有items的集合。在M中的转移概率在某种程度上依赖于$$\tau_1, \cdots, \tau_n$$，如下所示。$$\hat{\tau}$$是在M上的Markov chain ordering。下面，[7]提出了了一些Markov chains(MC):
 
