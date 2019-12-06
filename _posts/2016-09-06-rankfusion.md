@@ -54,7 +54,7 @@ ranking fusion的理想场景是，每个judge（search engine）给出对所有
 
 ## 2.2 Fusion方法
 
-本节中，我们将讲述分析的ranking fusion方法。考虑一个包含了n个rankings的集合$$R=\lbrace \tau_1, \cdots, \tau_n \brace$$。假设：U表示在$$\tau_1, \cdots, \tau_n$$中的items的union，例如：$$U = \cup_{\tau \in R, i \in \tau} \lbrace i \brace $$。$$\hat{\tau}$$表示ranking（被称为fused ranking或fused rank list），它是一个rank fusion方法应用到在R中的rank lists之后得到的结果。为了完全指明$$\hat{\tau}$$，它足够决定得分$$s^{\tau}(i)$$（称为：fused score），对于每个item $$i \in U$$，由于$$\hat{\tau}$$根据$$s^{\hat{\tau}}$$的值递减进行排序。我们认为两个fused ranking $$\hat{\tau_1}, \hat{\tau_2}$$是相等的（equal），即$$\hat{\tau}_1 = \hat{\tau}_2$$，如果我们认为$$\hat{\tau}_1$$和$$\hat{\tau}_2$$是等价的(equivalent)，那么对于$$i \in U$$，有$$\hat{\tau}_1(i) = \hat{\tau}_2(i)$$（他们具有相同的顺序）。当然，equality意味着equivalence，但反过来不成立。
+本节中，我们将讲述分析的ranking fusion方法。考虑一个包含了n个rankings的集合$$R=\lbrace \tau_1, \cdots, \tau_n \rbrace$$。假设：U表示在$$\tau_1, \cdots, \tau_n$$中的items的union，例如：$$U = \cup_{\tau \in R, i \in \tau} \lbrace i \rbrace $$。$$\hat{\tau}$$表示ranking（被称为fused ranking或fused rank list），它是一个rank fusion方法应用到在R中的rank lists之后得到的结果。为了完全指明$$\hat{\tau}$$，它足够决定得分$$s^{\tau}(i)$$（称为：fused score），对于每个item $$i \in U$$，由于$$\hat{\tau}$$根据$$s^{\hat{\tau}}$$的值递减进行排序。我们认为两个fused ranking $$\hat{\tau_1}, \hat{\tau_2}$$是相等的（equal），即$$\hat{\tau}_1 = \hat{\tau}_2$$，如果我们认为$$\hat{\tau}_1$$和$$\hat{\tau}_2$$是等价的(equivalent)，那么对于$$i \in U$$，有$$\hat{\tau}_1(i) = \hat{\tau}_2(i)$$（他们具有相同的顺序）。当然，equality意味着equivalence，但反过来不成立。
 
 
 ### 2.2.1 线性组合
