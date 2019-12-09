@@ -126,15 +126,13 @@ $$
 
 - $$M_{21}^2$$是5/18. 均匀选择一个包含item 2的rank list的概率为1/3. 如果$$\tau_1$$被选中，那么$$Q_{\tau_1,2}^{C_2}=\lbrace 2,1 \rbrace$$。因此，选中item 1的概率为1/2. 相似的，$$Q_{\tau_2,2}^{C_2}=\lbrace 2,1,3 \rbrace$$并且$$Q_{\tau_3,2}^{C_2}=\lbrace 2, 3 \rbrace$$。因此，$$M_{21}^2 = \frac{1}{3} \cdot \frac{1}{2} + \frac{1}{3} \cdot \frac{1}{3} + \frac{1}{3} \cdot 0 = \frac{5}{18}$$
 
-- $$M_{23}^3$$是2/9. 均匀选中一个包含item 2的概率为1/3. 均匀选择一个item在一个rank list中的概率也为1/3. 由于$$\tau_1(3) \nless \tau_1(2), \tau_2(3) < \tau_2(2), \tau_3(3) < \tau_3(2)$$, 因此$$M_{23}^3 = \frac{1}{3} \cdot 0 + \frac{1}{3}\frac{1}{3} + \frac{1}{3}\frac{1}{3} = \frac{2}{9}$$。
-
-- $$M_{22}^4$$是1/3. 均匀选中在S中一个item的概率为1/3. 另外，考虑下表：
+- $$M_{23}^3$$是2/9. 均匀选中一个包含item 2的概率为1/3. 在一个rank list范围内均匀选择一个item的概率也为1/3. 由于$$\tau_1(3) \nless \tau_1(2), \tau_2(3) < \tau_2(2), \tau_3(3) < \tau_3(2)$$, 因此$$M_{23}^3 = \frac{1}{3} \cdot 0 + \frac{1}{3} \cdot \frac{1}{3} + \frac{1}{3} \cdot \frac{1}{3} = \frac{2}{9}$$。
 
 <img src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/769ccb287bbab5e5cdbce670c737edc61b6d1bf9d255a1ae57042d27382db0fccc88309666f9622aafcbacba81fa2b38?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
 
 图3
 
-在上表中的每个entry $$a_{ij}$$是lists $$\tau \in R$$的count，以便$$\tau(j) < \tau(i)$$，例如，有多少rankings满足：item j的rank比item i要好。由于有三个lists。majority的阀值是2. $$M_{22}^4$$是：给定item 2, 在下一step之后我们仍停留在item 2上的概率。由于$$a_{21}, a_{22}, a_{23}$$分别是2､ 0､ 2, 三种情况中有两种会从item 2进行转移，另一种仍会停留在item 2上。相应的$$M_{22}^4$$是1/3.
+- $$M_{22}^4$$是1/3. 均匀选中在S中一个item的概率为1/3. 另外，考虑图3中的表：在上表中的每个entry $$a_{ij}$$是lists $$\tau \in R$$的count，以便$$\tau(j) < \tau(i)$$，例如，有多少rankings满足：item j的rank比item i要好。由于有三个lists。majority的阀值是2. $$M_{22}^4$$是：给定item 2, 在下一step之后我们仍停留在item 2上的概率。由于$$a_{21}, a_{22}, a_{23}$$分别是2､ 0､ 2, 三种情况中有两种会从item 2进行转移，另一种仍会停留在item 2上。相应的$$M_{22}^4$$是1/3.
 
 最终，关于rank set R的fused rank list $$\hat{\tau}_k$$是在$$M^k, k=1, \cdots, 4$$上的Markov chain ordering。它可以被展示成$$\hat{\tau}=[3 \geq 2 \geq 1]$$的所有4种情况。
 
