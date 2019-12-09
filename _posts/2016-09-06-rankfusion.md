@@ -96,7 +96,7 @@ $$
 
 [7]中提出一种关于rank fusion的有意思的方法，它基于Markov chains实现。一个系统的一个(齐次：homogeneous)Markov chain可以通过一个状态集$$S=\lbrace 1,2, \cdots, \mid S \mid \rbrace$$以及一个$$\mid S \mid \times \mid S \mid $$的非负随机矩阵M（例如：每行的求和为1）来指定。该系统从S中的某个状态开始，并在每个step时会从一个state转移到另一个state。转移(transition)通过矩阵M来指导：在每个step上，如果**系统从状态i移到状态j的概率为$$M_{ij}$$**。如果给定当前状态作为概率分布，下一状态的概率分布通过表示当前状态的该vector与M相乘得到。总之，系统的起始状态（start state）根据在S上的一些分布x被选中。在m个steps后，该系统的状态会根据$$xM^m$$进行分布。在一些条件下，不需要考虑**起始分布x**，该系统最终会达到一个唯一确定点（状态分布不再变化）。该分布称为“**稳态分布(stationary distribution)**”。该分布可以通过M的左主特征向量（principal left eigenvector）y给出，例如：$$yM = \lambda y$$。实际上，一个简单的power-iteration算法可以快速获得关于y的一个合理近似。y中的entries定义了在S上的一个天然顺序。我们称这样的顺序为**M的马尔可夫序（Markov chain ordering）**。
 
-对rank fusion问题使用Markov chains如下所示。状态集合S对应于待排序(rank)的所有candidates的list，例如：在$$R=\lbrace \tau_1, \cdots, \tau_2 \rbrace$$中的所有items的集合。在M中的转移概率在某种程度上依赖于$$\tau_1, \cdots, \tau_n$$，如下所示。$$\hat{\tau}$$是在M上的Markov chain ordering。下面，[7]提出了了一些Markov chains(MC):
+对rank fusion问题使用Markov chains如下所示。**状态集合S对应于待排序(rank)的所有candidates的list**（例如：在$$R=\lbrace \tau_1, \cdots, \tau_2 \rbrace$$中的所有items的集合）。**在M中的转移概率在某种程度上依赖于$$\tau_1, \cdots, \tau_n$$，$$\hat{\tau}$$是在M上的Markov chain ordering**。下面，[7]提出了了一些Markov chains(MC):
 
 - $$MC_1$$: 如果当前state为item i，那么，下一state从对应rank >= item i的所有items j的multiset中均匀选中，例如，从multiset $$Q_i^{C_1} = \cup_{k=1}^n \lbrace j: \tau_k(j) \leq \tau_k(i) \rbrace $$中均匀选中下一state。
 
@@ -114,19 +114,19 @@ $$
 
 图1
 
-它可以展示成关于$$MC_1, MC_2, MC_3, MC_4$$的转移矩阵$$M^1, M^2, M^3, M^4$$。
+它可以展示成关于$$MC_1, MC_2, MC_3, MC_4$$的转移矩阵，分别为：$$M^1, M^2, M^3, M^4$$。
 
 <img src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/9fcac4fcc571e19208c5a25982dbc39bb817b7926719802639aa42657c575a4b8bd6ef92f525f1cb1ba628afcba96bac?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
 图2
 
-下面，我们会为该matrix entries展示一些示例计算。记住$$M_{ij}^k$$是给定当前state（item i）到下一state（item j）的概率。
+下面，我们会为matrix entries展示一些示例计算。记住$$M_{ij}^k$$是给定当前state（item i）到下一state（item j）的概率。
 
-- $$M_{13}^1$$是2/6. 确实，$$Q_1^{C_1}$$是$$\lbrace  1,1,3,1,2,3 \rbrace$$。因此，在$$Q_1^{C_1}$$中均匀选中某一元素的概率为1/6, 选中item 3的概率为2/6.
+- $$M_{13}^1$$是2/6. 确实，$$Q_1^{C_1}$$是$$\lbrace  1,1,3,1,2,3 \rbrace$$(rank<=item 1的case：1; 1,3; 1,2,3)。因此，在$$Q_1^{C_1}$$中均匀选中某一元素的概率为1/6, 选中item 3的概率为2/6.
 
 - $$M_{21}^2$$是5/18. 均匀选择一个包含item 2的rank list的概率为1/3. 如果$$\tau_1$$被选中，那么$$Q_{\tau_1,2}^{C_2}=\lbrace 2,1 \rbrace$$。因此，选中item 1的概率为1/2. 相似的，$$Q_{\tau_2,2}^{C_2}=\lbrace 2,1,3 \rbrace$$并且$$Q_{\tau_3,2}^{C_2}=\lbrace 2, 3 \rbrace$$。因此，$$M_{21}^2 = \frac{1}{3} \cdot \frac{1}{2} + \frac{1}{3} \cdot \frac{1}{3} + \frac{1}{3} \cdot 0 = \frac{5}{18}$$
 
-- $$M_{23}^3$$是2/9. 均匀选中一个包含item 2的概率为1/3. 均匀选择一个item在一个rank list中的概率也为1/3. 由于$$\tau_1(3) \nless \tau_1(2), \tau_2(3) < \tau_2(2), \tau_3(3) < \tau_3(2), M_{23}^3 = \frac{1}{3} \cdot 0 + \frac{1}{3}\frac{1}{3} + \frac{1}{3}\frac{1}{3} = \frac{2}{9}$$。
+- $$M_{23}^3$$是2/9. 均匀选中一个包含item 2的概率为1/3. 均匀选择一个item在一个rank list中的概率也为1/3. 由于$$\tau_1(3) \nless \tau_1(2), \tau_2(3) < \tau_2(2), \tau_3(3) < \tau_3(2)$$, 因此$$M_{23}^3 = \frac{1}{3} \cdot 0 + \frac{1}{3}\frac{1}{3} + \frac{1}{3}\frac{1}{3} = \frac{2}{9}$$。
 
 - $$M_{22}^4$$是1/3. 均匀选中在S中一个item的概率为1/3. 另外，考虑下表：
 
