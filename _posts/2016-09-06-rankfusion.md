@@ -132,7 +132,7 @@ $$
 
 图3
 
-- $$M_{22}^4$$是1/3. 均匀选中在S中一个item的概率为1/3. 另外，考虑图3中的表：在上表中的每个entry $$a_{ij}$$是lists $$\tau \in R$$的count，以便$$\tau(j) < \tau(i)$$，例如，有多少rankings满足：item j的rank比item i要好。由于有三个lists。majority的阀值是2. $$M_{22}^4$$是：给定item 2, 在下一step之后我们仍停留在item 2上的概率。由于$$a_{21}, a_{22}, a_{23}$$分别是2､ 0､ 2, 三种情况中有两种会从item 2进行转移，另一种仍会停留在item 2上。相应的$$M_{22}^4$$是1/3.
+- $$M_{22}^4$$是1/3. 均匀选中在S中一个item的概率为1/3. 另外，考虑图3中的表：在上表中的每个entry $$a_{ij}$$是满足$$\tau \in R, \tau(j) < \tau(i)$$的lists的count数（例如，有多少rankings满足：item j的rank比item i要好）。由于存在三个lists，因此majority的阀值是2. $$M_{22}^4$$指的是：给定item 2, 在下一step之后我们仍停留在item 2上的概率。由于$$a_{21}, a_{22}, a_{23}$$分别是2､ 0､ 2, 三种情况中有两种会从item 2进行转移，另一种仍会停留在item 2上。相应的$$M_{22}^4$$是1/3.
 
 最终，关于rank set R的fused rank list $$\hat{\tau}_k$$是在$$M^k, k=1, \cdots, 4$$上的Markov chain ordering。它可以被展示成$$\hat{\tau}=[3 \geq 2 \geq 1]$$的所有4种情况。
 
