@@ -212,15 +212,15 @@ $$
 
 ## 4.3 Top-K off-policy Correction
 
-在我们的setting中存在的另一个挑战是：**我们的系统会一次推荐一个包含k个items的页面**。由于用户会浏览我们的推荐（整个集合或部分集合），会与多个item存在潜在交互，我们需要选择一个相关items集合，而非单个item。换句话说，**我们会寻找一个policy $$\prod\limits_{\theta} (A \mid s)$$**，这样每个action A会选择一个包含k items的集合，来最大化期望累积回报（expected cumulative reward）：
+在我们的setting中存在的另一个挑战是：**我们的系统一次会推荐一个包含k个items的页面给用户**。由于用户会浏览我们的推荐（整个集合或部分集合），并与一个以上的item存在潜在交互，我们需要选择一个相关items集合（而非单个item）。换句话说，**我们会寻找一个policy $$\prod\limits_{\theta} (A \mid s)$$**，这样每个action A会选择一个关于k个items的集合，来最大化期望累积回报（expected cumulative reward）：
 
 $$
 max_{\theta} E_{\tau \sim \prod_{\theta}} [ \sum\limits_t r(s_t, A_t)]
 $$
 
-轨迹(trajectory) $$\tau = (s_0, A_0, s_1, \cdots)$$会通过根据$$s_0 \sim \rho_0, A_t \sim \prod(\mid s_t), s_{t+1} \sim P(\cdot \mid s_t, A_t)$$进行acting来获得。不幸的是，动作空间（action space）在该集合推荐公式是指数式增长，我们从中选择的items数过大，阶数是百万级。
+轨迹(trajectory) $$\tau = (s_0, A_0, s_1, \cdots)$$会通过根据 $$s_0 \sim \rho_0, A_t \sim \prod(\mid s_t), s_{t+1} \sim P(\cdot \mid s_t, A_t)$$ 进行acting来获得。不幸的是，动作空间（action space）在该集合推荐公式下是指数级增长，在给定items数时这会过大（从阶数为百万级的语料中选择items）。
 
-为了让该问题可跟踪，我们假设一个**无重复（non-repetitive）** items的集合的期望回报（expected reward）等于在集合中每个item的expected reward的和。更进一步，我们通过对每个item a根据softmax policy $$\pi_\theta$$进行独立抽样，接着进行去重来限制生成action A集合。也就是：
+为了让该问题可跟踪，我们假设：**一个无重复（non-repetitive） items的集合的期望回报（expected reward）等于在集合中每个item的expected reward的和**(该假设仍会认为：用户会独立地检查每个item)。更进一步，我们通过对每个item a根据softmax policy $$\pi_\theta$$进行独立抽样，接着进行去重来限制生成action A集合。也就是：
 
 $$
 \prod_{\theta}(A' | s) = \prod\limits_{a \in A'} \pi_{\theta} (a | s)
@@ -236,7 +236,7 @@ $$
 
 其中：
 
-- $$\alpha_{\theta} (a \mid s) = 1 - (1- \pi_{\theta}(a \mid s))^K$$：表示的是一个item a出现在最终的无重复集合A中的概率。这里，$$K = \mid A'\mid >\mid A\mid = k $$。
+- $$\alpha_{\theta} (a \mid s) = 1 - (1- \pi_{\theta}(a \mid s))^K$$：表示的是一个item a出现在最终的无重复集合A中的概率。这里，$$K = \mid A'\mid >\mid A\mid = k $$。（注：作为有放回(replacement)和去重（de-duplicate）抽样的结果，最终集合A的size是可变的）
 
 我们接着更新等式(3)中的off-policy corrected gradient，通过使用$$\alpha_{\theta}$$替代$$\pi_{\theta}$$，生成top-K off-policy correction factor: 
 
