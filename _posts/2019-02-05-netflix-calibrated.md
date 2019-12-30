@@ -52,16 +52,15 @@ Calibration在机器学习中是一个通用概念，最近在机器学习算法
 
 每个电影i具有一个不同的概率$$p(i \mid g)$$，它表示用户u决定播放genre g电影的概率。
 
-之前的示例中，我们已知：$$p(g_r \mid u)$$=0.7 （r: romance movies即爱情片），$$p(g_a \mid u)=0.3$$ （a: action movies即动作片）。假设两个电影集合genres是相互排斥的，用户u播放在genre g上的电影i的概率可以通过以下得到：$$p(i \mid u) = p(i \mid g) \cdot p(g \mid u)$$。为了得到最佳预测accuracy，我们已经找到具有被该用户播放的最高概率$$p(i \mid u)$$的10部电影i。我们考虑最可能的动作片$$i_{g_a,1}$$（例如：在动作片中排序第1的），接着第10个最可能的爱情片$$i_{g_r,10}$$，我们会获得：
+之前的示例中，我们已知：$$p(g_r \mid u)$$=0.7 （r: romance movies即爱情片），$$p(g_a \mid u)=0.3$$ （a: action movies即动作片）。假设两个电影集合genres是相互排斥的，用户u播放在genre g上的电影i的概率可以通过以下得到：$$p(i \mid u) = p(i \mid g) \cdot p(g \mid u)$$。为了得到最佳预测accuracy，我们已经找到具有被该用户播放的最高概率$$p(i \mid u)$$的10部电影i。我们考虑下：最可能播放的动作片$$i_{g_a,1}$$（例如：在动作片中排序第1的），以及最可能播放的第10个爱情片$$i_{g_r,10}$$，我们会获得：
 
 $$
 \frac{p(i_{g_r,10} | u)}{p(i_{g_a,1} | u)} = \underbrace{\frac{p(i_{g_r,10} | r_r)}{p(i_{g_a,1} | g_a)}}_{\approx 1/2.1} \cdot \underbrace{\frac{p(g_r | u)}{p(g_a | u)}}_{=\frac{0.7}{0.3} \approx 2.33} \approx \frac{2.33}{2.1} > 1
 $$
 
-(待补)
 ...(1)
 
-其中，我们从MovieLens 20 Million数据集中确定值2.1. 在该示例的变种中，第10部爱情片title要比最好的动作片title具有一个更大的播放概率。因此，根据accuracy，待推荐的最优10个titles可以全是爱情片title（没有一部动作片）。
+其中，我们从MovieLens 20 Million数据集中确定值2.1. 在该示例的变种中，第10部爱情片要比最好的动作片具有一个更大的播放概率。因此，根据accuracy，待推荐的最优的10个titles可以全是爱情片title（没有一部动作片）。
 
 ## 2.3 LDA
 
