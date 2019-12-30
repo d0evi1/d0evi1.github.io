@@ -10,13 +10,13 @@ netflix在recsys 2018的paper《Calibrated Recommendations》提出了Calibrated
 
 # 抽要
 
-当一个用户观看了70个爱情片(romance)和30个动作片(action)时，那么很合理的期望结果是：电影推荐的个性化列表中由70%的爱情片和30%的动作片组成。**这是个很重要的特性，称为“校准(calibration)”**，最近在机器学习的关于公平性（fairness）的背景下重新获得关注。在items推荐列表中，calibration可以保证：一个用户的多个（过往）兴趣领域，受它对应的占比影响。Calibration特别重要，因为推荐系统在离线环境下通常对accuracy(比如：ranking metrics)进行最优化，会**很容易导致这样的现象：一个用户的兴趣过少，推荐会被用户的主兴趣"挤得满满的"**——。这可以通过“校正推荐（calibrated recommendations）”来阻止。为了这个目的，我们会描述用于量化calibration程度（degree）的指标，以及一种简单有效的re-ranking算法来对推荐系统的输出进行后处理（post-processing）。
+当一个用户观看了70个爱情片(romance)和30个动作片(action)时，那么很合理的期望结果是：电影推荐的个性化列表中由70%的爱情片和30%的动作片组成。**这是个很重要的特性，称为“校准(calibration)”**，最近在机器学习的关于公平性（fairness）的背景下重新获得关注。在items推荐列表中，calibration可以保证：一个用户的多个（过往）兴趣领域，受它对应的占比影响。Calibration特别重要，因为推荐系统在离线环境下通常对accuracy(比如：ranking metrics)进行最优化，会**很容易导致这样的现象：一个用户的兴趣过少，推荐会被用户的主兴趣"挤得满满的"**——这可以通过“校正推荐（calibrated recommendations）”来阻止。为了这个目的，我们会描述用于量化calibration程度（degree）的指标，以及一种简单有效的re-ranking算法来对推荐系统的输出进行后处理（post-processing）。
 
 # 1.介绍
 
 推荐系统在许多不同应用领域提供了个性化的用户体验，包括：电商、社交网络、音乐视频流。
 
-在本paper中，我们展示了推荐系统根据accuracy（例如：ranking指标）训练时可以很容易生成以下的items推荐列表：一个用户的主要兴趣领域（main areas）的items——当用户的兴趣领域越少时，items趋向于未被充分表示（underrepresented）或者缺失（absent）。随着时间流逝，这样的不平衡推荐会让用户的兴趣领域越来越窄——这与回音室(echo chambers)效应或过滤气泡(filter bubbles)效应相似。该问题也会在以下情况中存在：一些用户共享相同的账号，其中：使用相同账号的少量活跃用户的兴趣会在推荐中“挤出”。我们会在第2节的一些思维实验(thought experiments)、以及第6节的真实数据实验中展示该效果。
+在本paper中，我们展示了：**根据accuracy（例如：ranking指标）训练的推荐系统，很容易为一个用户生成集中在主要兴趣领域（main areas）上的items**——当用户的兴趣领域越少时，items趋向于未被充分表示（underrepresented）或者缺失（absent）。随着时间流逝，这样的不平衡推荐会让用户的兴趣领域越来越窄——这与"回音室(echo chambers)效应"或"过滤气泡(filter bubbles)效应"相似。该问题也会在以下情况中存在：一些用户共享相同的账号，其中：使用相同账号的少量活跃用户的兴趣会在推荐中“挤出”。我们会在第2节的一些思维实验(thought experiments)、以及第6节的真实数据实验中展示该效果。
 
 Calibration在机器学习中是一个通用概念，最近在机器学习算法关于公平性(fairness)中开始复兴起来。如果关于多个分类的预测比例与实际数据点的比例相一致，那么这个分类算法被称为"calibrated"。相类似的，在本paper中，calibrated recommendations的目标是，影响在推荐列表中一个用户的多种兴趣，以及它们合适的比例。为了这个目的，我们在第3节描绘了calibration degree的量化指标。在第4节，我们提出了一个算法，目标函数使它更接近calibrated，来对一个给定推荐的ranked list进行post-processing。。。
 
