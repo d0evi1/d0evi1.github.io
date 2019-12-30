@@ -124,10 +124,10 @@ $$
 
 # 4.Calibration方法
 
-推荐的calibration是一个list-property。由于许多推荐系统以用一种pointwise/pariwise的方式进行训练，在训练中可能不包括calibration。这建议对推荐系统的预测列表以post-processing方式进行re-rank，这是机器学习中一种calibrating常用方法。为了决定N个推荐电影的最优集合$$I^*$$，我们会使用最大间隔相关度（maximum marginal relevance）：
+推荐的calibration是一个与list相关的特性（list-property）。由于许多推荐系统以用一种pointwise/pariwise的方式进行训练，在训练中可能不包括calibration。因而建议：对推荐系统的预测列表以post-processing方式进行re-rank，这也是机器学习中一种calibrating常用方法。为了决定N个推荐电影的最优集合$$I^*$$，我们会使用最大间隔相关度（maximum marginal relevance）：
 
 $$
-I^* = argmax_{I,|I|=N} (1-\lambda) \cdot s(I) - \lambda \cdot C_{KL} (p, q(I))
+I^* = \underset{I,|I|=N}{argmax} (1-\lambda) \cdot s(I) - \lambda \cdot C_{KL} (p, q(I))
 $$
 
 ...(6)
