@@ -16,14 +16,14 @@ netflix在recsys 2018的paper《Calibrated Recommendations》提出了Calibrated
 
 推荐系统在许多不同应用领域提供了个性化的用户体验，包括：电商、社交网络、音乐视频流。
 
-在本paper中，我们展示了：**根据accuracy（例如：ranking指标）训练的推荐系统，很容易为一个用户生成集中在主要兴趣领域（main areas）上的items**——当用户的兴趣领域越少时，items趋向于未被充分表示（underrepresented）或者缺失（absent）。随着时间流逝，这样的不平衡推荐会让用户的兴趣领域越来越窄——这与"回音室(echo chambers)效应"或"过滤气泡(filter bubbles)效应"相似。该问题也会在以下情况中存在：一些用户共享相同的账号，其中：使用相同账号的少量活跃用户的兴趣会在推荐中“挤出”。我们会在第2节的一些思维实验(thought experiments)、以及第6节的真实数据实验中展示该效果。
+在本paper中，我们展示了：**根据accuracy（例如：ranking指标）训练的推荐系统，很容易为一个用户生成集中在主要兴趣领域（main areas）上的items**——当用户的兴趣领域越少时，items会趋向于未被充分表示（underrepresented）或者缺失（absent）。随着时间流逝，**这样的不平衡推荐会让用户的兴趣领域越来越窄**——这与"回音室(echo chambers)效应"或"过滤气泡(filter bubbles)效应"相似。该问题也会在以下情况中存在：一些用户共享相同的账号，其中：使用相同账号的少量活跃用户的兴趣会在推荐中“挤出”。我们会在第2节的一些思维实验(thought experiments)、以及第6节的真实数据实验中展示该效果。
 
-Calibration在机器学习中是一个通用概念，最近在机器学习算法关于公平性(fairness)中开始复兴起来。如果关于多个分类的预测比例与实际数据点的比例相一致，那么这个分类算法被称为"calibrated"。相类似的，在本paper中，calibrated recommendations的目标是，影响在推荐列表中一个用户的多种兴趣，以及它们合适的比例。为了这个目的，我们在第3节描绘了calibration degree的量化指标。在第4节，我们提出了一个算法，目标函数使它更接近calibrated，来对一个给定推荐的ranked list进行post-processing。。。
+Calibration在机器学习中是一个通用概念，最近在机器学习算法关于公平性(fairness)中开始流行起来。**如果关于多个分类的预测比例与实际数据点的比例相一致，那么这个分类算法被称为"calibrated"**。相类似的，在本paper中，calibrated recommendations的目标是：影响在推荐列表中一个用户的多种兴趣，以及它们合适的比例。为了这个目的，我们在第3节描绘了calibration degree的量化指标。在第4节，我们提出了一个算法，目标函数使它更接近calibrated，来对一个给定推荐的ranked list进行post-processing。等等
 
 为了方便，我们会使用进行如下释义：
 
-- 与items交互的用户: 观看了电影的用户
-- items类目(categories): genres
+- **与items交互的用户**：观看了电影的用户
+- **items类目(categories)**：genres
 
 # 2.动机
 
@@ -31,7 +31,7 @@ Calibration在机器学习中是一个通用概念，最近在机器学习算法
 
 我们会考虑常用的离线环境（offline setting），其中数据集由历史的user-item交互组成，它们被分割成trainset和testset（例如：基于时间、或者随机划分）；评估目标(evaluation objective)是：预测在testset中哪些items与用户交互时会达到最佳的accuracy，通常会根据ranking metrics进行量化。该setting的优点是很容易实现，并且可应用到用于CF的公开数据集上。
 
-在我们的示例中，假设一个电影用户在离线训练数据中播放了70部爱情片和30部动作片：我们的objective是生成一个包含10个推荐电影的列表，可以让预测该用户的test-movies的概率最大化（例如：在offline test data中被该用户播放的held-out movies）。这会最大化推荐accuracy。出于简洁性，会假设：两个genres是完全互斥的（例如：一个电影可以是动作片、或者是爱情片，但不能是动作爱情片）
+在我们的示例中，假设一个电影用户在离线训练数据中播放了70部爱情片和30部动作片：我们的objective是生成一个包含10个推荐电影的列表，可以让预测该用户的test-movies的概率最大化（例如：在offline test data中被该用户播放的held-out movies）。这会最大化推荐accuracy。出于简洁性，我们假设：**两个genres是完全互斥的（例如：一个电影可以是动作片、或者是爱情片，但不能是动作爱情片）**
 
 ## 2.1 分类不平衡（class imbalance）
 
