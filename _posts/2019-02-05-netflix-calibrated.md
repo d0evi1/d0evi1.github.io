@@ -141,7 +141,12 @@ $$
 
 在关注accuracy的推荐与calibration间的trade-off，可以通过等式(6)的$$\lambda$$进行控制。我们会考虑calibration作为推荐列表的一个重要属性，如第5节所示，它会需要一个相当大的值$$\lambda$$。
 
-**寻找N个推荐电影的最优集合$$I^*$$是一个组合优化问题，它是NP-hard的**。在附录中，我们会描述该最优化问题的贪婪最优化（greedy optimization）等价于一个代理次模函数（surrogate submodular）函数的贪婪最优化。次模函数的贪婪最优化可以达到一个$$(1-1/e)$$的最优化保证，其中e是欧拉数。贪婪最优化会从empty set开始，迭代式地每次添加一个电影i：在step n，当我们已经具有n-1个电影组成的集合$$I_{n-1}$$，对于集合$$I_{n-1} \cup \lbrace i \rbrace $$可以最大化等式(6)的电影i被添加进行来获得$$I_n$$。该贪婪方法具有额外好处。首先，它会生成一个关于电影的有序列表（ordered/ranked list）。第二，该贪婪方法在每个step产生的list在相同size的lists间是$$(1-1/e)$$最优的。即使我们可以生成一个关于N部电影的ranked list，用户可能只会看到前n部（n<N）的推荐，比如：剩余电影只会在下滑后在视见区（view-port）变得可见。除此之外，用户可能会自顶向下扫描关于N部电影的list。在两种情况下，次模函数的greedy optimization会自动保证推荐列表中每个sub-list的前n部电影(n<N)是(1-1/e)最优的。
+**寻找N个推荐电影的最优集合$$I^*$$是一个组合优化问题，它是NP-hard的**。在附录中，我们会描述该最优化问题的贪婪最优化（greedy optimization）等价于一个代理次模函数（surrogate submodular）函数的贪婪最优化。次模函数的贪婪最优化可以达到一个$$(1-1/e)$$的最优化保证，其中e是欧拉数。**贪婪最优化会从empty set开始，迭代式地每次添加一个电影i：在step n，当我们已经具有n-1个电影组成的集合$$I_{n-1}$$，对于集合$$I_{n-1} \cup \lbrace i \rbrace $$可以最大化等式(6)的电影i被添加进行来获得$$I_n$$**。该贪婪方法具有额外优点。
+
+- 首先，它会生成一个关于电影的有序列表（ordered/ranked list）。
+- 第二，该贪婪方法在每个step产生的list在相同size的lists间是$$(1-1/e)$$最优的。
+
+即使我们可以生成一个关于N部电影的ranked list，用户可能只会看到前n部（n<N）的推荐，比如：剩余电影只会在下滑后在视见区（view-port）变得可见。除此之外，用户可能会自顶向下扫描关于N部电影的list。在两种情况下，次模函数的greedy optimization会自动保证推荐列表中每个sub-list的前n部电影(n<N)是(1-1/e)最优的。
 
 注意，该方法允许一个电影i根据可能的多个genres g进行加权，如等式(2)和(3)中所用的$$p(g \mid i)$$。再者，如果你吉根据多个不同的categories（例如：genres、subgenres、languages、movie-vs.-TV-show, etc）对推荐列表进行calibrate，会为每个category添加一个独立的calibration项 $$C_{KL}^{(category)}$$，并使用期望的weight/importance $$\lambda^{(category)}$$。生成的多个次模函数的和(sum)仍是一个次模函数，因而最优化问题仍然有效。
 
