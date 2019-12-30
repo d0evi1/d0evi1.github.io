@@ -55,7 +55,7 @@ Calibration在机器学习中是一个通用概念，最近在机器学习算法
 之前的示例中，我们已知：$$p(g_r \mid u)$$=0.7 （r: romance movies即爱情片），$$p(g_a \mid u)=0.3$$ （a: action movies即动作片）。假设两个电影集合genres是相互排斥的，用户u播放在genre g上的电影i的概率可以通过以下得到：$$p(i \mid u) = p(i \mid g) \cdot p(g \mid u)$$。为了得到最佳预测accuracy，我们已经找到具有被该用户播放的最高概率$$p(i \mid u)$$的10部电影i。我们考虑下：最可能播放的动作片$$i_{g_a,1}$$（例如：在动作片中排序第1的），以及最可能播放的第10个爱情片$$i_{g_r,10}$$，我们会获得：
 
 $$
-\frac{p(i_{g_r,10} | u)}{p(i_{g_a,1} | u)} = \underbrace{\frac{p(i_{g_r,10} | r_r)}{p(i_{g_a,1} | g_a)}}_{\approx 1/2.1} \cdot \underbrace{\frac{p(g_r | u)}{p(g_a | u)}}_{=\frac{0.7}{0.3} \approx 2.33} \approx \frac{2.33}{2.1} > 1
+\frac{p(i_{g_r,10} | u)}{p(i_{g_a,1} | u)} = \underbrace{\frac{p(i_{g_r,10} | g_r)}{p(i_{g_a,1} | g_a)}}_{\approx 1/2.1} \cdot \underbrace{\frac{p(g_r | u)}{p(g_a | u)}}_{=\frac{0.7}{0.3} \approx 2.33} \approx \frac{2.33}{2.1} > 1
 $$
 
 ...(1)
@@ -64,7 +64,7 @@ $$
 
 ## 2.3 LDA
 
-该动行示例受LDA的启发。LDA描述了一个用户会以一个2-step方式来选择一个电影：用户首先选择一个genre(topic)，然后在该选中genre中选择一个电影(word)。提到LDA有三个原因。
+该示例受LDA的启发。LDA描述了一个用户会以一个2-step方式来选择一个电影：用户首先选择一个genre(topic)，然后在该选中genre中选择一个电影(word)。提到LDA有三个原因。
 
 首先，如果我们假设，真实用户选择一部电影会遵循2-step过程，那么LDA模型是合适的模型。当该LDA被训练时，它可以捕获每个用户兴趣的正确平衡(correct balance)，以及正确的比例。因而，当遵循该生成过程时，会得到平衡的推荐，推荐列表会通过一次添加一个title的方式迭代式生成：首先，为用户u学到的genre分布$$p(g \mid u)$$中抽样一个genre g，接着根据genre g从学到的分布$$p(i \mid g)$$中抽样一个电影i。与根据$$p(i \mid u)$$进行ranking的电影相对比，Sampling出来的电影会产生更低的accuracy，其中: $$p(i \mid u) = \sum_g p(i \mid g) \cdot p(g \mid u)$$。原因是，具有较小概率值$$p(i \mid u)$$的电影i，会在接近推荐列表的top位置的被抽样到。相反的，ranking是deterministic的，并能保证：用户u喜欢具有最大概率$$p(i \mid u)$$的电影i，会在推荐列表的top，很明显：如果学到的概率$$p(i \mid u)$$被正确估计，那么可以在test data上达到最佳的accuracy。
 
