@@ -60,7 +60,7 @@ $$
 
 ...(1)
 
-其中，我们从MovieLens 20 Million数据集中确定值2.1. 在该示例的变种中，第10部爱情片要比最好的动作片具有一个更大的播放概率。因此，根据accuracy，待推荐的最优的10个titles可以全是爱情片title（没有一部动作片）。
+其中，值2.1通过MovieLens 20 Million数据集[13]确定。**在该示例的变种中，第10部爱情片要比最好的动作片具有一个更大的播放概率**。因此，根据accuracy，待推荐的最优的10个titles可以全是爱情片title（没有一部动作片）。
 
 ## 2.3 LDA
 
@@ -74,7 +74,7 @@ $$
 
 在本节中，我们描述了关于推荐电影列表的量化calibration degree的指标。我们考虑两个分布，两者都基于每个电影i的genres g分布$$p(g \mid i)$$，假设如下：
 
-- $$p(g \mid u)$$：由用户u在过去播放过的电影集合H在genres g上的分布:
+- $$p(g \mid u)$$：用户u在过去播放过的电影集合H在genres g上的分布:
 
 $$
 p(g | u) = \frac{\sum\limits_{i \in H} w_{u,i} \cdot p(g | i)}{\sum\limits_{i \in H} w_{u,i}}
@@ -84,7 +84,7 @@ $$
 
 其中，$$w_{u,i}$$是电影i的weight，例如：用户u最近播放有多近。等式(7)有一个正则版本。
 
-- $$q(g \mid u)$$：推荐给user u的电影列表在genres g上的分布：
+- $$q(g \mid u)$$：推荐给user u的电影列表I在genres g上的分布：
 
 $$
 q(g | u) = \frac{\sum\limits_{i \in I} w_{r(i)} \cdot p(g | i)}{\sum\limits_{i \in I} w_{r(i)}}
@@ -94,7 +94,7 @@ $$
 
 其中，I是推荐电影的集合。电影i的weight会因为它在推荐中的rank r(i)被表示为$$w_{r(i)}$$。可能选项包括在ranking指标中所使用的weighting schemes，比如：MRR和nDCG.
 
-有许多方法来决定这两个分布$$q(g \mid u)$$和$$p(g \mid u)$$是否相似。为了说明这样的分布从有限数据中（由N个推荐电影和M个被该用户播放电影组合）估计得到，使用零假设：两个分布是相同的。这通常将一个独立检验转化成在两个随机变量上的多项分布：genres g，以及一个影响两个电影集合(I和H)的变量。给定：N或M可能实际很小，这对于exact tests是必需的（像多项检验和fisher test）。这些tests在实际上是不可计算的。一种计算高效的方法是：渐近检验（asymptotic tests），比如：G-test或$$x^2$$-test。
+**有许多方法来决定这两个分布$$q(g \mid u)$$和$$p(g \mid u)$$是否相似**。为了说明这样的分布从有限数据中（由N个推荐电影和M个被该用户播放电影组合）估计得到，使用零假设：两个分布是相同的。这通常将一个独立检验转化成在两个随机变量上的多项分布：genres g，以及一个影响两个电影集合(I和H)的变量。给定：N或M可能实际很小，这对于exact tests是必需的（像多项检验和fisher test）。这些tests在实际上是不可计算的。一种计算高效的方法是：渐近检验（asymptotic tests），比如：G-test或$$x^2$$-test。
 
 我们不会计算p值，我们会忽略有限数据的大小N和M的影响，直接计算分布$$p(g \mid u)$$和$$q(g \mid u)$$。为了该目的，我们会使用KL散度作为calibration metric $$C_{KL}(p, q)$$：
 
@@ -104,7 +104,7 @@ $$
 
 ...(4)
 
-其中，我们会使用$$p(g \mid u)$$作为target分布。如果$$q(g \mid u)$$与它相似，$$C_{KL}(p, q)$$会具有小值。给定，对于一个genre g，如果$$q(g \mid u)=0$$并且$$p(g \mid u) > 0$$，则KL散度会背离（diverge），我们会使用下式替代：
+其中，我们会使用$$p(g \mid u)$$作为target分布。**如果$$q(g \mid u)$$与它相似，$$C_{KL}(p, q)$$会具有小值**。给定，对于一个genre g，如果$$q(g \mid u)=0$$并且$$p(g \mid u) > 0$$，则KL散度会背离（diverge），我们会使用下式替代：
 
 $$
 \hat{q}(g | u ) = (1-\alpha) \cdot q(g | u) + \alpha \cdot p(g | u)
