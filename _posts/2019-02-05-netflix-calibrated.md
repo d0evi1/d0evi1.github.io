@@ -10,7 +10,7 @@ netflix在recsys 2018的paper《Calibrated Recommendations》提出了Calibrated
 
 # 抽要
 
-当一个用户观看了70个爱情片(romance)和30个动作片(action)时，那么很合理的期望电影推荐的个性化列表中由70%的爱情片和30%的动作片组成。这是个很重要的特性，称为“校准(calibration)”，最近在机器学习的关于公平性（fairness）的背景下重新获得关注。在items推荐列表中，calibration可以保证：一个用户的多个（过往）兴趣领域，受它对应的占比影响。Calibration特别重要，因为推荐系统在离线环境下进着accuracy(比如：ranking metrics)进行最优化，会很容易导致这样的现象：一个用户的兴趣过少，推荐会被用户的主兴趣"挤出"——。这可以通过“校正推荐（calibrated recommendations）”来阻止。为了这个目的，我们会描述用于量化calibration程度（degree）的指标，以及一种简单有效的re-ranking算法来对推荐系统的输出进行后处理（post-processing）。
+当一个用户观看了70个爱情片(romance)和30个动作片(action)时，那么很合理的期望结果是：电影推荐的个性化列表中由70%的爱情片和30%的动作片组成。**这是个很重要的特性，称为“校准(calibration)”**，最近在机器学习的关于公平性（fairness）的背景下重新获得关注。在items推荐列表中，calibration可以保证：一个用户的多个（过往）兴趣领域，受它对应的占比影响。Calibration特别重要，因为推荐系统在离线环境下通常对accuracy(比如：ranking metrics)进行最优化，会**很容易导致这样的现象：一个用户的兴趣过少，推荐会被用户的主兴趣"挤得满满的"**——。这可以通过“校正推荐（calibrated recommendations）”来阻止。为了这个目的，我们会描述用于量化calibration程度（degree）的指标，以及一种简单有效的re-ranking算法来对推荐系统的输出进行后处理（post-processing）。
 
 # 1.介绍
 
