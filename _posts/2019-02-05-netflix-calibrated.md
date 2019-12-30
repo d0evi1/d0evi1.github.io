@@ -112,13 +112,13 @@ $$
 
 ...(5)
 
-其中，小值$$\alpha > 0$$，以便$$q \approx \hat{q}$$。在我们的实验中，我们会使用$$\alpha = 0.01$$。KL散度具有许多属性，正是在推荐中calibration degree的量化所需：
+其中，$$\alpha > 0$$，$$\alpha$$值小，以便$$q \approx \hat{q}$$。在我们的实验中，我们会使用$$\alpha = 0.01$$。KL散度具有许多属性，正是在推荐中calibration degree的量化所需：
 
-- (1) 完美的校正(perfect calibration)时KL为0: $$p(g \mid u)  = \hat{q}(g \mid u)$$
-- (2) 当$$p(g \mid u)$$很小时，对于在$$p(g \mid u)$$和$$\hat{q}(g \mid u)$$间的小差异很敏感。例如，如果一个用户播放的genre只有2%的时间，推荐该genre 1%在KL散度上会被认为是一个较大的差异。比一个genre被播放50%，但推荐只有49%的差异要大。
+- (1) 完美校正(perfect calibration)时，KL为0：$$p(g \mid u)  = \hat{q}(g \mid u)$$
+- (2) 当$$p(g \mid u)$$很小时，对于在$$p(g \mid u)$$和$$\hat{q}(g \mid u)$$间的微小差异很敏感。例如，如果一个用户播放的genre只有2%的时间，推荐该genre 1%在KL散度上会被认为是一个较大的差异。比起（一个genre被播放50%，但推荐只有49%）的case差异要更大。
 - (3) 它喜欢更平均、并且更不极端的分布：如表1所示，如果一个用户播放一个genre 30%的时间，推荐31%该genre 会被认为要比29%要好。
 
-这些属性确保了该用户很少播放的genres也可以在推荐列表中相应的比例被影响。作为KL散度的替代，你也可以使用其它f-散度，比如：在p和q间的Hellinger距离，$$C_H(p,q) = H(p,q) = \| \sqrt{p} - \sqrt{p} \|_2 / 2$$，其中$$\| \cdot \|_2$$表示概率向量(跨geners)的2-norm。Hellinger距离在零值上是定义良好的；它也对p和q间的小差异敏感，并且当p很小时，degree会小于KL散度。
+这些属性确保了该用户很少播放的genres也可以在推荐列表中相应的比例被影响。作为KL散度的替代，你也可以使用其它f-散度，比如：在p和q间的Hellinger距离，$$C_H(p,q) = H(p,q) = \| \sqrt{p} - \sqrt{q} \|_2 / 2$$，其中$$\| \cdot \|_2$$表示概率向量(跨geners)的2-norm。Hellinger距离在零值上是定义良好的；它也对p和q间的小差异敏感，并且当p很小时，degree会小于KL散度。
 
 整体calibration metric C可以通过跨所有users进行$$C(p, q)$$平均。
 
