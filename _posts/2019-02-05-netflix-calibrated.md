@@ -148,7 +148,7 @@ $$
 
 即使我们可以生成一个关于N部电影的ranked list，用户可能只会看到前n部（n<N）的推荐，比如：剩余电影只会在下滑后在视见区（view-port）变得可见。除此之外，用户可能会自顶向下扫描关于N部电影的list。在两种情况下，次模函数的greedy optimization会自动保证推荐列表中每个sub-list的前n部电影(n<N)是(1-1/e)最优的。
 
-注意，该方法允许一个电影i根据可能的多个genres g进行加权，如等式(2)和(3)中所用的$$p(g \mid i)$$。再者，如果你吉根据多个不同的categories（例如：genres、subgenres、languages、movie-vs.-TV-show, etc）对推荐列表进行calibrate，会为每个category添加一个独立的calibration项 $$C_{KL}^{(category)}$$，并使用期望的weight/importance $$\lambda^{(category)}$$。生成的多个次模函数的和(sum)仍是一个次模函数，因而最优化问题仍然有效。
+注意，该方法允许一个电影i根据可能的多个genres g进行加权，如等式(2)和(3)中所用的$$p(g \mid i)$$。再者，如果你根据多个不同的categories（例如：genres、subgenres、languages、movie-vs.-TV-show, etc）对推荐列表进行calibrate，会为每个category添加一个独立的calibration项 $$C_{KL}^{(category)}$$，并使用期望的weight/importance $$\lambda^{(category)}$$。生成的多个次模函数的和(sum)仍是一个次模函数，因而最优化问题仍然有效。
 
 # 5.相关概念
 
@@ -158,9 +158,9 @@ Calibration在机器学习中常被使用，主要在分类中，通常发现简
 
 ## 5.1 Diversity
 
-Diversity在许多papers中有定义，例如：最小冗余（minimal redundancy）或推荐items间的相似度，可以帮助避免推荐中100%都是爱情片：假设只有两种电影，最diverse的推荐为50%的爱情片和50%的动作片。如果有额外的电影类型，推荐的diversity可以通过推荐用户没观看过的其它genres来增加，比如：儿童片或记录片。Deversity不会保证将动作片的比例从0%增加到30%，从而影响用户的兴趣度。如果在accuracy和diversity之间的trade-off被选定，你可以获得well-calibrated推荐。**这在实际中很难达到，因为该trade-off对于每个用户是不同的**。这表明，diversity的目标并不使用合适比例来直接影响一个用户的多种兴趣。这与calibrated推荐有一个主要的不同之处。
+Diversity在许多papers中有定义，例如：最小冗余（minimal redundancy）或推荐items间的相似度，可以帮助避免推荐中100%都是爱情片：假设只有两种电影，最diverse的推荐为50%的爱情片和50%的动作片。如果有额外的电影类型，推荐的diversity可以通过推荐用户没观看过的其它genres来增加，比如：儿童片或记录片。Diversity不会保证将动作片的比例从0%增加到30%，从而影响用户的兴趣度。如果在accuracy和diversity之间的trade-off被选定，你可以获得well-calibrated推荐。**这在实际中很难达到，因为该trade-off对于每个用户是不同的**。这表明，diversity的目标并不使用合适比例来直接影响一个用户的多种兴趣。这与calibrated推荐有一个主要的不同之处。
 
-**第二个关键不同点是：diversity可以帮助用户逃脱可能的filter bubble现象，因为它可能包括用户未曾播放过的genres。而calibrated recommendations并没有提供这个重要特性**。这触使我们对calibrated推荐进行一个简单扩展，以便从用户过往兴趣之外的genres的电影可以被添加到推荐列表中：假设$$p_0(g)$$表示一个先验分布，对于所有genres g会使用正值，从而提升在推荐中的diversity——两个明显选择是：均匀分布（uniform distribution）或在所有用户genre分布上的平均。这种diversity-promoting先验$$p_0(g)$$以及calibration target $$p(g \mid u)$$的加权平均：
+**第二个关键不同点是：diversity可以帮助用户逃脱可能的filter bubble现象，因为它可能包括用户未曾播放过的genres。而calibrated recommendations并没有提供这个重要特性**。这驱使我们对calibrated推荐进行一个简单扩展，以便从用户过往兴趣之外的genres的电影可以被添加到推荐列表中：假设$$p_0(g)$$表示一个先验分布，对于所有genres g会使用正值，从而提升在推荐中的diversity——两个明显选择是：均匀分布（uniform distribution）、或所有用户在genre分布上的平均。这种diversity-promoting先验$$p_0(g)$$以及calibration target $$p(g \mid u)$$的加权平均：
 
 $$
 \bar{p}(g|u) = \beta \cdot p_0(g) + (1-\beta) \cdot p(g | u)
@@ -170,13 +170,13 @@ $$
 
 其中，参数$$\beta \in [0, 1]$$，决定了在diversity和calibration间的trade-off。这种extended calibration probability $$\bar{p}(g \mid u)$$可以被用于替代$$p(g \mid u)$$。
 
-在许多paper中，如果一个list只有少量的冗余度或者 在items相似度低，就认为是diverse的。已经提出的大多数方法会生成这样的diverse推荐，比如：[4,15,31,32]，包括DPP(行列式点过程)【8，11】，次模最优化【1，2，19】。
+在许多paper中，**如果一个list只有少量的冗余度或者 在items相似度低，就认为是diverse的**。已经提出的大多数方法会生成这样的diverse推荐，比如：[4,15,31,32]，包括DPP(行列式点过程)【8，11】，次模最优化【1，2，19】。
 
-第二条研究线是，在还未选择任意n-1个items ranked/displayed上（比如：一个浏览模型），对用户从推荐列表中选择第n个item的概率进行建模。该思想会产生ranking metric（称为：ERR），也被用于生成一个更diverse ranked list的方法中。
+**第二条研究线是：在还未选择任意n-1个items ranked/displayed上（比如：一个浏览模型），对用户从推荐列表中选择第n个item的概率进行建模**。该思想会产生ranking metric（称为：ERR），也被用于生成一个更diverse ranked list的方法中。
 
 只有少量paper解决了该重要的issue：推荐会以适当比例影响用户的多种兴趣[9,25,26]，我们会在下面讨论。
 
-比例性的思想首先在[9]中关于搜索结果多样化中提出。在[9]中，提出的指标，称为DP，本质上是一个在分布$$p(g \mid u)$$和$$g(g \mid u)$$间的平方差的修改版本。当它满足calibration metrics的性质1时，它不会展示其它两个性质：正如如表1所示的target proportions为：60%:40%，在两个genres中具有7:3会接收更不平衡的推荐，当采用相同值DP=1，正如均匀5:5。。。假设：两者都脱离6:4的理想推荐（将某一电影放到另一个genre中），根据性质（3），5:5可以比7:3接收一个更好的calibration score。性质（2）也不会满足，因为当10部电影被评建时，对于1部电影是如何与target分布相背离的程度，DP=1——理想上，该得分对于target distribution 70%:30%会更糟糕，因为它比60%:40%更极端。注意，KL散度会满足表1的性质。在[9]中，生成一个proportional list的算法会使用用于在选举(election)之后坐位安排(seat assignment)的过程，因此，每个party的坐位会与它们收来的投票数(votes)成比例。他们为该过程(procedure)开发了一个概率化版本来解决items属于多个类目的问题，并发现该方法的效果要好于在实验中的原始实验。在完美比例不能达到的情况下，会发现具有某些偏差(deviations)的一个近似解，它们的算法必须将偏差(deviaitons)看成与现有metric不同，因为他们在概念上是无关的。关于该近似解是否服从在calibrated recommendations中所期望的属性是不明显的。
+比例性的思想首先在[9]中关于搜索结果多样化中提出。在[9]中，提出的指标，称为DP，本质上是一个在分布$$p(g \mid u)$$和$$g(g \mid u)$$间的平方差的修改版本。当它满足calibration metrics的性质1时，它不会表现出其它两个性质：如表1所示，对于target proportions为：60%:40%，当两个genres中具有7:3会接收更不平衡的推荐，但会与均匀5:5的情况一样，得到相同的DP=1。假设：两者都脱离6:4的理想推荐（将某一电影放到另一个genre中），根据性质（3），5:5可以比7:3接收一个更好的calibration score。性质（2）也不会满足，因为当10部电影被评建时，对于1部电影是如何与target分布相背离的程度，DP=1——理想上，该得分对于target distribution 70%:30%会更糟糕，因为它比60%:40%更极端。注意，KL散度会满足表1的性质。在[9]中，生成一个proportional list的算法会使用用于在选举(election)之后坐位安排(seat assignment)的过程，因此，每个party的坐位会与它们收来的投票数(votes)成比例。他们为该过程(procedure)开发了一个概率化版本来解决items属于多个类目的问题，并发现该方法的效果要好于在实验中的原始实验。在完美比例不能达到的情况下，会发现具有某些偏差(deviations)的一个近似解，它们的算法必须将偏差(deviaitons)看成与现有metric不同，因为他们在概念上是无关的。关于该近似解是否服从在calibrated recommendations中所期望的属性是不明显的。
 
 在[25]中，个性化多样性(personalized diversification)从次模化（submodularity）的角度解决。而他们在[25]中提出的一个次模目标函数（等式(2)），由一个log-sum项组成，与我们附录中的等式(8)相似，它与[25]中未描述的KL散度有关。在[25]中仍未讲明的是，该次模函数的实际目标是，推荐多个与它们的weights（例如：[25]中的CTR）成比例的item-categories。
 
