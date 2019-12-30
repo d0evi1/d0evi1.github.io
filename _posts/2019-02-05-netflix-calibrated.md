@@ -55,7 +55,7 @@ Calibration在机器学习中是一个通用概念，最近在机器学习算法
 之前的示例中，我们已知：$$p(g_r \mid u)$$=0.7 （r: romance movies即爱情片），$$p(g_a \mid u)=0.3$$ （a: action movies即动作片）。假设两个电影集合genres是相互排斥的，用户u播放在genre g上的电影i的概率可以通过以下得到：$$p(i \mid u) = p(i \mid g) \cdot p(g \mid u)$$。为了得到最佳预测accuracy，我们已经找到具有被该用户播放的最高概率$$p(i \mid u)$$的10部电影i。我们考虑最可能的动作片$$i_{g_a,1}$$（例如：在动作片中排序第1的），接着第10个最可能的爱情片$$i_{g_r,10}$$，我们会获得：
 
 $$
-\frac{p(i_{g_r,10} | u)}{p(i_{g_a,1} | u)} = \frac{p(i_{g_r,10} | r_r)}{p(i_{g_a,1} | g_a)} \cdot \frac{p(g_r | u)}{p(g_a | u)} \approx \frac{2.33}{2.1} > 1
+\frac{p(i_{g_r,10} | u)}{p(i_{g_a,1} | u)} = \underbrace{\frac{p(i_{g_r,10} | r_r)}{p(i_{g_a,1} | g_a)}}_{\approx 1/2.1} \cdot \underbrace{\frac{p(g_r | u)}{p(g_a | u)}}_{=\frac{0.7}{0.3} \approx 2.33} \approx \frac{2.33}{2.1} > 1
 $$
 
 (待补)
