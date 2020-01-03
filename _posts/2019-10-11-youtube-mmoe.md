@@ -12,18 +12,18 @@ youtube在2019公布了它的MMoE多目标排序系统《Recommending What Video
 
 # 摘要
 
-在本paper中，我们介绍了一个大规模多目标排序系统，用于在工业界视频分享平台上推荐下一个要观看的视频。该系统会面临许多挑战，包括：存在多个竞争性的排序目标（ranking objectives），以及在user feedback中的隐式选择偏差(implicit selection biases)。为了解决这些挑战，我们探索了多种软参数共享技术（soft-parameter sharing techniques），比如：Multi-gate Mixture-of-Experts，以便对多个排序目标进行有效最优化（optimize）。另外，我们会采用一个Wide&Deep框架来缓和选择偏差（selection biases）。我们演示了我们提出的技术可以在youtube推荐质量上产生有效提升。
+在本paper中，我们介绍了一个大规模多目标排序系统，用于在工业界视频分享平台上推荐下一个要观看的视频。该系统会面临许多挑战，包括：存在**多个竞争性的排序目标（ranking objectives）**，以及在user feedback中的**隐式选择偏差(implicit selection biases)**。为了解决这些挑战，我们探索了多种**软参数共享技术**（soft-parameter sharing techniques），比如：Multi-gate Mixture-of-Experts，以便对多个排序目标进行有效最优化（optimize）。另外，我们会采用一个**Wide&Deep框架**来减缓选择偏差（selection biases）。我们演示了我们提出的技术可以在youtube推荐质量上产生有效提升。
 
 # 介绍
 
-在本paper中，我们描述了一个关于视频推荐的大规模排序系统。也就是说，给定用户当前观看的一个视频，推荐该用户可能会观看和享受的下一个视频。通常推荐系统会遵循一个two-stage设计：candidate generation、ranking。该paper主要关注ranking。在该stage，推荐器会具有数百个候选，接着会应用一个复杂的模型来对它们进行排序，并将最可能观看的items推荐给用户。
+在本paper中，我们描述了一个关于视频推荐的大规模排序系统。也就是说，**给定用户当前观看的一个视频，推荐该用户可能会观看和享受的下一个视频**。通常推荐系统会遵循一个two-stage设计：candidate generation、ranking。该paper主要关注ranking。在该stage，推荐器会具有数百个候选，接着会应用一个复杂的模型来对它们进行排序，并将最可能观看的items推荐给用户。
 
 设计一个真实世界的大规模视频推荐系统充满挑战：
 
-- 通常有许多不同的、有时甚至有冲突的待优化目标。例如，我们想推荐用户点击率高、愿与朋友共享的、包括观看高的视频
-- 在该系统中通常有隐式偏差（implicit bias）。例如，一个用户通常点击和观看一个视频，仅仅只因为它的排序高，而不是因为用户最喜欢它。因此，从当前系统的数据生成来进行模型训练会是有偏的，这会造成(feedback loop)效果[33]。如何有效和高效地学习减少这样的biases是个开放问题。
+- 通常有许多不同的、有时甚至**有冲突的待优化目标**。例如，我们想推荐用户点击率高、愿与朋友共享的、包括观看高的视频
+- 在该系统中通常有**隐式偏差（implicit bias）**。例如，一个用户通常点击和观看一个视频，仅仅只因为它的排序高，而不是因为用户最喜欢它。因此，从当前系统的数据生成来进行模型训练会是有偏的，这会造成(feedback loop effect)效应[33]。如何有效和高效地学习减少这样的biases是个开放问题。
 
-为了解决这样的挑战，我们为ranking system提出了一个有效的多任务神经网络架构，如图1所示。它会扩展Wide&Deep模型，通过采用Multi-gate Mixture-of-Experts(MMoE) [30]来进行多任务学习。另外，它会引入一个浅层塔结构（shallow tower）来建模和移除选择偏差。我们会应用该结构到视频推荐中：给定当前用户观看的视频，推荐下一个要观看的视频。我们在实验和真实环境中均有较大提升。
+为了解决这样的挑战，我们为ranking system提出了一个有效的多任务神经网络架构，如图1所示。它会扩展Wide&Deep模型，通过采用**Multi-gate Mixture-of-Experts(MMoE) [30]**来进行多任务学习。另外，它会引入一个**浅层塔结构（shallow tower）**来建模和移除选择偏差。我们会应用该结构到视频推荐中：给定当前用户观看的视频，推荐下一个要观看的视频。我们在实验和真实环境中均有较大提升。
 
 <img src="http://pic.yupoo.com/wangdren23_v/1be77f49/1dec8cbc.jpg">
 
