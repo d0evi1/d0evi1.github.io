@@ -29,9 +29,9 @@ Accuracy指标不会看到该问题，因为它们被设计用来判断单个ite
 
 # 3.惊喜性（Serendipity）
 
-推荐系统中的Serendipity指的是：**接收到一个意料之外的item推荐**。与Serendipity相关的心理反应很难在指标上捕获。但如果去掉该构成，该概念的unexpectedness部分——（即：收到推荐的新颖性novelty）——仍然很难measure。该概念的反面即：ratability(可估的），则很容易measure。可以使用leave-n-out方法进行measure
+推荐系统中的Serendipity指的是：**接收到一个意料之外的item推荐**。**与Serendipity相关的心理反应很难在指标上捕获**。但如果去掉该构成，该概念的unexpectedness部分——（即：收到推荐的新颖性novelty）——仍然很难measure。该概念的反面即：ratability(可估的），则很容易measure。可以使用leave-n-out方法进行measure。
 
-我们可以将一个item的ratability定义为：在已知user profile的情况下，该item作为用户将消费的next item的概率。从机器学习的角度，具有最高ratability的item会成为next item。因此，推荐器算法在accuracy metrics打分良好。
+我们可以将一个item的ratability定义为：**在已知user profile的情况下，该item作为用户将消费的next item的概率**。从机器学习的角度，具有最高ratability的item会成为next item。因此，推荐器算法在accuracy metrics打分良好。
 
 隐式假设是：一个用户总是会对具有最高ratability的items感兴趣。而**该假设在分类问题中是true的，但在推荐系统(recomenders)中并不总是true的**。用户通常会对那些不可预料的items的推荐进行judge。例如，一个在线音乐商店的推荐系统，会使用一个User-User CF算法。最常见的推荐是： the Beatle乐队的“White Album”。从accuracy的角度，这些推荐是十分准确的（dead-on）：大多数用户非常喜欢该专辑。但从有用性(usefulness)的角度，该推荐是完全失败的：每个用户已经拥有了“White Album”、或者明确表示不买它。尽管它的估计分非常高，但“White Album”推荐几乎从不会被用户播放，因为它们几乎没价值。
 
