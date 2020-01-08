@@ -13,23 +13,23 @@ Recommender Systems》中提出accurate是不够的：
 
 # 1.介绍
 
-假设你正使用一个关于旅游的推荐系统。假设它给出的所有推荐都是你已经旅行过的地方。即使该系统在ranking上做的很好（所有的地方都根据你的访问偏好排序），这仍角是一个很差的推荐系统。你会使用这样的系统吗？
+假设你正使用一个关于旅游的推荐系统。**假设它给出的所有推荐都是你已经旅行过的地方**，即使该系统在ranking上做的很好（所有的地方都根据你的访问偏好排序），这仍是一个很差的推荐系统。你会使用这样的系统吗？
 
-不幸的是，我们当前就是这样测试我们的推荐系统的。在标准方法中，旅游推荐器会对推荐新地方进行惩罚（而非对已经访问过的地方进行惩罚）。当前的accuracy指标（比如：MAE），会将算法的预测与用户对一item的评分进行比较来衡量推荐算法效果。使用这些指标的最常用技术是：留一法（leave-n-out方法）。本质上，我们会对推荐用户已经访问过的地方进行奖励（reward），而非对用户将要访问的新地方进行奖励。
+不幸的是，我们当前就是这样测试我们的推荐系统的。**在标准方法中，旅游推荐器会对推荐新地方进行惩罚（而非对已经访问过的地方进行惩罚）**。当前的accuracy指标（比如：MAE），会将算法的预测与用户对item的评分进行比较来衡量推荐算法效果。使用这些指标的最常用技术是：留一法（leave-n-out方法）。本质上：**我们会对推荐用户已经访问过的地方进行奖励（reward），而非对用户将要访问的新地方进行奖励**。
 
 # 2.Similarity
 
-通常，推荐列表中会包含相似的items。
+通常，**推荐列表中会包含相似的items**。
 
-Accuracy指标不会看到该问题，因为它们被设计用来判断单个item预测的accuracy；他们不会判断整个推荐列表的内容。不幸的是，用户是与这样的列表进行交互的。所有推荐是在当前推荐列表、以及之前用户已经看过的列表的上下文中做出的。该推荐列表应作为一个整体进行评判，而非作为各个单独items的一个集合。
+Accuracy指标不会看到该问题，因为它们被设计用来判断单个item预测的accuracy；**他们不会判断整个推荐列表的内容**。不幸的是，用户是与这样的列表进行交互的。所有推荐是在当前推荐列表、以及之前用户已经看过的列表的上下文中做出的。该推荐列表应作为一个整体进行评判，而非作为各个单独items的一个集合。
 
-解决该问题的一个方法是：[Ziegler 2005]：推荐列表的Intra-List Similarity Metric和Topic Diversification。返回的列表可以进行变更（增加/减小diversity）。结果表明，变更后的列表在accuracy上更差，但用户更喜欢变更后的列表。
+解决该问题的一个方法是：[Ziegler 2005]：推荐列表的Intra-List Similarity Metric和Topic Diversification。返回的列表可以进行变更（增加/减小diversity）。结果表明，**变更后的列表在accuracy上更差，但用户更喜欢变更后的列表**。
 
 依赖于用户的意图，出现在该list中的items组合，对用户对推荐的满意度的影响要超过item accuracy的变更。
 
 # 3.惊喜性（Serendipity）
 
-推荐系统中的Serendipity指的是，接收到一个意料之外的item推荐。与Serendipity相关的心理反应很难在指标上捕获。但如果去掉该构成，该概念的unexpectedness部分——（即：收到推荐的新颖性novelty）——仍然很难measure。该概念的反面即：ratability(可估的），则很容易measure。可以使用leave-n-out方法进行measure
+推荐系统中的Serendipity指的是：**接收到一个意料之外的item推荐**。与Serendipity相关的心理反应很难在指标上捕获。但如果去掉该构成，该概念的unexpectedness部分——（即：收到推荐的新颖性novelty）——仍然很难measure。该概念的反面即：ratability(可估的），则很容易measure。可以使用leave-n-out方法进行measure
 
 我们可以将一个item的ratability定义为：在已知user profile的情况下，该item作为用户将消费的next item的概率。从机器学习的角度，具有最高ratability的item会成为next item。因此，推荐器算法在accuracy metrics打分良好。
 
