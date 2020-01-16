@@ -108,6 +108,10 @@ $$
 
 根据[10]，$$a_i$$是一个item正则权重，它与item流行度成反比。矩阵V和D可以使用SGA来最大化log似然进行学习。GA的一个step需要计算一个对称矩阵($$L_i$$，其中I是gradient step的相应item set)的行列式，它可以使用 optimized CW-like algorithm算法来达到，复杂度为：$$O(f^3)$$或$$O(f^{2.373})$$，其中，f对应于在I中的items数目。用于学习所使用的最优化算法如算法1所示。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/dc66c9d80dbbc0a23e9e42cb601d032b713cad057df59da75416aef665e839afc61dc96db4754248c8ed622916effae0?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=a1.jpg&amp;size=750">
+
+算法1
+
 ## 3.3 Tensorized DPP
 
 我们现在提出了对之前模型的一个修改版本，它更适合basket completion任务。为了这样做，对于basket completion场景，我们加强logistic DPP，其中我们对概率建模：用户将基于已经出现在shooping basket中的items来购买一个指定额外的item。我们使用一个tensor来表示它，目标是预测用户是否会基于basket来购买一个给定的candidate target item。该tensor的每个slice对应于一个candidate target item。在该setting中，对于在catalog p中的item （减去basket中已经存在的items），会存在越来越多的问题待解决。为每个待推荐的item学习一个kernel，每个item会与其它所有items相独立，在实际上是不可能的，会存在稀疏性问题。每个item只在baskets中的一小部分出现，因而每个kernel只会接受一小部分数据来学习。然而，所有items间并不完全相互独立。为了解决稀疏性问题，受RESCAL分解的启发，我们使用一个low-rank tensor。我们使用一个cubic tensor $$K \in R^{p \times p \times p }$$，其中K的每个slice $$\tau$$(标为：$$K_{\tau}$$)是candidate item (low-rank) kernel。通过假设：tensor K是low-rank的，我们可以实现在每个item间学到参数的共享，以如下等式所示：
@@ -118,7 +122,13 @@ $$
 
 ...(7)
 
-其中，$$V \in R^{p \times r}$$是item latent factors，它对所有candidates items是共用的，$$R_{\tau} \in R^{r \times r}$$是一个candidate item指定的matrix，会建模每个candidate item间的latent components的交叉。为了对candidate items与已经在basket中的items间的自由度进行balance，我们进一步假设：$$R_{\tau}$$是一个对角矩阵。因此，$$R_{\tau}$$的对角向量会建模每个candidate item的latent factors，item的latent factors可以被看成是在每个latent factor上的产品的相关度。正如在matrix D的case，在$$R_{\tau}$$上的平方指数（squared exponent）可以确保我们总是有一个合理的kernel。图1展示了factorization的一个图示。candidate item $$\tau$$的概率与已经在basket中的items set I是相关的：
+其中，$$V \in R^{p \times r}$$是item latent factors，它对所有candidates items是共用的，$$R_{\tau} \in R^{r \times r}$$是一个candidate item指定的matrix，会建模每个candidate item间的latent components的交叉。为了对candidate items与已经在basket中的items间的自由度进行balance，我们进一步假设：$$R_{\tau}$$是一个对角矩阵。因此，$$R_{\tau}$$的对角向量会建模每个candidate item的latent factors，item的latent factors可以被看成是在每个latent factor上的产品的相关度。正如在matrix D的case，在$$R_{\tau}$$上的平方指数（squared exponent）可以确保我们总是有一个合理的kernel。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/cd6c888b5f291c25ea9371bb18711d1c728944a80f25b6138c6067954d4a358df5f27673ab8de376583d273d0a7bbabc?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
+
+图1
+
+图1展示了factorization的一个图示。candidate item $$\tau$$的概率与已经在basket中的items set I是相关的：
 
 $$
 P(y_{\tau} = 1 | I) = \sigma (w det K_{\tau, I} = 1 - exp(-w det K_{\tau,I})
@@ -133,6 +143,10 @@ g = \sum\limits_{m=1}^M log P(y_{\tau} | I_m) - \frac{a_0}{2} a_i (\| V_i \|^2 +
 $$
 
 其中，每个observation m与一个candidate item有关，$$I_m$$是与一个observation相关的basket items的set。由于之前的描述，矩阵V, D，以及$$(R_{\tau})_{\tau \in \lbrace 1, \cdots, p\rbrace}$$通过使用SGA最大化log似然学到。正如logistic DPP模型，gradient ascent的一个step需要计算对称矩阵 $$L_I$$的逆和行列式，会产生$$O(f^{2.373})$$的复杂度（I中items数目为f）。算法2描述了该算法。关于最优化算法的细节详见附录。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/8cc8fb24c587fe9ec0d5fc3ecef6bfae1621e3885f97fbe377be4a88d6da10b5fe417457a3040924bfdca39c2f093865?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=a2.jpg&amp;size=750">
+
+算法2
 
 **泛化到高阶交叉**。在basket completion应用中，尝试同时推荐多个items挺有意思的。这可以使用一个贪婪方法来完成。也就是说，我们首先使用一个初始产品（initial product）来补充basket，并将augmented basket看成是一个新的basket，接着补充它。一种更直接的方法是，更适合捕获items间的高阶交叉，这可以泛化等式(7)。我们提出了一种高阶版本的模型，将来会对该模型进行效果评估。假设：d是要推荐的items数目，$$\tau = [\tau_1, \cdots, \tau_d] \in [p]^d$$。我们接着可以将kernel $$K_{\tau}$$定义为：
 
