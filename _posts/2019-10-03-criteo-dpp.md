@@ -10,23 +10,23 @@ criteo也开放了它们的dpp方法:《Tensorized Determinantal Point Processes
 
 # 摘要
 
-DPP在机器学习中的关注度越来越高，因为它可以在组合集合上提供一种优雅的参数化模型。特别的，在DPP中的所需的参数数目只与ground truth(例如：item catalog)的size成平方关系，而items的数目增长是指数式的。最近一些研究表明，DPPs对于商品推荐和（basket completion）任务 来说是很高效的模型，因为他们可以同时在一个集合中解释diversity和quality。我们提出了一种增加的DPP模型：tensorized DPP，它特别适合于basket completion任务。我们利用来自张量分解（tensor factorization）的思想，以便定制化模型来用于next-item basket completion任务上，其中next item会在该模型的一个额外维度中被捕获。我们在多个真实数据集上评估了该模型，并找出：tensorized DPP在许多settings中，比许多SOTA模型提供了大量更好的predictive quality。
+DPP在机器学习中的关注度越来越高，因为它可以在组合集合上提供一种优雅的参数化模型。特别的，**在DPP中的所需的参数数目只与ground truth(例如：item catalog)的size成平方关系**，而items的数目增长是指数式的。最近一些研究表明，DPPs对于商品推荐和（basket completion）任务 来说是很高效的模型，因为他们可以同时在一个集合中解释diversity和quality。我们提出了一种增强的DPP模型：tensorized DPP，它特别适合于basket completion任务。我们利用来自张量分解（tensor factorization）的思想，以便将模型进行定制用在next-item basket completion任务上，其中next item会在该模型的一个额外维度中被捕获。我们在多个真实数据集上评估了该模型，并找出：tensorized DPP在许多settings中，比许多SOTA模型提供了更好的predictive quality。
 
 # 1.介绍
 
-在averge shooping basket中items数的增加，对于在线零售商来说是一个主要关注点。有许多大量可能的处理策略中，本工作主要关注于，算法会提出一个items集合，它们能适合补全用户的当前shopping basket。
+在averge shooping basket中items数的增加，对于在线零售商来说是一个主要关注点。该问题存在许多处理策略。而本工作主要关注于：算法会生成一个items集合，它们能适合补全用户的当前shopping basket。
 
 Basket analysis和completion是机器学习中非常老的任务。许多年来，关联规则挖掘（association rule mining）是SOTA的。尽管该算法具有不同变种，主要的准则是涉及到：通过统计在过往observations中的共现，来计算购买一个额外商品的条件概率。由于计算开销和健壮性，现代方法更喜欢i2i CF，或者使用LR基于二分类购买得分来预测一个用户是否会构买一个item。
 
-标准CF方法必须被扩展到能正确捕获商品间的diversity。在basket completion中，需要插入一定形式的diversity，因为推荐过于相似的items给用户并不好。实践者经常通过添加constraints到items推荐集合中来缓和该问题。例如，当使用类目信息时，在裤子被添加到basket时可以强制推荐相匹配的鞋子，而如果按天然的共同出售(co-sale) patterns会导致其它裤子的推荐。在这种情况中，diversity推荐的出现不会通过学习算法直接驱动，但可以通过side information和专家知识。Ref【28】提出了一种有效的Bayesian方法来学习类目的权重，当类目已知时。
+标准CF方法必须被扩展到能正确捕获商品间的diversity。**在basket completion中，需要插入一定形式的diversity，因为推荐过于相似的items给用户并不好**。实践者经常通过添加constraints到items推荐集合中来缓和该问题。例如，当使用类目信息时，在裤子被添加到basket时可以强制推荐相匹配的鞋子，而如果按天然的共同出售(co-sale) patterns会导致其它裤子的推荐。在这种情况中，diversity推荐的出现不会通过学习算法直接驱动，但可以通过side information和专家知识。Ref【28】提出了一种有效的Bayesian方法来学习类目的权重，当类目已知时。
 
-然而，不依赖额外信息直接学习合适的diversity更令人关注。不使用side information，直接从数据中的diversity的naive learning，会得到一个高的计算开销，因为可能集合的数目会随类目中items数目而指数增长。该issue是no-trivial的，即使当我们只想往已存在集合中添加一个item时，而当我们想添加超过一个item来达到最终推荐set的diversity时会更难。
+然而，不依赖额外信息直接学习合适的diversity更令人关注。**不使用side information，直接从数据中的diversity的naive learning，会得到一个高的计算开销**，因为可能集合的数目会随类目中items数目而指数增长。该issue是no-trivial的，即使当我们只想往已存在集合中添加一个item时，而当我们想添加超过一个item来达到最终推荐set的diversity时会更难。
 
 【9, 10】使用基于DPPs的模型来解决该组合问题。DPPs是一个来自量子物理学的优雅的关于排斥(repulsion)的概率模型，在机器学习上被广泛使用[17]。它允许抽样一个diverse的点集，相似度（similarity）和流行度(popularity)会使用一个称为“kernel”半正定矩阵进行编码。关于marginalization和conditioning DPPs有很多高效算法提供。从实用角度，学习DPP kernel是个挑战，因为相关的likelihood是non-convex的，从items的observed sets中学到它是NP-hard的。
 
-对于basket completion问题，天然地会考虑：sets是那些转换到销售的baskets。在该setting中，DPP通过一个size为p x p的kernel matrix进行参数化，其中p是catalog的size。因而，参数的数目会随着p的二次方进行增长，计算复杂度、预测、抽样会随着p的三次方增长。由于学习一个full-rank的DPP是很难的，[10]提出了通过对kernel限制到low rank来对DPP正则化（regularization）。该regularization会在不伤害预测效果下提升generalization，并可以提供更diversity的推荐。在许多settings中，预测质量也会被提升，使得DPP对于建模baskets问题是一个理想的工具。再者，对比起full-rank DPP，low-rank假设也提供了更好的runtime效果。
+对于basket completion问题，天然地会考虑：那些转化成售买的baskets的sets。在该setting中，**DPP通过一个size为$$p \times p$$的kernel matrix进行参数化，其中p是catalog(item目录表)的size**。因而，参数的数目会随着p的二次方进行增长，计算复杂度、预测、抽样会随着p的三次方增长。由于学习一个full-rank的DPP是很难的，[10]提出了通过对kernel限制到low rank来对DPP正则化（regularization）。该regularization会在不伤害预测效果下提升generalization，并可以提供更diversity的推荐。在许多settings中，预测质量也会被提升，使得DPP对于建模baskets问题是一个理想的工具。再者，对比起full-rank DPP，**low-rank假设也提供了更好的runtime效果**。
 
-另外，由于DPP的定义，正如在Model部分所描述的，low-rank假设对于kernel来说，意味着任意可能的baskets会比那些概率为0的选中rank要具有更好的items。该方法对于大的baskets来说不可能，一些其它DPP kernel的正则化可能更合适。另外，由于DPP kernel的对称性，建模ordered corrections. 然而，这些被添加到shooping basket中的items的order会在basket completion任务中扮演重要角色。
+另外，由于DPP的定义，正如在Model部分所描述的，low-rank假设对于kernel来说，意味着任意可能的baskets会比那些概率为0的选中rank要具有更好的items。该方法对于大的baskets来说不可能，一些其它DPP kernel的正则化可能更合适。另外，由于DPP kernel的对称性，可以建模有序（ordered corrections）。然而，这些被添加到shooping basket中的items的order会在basket completion任务中扮演重要角色。
 
 主要贡献：
 
@@ -45,19 +45,19 @@ Basket analysis和completion是机器学习中非常老的任务。许多年来�
 DPPs最初用来建模具有排斥效应(replusive effect)的粒子间的分布。最近，在利用这种排斥行为上的兴趣，已经导致DPP在机器学习界受到大量关注。数学上，离散DPPs是在离散点集上的分布，在我们的case中，点就是items，模型会为观察到的给定items集合分配一个概率。假设I表示一个items集合，L是与DPP相关的kernel matrix（它的entries会在items间对polularity和similarity进行编码）。观察到的set I的概率与主子矩阵（principal submatrix）L的行列式成正比：$$I: P(I) \propto del L_I$$。因而，如果p表示在item catalog中的items数目，DPP是在$$2^p$$上的概率measure（），而它只包含了$$p^2$$的参数。kernel L会对items间的polularities和similarities进行编码，而对角条目$$L_{ii}$$表示item i的流行度，off-diagonal entry $$L_{ij} = L_{ji}$$表示item i和item j间的相似度。行列式从几何角度可以被看成是体积（volume），因此更diverse的sets趋向于具有更大的行列式。例如，选择items i和j的概率可以通过以下计算：
 
 $$
-P[\lbrace i,j \rbrace] \propto \begin{matrix}
+P[\lbrace i,j \rbrace] \propto \begin{vmatrix}
     L_{ii} & L_{ij} \\
     L_{ji} & L_{jj} \\
-    \end{matrix} = L_{ii} L_{jj} - L_{ij}^2
+    \end{vmatrix} = L_{ii} L_{jj} - L_{ij}^2
 $$
 
 ...(1)
 
-等式(1)中我们可以看到：如果i和j更相似，他们被抽样在一起的可能样越低。entries $$L_{ij}$$因此会决定kernel的排斥行为。例如，如果使用图片描述符来决定相似度，那么DPP会选择那些有区别的图片。另一方面，如果entries $$L_{ij}$$使用之前观察到的sets学到，比如：电商购物篮[10]，那么，“similarity” $$L_{ij}$$会低些。由于共同购买的items可能具有某些diversity，DPPs对于建模包含购买items的baskets是一种天然选择。在搜索引擎场景、或者文档归纳应用中，kernel可以使用特征描述述 $$\phi_i \in R^D$$（例如：文本中的tf-idf）、以及一个关于每个item i的相关得分$$q_i \in R^+$$，比如：$$L_{ij} = q_i \phi_i^T q_j$$（它会喜欢相关items ($$q_i$$值大)，阻止相似items组成的lists）。
+等式(1)中我们可以看到：如果i和j更相似，他们被抽样在一起的可能性越低。entries $$L_{ij}$$因此会决定kernel的排斥行为。例如，如果使用图片描述符来决定相似度，那么DPP会选择那些有区别的图片。另一方面，如果entries $$L_{ij}$$使用之前观察到的sets学到，比如：电商购物篮[10]，那么，“similarity” $$L_{ij}$$会低些。由于共同购买的items可能具有某些diversity，DPPs对于建模包含购买items的baskets是一种天然选择。在搜索引擎场景、或者文档归纳应用中，kernel可以使用特征描述述 $$\phi_i \in R^D$$（例如：文本中的tf-idf）、以及一个关于每个item i的相关得分$$q_i \in R^+$$，比如：$$L_{ij} = q_i \phi_i^T q_j$$（它会喜欢相关items ($$q_i$$值大)，阻止相似items组成的lists）。
 
 ## 3.1 Logistic DPP
 
-我们的目标是，寻找一个最可能一起购买的items集合。我们将该问题看成是一个分类问题，目标是预测：一个items的特定集合会生成一个转化（conversion），即：所有items都将被一起购买，这可以表示成$$Y \in \lbrace 0, 1 \rbrace$$。我们将class label Y建模成一个Bernoulli随机变量，它具有参数$$\phi(I)$$，其中$$I$$是items集合，$$\phi$$是如下定义的函数：
+我们的目标是，寻找一个最可能一起购买的items集合。我们将该问题看成是一个分类问题，目标是预测：**一个items的特定集合会生成一个转化（conversion），即：所有items都将被一起购买，这可以表示成$$Y \in \lbrace 0, 1 \rbrace$$**。我们将class label Y建模成一个Bernoulli随机变量，它具有参数$$\phi(I)$$，其中$$I$$是items集合，$$\phi$$是如下定义的函数：
 
 $$
 p(y | I) = \phi(I)^y (1- \phi(I))^{1-y}
