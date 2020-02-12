@@ -94,9 +94,9 @@ $$
 
 ### 2.2.2 Markovchain-based方法
 
-[7]中提出一种关于rank fusion的有意思的方法，它基于Markov chains实现。一个系统的一个(齐次：homogeneous)Markov chain可以通过一个状态集$$S=\lbrace 1,2, \cdots, \mid S \mid \rbrace$$以及一个$$\mid S \mid \times \mid S \mid $$的非负随机矩阵M（例如：每行的求和为1）来指定。该系统从S中的某个状态开始，并在每个step时会从一个state转移到另一个state。转移(transition)通过矩阵M来指导：在每个step上，如果**系统从状态i移到状态j的概率为$$M_{ij}$$**。如果给定当前状态作为概率分布，下一状态的概率分布通过表示当前状态的该vector与M相乘得到。总之，系统的起始状态（start state）根据在S上的一些分布x被选中。在m个steps后，该系统的状态会根据$$xM^m$$进行分布。在一些条件下，不需要考虑**起始分布x**，该系统最终会达到一个唯一确定点（状态分布不再变化）。该分布称为“**稳态分布(stationary distribution)**”。该分布可以通过M的左主特征向量（principal left eigenvector）y给出，例如：$$yM = \lambda y$$。实际上，一个简单的power-iteration算法可以快速获得关于y的一个合理近似。y中的entries定义了在S上的一个天然顺序。我们称这样的顺序为**M的马尔可夫序（Markov chain ordering）**。
+[7]中提出一种关于rank fusion的有意思的方法，它基于Markov chains实现。一个系统的一个(齐次：homogeneous)Markov chain可以通过一个状态集$$S=\lbrace 1,2, \cdots, \mid S \mid \rbrace$$以及一个$$\mid S \mid \times \mid S \mid $$的非负随机矩阵M（例如：每行的求和为1）来指定。该系统从S中的某个状态开始，并在每个step时会从一个state转移到另一个state。转移(transition)通过矩阵M来指导：在每个step上，如果**系统从状态i移到状态j的概率为$$M_{ij}$$**。如果给定当前状态作为概率分布，下一状态的概率分布通过表示当前状态的该vector与M相乘得到。总之，系统的起始状态（start state）根据在S上的一些分布x被选中。在m个steps后，该系统的状态会根据$$xM^m$$进行分布。在一些条件下，不需要考虑**起始分布x**，该系统最终会达到一个唯一确定点（状态分布不再变化）。该分布称为“**稳态分布(stationary distribution)**”。该分布可以通过M的左主特征向量（principal left eigenvector）y给出，例如：$$yM = \lambda y$$。实际上，一个简单的power-iteration算法可以快速获得关于y的一个合理近似。y中的entries定义了在S上的一个天然顺序。我们称这样的顺序为**M的马尔可夫排序（Markov chain ordering）**。
 
-对rank fusion问题使用Markov chains如下所示。**状态集合S对应于待排序(rank)的所有candidates的list**（例如：在$$R=\lbrace \tau_1, \cdots, \tau_2 \rbrace$$中的所有items的集合）。**在M中的转移概率在某种程度上依赖于$$\tau_1, \cdots, \tau_n$$，$$\hat{\tau}$$是在M上的Markov chain ordering**。下面，[7]提出了了一些Markov chains(MC):
+对rank fusion问题使用Markov chains如下所示。**状态集合(State Set) S对应于包含待排序(rank)的所有candidates的list**（例如：在$$R=\lbrace \tau_1, \cdots, \tau_2 \rbrace$$中的所有items的集合）。**在M中的转移概率在某种程度上依赖于$$\tau_1, \cdots, \tau_n$$，待估计的$$\hat{\tau}$$是在M上的Markov chain ordering**。下面，[7]提出了一些Markov chains(MC):
 
 - $$MC_1$$: 如果当前state为item i，那么，下一state从对应rank >= item i的所有items j的multiset中均匀选中，例如，从multiset $$Q_i^{C_1} = \cup_{k=1}^n \lbrace j: \tau_k(j) \leq \tau_k(i) \rbrace $$中均匀选中下一state。
 
@@ -134,7 +134,13 @@ $$
 
 - $$M_{22}^4$$是1/3. 均匀选中在S中一个item的概率为1/3. 另外，考虑图3中的表：在上表中的每个entry $$a_{ij}$$是满足$$\tau \in R, \tau(j) < \tau(i)$$的lists的count数（例如，有多少rankings满足：item j的rank比item i要好）。由于存在三个lists，因此majority的阀值是2. $$M_{22}^4$$指的是：给定item 2, 在下一step之后我们仍停留在item 2上的概率。由于$$a_{21}, a_{22}, a_{23}$$分别是2､ 0､ 2, 三种情况中有两种会从item 2进行转移，另一种仍会停留在item 2上。相应的$$M_{22}^4$$是1/3.
 
-最终，关于rank set R的fused rank list $$\hat{\tau}_k$$是在$$M^k, k=1, \cdots, 4$$上的Markov chain ordering。它可以被展示成$$\hat{\tau}=[3 \geq 2 \geq 1]$$的所有4种情况。
+最终，rank set R的fused rank list $$\hat{\tau}_k$$是在$$M^k, k=1, \cdots, 4$$上的Markov chain ordering。它可以被展示成$$\hat{\tau}=[3 \geq 2 \geq 1]$$的所有4种情况。
+
+# 3.实验
+
+## 3.1 数据集
+
+使用Text Retrieval Conference(TREC)数据集。它提供了具有许多rank lists的大的、标准的数据集，准备进行fused。通常，每年会提供一个大的文档数据base S和一个包含 50个querie的list。在ad-hoc和web信息检索大会上，每个系统x会
 
 
 
