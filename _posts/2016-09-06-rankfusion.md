@@ -124,7 +124,7 @@ $$
 
 - $$M_{13}^1$$是2/6. 确实，$$Q_1^{C_1}$$是$$\lbrace  1,1,3,1,2,3 \rbrace$$(rank<=item 1的case：1; 1,3; 1,2,3)。因此，在$$Q_1^{C_1}$$中均匀选中某一元素的概率为1/6, 选中item 3的概率为2/6.
 
-- $$M_{21}^2$$是5/18. 均匀选择一个包含item 2的rank list的概率为1/3. 如果$$\tau_1$$被选中，那么$$Q_{\tau_1,2}^{C_2}=\lbrace 2,1 \rbrace$$。因此，选中item 1的概率为1/2. 相似的，$$Q_{\tau_2,2}^{C_2}=\lbrace 2,1,3 \rbrace$$并且$$Q_{\tau_3,2}^{C_2}=\lbrace 2, 3 \rbrace$$。因此，$$M_{21}^2 = \frac{1}{3} \cdot \frac{1}{2} + \frac{1}{3} \cdot \frac{1}{3} + \frac{1}{3} \cdot 0 = \frac{5}{18}$$
+- $$M_{21}^2$$是5/18. 均匀选择一个包含item 2的rank list的概率为1/3. 如果$$\tau_1$$被选中，那么$$Q_{\tau_1,2}^{C_2}=\lbrace 2,1 \rbrace$$。因此，选中item 1的概率为1/2. 相似的，有$$Q_{\tau_2,2}^{C_2}=\lbrace 2,1,3 \rbrace$$，以及$$Q_{\tau_3,2}^{C_2}=\lbrace 2, 3 \rbrace$$。因此，$$M_{21}^2 = \frac{1}{3} \cdot \frac{1}{2} + \frac{1}{3} \cdot \frac{1}{3} + \frac{1}{3} \cdot 0 = \frac{5}{18}$$
 
 - $$M_{23}^3$$是2/9. 均匀选中一个包含item 2的概率为1/3. 在一个rank list范围内均匀选择一个item的概率也为1/3. 由于$$\tau_1(3) \nless \tau_1(2), \tau_2(3) < \tau_2(2), \tau_3(3) < \tau_3(2)$$, 因此$$M_{23}^3 = \frac{1}{3} \cdot 0 + \frac{1}{3} \cdot \frac{1}{3} + \frac{1}{3} \cdot \frac{1}{3} = \frac{2}{9}$$。
 
@@ -134,7 +134,7 @@ $$
 
 - $$M_{22}^4$$是1/3. 均匀选中在S中一个item的概率为1/3. 另外，考虑图3中的表：在上表中的每个entry $$a_{ij}$$是满足$$\tau \in R, \tau(j) < \tau(i)$$的lists的count数（例如，有多少rankings满足：item j的rank比item i要好）。由于存在三个lists，因此majority的阀值是2. $$M_{22}^4$$指的是：给定item 2, 在下一step之后我们仍停留在item 2上的概率。由于$$a_{21}, a_{22}, a_{23}$$分别是2､ 0､ 2, 三种情况中有两种会从item 2进行转移，另一种仍会停留在item 2上。相应的$$M_{22}^4$$是1/3.
 
-最终，rank set R的fused rank list $$\hat{\tau}_k$$是在$$M^k, k=1, \cdots, 4$$上的Markov chain ordering。它可以被展示成$$\hat{\tau}=[3 \geq 2 \geq 1]$$的所有4种情况。
+最终，rank set R的fused rank list $$\hat{\tau}_k$$是在$$M^k, k=1, \cdots, 4$$上的Markov chain ordering。可以看到所有4种情况都是：$$\hat{\tau}=[3 \geq 2 \geq 1]$$。
 
 # 3.实验
 
