@@ -7,7 +7,7 @@ tagline:
 
 # 介绍
 
-index_factory函数会将一个string进行翻译，来生成一个composite faiss index。该string是一个逗号分割的列表。它的目标是，帮助index结构的构建，特别是它们被嵌套时。index_factory参数通常包含一个preprocessing组件、inverted file以及一个encoding组件。这里总结了index_factory的components和参数。
+index_factory函数会将一个string进行翻译，来生成一个composite faiss index。该string是一个逗号分割的列表。它的目标是，帮助index结构的构建，特别是它们被嵌套时。index_factory参数通常包含：**一个preprocessing组件、inverted file以及一个encoding组件**。这里总结了index_factory的components和参数。
 
 示例：
 
@@ -21,9 +21,12 @@ index_factory函数会将一个string进行翻译，来生成一个composite fai
 
 # 1.前缀(Prefixes)
 
+
+
 | String  | Class name  |  注释   |
 |---|---|---|
-|  IDMap | IndexIDMap  |  用于在不支持它的indexes上开启add\_with\_ids，主要用于flat indexes |
+|  IDMap | IndexIDMap  |  <div style="width: 150pt">用于在不支持它的indexes上开启add\_with\_ids，主要用于flat indexes</div>|
+{:.table-striped}
 
 # 2.vector转换
 
