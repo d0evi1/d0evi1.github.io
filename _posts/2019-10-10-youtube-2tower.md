@@ -11,23 +11,23 @@ youtube在2019发布了它的双塔模型《Sampling-Bias-Corrected Neural Model
 
 # 介绍
 
-在许多服务上（视频推荐、app推荐、在线广告定向），推荐系统帮助用户发现感兴趣内容。在许多情况下，这些系统在一个低延时的条件下，会将数十亿用户与一个相当大的内容语料（数百万到数十亿）相连接。常用的方法是retrieval-and-ranking策略，这是一个two-stage系统。首先，一个可扩展的retrieval模型会从一个大语料中检索出一小部分相关items，接着一个fully-blown ranking模型会对这些retrieved items基于一或多个目标(objectives: 比如clicks或user-ratings)进行rerank。在本文中，主要关注retrieval system。
+在许多服务上（视频推荐、app推荐、在线广告定向），推荐系统帮助用户发现感兴趣内容。在许多情况下，这些系统在一个低延时的条件下，会将数十亿用户与一个相当大的内容语料（数百万到数十亿）相连接。常用的方法是retrieval-and-ranking策略，这是一个two-stage系统。首先，一个可扩展的retrieval模型会从一个大语料中检索出一小部分相关items，接着一个成熟的ranking模型会对这些retrieved items**基于一或多个目标(objectives: 比如clicks或user-ratings)进行rerank**。在本文中，主要关注retrieval system。
 
-给定一个{user, context, item}三元组，一个常用方法是，构建一个可扩展的retrieval模型：
+给定一个{user, context, item}三元组，构建一个可扩展的retrieval模型的一个常用方法是：
 
-- 1) 分别为{user,context}和{item}各自学习query和item表示
-- 2) 在query和item representations间使用一个simple scoring function（比如：dot product）来获到对该query适合的推荐
+- 1) 分别为{user,context}和{item}各自学习query和item representations
+- 2) 在query和item representations间使用一个simple scoring function（比如：dot product）来得到对该query合适的推荐
 
-context通常表示具有动态特性的variables，比如：天时长(time of day)，用户所用设备（devices）。representation learning问题通常有以下两个挑战：
+**context通常表示具有动态特性的variables，比如：天时长(time of day)，用户所用设备（devices）**。representation learning问题通常有以下两个挑战：
 
 - 1) items的corpus对于工业界规模的app来说相当大
 - 2) 从用户反馈收集得到的训练数据对于某些items相当稀疏
 
-这会造成模型预测对于长尾内容（long-tail content）具有很大variance。对于这种cold-start问题，真实世界系统需要适应数据分布的变化来更好面对新鲜内容（fresh content）。
+**这会造成模型预测对于长尾内容（long-tail content）具有很大variance**。对于这种cold-start问题，真实世界系统需要适应数据分布的变化来更好面对**新鲜内容（fresh content）**。
 
 受Netflix prize的启发，MF-based modeling被广泛用在构建retrieval systems中学习query和item的latent factors。在MF框架下，大量推荐研究在学习大规模corpus上解决了许多挑战。常见的思路是，利用query和item的content features。在item id外，content features很难被定义成大量用于描述items的features。例如，一个video的content features可以是从video frames中抽取的视觉features或音频features。MF-based模型通常只能捕获features的二阶交叉，因而，在表示具有许多格式的features collection时具有有限阶（power）。
 
-在最近几年，受deep learning的影响，大量工作采用DNNs来推荐。Deep representations很适合编码在低维embedding space上的复杂的user states和item content features。在本paper中，采用two-tower DNNs来构建retrieval模型。图1提供了two-tower模型构建的图示，左和右分别表示{user, context}和{item}。two-tower DNN从multi-class classification NN（一个MLP模型）泛化而来[19]，其中，图1的right tower被简化成一个具有item embeddings的single layer。作为结果，two-tower模型结构可以建模labels具有structures或content features的情形。MLP模型通常使用许多来自一个fixed的item语料表中sampled negatives进行训练。相反的，使用了deep item tower后，由于item content features以及共享的网络参数，对于计算所有item embeddings来说，在许多negatives上抽样和训练通常是无效的。
+在最近几年，受deep learning的影响，大量工作采用DNNs来推荐。Deep representations很适合编码在低维embedding space上的复杂的user states和item content features。在本paper中，采用two-tower DNNs来构建retrieval模型。**图1提供了two-tower模型构建的图示，左和右分别表示{user, context}和{item}**。two-tower DNN从multi-class classification NN（一个MLP模型）泛化而来[19]，其中，图1的right tower被简化成一个具有item embeddings的single layer。因而，**two-tower模型结构可以建模当labels具有structures或content features的情形**。MLP模型通常使用许多来自一个fixed的item语料表中sampled negatives进行训练。相反的，使用了deep item tower后，由于item content features以及共享的网络参数，对于计算所有item embeddings来说，在许多negatives上抽样和训练通常是无效的。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/727bab11fbdbc3698fb29496fd211f65663b710033b639c3e514edf43885bf90be605e072ef20ed3c277c5d73aa4f912?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750" width="300">
 
@@ -55,7 +55,7 @@ context通常表示具有动态特性的variables，比如：天时长(time of d
 
 ## 2.2 Extreme classification
 
-在设计用于预测具有大规模输出空间的labels的模型时，softmax是一个常用函数。大量研究注交于训练softmax多分类模型，从语言模型到推荐模型。当classes的数目相当大时，广泛采用的技术是，抽样classes的一个subset。Bengio[5]表明，一个好的sampling distribution应该与模型的output distribution相适配。为了避免计算sampling distribution的并发症，许多现实模型都采用一个简单分布（比如：unigram或uniform）作为替代。最近，Blanc[7]设计了一个有效的adaptive kernel based的sampling方法。尽管sampled softmax在许多领域很成功，但不能应用在具有content features的label的case中。这种case中的Adaptive sampling仍然是一个开放问题。许多works表明，具有tree-based的label结构（比如：hierarchical softmax），对于构建大规模分类模型很用用，可以极大减小inference time。这些方法通常需要一个预定义的基于特定categorical attributes的tree structure。因此，他们不适用于包含大量input features的情况。
+在设计用于预测具有大规模输出空间的labels的模型时，softmax是一个常用函数。从语言模型到推荐模型的大量研究，都关注于训练softmax多分类模型。当classes的数目相当大时，大量采用的技术是：抽样classes的一个subset。Bengio[5]表明：**一个好的sampling distribution应该与模型的output distribution相适配**。为了避免计算sampling distribution的并发症，许多现实模型都采用一个简单分布（比如：unigram或uniform）作为替代。最近，Blanc[7]设计了一个有效的adaptive kernel based的sampling方法。**尽管sampled softmax在许多领域很成功，但不能应用在具有content features的label的case中**。这种case中的Adaptive sampling仍然是一个开放问题。许多works表明，具有tree-based的label结构（比如：hierarchical softmax），对于构建大规模分类模型很有用，可以极大减小inference time。这些方法通常需要一个预定义的基于特定categorical attributes的tree structure。因此，他们不适用于包含大量input features的情况。
 
 ## 2.3 two-tower模型
 
