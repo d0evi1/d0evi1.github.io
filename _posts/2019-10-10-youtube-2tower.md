@@ -93,10 +93,10 @@ $$
 
 ...(1)
 
-在我们的target应用中，in-batch items通常从一个power-law分布中抽样得到。因此，等式(3)在full softmax上会引入了一个大的bias：流行的items通常会过度被当成negatives，因为概率高。受在sampled softmax model[5]中logQ correction的启发，我们将每个logit $$s(x_i, y_i)$$通过下式进行纠正：
+在我们的target应用中，**in-batch items通常从一个power-law分布中抽样得到。因此，等式(3)在full softmax上会引入了一个大的bias：流行的items通常会过度被当成negatives，因为概率高**。受在sampled softmax model[5]中logQ correction的启发，我们将每个logit $$s(x_i, y_i)$$通过下式进行纠正：
 
 $$
-s^c(x_i, y_i) = s(x_i, y_j) - log(p_i)
+s^c(x_i, y_i) = s(x_i, y_j) - log(p_j)
 $$
 
 这里，$$p_j$$表示在一个random batch中item j的sampling概率。
@@ -104,7 +104,7 @@ $$
 有了该correction，我们有：
 
 $$
-P_B^c (y_i \| x_i; \theta) = \frac{e^{s^c(x_i,y_i)}}{e^{s^c(x_i,y_i) + \sum_{j \in [B],j \neq i} e^{s^c(x_i,y_i)}}}
+P_B^c (y_i | x_i; \theta) = \frac{e^{s^c(x_i,y_i)}}{e^{s^c(x_i,y_i)} + \sum_{j \in [B],j \neq i} e^{s^c(x_i,y_i)}}
 $$
 
 接着将上述term插入到等式(2)，产生：
