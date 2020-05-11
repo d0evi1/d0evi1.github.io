@@ -152,7 +152,7 @@ $$
 
 另外，我们的模型框架提供了选项，可以在inference时选择任意items。不再计算在所有items上的dot product，低时耗retrieval通常基于一个基于hashing技术高效相似度搜索系统，特别的，高维embeddings的compact representations通过quantization、以及end-to-end learning和coarse和PQ来构建。
 
-归一化（Normalization）和温度（Temperature）。经验上，我们发现，添加embedding normalization，比如：$$u(x,\theta) \leftarrow u(x,\theta) / || u(x,\theta) ||_2, u(y,\theta) \leftarrow v(y,\theta) / || v(y,\theta) ||_2$$，可以提升模型的trainability，从而产生更好的retrieval quanlity。另外，一个tempreature $$\tau$$被添加到每个logit上来对predictions进行削尖(sharpen)：
+归一化（Normalization）和温度（Temperature）。经验上，我们发现，添加embedding normalization，比如：$$u(x,\theta) \leftarrow u(x,\theta) / \|\| u(x,\theta) ||_2, u(y,\theta) \leftarrow v(y,\theta) / \|\| v(y,\theta) \|\|_2$$，可以提升模型的trainability，从而产生更好的retrieval quanlity。另外，一个tempreature $$\tau$$被添加到每个logit上来对predictions进行削尖(sharpen)：
 
 $$
 s(x,y) = <u(x,\theta), v(y,\theta)> / \tau>
@@ -172,7 +172,7 @@ $$
 
 # 5. Youtube的Neural检索系统
 
-我们在Youtube中使用提出的模型框架。该产品会基于在某个用户观看的某个video上生成视频推荐。推荐系统包含两个stages：nomination(或：retrieval)、ranking。在nomination stage，我们具有多个nominators，每个nomiator都会基于一个user和一个seed video生成成百上午的视频推荐。这些videos会按顺序打分，并在下游的一个NN ranking模型中进行rerank。在本节中，我们关注在retrieval stage中一个额外nominator。
+我们在Youtube中使用提出的模型框架。该产品会基于在某个用户观看的某个video上生成视频推荐。推荐系统包含两个stages：nomination(或：retrieval)、ranking。在nomination stage，我们具有多个nominators，每个nomiator都会基于一个user和一个seed video生成成百上千的视频推荐。这些videos会按顺序打分，并在下游的一个NN ranking模型中进行rerank。在本节中，我们关注在retrieval stage中一个额外nominator。
 
 ## 5.1 模型总览
 
