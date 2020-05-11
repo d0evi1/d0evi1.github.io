@@ -93,7 +93,23 @@ $$
 
 ...(1)
 
-在我们的target应用中，**in-batch items通常从一个power-law分布中抽样得到。因此，等式(3)在full softmax上会引入了一个大的bias：流行的items通常会过度被当成negatives，因为概率高**。受在sampled softmax model[5]中logQ correction的启发，我们将每个logit $$s(x_i, y_i)$$通过下式进行纠正：
+接着进一步加入rewards $$r_i$$，我们考虑上下面的weighted log-likelihood作为loss function：
+
+$$
+L_T(\theta) := - \frac{1}{T} \sum\limits_{i \in [T]} r_i \cdot log(P(y_i | x_i; \theta) 
+$$
+
+...(2)
+
+当M非常大时，在计算partition function时很难包括所有的candidate examples，例如：等式(1)中的分母。我们主要关注处理streaming data。因此，与负样本(negatives)从一个固定corpus中抽样得到的case训练MLP模型不同，对于从相同batch中的所有queries来说，我们只考虑使用in-batch items[22]作为负样本（negatives）。更确切地说，给定一个关于B pairs $$\lbrace (x_i, y_I, r_i) \rbrace_{i=1}^B$$的mini-batch，对于每个$$i \in [B]$$，该batch softmax是：
+
+$$
+P_B (y_i | x_i; \theta) = \frac{e^{s(x_i,y_i)}}{ \sum\limits_{i \in [B]} e^{s(x_i, y_i)}}
+$$
+
+...(3)
+
+在我们的目标应用中，**in-batch items通常从一个power-law分布中抽样得到。因此，等式(3)在full softmax上会引入了一个大的bias：流行的items通常会过度被当成negatives，因为概率高**。受在sampled softmax model[5]中logQ correction的启发，我们将每个logit $$s(x_i, y_i)$$通过下式进行纠正：
 
 $$
 s^c(x_i, y_i) = s(x_i, y_j) - log(p_j)
