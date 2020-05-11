@@ -63,7 +63,7 @@ youtube在2019发布了它的双塔模型《Sampling-Bias-Corrected Neural Model
 
 # 3.模型框架
 
-考虑推荐问题的一个常见设定，我们具有queries和items的一个集合。queries和items通过feature vectors $$\lbrace x_i \rbrace_{i=1}^{N}$$和$$\lbrace y_I \rbrace_{j=1}^M$$表示。这里，$$x_i \in X, y_i \in Y$$，是多种features的混合（比如：sparse IDs和dense features），可以在一个非常高维的空间中。这里的目标是，为给定一个query检索一个items的subset。在个性化场景中，我们假设：user和context在$$x_i$$中被完全捕获。注意，我们从有限数目的queries和items开始来解释该情形。我们的模型框架没有这样的假设。
+考虑推荐问题的一个常见设定，我们具有queries和items的一个集合。queries和items通过feature vectors $$\lbrace x_i \rbrace_{i=1}^{N}$$和$$\lbrace y_i \rbrace_{j=1}^M$$表示。这里，$$x_i \in X, y_i \in Y$$，是多种features的混合（比如：sparse IDs和dense features），可以在一个非常高维的空间中。这里的目标是：为给定一个query检索一个items的subset。在个性化场景中，**我们假设：user和context在$$x_i$$中被完全捕获**。注意，我们从有限数目的queries和items开始来解释该情形。我们的模型框架没有这样的假设。
 
 我们的目标是构建具有两个参数化embedding functions的模型：
 
@@ -80,12 +80,12 @@ $$
 目标是，从一个具有T个样本的训练集中学习模型参数$$\theta$$：
 
 $$
-\Tau := \lbrace (x_i, y_i, R_i) \rbrace_{i=1}^T
+\mathscr{T} := \lbrace (x_i, y_i, R_i) \rbrace_{i=1}^T
 $$
 
-其中，$$(x_i, y_i)$$表示query $$x_i$$和item $$y_i$$的query，$$r_i \in R $$是每个pair相关的reward。
+其中，$$(x_i, y_i)$$表示query $$x_i$$和item $$y_i$$的query，**$$r_i \in R $$是每个pair相关的reward**。
 
-相应的，retrieval问题可以被看成是一个具有continuous reward的multi-class分类问题。在分类任务中，每个label的重要性等价，对于所有postive pairs $$r_i=1$$。在recommenders中，$$r_i$$可以被扩展到捕获在一个特定candidate上的多个user engagement的degree。例如，在新闻推荐中，$$r_i$$可以是一个用户花费在特定某个文章上的时间。给定一个query x，对于从M个items $$\lbrace y_i \rbrace_{j=1}^M$$选择候选y的概率分布，常用的选择是基于softmax function，例如：
+相应的，retrieval问题可以被看成是一个具有continuous reward的multi-class分类问题。**在分类任务中，每个label的重要性等价，对于所有postive pairs $$r_i=1$$**。**在recommenders中，$$r_i$$可以被扩展成：对于一个特定candidate捕获到的user engagement的不同程度**。例如，在新闻推荐中，$$r_i$$可以是一个用户花费在特定某个文章上的时间。给定一个query x，对于从M个items $$\lbrace y_i \rbrace_{j=1}^M$$选择候选y的概率分布，常用的选择是基于softmax function，例如：
 
 $$
 P(y|x; \theta) = \frac{e^{s(x,y)}}{\sum_{j \in [M]} e^{s(x,y_j)}}
