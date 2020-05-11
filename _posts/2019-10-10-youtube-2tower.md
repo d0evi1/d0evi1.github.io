@@ -152,7 +152,7 @@ $$
 
 另外，我们的模型框架提供了选项，可以在inference时选择任意items。不再计算在所有items上的dot product，低时耗retrieval通常基于一个基于hashing技术高效相似度搜索系统，特别的，高维embeddings的compact representations通过quantization、以及end-to-end learning和coarse和PQ来构建。
 
-归一化（Normalization）和温度（Temperature）。经验上，我们发现，添加embedding normalization，比如：$$u(x,\theta) \leftarrow u(x,\theta) / \|\| u(x,\theta) ||_2, u(y,\theta) \leftarrow v(y,\theta) / \|\| v(y,\theta) \|\|_2$$，可以提升模型的trainability，从而产生更好的retrieval quanlity。另外，一个tempreature $$\tau$$被添加到每个logit上来对predictions进行削尖(sharpen)：
+归一化（Normalization）和温度（Temperature）。经验上，我们发现，添加embedding normalization，比如：$$u(x,\theta) \leftarrow u(x,\theta) / \|\| u(x,\theta) \|\|_2, u(y,\theta) \leftarrow v(y,\theta) / \|\| v(y,\theta) \|\|_2$$，可以提升模型的trainability，从而产生更好的retrieval quanlity。另外，一个tempreature $$\tau$$被添加到每个logit上来对predictions进行削尖(sharpen)：
 
 $$
 s(x,y) = <u(x,\theta), v(y,\theta)> / \tau>
