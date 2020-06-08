@@ -106,8 +106,6 @@ $$
 
 定理1和2表明，用户兴趣会在非常温和的条件下退化（degenerate），特别的是在我们的模似实验中。在这样的cases中，如果一个item（或一个item category）是被展示有限多次时，degeneracy可以被避免，否则你只能寄希望于控制$$\mu_t$$退化的有多快了（例如：趋向于$$\infty$$）。
 
-。。。
-
 # 4.系统设计角色——filter bubble
 
 在之前的部分讨论了对于不同user interest dynamics的egeneracy的条件。在本节中，会检查另一面：推荐系统动作在创建filter bubbles上的影响。我们通常不知道现实世界用户兴趣的动态性。然而，我们考虑echo chamber/filter bubble的相关场景：其中在一些items上的用户兴趣具有退化动态性(degenerative dynamics)，并检查了如何设计一个推荐系统来减缓degeneracy过程。我们会考虑三个维度：model accuracy，曝光量（exploration amount），增长的candidate pool。
