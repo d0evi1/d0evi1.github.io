@@ -26,9 +26,9 @@ deepmind在19年发了篇关于feedback loops的paper：《Degenerate Feedback L
 
 我们考虑一个推荐系统，它会与用户随时间一直交互。在每个timestep t上，recommender系统会从一个有限的item set M中提供l个items给一个user。总之，该系统的目标是：将可能感兴趣的items呈现（present）给用户。我们假设：
 
-**在timestep t上，user在一个item $a \in M$上的兴趣，可以通过函数$$\mu_t: M \rightarrow R$$来描述。**
+- **在timestep t上，user在一个item $a \in M$上的兴趣，可以通过函数$$\mu_t: M \rightarrow R$$来描述。**
+- 如果用户对该item很感兴趣，那么$$\mu_t(a)$$很大（positive）；反之为很小（negative）
 
-如果用户对该item很感兴趣，那么$$\mu_t(a)$$很大（positive）；反之为很小（negative）。
 
 给定一个推荐(recommendation) $$a_t = (a_t^1, \cdots, a_t^l) \in M^l$$，用户基于它当前的兴趣 $$\mu_t(a_t^1), \cdots, \mu_t(a_t^l)$$提供一些feedback $$c_t$$。该交互具有多个effects：在推荐系统传统文献中，feedback $$c_t$$被用于更新用于获取推荐$$a_t$$推荐系统的internal model $$\theta_t$$，接着新模型$$\theta_{t+1}$$会依赖$$\theta_t, a_t, c_t$$。实际上，$$\theta_t$$通常会预测user feedback的分布来决定哪个items $$a_t$$应被呈现给该用户。在本paper中，我们关注另一个效应（effect），并显式考虑用户与推荐系统的交互可能会在下一次交互时以不同的items来变更他的兴趣，这样，该兴趣$$\mu_{t+1}$$会依赖于$$\mu_t, a_t, c_t$$。交互的完整模型如图1所示。
 
