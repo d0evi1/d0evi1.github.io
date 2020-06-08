@@ -184,7 +184,7 @@ $$
 
 接着，我们在fixed和growing的两种candidate sets上，为5个推荐系统模型比较了degeneracy speed。由于测量系统degeneracy的L2矩离对于所有五种模型来说是线性对称的，我们可以在有限candidate pools上，对于不同的实验设定比较$$\mid \mu_t - \mu_0 \mid_2 /t $$。
 
-<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ecd224206082b35a69af5945caafbc1eaf3f1a7f270db51656f31af96d34f6235b35b9a11242766e2d62a493e110a9f5?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750" width="300">
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ecd224206082b35a69af5945caafbc1eaf3f1a7f270db51656f31af96d34f6235b35b9a11242766e2d62a493e110a9f5?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
 
 图3  5000个time steps上的系统演进，其中在report interval为500。结果是在30次运行上的平均，共享区域表示标准差。在degeneracy speed上，Optimal Oracle > Oracle > TS > UCB > Random
 
@@ -212,7 +212,7 @@ $$
 
 我们通过计算$$sup_{a \in M} \mid \mu_t(a) - \mu_0(a)\mid /t$$，将degeneracy speed的定义扩展到一个有限的candidate pool上。由于degeneracy speed对于所有5种模型不是渐近线性的（asymptotically linear），我们会在10000个time steps上直接检查sup distance $$sup_{a \in M} \mid \mu_t(a) - \mu_0(a) \mid$$。为了构建在不同growth speed上的growing candidate pools，我们定义了一个增长函数$$m_t = \lfloor m_0 + l t^{\eta}\rfloor$$，通过不同增长参数$$\eta = 0, 0.5, 1, m_0 = 100$$定义。在图6中，我们在10个独立运行上对结果进行平均。对于所有growth rates，Oracle和Optimal Oracle都是degenerate的。Random Model会在sublinear growth $$\eta=0.5$$上停止degeneration，UCB也如此，这归因于之前unserved items上进行强制exploration，尽管它的trajectory具有一个小的上翘（upward tilt）。TS模型会在sublinear growth上degenerates，但在linear growth $$\eta=1$$上停止degernation。对于所有模型，growth rate $$\eta$$越高，他们degerate会越慢，如果他们完全这样做的话。当全部可用时，**线性growing candidate set和continuous random exploration看起来是一个不错的方法**，来对抗$$\mu_t$$的dynamics来阻止degeneracy。
 
-<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/fc01a847d9320bf6fae01f7ea89c760362115fc35ab2568524c5a2586b0363f9837bff7279b48bef934099fab31d9c04?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=6.jpg&amp;size=750" width="300">
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/fc01a847d9320bf6fae01f7ea89c760362115fc35ab2568524c5a2586b0363f9837bff7279b48bef934099fab31d9c04?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=6.jpg&amp;size=750">
 
 图6 5个模型的比较，它们使用growing candidate pools，具有不同的rates $$\eta = 0, 0.5, 1.0$$，degeneracy直到T=10000, 在10个运行结果上平均得到。对于所有growth rates，Oracle和Optimal Oracle都是degenerate的。Random Model和UCB会在sublinear growth上停止generation，而TS model需要linear growth才会停止degeneration。
 
