@@ -174,7 +174,7 @@ $$
 
 我们通过在一个fixed size $$m_t = m = 100$$、time horizon T=5000的candidate pool上运行仿真，来检查echo chamber和filter bubble效应。
 
-在图2中，我们展示了user interest $$\mu_t$$（左列）的degenreation、以及每个item的serving rate（右列），因为每个推荐模型会随时间演化。一个item的serving rate展示了在report interval内服务的频次。为了清楚地观察该分布，我们根据report time上的z-values对items进行排序。尽管所有模型会造成user interest degeneration，degeneration的speeds相当不同（Optimal Oracle > Oracle, TS, UCB > Random Model）。Oracle, TS 和 UCB是基于$$\mu_t$$优化的，因此我们可以看到对于$$\mu_t$$有一个positive的degenerative dynamics。Optimal Oracle会直接在degeneration speed上进行优化，而不会在$$\mu_t$$上，因此我们可以看到在$$\mu_t$$上同时有一个positive和negative degeneration。Random Model也会在两个方向上对$$\mu_t$$进行drifts，但以一个更慢的rate。然而，除了Random Model外，在所服务的top items上和top user interests会非常快速地收窄降到$$l=5$$的最positive的reinfofced items上。
+在图2中，我们展示了user interest $$\mu_t$$（左列）的degenreation、以及每个item的serving rate（右列），因为每个推荐模型会随时间演化。一个item的serving rate展示了在report interval内服务的频次。为了清楚地观察该分布，我们根据report time上的z-values对items进行排序。**尽管所有模型会造成user interest degeneration，degeneration的speeds相当不同（Optimal Oracle > Oracle, TS, UCB > Random Model）**。Oracle, TS 和 UCB是基于$$\mu_t$$优化的，因此我们可以看到对于$$\mu_t$$有一个positive的degenerative dynamics。Optimal Oracle会直接在degeneration speed上进行优化，而不会在$$\mu_t$$上，因此我们可以看到在$$\mu_t$$上同时有一个positive和negative degeneration。Random Model也会在两个方向上对$$\mu_t$$进行drifts，但以一个更慢的rate。然而，除了Random Model外，在所服务的top items上和top user interests会非常快速地收窄降到$$l=5$$的最positive的reinfofced items上。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/83440aa88143fa3d473d0d9e07ffc8d011cc2f578a60db119c9b5f9fb94569bbe91668f8b4fd181f168effd2d095916d?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
@@ -182,11 +182,11 @@ $$
 
 **Degenracy Speed**
 
-接着，我们在fixed和growing的g肉种candidate sets上，为5个推荐系统模型比较了degeneracy speed。由于测量系统degeneracy的L2矩离对于所有五种模型来说是线性对称的，我们可以在有限candidate pools上，对于不同的实验设定比较$$\mid \mu_t - \mu_0 \mid_2 /t $$。
+接着，我们在fixed和growing的两种candidate sets上，为5个推荐系统模型比较了degeneracy speed。由于测量系统degeneracy的L2矩离对于所有五种模型来说是线性对称的，我们可以在有限candidate pools上，对于不同的实验设定比较$$\mid \mu_t - \mu_0 \mid_2 /t $$。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ecd224206082b35a69af5945caafbc1eaf3f1a7f270db51656f31af96d34f6235b35b9a11242766e2d62a493e110a9f5?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750" width="300">
 
-图3
+图3  5000个time steps上的系统演进，其中在report interval为500。结果是在30次运行上的平均，共享区域表示标准差。在degeneracy speed上，Optimal Oracle > Oracle > TS > UCB > Random
 
 图3展示了5种模型的degeneracy speed，。。。。我们可以看到，Optimal Oracle会产生最快的degnereation，接着是：Oracle, TS，UCB。Random Model最慢。
 
