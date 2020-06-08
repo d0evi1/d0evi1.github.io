@@ -69,7 +69,13 @@ $$
 
 **非线性随机模型（Nonlinear Stochastic Model）**
 
-我们假设$$\mu_0 \in R$$是固定的，$$\mu_{t+1} = \mu_t + f(\mu_t, \xi_t)$$，其中$$(\xi_t)_{t=1}^{\infty}$$是一个关于独立均匀分布的随机变量的无限序列，它引入噪声到系统中（例如：$$\mu_{t+1}$$是一个$$\mu_t$$的随机函数）。该函数 $$f: R \times [0, 1]$$是假设是可测的，但其它任意。通过$$U([0, 1])$$来定义[0,1]上的均匀分布，假设：
+$$\mu_{t+1} = \mu_t + f(\mu_t, \xi_t)$$
+
+其中：
+
+- 我们假设$$\mu_0 \in R$$是固定的
+- $$(\xi_t)_{t=1}^{\infty}$$是一个关于独立均匀分布的随机变量的无限序列，它引入噪声到系统中（例如：$$\mu_{t+1}$$是一个$$\mu_t$$的随机函数）
+- 函数 $$f: R \times [0, 1]$$是假设是可测的，但其它任意。通过$$U([0, 1])$$来定义[0,1]上的均匀分布，假设：
 
 $$
 \bar{f}(\mu) = E_{\xi \sim U([0,1])} [f(\mu, \xi)]
@@ -83,16 +89,22 @@ $$
 
 是increment的累积分布。$$\mu_t$$的渐近行为依赖于f，但在mild假设下，系统会微弱（定理1）／较强（定理2）退化。
 
-**定理1（弱退化）**。假设F对于所有$$\mu \in R$$在$$(\mu, 0)$$上是连续的，存在一个$$\mu_o \in R$$，使得：
+**定理1（弱退化weak degeneracy）**。假设F对于所有$$\mu \in R$$在$$(\mu, 0)$$上是连续的，存在一个$$\mu_o \in R$$，使得：
 
 - 1) 对于所有$$\mu \geq \mu_o$$，有$$F(\mu, 0) < 1$$
 - 2) 对于所有$$\mu \geq \mu_o$$，有$$F(\mu, 0) > 0$$
 
-那么序列$$\mu_t$$是weakly degenerate，比如：$$lim sup_{t \rightarrow \infty} \mid \mu_t \mid = \infty$$
+那么序列$$\mu_t$$是weakly degenerate，比如：$$\underset{t \rightarrow \infty}{lim} sup \mid \mu_t \mid = \infty$$
 
-该假设保证了，在任意闭区间内，存在一个常数概率，该random walk会逃离左/右。
+该假设保证了在任意闭区间内，存在一个常数概率，当分别从$$\mu_o$$的左侧/右侧开始时，该random walk会逃离区间左侧/右侧。在stronger condition下，可以保证random walk的分散性（divergence）。
 
-**定理2 (强退化)**。
+**定理2 (强退化: strong degeneracy)**
+
+假设定理1恒定，另外存在$$c \in R$$使得 $$\| \mu_{t+1} - \mu_t \| \leq c$$，存在一个$$ \epsilon > 0$$，使得对于所有足够大的$$\mu$$，有$$f(\mu) > \epsilon$$，对于所有足够小的$$\mu$$有$$f(\mu) \leq - \epsilon$$。接着，$$\limit_{t \rightarrow \infty} \mu_t = \infty$$或者$$\limit_{t \rightarrow \infty} \mu_t = -\infty$$。
+
+直觉上，如果用户兴趣具有一些关于drift的非零概率，weak degeneracy在一个随机环境中发生。而strong degeneracy会持有额外的$$\mu_{t+1} - \mu_t$$被限制，对于$$\mu_t$$足够大/小，而增量$$\mu_{t+1} - \mu_t$$具有positive/negative drift，它大于一个constant。
+
+定理1和2表明，用户兴趣会在非常温和的条件下退化（degenerate），特别的是在我们的模似实验中。在这样的cases中，如果一个item（或一个item category）是被展示有限多次时，degeneracy可以被避免，否则你只能寄希望于控制$$\mu_t$$退化的有多快了（例如：趋向于$$\infty$$）。
 
 。。。
 
