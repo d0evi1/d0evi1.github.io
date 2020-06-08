@@ -6,17 +6,17 @@ modified: 2019-10-28
 tags: 
 ---
 
-deepmind在19年发了篇关于feedback loops的paper：《Degenerate Feedback Loops in Recommender Systems》
+deepmind在19年发了篇关于feedback loops的paper：《Degenerate Feedback Loops in Recommender Systems》，我们可以来看下它的paper介绍：
 
 # 摘要
 
-在生产环境中的推荐系统大量使用机器学习。这些系统的决策会影响user beliefs和preferences，从而影响学习系统接受到的feedback——这会创建一个feedback loop。这个现象被称为“echo chambers”或“filter bubbles”。本paper提供了一个新的理论分析，来检查user dynamics的角色、以及推荐系统的行为，从而从filter bubble效应中解脱出来。另外，我们提供了实际解决方案来减小系统的退化（degeneracy）。
+**在生产环境中的推荐系统大量使用机器学习。这些系统的决策会影响user beliefs和preferences，从而影响学习系统接受到的feedback——这会创建一个feedback loop**。这个现象被称为“echo chambers”或“filter bubbles”。本paper提供了一个新的理论分析，来检查user dynamics的角色、以及推荐系统的行为，从而从filter bubble效应中解脱出来。另外，我们提供了实际解决方案来减小系统的退化（degeneracy）。
 
 # 介绍
 
-推荐系统广泛被用于提供个性化商品和信息流。这些系统会采用user的个人特征以及过往行为来生成一个符合用户个人偏好的items list。虽然商业化很成功，这样的系统会产生一个关于窄曝光（narrowing exposure）的自我增强的模式，从而影响用户兴趣，这样的问题称为“echo chamber”和“filte bubble”。大量研究都致力于对曝光给用户的items set上使用favor diversity来解决。然而，echo chamber和filter bubble效应的当前理解很有限，实验分析表明会有冲突结果。
+推荐系统广泛被用于提供个性化商品和信息流。这些系统会采用user的个人特征以及过往行为来生成一个符合用户个人偏好的items list。虽然商业上很成功，**但这样的系统会产生一个关于窄曝光（narrowing exposure）的自我增强的模式，从而影响用户兴趣，这样的问题称为“echo chamber”和“filte bubble”**。大量研究都致力于对曝光给用户的items set上使用favor diversity来解决。然而，echo chamber和filter bubble效应的当前理解很有限，实验分析表明会有冲突结果。
 
-在本paper中，我们将一个用户的兴趣的echo chamber，通过重复曝光一个特定item或item类目，定义为正（positively）、或负（negatively），从而生成Sunstein(2009)的定义，其中，该术语通常指的是：对于增强个人已存在beliefs的相似政治意见的over-exposure和limited-exposure。Pariser(2011)引入了filter bubble的定义，来描述推荐系统会选择有限内容来服务用户。我们提供了一个理论方法来允许我们单独考虑echo chamber和filter bubble效应。我们将用户兴趣看成是一个动态系统（dynamical system），并将兴趣看成是系统的简并点（degeneracy points）。我们考虑不同的dynamics模型，并区分使得随时间degenerate的充分条件集合。我们接着使用该分析来理解推荐系统扮演的角色。最终我们展示了：在一个使用仿造数据和多个经典bandit算法的仿真学习中，在user dynamics和推荐系统actions间的相互作用。结果表明，推荐系统设计的许多缺陷（pitfalls）和缓和策略。
+在本paper中，我们将echo chamber定义为这样的效应：**通过重复曝光一个特定item或item类目，一个用户的兴趣被正向地（positively reinforced）、或负向地（negatively）增强**。这是Sunstein(2009)的定义概括，其中，该术语通常指的是：对相似政治意见的over-exposure和limited-exposure，会增强个人的已存在信念（beliefs）。Pariser(2011)引入了filter bubble的定义，来描述推荐系统会选择有限内容来服务用户。我们提供了一个理论方法来允许我们单独考虑echo chamber和filter bubble效应。我们将用户兴趣看成是一个动态系统（dynamical system），并将兴趣看成是系统的简并点（degeneracy points）。我们考虑不同的dynamics模型，并区分使得随时间degenerate的充分条件集合。我们接着使用该分析来理解推荐系统扮演的角色。最终我们展示了：在一个使用仿造数据和多个经典bandit算法的仿真学习中，在user dynamics和推荐系统actions间的相互作用。结果表明，推荐系统设计的许多缺陷（pitfalls）和缓和策略。
 
 # 相关工作
 
