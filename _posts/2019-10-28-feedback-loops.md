@@ -174,7 +174,7 @@ $$
 
 我们通过在一个fixed size $$m_t = m = 100$$、time horizon T=5000的candidate pool上运行仿真，来检查echo chamber和filter bubble效应。
 
-在图2中，我们展示了user interest $$\mu_t$$（左列）的degenreation、以及每个item的serving rate（右列），因为每个推荐模型会随时间演化。一个item的serving rate展示了在report interval内服务的频次。为了清楚地观察该分布，我们根据report time上的z-values对items进行排序。尽管所有模型会造成user interest degeneration，degeneration的speeds相当不同（Optimal Oracle > Oracle, TS, UCB > Random Model）。Oracle, TS 和 UCB是基于$$\mu_t$$优化的，因此我们可以看到对于$$\mu_t$$有一个positive的degenerative dynamics。Optimal Oracle会直接在在egeneration speed上进行优化，而不会在$$\mu_t$$上，因此我们可以看到在$$\mu_t$$上同时有一个positive和negative degenreation。Random Model也会在两个方向上对$$\mu_t$$进行drifts，但以一个更慢的rate。然而，除了Random Model外，在所服务的top items上和top user interests会非常快速地收窄降到$$l=5$$的最positive的reinfofced items上。
+在图2中，我们展示了user interest $$\mu_t$$（左列）的degenreation、以及每个item的serving rate（右列），因为每个推荐模型会随时间演化。一个item的serving rate展示了在report interval内服务的频次。为了清楚地观察该分布，我们根据report time上的z-values对items进行排序。尽管所有模型会造成user interest degeneration，degeneration的speeds相当不同（Optimal Oracle > Oracle, TS, UCB > Random Model）。Oracle, TS 和 UCB是基于$$\mu_t$$优化的，因此我们可以看到对于$$\mu_t$$有一个positive的degenerative dynamics。Optimal Oracle会直接在degeneration speed上进行优化，而不会在$$\mu_t$$上，因此我们可以看到在$$\mu_t$$上同时有一个positive和negative degeneration。Random Model也会在两个方向上对$$\mu_t$$进行drifts，但以一个更慢的rate。然而，除了Random Model外，在所服务的top items上和top user interests会非常快速地收窄降到$$l=5$$的最positive的reinfofced items上。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/83440aa88143fa3d473d0d9e07ffc8d011cc2f578a60db119c9b5f9fb94569bbe91668f8b4fd181f168effd2d095916d?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
