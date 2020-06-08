@@ -108,9 +108,11 @@ $$
 
 # 4.系统设计角色——filter bubble
 
-在之前的部分讨论了对于不同user interest dynamics的egeneracy的条件。在本节中，会检查另一面：推荐系统动作在创建filter bubbles上的影响。我们通常不知道现实世界用户兴趣的动态性。然而，我们考虑echo chamber/filter bubble的相关场景：其中在一些items上的用户兴趣具有退化动态性(degenerative dynamics)，并检查了如何设计一个推荐系统来减缓degeneracy过程。我们会考虑三个维度：model accuracy，曝光量（exploration amount），增长的candidate pool。
+在之前的部分讨论了对于不同user interest dynamics的degeneracy的条件。在本节中，会检查另一面：**推荐系统动作对于创建filter bubbles上的影响**。我们通常不知道现实世界用户兴趣的动态性。然而，我们考虑echo chamber/filter bubble的相关场景：其中在一些items上的用户兴趣具有退化动态性(degenerative dynamics)，并检查了如何设计一个推荐系统来减缓degeneracy过程。**我们会考虑三个维度：model accuracy，曝光量（exploration amount），growing candidate pool**。
 
-**Model accuracy**。推荐系统设计者的一个常见目标是，增加internal model $$\theta_t$$的预测accuracy。然而，模型accuracy如何与greedy optimal $$a_t$$组合一起来影响degeneration的速度？对于exact predctions的极端示例，例如：$$\theta_t = \mu_t$$，我们会检查该问题，我们称一个预测模型为“oracle model”。我们会在surfacing assumption下讨论，oracle模型与reedily optimal action selection组合来生成快速的degeneracy。
+## 4.1 Model accuracy
+
+推荐系统设计者的一个常见目标是，增加internal model $$\theta_t$$的预测accuracy。然而，模型accuracy如何与greedy optimal $$a_t$$组合一起来影响degeneration的速度？对于exact predictions的极端示例，**例如：$$\theta_t = \mu_t$$，我们会将这样的预测模型为“oracle model”**。我们会在前提假设法（surfacing assumption）下讨论，oracle模型与greedily optimal action selection组合来生成快速的degeneracy。
 
 为了具体分析该问题，对于$$\mu_t(a)$$的$$a \in M$$，我们会关注degenerate线性动态模型，例如：$$\mu_{t+1}(a) = (1+k) \mu_t(a) + b$$。接着，我们可以为$$\mu_t(a)$$求解，对于$$\mid 1+k(a) \mid > 1$$来获得：
 
@@ -118,27 +120,29 @@ $$
 \mu_t(a) = (\mu_0(a) + \frac{b(a)}{k(a)} (1 + k(a))^t - \frac{b(a)}{k(a)}
 $$
 
-**sufacing Assuption**:
+**Sufacing Assuption**:
 
-假设$$[m] = \lbrace 1,2, \cdots, m \rbrace $$是size=m的candidate set。如果一个items子集 $$S \subset [m]$$会导致，正的positive degenerate  （例如，对于所有$$a \in S$$, $$\mu_t(a) \rightarrow +\infty $$），那么我们假设，存在一个时间$$\tau > 0$$，对于所有$$ t \geq \tau$$，S会占据根据$$\mu_t$$值生成的top $$\mid S \mid$$的items，该$$\mu_t$$由指数函数 $$\mid 1 + k(a) \mid $$的base value进行排序。
+假设$$[m] = \lbrace 1,2, \cdots, m \rbrace $$是size=m的candidate set。如果一个items子集 $$S \subset [m]$$会产生positive degenerate  （例如，对于所有$$a \in S$$, $$\mu_t(a) \rightarrow +\infty $$），那么我们假设：**存在一个时间$$\tau > 0$$，对于所有$$ t \geq \tau$$，S会占据根据$$\mu_t$$值生成的top $$\mid S \mid$$的items**。该$$\mu_t$$由指数函数 $$\mid 1 + k(a) \mid $$的base value进行排序。
 
-如果给定足够的曝光（exposure）时间，surfacing assumption可以确保很快地将items surface退化到top list上。它可以被泛化到关于$$\mu_t$$的非线性随机动态性上，从而提供：来自S的items具有一个稳定的随时间退化速度$$\mid \mu_t(a) - \mu_0(a) \mid /t$$的排序。
+**如果给定足够的曝光（exposure）时间，surfacing assumption可以确保很快地将items surface退化到top list上**。它可以被泛化到关于$$\mu_t$$的非线性随机动态性上，从而提供：来自S的items具有一个稳定的随时间退化速度$$\mid \mu_t(a) - \mu_0(a) \mid /t$$的排序。
 
-在通用的surfacing assumption下，在时间$$\tau$$之后，退化（degeneration）的最快方式是，根据$$\mu_t$$或oracle model的$$\theta_t$$来服务top l items。即使该assuption有一定程度的冲突，oracle model仍会产生非常高效的退化（degeneracy），通过根据$$\mu_t$$来选择top l items，由于较高的$$\mu_t$$，他不会接受到positive feedback，从而增加$$\mu_{t+1}$$、并增强过往选择。
+在通用的surfacing assumption下，在时间$$\tau$$之后，退化（degeneration）的最快方式是：根据$$\mu_t$$或oracle model的$$\theta_t$$来服务top l items。即使该assuption有一定程度的冲突，oracle model仍会产生非常高效的退化（degeneracy），通过根据$$\mu_t$$来选择top l items，由于较高的$$\mu_t$$，他不会接受到positive feedback，从而增加$$\mu_{t+1}$$、并增强过往选择。
 
-实际上，推荐系统模型是不准确的（inaccurate）。我们可以将inaccurate models看成是具有不同级别的noises(添加到$$\theta_t$$)的oracle model。
+**实际上，推荐系统模型是不准确的（inaccurate）。我们可以将inaccurate models看成是具有不同级别的noises(添加到$$\theta_t$$)的oracle model**。
 
-**探索量（Amount of Exploration）**
+## 4.2 探索量（Amount of Exploration）
 
-考虑一种e-random exploration，其中$$a_t$$总是从一个有限candidate pool [m]中（它在$$\theta_t$$上具有一个uniform e noise），根据$$\theta_t^{'} = \theta_t + U([[-\epsilon,  \epsilon])$$，选择出top l items。
+考虑一种$$\epsilon$$-random exploration，其中$$a_t$$总是从一个有限candidate pool [m]中（它在$$\theta_t$$上具有一个uniform $$\epsilon$$ noise），根据$$\theta_t^{'} = \theta_t + U([-\epsilon,  \epsilon])$$，选择出top l items。
 
-给定相同的模型序列$$\theta_t$$，$$\epsilon$$越大，系统退化（degenerate）越慢。然而，实际上，$$\theta_t$$从boservations上学到，在一个oracle model上添加的random expoloration可能会加速退化（degeneration）：random exploration可以随时间展示最正向的degenerating items，使得suracing assumption更可能为true（在图5中，我们在仿真实验中展示了该现象）。另外，如果user interests具有degenerative dynamics，随机均匀推荐items会导致degeration，虽然相当慢。
+**给定相同的模型序列$$\theta_t$$，$$\epsilon$$越大，系统退化（degenerate）越慢**。然而，实际上，$$\theta_t$$从observations上学到，在一个oracle model上添加的random expoloration可能会加速退化（degeneration）：**random exploration可以随时间展示最正向的degenerating items，使得suracing assumption更可能为true（在图5中，我们在仿真实验中展示了该现象）**。另外，如果user interests具有degenerative dynamics，随机均匀推荐items会导致degeration，虽然相当慢。
 
-接着我们如何确保推荐系统不会使得user interests退化（degenerate）？一种方法是，限制一个item服务给user的次数（times）， 越多次会使得用户兴趣动态性退化。实际上，很难检测哪个items与dynamics退化相关，然而，如果所有items都只服务一个有限次数，这通常会阻止degeneration，这也暗示着需要一个不断增长的candidate items池子。
+**接着我们如何确保推荐系统不会使得user interests退化（degenerate）？**一种方法是，限制一个item服务给user的次数（times）， 越多次会使得用户兴趣动态性退化。实际上，很难检测哪个items与dynamics退化相关，然而，如果所有items都只服务一个有限次数，这通常会阻止degeneration，这也暗示着需要一个不断增长的candidate items池子。
 
-**Growing Candidate Pool M**。有了一个不断增长的（growing） candidate pool，在每个timestep时，会有一个关于new items的额外集合可提供给该user。从而，function $$\mu_t$$的domain会随时间t的增加而扩展（expands）。线性增加新items通fipkh是一个避免退化的必要条件，因为在一个有限/任意次线性（sublinearly）增长的candidate pool上，通过鸽巢原理(pigeon hole principle)，必须存在至少一个item，在最坏情况下它会退化（degenerate）（在定理2描述的通用条件下）。然而，有了一个至少线性增长的candidate pool M，系统会潜在利用任意item的最大服务次数来阻止degeneration。
+## 4.3 Growing Candidate Pool M
 
-# 6.模拟实验
+有了一个不断增长的（growing） candidate pool，在每个timestep时，会有一个关于new items的额外集合可提供给该user。从而，function $$\mu_t$$的domain会随时间t的增加而扩展（expands）。线性增加新items通fipkh是一个避免退化的必要条件，因为在一个有限/任意次线性（sublinearly）增长的candidate pool上，通过鸽巢原理(pigeon hole principle)，必须存在至少一个item，在最坏情况下它会退化（degenerate）（在定理2描述的通用条件下）。然而，有了一个至少线性增长的candidate pool M，系统会潜在利用任意item的最大服务次数来阻止degeneration。
+
+# 5.模拟实验
 
 本节考虑一个$$\mu_t$$简单的degenerative dynamics，并检查在5个不同的推荐系统模型中的degeneration速度。我们进一步演示了，增加new items到candidate pool中会有一个对抗system degeneracy的有效解法。
 
