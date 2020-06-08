@@ -36,9 +36,12 @@ deepmind在19年发了篇关于feedback loops的paper：《Degenerate Feedback L
 
 图1
 
-我们对用户兴趣的演化研究很感兴趣。这样的一个演化示例是，兴趣会通过用户与所推荐items的交互进行增强，也就是说，如果用户在timestep t上对一个item a进行点击，那么$$\mu_{t+1}(a) > \mu_t(a)$$；如果a被展示但未被点击，则$$\mu_{t+1}(a) < \mu_t(a)$$. （这里, $$c_t \in \lbrace 0, 1 \rbrace^l$$可以被定义成所对应items的点击indicator vector）
+我们对用户兴趣的演化研究很感兴趣。这样的一个演化示例是，兴趣会通过用户与所推荐items的交互进行增强，也就是说：
 
-为了分析echo chamber或filter bubble效应，我们对于什么时候用户兴趣发生非常剧烈的变更非常感兴趣，在我们的模型中，这会转成$$\mu_t(a)$$采用任意不同于初始兴趣$$\mu_0(a)$$的值：大的positive values表示用户会对item a变得非常感兴趣，而大的negative values表示用户不喜欢a。正式的，对于一个有限item set M，我们会询问：如果 L2-norm $$\| \mu_t \mu_0 \|_2 = (\sum_{a \in M} (\mu_t(a) - \mu_0(a))^2)^{1/2}$$是否可以变得任意大：如果满足下面条件，几乎必然用户的兴趣序列$$\mu_t$$被称为“微弱退化（ weakly degenerat）”：
+- 如果用户在timestep t上对一个item a进行点击，那么$$\mu_{t+1}(a) > \mu_t(a)$$；
+- 如果a被展示但未被点击，则$$\mu_{t+1}(a) < \mu_t(a)$$. （这里, $$c_t \in \lbrace 0, 1 \rbrace^l$$可以被定义成所对应items的关于点击的indicator vector）
+
+为了分析echo chamber或filter bubble效应，**我们对于用户兴趣在什么时候发生非常剧烈变化非常感兴趣**。在我们的模型中，这会转成$$\mu_t(a)$$采用任意不同于初始兴趣$$\mu_0(a)$$的值：大的positive values表示用户会对item a变得非常感兴趣，而大的negative values表示用户不喜欢a。正式的，对于一个有限item set M，我们会询问：如果 L2-norm $$\| \mu_t \mu_0 \|_2 = (\sum_{a \in M} (\mu_t(a) - \mu_0(a))^2)^{1/2}$$是否可以变得任意大：如果满足下面条件，几乎必然用户的兴趣序列$$\mu_t$$被称为“微弱退化（ weakly degenerat）”：
 
 $$
 \underset{t \rightarrow \infty} {lim} sup || \mu_t - \mu_0 ||_2 = \infty, 
