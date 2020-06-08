@@ -146,10 +146,17 @@ $$
 
 本节考虑一个$$\mu_t$$简单的degenerative dynamics，并检查在5个不同的推荐系统模型中的degeneration速度。我们进一步演示了，增加new items到candidate pool中会有一个对抗system degeneracy的有效解法。
 
-我们为图1中一个推荐系统和一个用户间的交互创建了一个simulation。初始size=$$m_0$$，在timestep t上的size=$$m_t$$。在timestep t时，一个推荐系统会从$$m_t$$个items中，根据内部模型$$\theta_t$$来选择top l 个items  $$a_t = (a_t^1, \cdots, a_t^l)$$服务给一个user。该user会独立考虑l items的每一个，并选择点击一个子集（也可能不点击，为空），从而生成一个size=l的binary vector $$c_t$$，其中$$c_t(a_t^i)$$会给出在item $$a_t^i$$上的user feedback，根据$$c_t(a_t^i) \sim Bernoulli(\phi(\mu_t(a_t^i)))$$，其中$$\phi$$是sigmoid function $$\phi(x) = 1/(1 + e^{-x})$$。该系统接着会基于过往行为（past actions）、feedbacks和当前模型参数$$\theta_t$$来更新模型$$\theta_{t+1}$$。我们假设，用户兴趣通过$$\theta(a')$$增加/减少，如果item $$a'$$会收到/未收到一个点击，例如：
+我们为图1中一个推荐系统和一个用户间的交互创建了一个simulation。初始size=$$m_0$$，在timestep t上的size=$$m_t$$。**在timestep t时，一个推荐系统会从$$m_t$$个items中，根据内部模型$$\theta_t$$来选择top l 个items  $$a_t = (a_t^1, \cdots, a_t^l)$$服务给一个user**。
+
+该user会独立考虑l items的每一个，并选择点击一个子集（也可能不点击，为空），从而生成一个size=l的binary vector $$c_t$$，其中$$c_t(a_t^i)$$会给出在item $$a_t^i$$上的user feedback，根据$$c_t(a_t^i) \sim Bernoulli(\phi(\mu_t(a_t^i)))$$，其中$$\phi$$是sigmoid function $$\phi(x) = 1/(1 + e^{-x})$$。
+
+接着该系统会基于过往行为（past actions）、feedbacks和当前模型参数$$\theta_t$$来更新模型$$\theta_{t+1}$$。我们假设，用户兴趣通过$$\theta(a')$$增加/减少，如果item $$a'$$会收到/未收到一个点击，例如：
 
 $$
-\mu_{t+1}(a_t^i) - \mu_t(a_t^i) = 
+\mu_{t+1}(a_t^i) - \mu_t(a_t^i) = \begin{cases}
+\delta(a_t^i)  & \text{if c_t(a_t^i) = 1} \\
+-\delta(a_t^i) & \text{otherwise}
+\end{cases}
 $$
 
 ...(3)
