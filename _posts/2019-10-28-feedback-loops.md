@@ -202,11 +202,11 @@ $$
 
 **Noise Level的效应**
 
-接着我们展示了internal model inaccuracy在degeneracy speed上的影响。我们对比使用不同均匀随机噪声量的Oracle model，例如：系统根据noisy internal model $$\theta_t^{'} = \theta_t + U([-\epsilon, \epsilon])$$来对外服务top l items。candidate pool具有fixed size $$m=100$$。在图5中，我们从0到10来区分$$\epsilon$$。与直觉相反的是（ Counter-intuitively），添加噪声到Oracle中会加速degeneration，因为对比起由$$\mu_0$$排序的top l items的fixed set，它会具有更快degenerative的items会被偶然选中，更可能满足Surfacing Assumption。给定$$\epsilon > 0$$，我们可以看到，随着noise level的增长，在degeneracy speed上具有一个单调递增的阻尼效应（damping effect）。
+**接着我们展示了internal model inaccuracy在degeneracy speed上的影响**。我们对比使用不同均匀随机噪声量的Oracle model，例如：系统根据noisy internal model $$\theta_t^{'} = \theta_t + U([-\epsilon, \epsilon])$$来对外服务top l items。candidate pool具有fixed size $$m=100$$。在图5中，我们从0到10来区分$$\epsilon$$。**与直觉相反的是（ Counter-intuitively），添加噪声到Oracle中会加速degeneration**，因为对比起由$$\mu_0$$排序的top l items的fixed set，添加噪声会使得具有更快degenerative的items会被偶然选中，更可能满足Surfacing Assumption。给定$$\epsilon > 0$$，我们可以看到，随着noise level的增长，在degeneracy speed上具有一个单调递增的阻尼效应（damping effect）。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/32452133dfdcb1a430fc58bfd712b4eb86fabee8579283bf8ad06346406687b52a3772c4c0c6a90531fa5e65d5928356?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=5.jpg&amp;size=750" width="300">
 
-图5
+图5 在Oracle model上具有不同noise levels $$\epsilon \in [0, 10]$$的degeneracy speed，直到T=20000. 在Oracle中添加noise会加速degeneration，但随着noise level的增长，degneracy会缓下来
 
 **Growing Candidate Pool**
 
@@ -214,7 +214,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/fc01a847d9320bf6fae01f7ea89c760362115fc35ab2568524c5a2586b0363f9837bff7279b48bef934099fab31d9c04?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=6.jpg&amp;size=750" width="300">
 
-图6
+图6 5个模型的比较，它们使用growing candidate pools，具有不同的rates $$\eta = 0, 0.5, 1.0$$，degeneracy直到T=10000, 在10个运行结果上平均得到。对于所有growth rates，Oracle和Optimal Oracle都是degenerate的。Random Model和UCB会在sublinear growth上停止generation，而TS model需要linear growth才会停止degeneration。
 
 # 参考
 
