@@ -16,7 +16,7 @@ deepmind在19年发了篇关于feedback loops的paper：《Degenerate Feedback L
 
 推荐系统广泛被用于提供个性化商品和信息流。这些系统会采用user的个人特征以及过往行为来生成一个符合用户个人偏好的items list。虽然商业上很成功，**但这样的系统会产生一个关于窄曝光（narrowing exposure）的自我增强的模式，从而影响用户兴趣，这样的问题称为“echo chamber”和“filte bubble”**。大量研究都致力于对曝光给用户的items set上使用favor diversity来解决。然而，echo chamber和filter bubble效应的当前理解很有限，实验分析表明会有冲突结果。
 
-在本paper中，我们将echo chamber定义为这样的效应：**通过重复曝光一个特定item或item类目，一个用户的兴趣被正向地（positively reinforced）、或负向地（negatively）增强**。这是Sunstein(2009)的定义概括，其中，该术语通常指的是：对相似政治意见的over-exposure和limited-exposure，会增强个人的已存在信念（beliefs）。Pariser(2011)引入了filter bubble的定义，来描述推荐系统会选择有限内容来服务用户。我们提供了一个理论方法来允许我们单独考虑echo chamber和filter bubble效应。我们将用户兴趣看成是一个动态系统（dynamical system），并将兴趣看成是系统的简并点（degeneracy points）。我们考虑不同的dynamics模型，并区分使得随时间degenerate的充分条件集合。我们接着使用该分析来理解推荐系统扮演的角色。最终我们展示了：在一个使用仿造数据和多个经典bandit算法的仿真学习中，在user dynamics和推荐系统actions间的相互作用。结果表明，推荐系统设计的许多缺陷（pitfalls）和缓和策略。
+在本paper中，我们将echo chamber定义为这样的效应：**通过重复曝光一个特定item或item类目，一个用户的兴趣被正向地（positively reinforced）、或负向地（negatively）增强**。这是Sunstein(2009)的定义概括，其中，该术语通常指的是：对相似政治意见的over-exposure和limited-exposure，会增强个人的已存在信念（beliefs）。Pariser(2011)引入了filter bubble的定义，来描述推荐系统会选择有限内容来服务用户。我们提供了一个理论方法来允许我们单独考虑echo chamber和filter bubble效应。**我们将用户兴趣看成是一个动态系统（dynamical system），并将兴趣看成是系统的退化点（degeneracy points）**。我们考虑不同模型的动态性，并确定系统随时间degenerate的充分条件集合。我们接着使用该分析来理解推荐系统所扮演的角色。最终我们展示了：在一个使用模拟数据和多个经典bandit算法的仿真学习中，在user dynamics和推荐系统actions间的相互作用。结果表明，推荐系统设计的许多缺陷（pitfalls）和缓和策略。
 
 # 相关工作
 
@@ -24,9 +24,13 @@ deepmind在19年发了篇关于feedback loops的paper：《Degenerate Feedback L
 
 # 3.模型
 
-我们考虑一个推荐系统，它会与用户随时间一直交互。在每个timestep t上，recommender系统会从一个有限的item set M中提供l个items给一个user。总之，该系统的目标是，呈现（present）用户感兴趣的items给user：我们假设，在timestep t上，user在一个item $a \in M$上的兴趣，可以通过函数$$\mu_t: M \rightarrow R$$来描述，比如：如果用户对该item很感兴趣，那么$$\mu_t(a)$$很大（positive）；反之为很小（负）。
+我们考虑一个推荐系统，它会与用户随时间一直交互。在每个timestep t上，recommender系统会从一个有限的item set M中提供l个items给一个user。总之，该系统的目标是：将可能感兴趣的items呈现（present）给用户。我们假设：
 
-给定一个推荐(recommendation) $$a_t = (a_t^1, \cdots, a_t^l) \in M^l$$，用户基于它当前的兴趣 $$\mu_t(a_t^1), \cdots, \mu_t(a_t^1)$$提供一些feedback $$c_t$$。该交互具有多个effects：在推荐系统传统文献中，feedback $$c_t$$被用于更新用于获取推荐$$a_t$$推荐系统的internal model $$\theta_t$$，接着新模型$$\theta_{t+1}$$会依赖$$\theta_t, a_t, c_t$$。实际上，$$\theta_t$$通常会预测user feedback的分布来决定哪个items $$a_t$$应被呈现给该用户。在本paper中，我们关注另一个效应（effect），并显式考虑用户与推荐系统的交互可能会在下一次交互时以不同的items来变更他的兴趣，这样，该兴趣$$\mu_{t+1}$$会依赖于$$\mu_t, a_t, c_t$$。交互的完整模型如图1所示。
+**在timestep t上，user在一个item $a \in M$上的兴趣，可以通过函数$$\mu_t: M \rightarrow R$$来描述。**
+
+如果用户对该item很感兴趣，那么$$\mu_t(a)$$很大（positive）；反之为很小（negative）。
+
+给定一个推荐(recommendation) $$a_t = (a_t^1, \cdots, a_t^l) \in M^l$$，用户基于它当前的兴趣 $$\mu_t(a_t^1), \cdots, \mu_t(a_t^l)$$提供一些feedback $$c_t$$。该交互具有多个effects：在推荐系统传统文献中，feedback $$c_t$$被用于更新用于获取推荐$$a_t$$推荐系统的internal model $$\theta_t$$，接着新模型$$\theta_{t+1}$$会依赖$$\theta_t, a_t, c_t$$。实际上，$$\theta_t$$通常会预测user feedback的分布来决定哪个items $$a_t$$应被呈现给该用户。在本paper中，我们关注另一个效应（effect），并显式考虑用户与推荐系统的交互可能会在下一次交互时以不同的items来变更他的兴趣，这样，该兴趣$$\mu_{t+1}$$会依赖于$$\mu_t, a_t, c_t$$。交互的完整模型如图1所示。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/2ed24fc42044cfe9e6ca014cf8e512a329d2f37f05bdf544c1a4362c6ef08c51aa5da0b7c7ec70621d93eb0b6922d066?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750" width="400">
 
