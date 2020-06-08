@@ -100,7 +100,7 @@ $$
 
 **定理2 (强退化: strong degeneracy)**
 
-假设定理1恒定，另外存在$$c \in R$$使得 $$\| \mu_{t+1} - \mu_t \| \leq c$$，存在一个$$ \epsilon > 0$$，使得对于所有足够大的$$\mu$$，有$$f(\mu) > \epsilon$$，对于所有足够小的$$\mu$$有$$f(\mu) \leq - \epsilon$$。接着，$$\limit_{t \rightarrow \infty} \mu_t = \infty$$或者$$\limit_{t \rightarrow \infty} \mu_t = -\infty$$。
+假设定理1恒定，另外存在$$c \in R$$使得 $$\| \mu_{t+1} - \mu_t \| \leq c$$，存在一个$$ \epsilon > 0$$，使得对于所有足够大的$$\mu$$，有$$f(\mu) > \epsilon$$，对于所有足够小的$$\mu$$有$$f(\mu) \leq - \epsilon$$。接着，$$limit_{t \rightarrow \infty} \mu_t = \infty$$或者$$limit_{t \rightarrow \infty} \mu_t = -\infty$$。
 
 直觉上，如果用户兴趣具有一些关于drift的非零概率，weak degeneracy在一个随机环境中发生。而strong degeneracy会持有额外的$$\mu_{t+1} - \mu_t$$被限制，对于$$\mu_t$$足够大/小，而增量$$\mu_{t+1} - \mu_t$$具有positive/negative drift，它大于一个constant。
 
@@ -140,7 +140,7 @@ $$
 
 ## 4.3 Growing Candidate Pool M
 
-有了一个不断增长的（growing） candidate pool，在每个timestep时，会有一个关于new items的额外集合可提供给该user。从而，function $$\mu_t$$的domain会随时间t的增加而扩展（expands）。线性增加新items通fipkh是一个避免退化的必要条件，因为在一个有限/任意次线性（sublinearly）增长的candidate pool上，通过鸽巢原理(pigeon hole principle)，必须存在至少一个item，在最坏情况下它会退化（degenerate）（在定理2描述的通用条件下）。然而，有了一个至少线性增长的candidate pool M，系统会潜在利用任意item的最大服务次数来阻止degeneration。
+有了一个不断增长的（growing） candidate pool，在每个timestep时，会有一个关于new items的额外集合可提供给该user。从而，function $$\mu_t$$的domain会随时间t的增加而扩展（expands）。**线性增加新items通常是一个避免退化的必要条件**，因为在一个有限/任意次线性（sublinearly）增长的candidate pool上，通过鸽巢原理(pigeon hole principle)，必须存在至少一个item，在最坏情况下它会退化（degenerate）（在定理2描述的通用条件下）。然而，有了一个至少线性增长的candidate pool M，系统会潜在利用任意item的最大服务次数来阻止degeneration。
 
 # 5.模拟实验
 
@@ -154,14 +154,14 @@ $$
 
 $$
 \mu_{t+1}(a_t^i) - \mu_t(a_t^i) = \begin{cases}
-\delta(a_t^i)  & \text{if c_t(a_t^i) = 1} \\
+\delta(a_t^i)  & \text{if  $ c_t(a_t^i) = 1 $ } \\
 -\delta(a_t^i) & \text{otherwise}
 \end{cases}
 $$
 
 ...(3)
 
-其中，function $$\delta$$会从candidate set映射到R上。从定理2中，我们知道对于所有不tem，有$$\mu_t \rightarrow \pm \infty$$。在该实验中，我们设置l=5,并从一个均匀随机分布$$U([-0.01, 0.01])$$中抽样drift $$\delta$$。对于所有items，用户的初始兴趣$$\mu_0$$是独立的，它们从一个均匀随机分布U([-1,1])中抽样得到。
+其中，function $$\delta$$会从candidate set映射到R上。从定理2中，我们知道对于所有item，有$$\mu_t \rightarrow \pm \infty$$。在该实验中，我们设置l=5,并从一个均匀随机分布$$U([-0.01, 0.01])$$中抽样drift $$\delta$$。对于所有items，用户的初始兴趣$$\mu_0$$是独立的，它们从一个均匀随机分布U([-1,1])中抽样得到。
 
 内部推荐系统模型根据以下5个算法更新：
 
@@ -176,7 +176,7 @@ $$
 
 在图2中，我们展示了user interest $$\mu_t$$（左列）的degenreation、以及每个item的serving rate（右列），因为每个推荐模型会随时间演化。一个item的serving rate展示了在report interval内服务的频次。为了清楚地观察该分布，我们根据report time上的z-values对items进行排序。尽管所有模型会造成user interest degeneration，degeneration的speeds相当不同（Optimal Oracle > Oracle, TS, UCB > Random Model）。Oracle, TS 和 UCB是基于$$\mu_t$$优化的，因此我们可以看到对于$$\mu_t$$有一个positive的degenerative dynamics。Optimal Oracle会直接在在egeneration speed上进行优化，而不会在$$\mu_t$$上，因此我们可以看到在$$\mu_t$$上同时有一个positive和negative degenreation。Random Model也会在两个方向上对$$\mu_t$$进行drifts，但以一个更慢的rate。然而，除了Random Model外，在所服务的top items上和top user interests会非常快速地收窄降到$$l=5$$的最positive的reinfofced items上。
 
-<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/83440aa88143fa3d473d0d9e07ffc8d011cc2f578a60db119c9b5f9fb94569bbe91668f8b4fd181f168effd2d095916d?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750" width="400">
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/83440aa88143fa3d473d0d9e07ffc8d011cc2f578a60db119c9b5f9fb94569bbe91668f8b4fd181f168effd2d095916d?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
 图2
 
