@@ -16,7 +16,7 @@ youtube在2019公布了它的MMoE多目标排序系统《Recommending What Video
 
 # 介绍
 
-在本paper中，我们描述了一个关于视频推荐的大规模排序系统。也就是说，**给定用户当前观看的一个视频，推荐该用户可能会观看和享受的下一个视频**。通常推荐系统会遵循一个two-stage设计：candidate generation、ranking。该paper主要关注ranking。在该stage，推荐器会具有数百个候选，接着会应用一个复杂的模型来对它们进行排序，并将最可能观看的items推荐给用户。
+在本paper中，我们描述了一个关于视频推荐的大规模排序系统。也就是说：**在给定用户当前观看的一个视频的情况下，推荐该用户可能会观看和享受的下一个视频**。通常推荐系统会遵循一个two-stage设计：candidate generation、ranking。该paper主要关注ranking。在该stage，推荐器会具有数百个候选，接着会应用一个复杂的模型来对它们进行排序，并将最可能观看的items推荐给用户。
 
 设计一个真实世界的大规模视频推荐系统充满挑战：
 
@@ -34,9 +34,16 @@ youtube在2019公布了它的MMoE多目标排序系统《Recommending What Video
 - 1) 参与度目标(engagement objectives)，比如：用户点击(user clicks)，推荐视频的参与度
 - 2) 满意度目标（satisfaction objectives），比如：用户喜欢一个视频的程度，在推荐上留下一个评分
 
-为了学习和估计多种类型的用户行为，我们使用MMoE来自动化学习那些跨潜在冲突的多目标共享的参数。Mixture-of-Experts[21]架构会将input layer模块化成experts，每个expert会关注input的不同部分。这可以提升从复杂特征空间（由多个模块生成）中学到的表示。接着，通过使用多个gating network，每个objective可以选择experts来相互共享或不共享。
+为了学习和估计多种类型的用户行为，我们使用MMoE来自动化学习那些跨潜在冲突的多目标共享的参数。**Mixture-of-Experts[21]架构**会将input layer模块化成experts，每个expert会关注input的不同部分。这可以提升从复杂特征空间（由多个模块生成）中学到的表示。
 
-为了建模和减小来自有偏训练数据的选择偏差（selection bias，比如：position bias），我们提出了添加一个shallow tower到主模型中，如图1左侧所示。shallow tower会将input与selection bias（比如：由当前系统决定的ranking order）相关联，接着输出一个scalar作为一个bias项来服务给主模型的最终预测。该模型架构会将训练数据中的label分解成两部分：从主模型中学到的无偏用户工具(unbiased user utility)，从shallow tower学到的估计倾向评分(estimated propensity score)。我们提出的模型结构可以被看成是Wide&Deep模型的一个扩展，shallow tower表示Wide部分。通过直接学习shallow tower和main model，我们可以具有优点：学习selection bias，无需对随机实验resort来获取propensity score。
+接着，通过使用多个**gating network**，每个objective可以选择experts来相互共享或不共享。
+
+为了建模和减小来自有偏训练数据的选择偏差（selection bias，比如：position bias），我们提出了添加一个**shallow tower**到主模型中，如图1左侧所示。shallow tower会将input与selection bias（比如：由当前系统决定的ranking order）相关联，接着输出一个scalar作为一个bias项来服务给主模型的最终预测。**该模型架构会将训练数据中的label分解成两部分**：
+
+- 1.从主模型中学到的无偏用户效用(unbiased user utility)
+- 2.从shallow tower学到的估计倾向评分(estimated propensity score)
+
+我们提出的模型结构可以被看成是Wide&Deep模型的一个扩展，**shallow tower表示Wide部分**。通过直接学习shallow tower和main model，我们可以具有优点：学习selection bias，无需对随机实验resort来获取propensity score。
 
 为了评估我们提出的ranking系统，我们设计了offline和live实验来验证以下的效果：
 
