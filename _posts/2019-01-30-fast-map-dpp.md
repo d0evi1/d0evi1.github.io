@@ -10,15 +10,15 @@ hulu在NIPS 2018上开放了它们的方法:《Fast Greedy MAP Inference for Det
 
 # 摘要
 
-DPP是一种优雅的概率模型。然而，为DPP进行最大后验推断（MAP：maximum a posteriori inference），在许多应用中扮演着一个重要角色，这是一个NP-hard问题。流行的贪婪算法计算开销很大，很难用于大规模实时场景。为了克服计算挑战，在本paper中，我们提出了一种新算法，可以极快加速DPP的贪婪后验推断（greedy MAP inference）。另外，我们的算法也会应用到以下场景：在结果序列中，只需要在附近很少的items上进行多样性排斥。我们应用该算法来生成相关性和多样性推荐。实验结果表明，我们提出的算法要比state-of-the-art的其它方法要快，并在一些公开数据集上提供了一个更好的relevance-diversity trade-off，同时也在online A/B test上要好。
+DPP是一种优雅的概率模型。然而，为DPP进行最大后验推断（MAP：maximum a posteriori inference），在许多应用中扮演着一个重要角色，这是一个NP-hard问题。流行的贪婪算法贪心法计算开销很大，很难用于大规模实时场景。为了克服计算挑战，在本paper中，我们提出了一种新算法，可以极快加速DPP的贪婪后验推断（greedy MAP inference）。另外，我们的算法也会应用到以下场景：在结果序列中，只需要在附近很少的items上进行多样性排斥。我们应用该算法来生成相关性和多样性推荐。实验结果表明，我们提出的算法要比state-of-the-art的其它方法要快，并在一些公开数据集上提供了一个更好的relevance-diversity trade-off，同时也在online A/B test上要好。
 
 # 1.介绍
 
 行列式点过程（DPP： determinantal point process）首先在[33]中介绍用来给出在热平衡(thermal equilibrium)中的费米子系统的分布。除了在量子物理学和随机矩阵上的早期应用，它也可以被应用到多种机器学习任务上，比如：多人姿态估计（multiple person pose estimation）、图片搜索、文档归纳、视频归纳、产品推荐、tweet timeline生成。对比其它概率模型（比如：图形模型），**DPP的一个主要优点是，对于不同类型的推断（包含：conditioning和sampling），它遵循多项式时间算法（polynomial-time algorithms）**。
 
-**上述推断的一个例外是：最大后验推断(MAP)(例如：寻找具有最高概率的items集合)，它是一个NP-hard问题**。因此，具有较低计算复杂度的近似推断方法（approximate inference）更受欢迎。paper[17]提出了针对DPP的一种近似最优的MAP推断（inference）。然而，该算法是一个基于梯度的方法，它在每次迭代上评估梯度时具有较高的计算复杂度，使得它对于大规模实时应用来说不实际。**另一个方法是广泛使用的贪婪算法（greedy algorithm），事实证明：DPP中的log概率是次模的（submodular）**。尽管它具有相对较弱的理论保证，但它仍被广泛使用，因为它在经验上对效果有前景。贪婪算法（reedy algorithm）[17,32]的己知实现具有$$O(M^4)$$的复杂度，其中M是items的总数目。Han et al.的最近工作[20]通过引入一些近似可以将复杂度降到$$O(M^3)$$，但会牺牲accuracy。**在本paper中，我们提出了关于该贪婪算法的一种准确（exact）实现，它具有$$O(M^3)$$的复杂度，它经验上比近似算法[20]要更快**。
+**上述推断的一个例外是：最大后验推断(MAP)(例如：寻找具有最高概率的items集合)，它是一个NP-hard问题**。因此，具有较低计算复杂度的近似推断方法（approximate inference）更受欢迎。paper[17]提出了针对DPP的一种近似最优的MAP推断（inference）。然而，该算法是一个基于梯度的方法，它在每次迭代上评估梯度时具有较高的计算复杂度，使得它对于大规模实时应用来说不实际。**另一个方法是广泛使用的贪心法（greedy algorithm），事实证明：DPP中的log概率是次模的（submodular）**。尽管它具有相对较弱的理论保证，但它仍被广泛使用，因为它在经验上对效果有前景。贪心法（greedy algorithm）[17,32]的已知实现具有$$O(M^4)$$的复杂度，其中M是items的总数目。Han et al.的最近工作[20]通过引入一些近似可以将复杂度降到$$O(M^3)$$，但会牺牲accuracy。**在本paper中，我们提出了关于该w贪心法的一种准确（exact）实现，它具有$$O(M^3)$$的复杂度，它经验上比近似算法[20]要更快**。
 
-**DPP的基本特性是，它会为那些相互比较多样化（diverse）的items集合分配更高的概率**。在一些应用中，选择的items是以序列方式展示的，在少量相邻items间会有**负作用**（negative interactions）。**例如，当推荐一个关于items的长序列给用户时，每个时候只有少量序列会捕获用户的注意力**。在这种场景下，要求离得较远的items相互间更多样(diverse)些是没必要的。为这种情况开发快速算法。
+DPP的基本特性是：它会为那些相互比较多样化（diverse）的items集合分配更高的概率。**在一些应用中，选择的items是以序列方式展示的，在少量相邻items间会有负作用（negative interactions）**。例如，当推荐一个关于items的长序列给用户时，每个时候只有少量序列会捕获用户的注意力。**在这种场景下，要求离得较远的items相互间更多样(diverse)些是没必要的**。我们会为这种情况开发快速算法。
 
 本文贡献。在本paper中，我们提出了一种新算法，它能极大加速DPP的greedy MAP inference。通过增量更新Cholesky因子，我们的算法可以**将计算复杂度降至$$O(M^3)$$**，运行$$(O(N^2 M))$$的时间来返回N个items，使它在大规模实时场景中变得可用。据我们所知，这是首个具有很低时间复杂度的greedy Map inferenece for DPP的准确实现(exact implementation)。
 
