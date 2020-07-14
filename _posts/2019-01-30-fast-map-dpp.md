@@ -24,6 +24,12 @@ DPP的基本特性是：它会为那些相互比较多样化（diverse）的item
 
 另外，我们也将该算法应用到以下场景：只需要在一个滑动窗口中保证多样性。假设window size为：$$w < N$$，复杂度可以减小到$$O(w N M)$$。这个特性使得它很适合用于以下场景，即：在一个短的滑动窗口内保证多样性。
 
+注：
+
+- M：items的总数目
+- N：最终返回N个items结果
+- w：window size
+
 最后，我们将提出的算法应用到推荐任务上。**推荐多样化的items可以给用户探索的机会来发现新items 和 意外发现的items**，也使得该服务可以发现用户的新兴趣。正如实验结果所示，在公开数据集和online A/B test上，对比起其它已知的方法，DPP-based方法在相关性和多样性的trade-off上更好。
 
 # 2.背景
@@ -45,7 +51,7 @@ DPP的基本特性是：它会为那些相互比较多样化（diverse）的item
 
 ## 2.1 DPP
 
-DPP是一个优雅的概率模型，它可以表示负作用（negative interactions）[30]。正式的，一个DPP的$$P$$表示：对于一个离散集合$$Z=\lbrace 1,2,...,M \rbrace$$，在Z的所有子集集合（$$2^Z$$）上的一个概率度量(probability measure)。当P会为空集给出非零概率时，存在一个矩阵$$L \in R^{M \times M}$$，对于所有子集$$Y \subseteq Z$$，Y的概率为：
+DPP是一个优雅的概率模型，它可以表示负作用（negative interactions）[30]。正式的，对于一个离散集合$$Z=\lbrace 1,2,...,M \rbrace$$，一个DPP的$$P$$表示在Z的所有子集集合（共$$2^Z$$种）上的一个概率度量(probability measure)。当P会为空集给出非零概率时，存在一个矩阵$$L \in R^{M \times M}$$，对于所有子集$$Y \subseteq Z$$，Y的概率为：
 
 $$
 P(Y) \propto det(L_Y)
@@ -73,13 +79,13 @@ $$
 
 其中，f是次模函数(submodular)。**在DPP中的log概率函数$$f(Y)=log det(L_Y)$$也是次模函数(submodular)，在[17]中有介绍**。次模最大化（submodular maximization）对应是：寻找能让一个次模函数最大化的一个集合。DPP的MAP inference是一个次模最大化过程。
 
-**次模函数最大化通常是NP-hard的。一个流行的近似方法是基于贪婪算法[37]**。初始化为$$\emptyset$$，在每次迭代中，如果增加一个item能最大化边际增益(marginal gain):
+**次模函数最大化通常是NP-hard的。一个流行的近似方法是基于贪心法[37]**。初始化为$$\emptyset$$，在每次迭代中，如果增加一个item能最大化边际增益(marginal gain):
 
 $$
 j = \underset{i \in Z \backslash Y_g}{argmax} \ f(Y_g \cup \lbrace i \rbrace) - f(Y_g)
 $$
 
-那么它就会被添加到$$Y_g$$中，**直到最大边际增益(maximal marginal gain)为负 或者 违反了基数约束**。当f是单调的（monotone），例如：$$f(X) \leq f(Y)$$对于任意的$$X \subseteq Y$$，贪婪算法会遵循一个$$(1-1/e)$$的近似保证，它服从一个基数约束[37]。对于通用的无约束的次模最大化(no constraints)，一个修改版的贪婪算法会保证(1/2)近似。尽管这些理论保证，在DPP中广泛使用的贪婪算法是因为它的经验上的性能保障(promising empirical performance)。
+那么它就会被添加到$$Y_g$$中，**直到最大边际增益(maximal marginal gain)为负 或者 违反了基数约束**。当f是单调的（monotone），例如：$$f(X) \leq f(Y)$$对于任意的$$X \subseteq Y$$，贪心算法会遵循一个$$(1-1/e)$$的近似保证，它服从一个基数约束[37]。对于通用的无约束的次模最大化(no constraints)，一个修改版的贪心算法会保证(1/2)近似。尽管这些理论保证，在DPP中广泛使用的贪心算法是因为它的经验上的性能保障(promising empirical performance)。
 
 ## 2.3 推荐多样性
 
@@ -282,7 +288,7 @@ $$
 
 ...(13) 
 
-接着，算法1和算法2可以轻易修改成：使用kernel matrix来最大化等式(13)。
+接着，算法1和算法2可以轻易修改成：**使用kernel matrix S来最大化等式(13)**。
 
 注意，对于推荐任务，我们需要相似度$$S_{i,j} \in [0, 1]$$，其中0意味着最大的多样性(diverse)，1意味着最相似（similar）。当归一化向量$$\langle f_i, f_j \rangle$$的内积可以采用负值。在极端情况下，最多样的对（most diverse pair) $$f_i = -f_j$$，但相应的子矩阵（sub-matrix）的行列式为0, 这与$$f_i = f_j$$相同。为了保证非负性（nonnegativity），当将S保持为一个半正定矩阵时，我们会采用一个线性映射，比如：
 
