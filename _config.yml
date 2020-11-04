@@ -26,6 +26,16 @@ owner:
   # google plus id, include the '+', eg +mmistakes
   google_plus:
 
+
+math:
+    engine: 'mathjax'
+    mathjax:
+        src: "//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+        config:
+            tex2jax:
+                inlineMath: [ ['$','$'], ["\\(","\\)"] ]
+
+
 # Background image to be tiled on all pages
 background: 
 
