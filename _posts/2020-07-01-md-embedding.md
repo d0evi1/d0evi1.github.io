@@ -16,7 +16,7 @@ Memory-Efficient Recommendation Systems》，提出了一种mixed dimension embe
 假设一个mixed dimension embedding layer $\bar{E}$ 包含了k+1个blocks，被定义成2k+1个matrices，比如：
 
 $$
-\bar{E} = (\bar{E}^{(0)},\bar{E}^{(0)}, cdots, \bar{E}^{(0)}, P^{(1)}, \cdots, P^{(k)})
+\bar{E} = (\bar{E}^{(0)},\bar{E}^{(1)}, \cdots, \bar{E}^{(k)}, P^{(1)}, \cdots, P^{(k)})
 $$
 
 ...(4)
