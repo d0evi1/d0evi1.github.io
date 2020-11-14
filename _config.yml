@@ -33,7 +33,7 @@ math:
         src: "//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
         config:
             tex2jax:
-                inlineMath: [ ['$','$'], ["\\(","\\)"] ]
+                inlineMath: [ ['$','$'] ], 
 		displayMath: [ ['$$', '$$'] ]
 
 
