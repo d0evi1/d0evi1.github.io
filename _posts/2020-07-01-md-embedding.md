@@ -13,7 +13,7 @@ Memory-Efficient Recommendation Systems》，提出了一种mixed dimension embe
 
 我们开始定义MD embedding layer，并讨论如何将它应用于CF和CTR预测任务上。
 
-假设一个mixed dimension embedding layer $\bar{E}$ 包含了k+1个blocks，被定义成2k+1个matrices，比如：
+假设一个mixed dimension embedding layer $\bar{E}$ 包含了k+1个blocks，它可以通过2k+1个matrices来定义：
 
 $$
 \bar{E} = (\bar{E}^{(0)},\bar{E}^{(1)}, \cdots, \bar{E}^{(k)}, P^{(1)}, \cdots, P^{(k)})
@@ -23,8 +23,8 @@ $$
 
 其中，
 
-- $$\bar{E}^{(i)} \in R^{n_i \times d_i}$$
-- $$P^{(i)} \in R^{d_i \times d_0}$$，其中$$P^{(0)} \in R^{d_0 \times d_0}$$是显式定义
+- $\bar{E}^{(i)} \in R^{n_i \times d_i}$
+- $P^{(i)} \in R^{d_i \times d_0}$，其中$P^{(0)} \in R^{d_0 \times d_0}$是显式定义
 
 假设这些blocks的维度是固定的。接着，对于一个MD embedding layer的forward propagation，会采用一个范围在(1, $$n=\sum_{i=0}^k n_i$$)的index x，并产生一个如算法1所定义的embedding vector $$e_x$$。在该算法中涉及到的steps是可微的，因此我们会通过该layer执行backward propagation，并在训练期间更新matrices $$\bar{E}^{(i)}$$和 $$P^{(i)}$$。我们注意到图1可以被泛化成支持multi-hot lookups，其中对应于一些z query indices的embedding vectors会被fetched，并通过一个可微操作符（比如：add, multiply, concatenation）进行recude。
 
