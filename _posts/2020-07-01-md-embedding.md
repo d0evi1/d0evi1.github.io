@@ -44,21 +44,21 @@ $$
 - $\bar{E}^{(i)} \in R^{n_i \times d_i}$
 - $P^{(i)} \in R^{d_i \times d_0}$，其中$P^{(0)} \in R^{d_0 \times d_0}$是显式定义
 
-假设这些blocks的维度是固定的。接着，对于一个MD embedding layer的forward propagation，会采用一个范围在(1, $$n=\sum_{i=0}^k n_i$$)的index x，并产生一个如算法1所定义的embedding vector $$e_x$$。在该算法中涉及到的steps是可微的，因此我们会通过该layer执行backward propagation，并在训练期间更新matrices $$\bar{E}^{(i)}$$和 $$P^{(i)}$$。我们注意到图1可以被泛化成支持multi-hot lookups，其中对应于一些z query indices的embedding vectors会被fetched，并通过一个可微操作符（比如：add, multiply, concatenation）进行recude。
+假设这些blocks的维度是固定的。接着，对于一个MD embedding layer的forward propagation，会采用一个范围在(1, $$n=\sum_{i=0}^k n_i$$)的index x，并产生一个如算法1所定义的embedding vector $$e_x$$。在该算法中涉及到的steps是可微的，因此我们会通过该layer执行backward propagation，并在训练期间更新matrices $$\bar{E}^{(i)}$$和 $$P^{(i)}$$。我们注意到算法1可以被泛化成支持multi-hot lookups，其中对应于一些z query indices的embedding vectors会被取到（fetched），并通过一个可微操作符（比如：add, multiply, concatenation）进行recude。
 
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/d652fa9bc5c07a2274d796078002cf2ed0b9a232de315ccc4cebcaf0b23aebfd809583963a772d6114e6cdfe9e97c15a?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=a1.jpg&amp;size=750">
 
 算法一
 
-注意，我们会为除了第一个embedding matrix的所有embeddings返回投影embeddings（projected embeddings），所有的embedding vectors $$e_j$$会具有相同的base dimension $$d:= d_0$$。因此，基于一个mixed dimension embedding layer的模型应该根据$$\bar{d}$$确定size。我们在图2中展示了mixed dimension embedding layer的矩阵结构，它具有两个blocks，其中，通过uniform或mixed dimension matrices的参数预算（parameter budget（总区域））是相同的，但分配各不同。
+注意，我们会为除了第一个embedding matrix之外的所有embeddings返回投影embeddings（projected embeddings），所有的embedding vectors $$e_j$$会具有相同的base dimension $$d:= d_0$$。因此，**基于一个mixed dimension embedding layer的模型应根据$$\bar{d}$$来确定size**。我们在图2中展示了mixed dimension embedding layer的矩阵结构，它具有两个blocks，其中，由uniform或mixed dimension matrices的参数预算（parameter budget（总区域））是相同的，但内存分配不同。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a848f955fc4ecc887841af6c9772ed233a885aa47f3e4dc86c732876bfae0b8121c37bdbe29797ae8d99e4a288f32f89?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
 图2 Uniform和Mixed Dimension Embedding layers的matrics结构
 
 
-我们会关注如何来在mixed dimension结构中寻找block结构。这包括了：row count $$n_i$$、以及dimension $$d_i$$会被分配给在mixed dimension embedding  layer中的每个block。我们做了限制：使用流行的信息（popularity information）来确定mixed dimension embedding layer的sizing（例如：访问一个特定feature的频率f；假设这里在training和test样本间大部分一致）。我们注意到，你可以使用一个关于importance的相关概念：它指的是一个特定的feature通常是如何统计信息给target variable的inference的。Importance可以通过domain experts或在训练时通过data-driven的方式来决定。
+接着，我们看下如何来在mixed dimension结构中寻找block结构。这包括了：在mixed dimension embedding layer中分配给每个block的行数（row count）$$n_i$$、以及维度（dimension）$$d_i$$。我们使用流行度信息（popularity information）来界定（sizing）mixed dimension embedding layer的大小（例如：访问一个特定feature的频率f；假设这里在training和test样本间大部分一致）。我们注意到，你可以使用一个与importance相关但不同的概念：它指的是一个特定的feature通常是如何统计信息给target variable的inference的。Importance可以通过domain experts或在训练时通过data-driven的方式来决定。
 
 ## 4.1 Mixed Dimensions的Blocking Scheme
 
