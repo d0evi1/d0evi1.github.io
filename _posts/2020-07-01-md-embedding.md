@@ -11,18 +11,18 @@ Memory-Efficient Recommendation Systems》，提出了一种mixed dimension embe
 
 # 2.背景
 
-我们关注于explicit CF和CTR预估。在explicit CF中，特定items的user ratings会被直接观测到，因此，它可以被公式化成一个矩阵补全问题（matrix complition problem）。embedding-based的方法（比如：MF、NCF）会介于最流行和高效解与矩阵补全之间。主要选择是，使用一个convex relaxation来发现最小nuclear norm solution。该需求会解一个半正定的program，它的时耗是$$O(n^4)$$，不能扩展到real-worl应用中。作为替代，实现上，可以使用cross-validation或其它超参数tuning技术求解。在CATR预测中，我们会预测一个click的概率，它可以被看成是只有二元rating的context-based CF。最近这领域开发了许多模型。这些state-of-the-art的模型会具有许多相似的特征，他们无一例外都使用**内存密集型(memory-intensive) embedding layers**来简化模型其余部分。
+我们主要关注explicit CF和CTR预估这两块。在explicit CF中，特定items的user ratings会被直接观测到，因此，它可以被看成是一个矩阵补全问题（matrix complition problem）。在解决矩阵补全问题时，embedding-based的方法（比如：MF、NCF）是流行的高效解法。它的核心是，使用一个convex relaxation来发现最小的nuclear norm solution。它需要求解一个半正定的program，时耗是$$O(n^4)$$，因而不能扩展到real-world应用中。作为替代，**embedding/factorization方法具有明显缺点：显式需要一个embedding dimension**，但实际上，这可以使用cross-validation或其它超参数tuning技术求解。在CTR预测任务中，我们会预测一个click的概率，它可以被看成是只有二元rating的context-based CF。最近该领域开发了许多模型。这些state-of-the-art的模型会具有许多相似的特征，他们无一例外都使用**内存密集型(memory-intensive) embedding layers**来简化模型其余部分。
 
-在现代ML中，embeddings是通常会用来表示categorical features。embeddings vectors会从数据中进行挖掘，由vectors表示的categorical概念间的特定语义关系可以通过spatial或geometric关系、以及vectors的属性来编码。因而，大的embeddings是推荐系统的天然选择，它需要模型来理解users和items间的关系。
+在现代ML中，embeddings通常会用来表示categorical features。embeddings vectors会从数据中进行挖掘，由vectors表示的categorical概念间的特定语义关系可以通过spatial或geometric关系、以及vectors的属性来编码。因而，**large embeddings**是推荐系统的天然选择，它需要模型来理解users和items间的关系。
 
 目前开发了许多技术来减小由embedding layers消耗的内存量。他们可以被划分成两类：
 
-- (i) 压缩算法
-- (ii) 压缩结构
+- (i) 压缩算法（compression algorithms）
+- (ii) 压缩结构 （compressed architectures）
 
-在标准训练之前，压缩算法通常会涉及到对模型进行一些额外处理。它们可以离线（只涉及到post-training处理）或在线执行（压缩处理会交太、或者部分变更训练处理）。简单的offline压缩算法包括：post-training quantization、pruning或low-rank SVD。模型蒸溜技术（比如：compositional coding）和neural binarization也是一种复杂的离线压缩方法，其中：autoencoders会被训练成mimic uncompressed、pre-trained embedding layers。在线压缩算法包括：quantization-aware training、gradual pruning、以及periodic regularization。我们注意到，许多这些压缩算法对于embedding layers是不唯一的，在模型压缩文献中被广泛使用。
+在标准训练之前，压缩算法通常会涉及到对模型进行一些额外处理。它们可以离线（只涉及到post-training处理）或在线执行（压缩处理会交太、或者部分变更训练处理）。简单的offline压缩算法包括：post-training quantization、pruning或low-rank SVD。模型蒸馏技术（比如：compositional coding）和neural binarization也是一种复杂的离线压缩方法，其中：autoencoders会被训练成mimic uncompressed、pre-trained embedding layers。在线压缩算法包括：quantization-aware training、gradual pruning、以及periodic regularization。我们注意到，许多这些压缩算法对于embedding layers是不唯一的，在模型压缩文献中被广泛使用。
 
-另一方面，我们也可以压缩结构，它尝试使用更少的参数来构建关于**可比静态质量(comparable statistical quality)的embedding representations**。压缩结构的优点是，inference时不只可以减小内存需要，在training时也可以。该方法遵循hashing-based和tensor factorization方法，它们可以以多种方式通过re-unsing参数来减小在一个embedding layer上使用的参数数目。我们的方法与这些技术不同，我们基于embedding popularity来对embedding vectors的维度进行非统一（non-uniform）reduction。原则上，我们提出的技术与大多数其它压缩算法或压缩结构的方法可以混合使用。这是未来的一个方向。
+另一方面，我们也可以压缩结构，它尝试使用更少的参数来构建关于可比静态质量(comparable statistical quality)的embedding representations。**压缩结构的优点是，inference时不只可以减小内存需要，在training时也可以**。该方法遵循hashing-based和tensor factorization方法，它们可以以多种方式通过re-using参数来减小在一个embedding layer上使用的参数数目。我们的方法与这些技术不同，我们基于embedding popularity来对embedding vectors的维度进行非统一（non-uniform）reduction。原则上，我们提出的技术与大多数其它压缩算法或压缩结构的方法可以混合使用。这是未来的一个方向。
 
 最终，我们注意到，non-uniform和deterministic sampling在矩阵补全文献中有提出【37】，同时也包括：纠正popularity来提升statistical recovery performance，或者在non-uniform sampling下为completion提供理论保证。据我们所知，我们是第一个利用popularity来在大规模embedding layers中实际减小参数数的。
 
