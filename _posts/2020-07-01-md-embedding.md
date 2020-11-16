@@ -94,8 +94,11 @@ $$
 
 假设在md embedding layer $$\bar{E}$$的每个block中的vectors数目$$n_i$$是已经固定的。因此，它只分配了维度$$d:=(d_0, \cdots, d_k)$$来完全指定它。
 
+我们提出了一个popularity-based scheme来在block-level上操作，它基于这样一个heuristic：**每个embedding应分配一个与它的popularity的一些分数幂（fractional power）成比例的维度**。
 
-我们提出了一个popularity-based scheme来在block-level上操作，它基于这样一个heuristic：每个embedding应分配一个维度，它与popularity的一些分数幂（fractional power）成比例。注意，这里我们会将block-level probability p与row-wise frequency f进行区别。给定f，我们会定义$$a_i = \sum_{j=t_i}^{t_{i+1}} f_j$$作为在区间$$[t_i, t_{i+1}]$$间的frequency curve的面积，总的$$\tau = \sum_{j=0}^n f_j$$。接着，我们假设：block-level probability vector $$p \in R^{k+1}$$通过它的elements $$p_i=a_i/\tau$$来定义。我们将算法3中的popularity-based scheme进行公式化，使用一个额外的超参数temperature $$a > 0$$。
+注意，这里我们会将block-level probability p与row-wise frequency f进行区别。给定f，我们将$$a_i = \sum\limits_{j=t_i}^{t_{i+1}} f_j$$定义成：在区间$$[t_i, t_{i+1}]$$间的frequency curve的面积，其中总的$$\tau = \sum\limits_{j=0}^n f_j$$。
+
+接着，我们假设：block-level probability vector $$p \in R^{k+1}$$通过它的elements $$p_i=a_i/\tau$$来定义。我们将算法3中的popularity-based scheme进行公式化，使用一个额外的超参数temperature $$a > 0$$。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/9893f13df3b771cf8176302bd687f0fb125c36ac909750e4c1c271acc69f3ac19065c72171730782ead4b27b46aedb05?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=alg3.jpg&amp;size=750">
 
