@@ -62,11 +62,25 @@ $$
 
 ## 4.1 Mixed Dimensions的Blocking Scheme
 
-从一个uniform dimension embedding layer转成一个mixed dimension layer，存在一些延续性。通过使用合理的re-indexing，multiple embedding matrics可以被stack成单个block matrix，或者单个embedding matrix可以通过row-wise的形式划分(partitioned)成多个block matrices。partitioned blocking scheme的关键是，将n个total embedding rows映射成blocks，其中block-level row counts通过$$(n_0, \cdots, n_k)$$和offset vector $$t \in N^{k+1}$$给出，有：$$t_i := \sum_{j=0}^{i-1} n_j$$。
+从一个uniform dimension embedding layer转成一个mixed dimension layer，存在一些延续性。通过使用合理的re-indexing，多个embedding matrics可以被stack成单个block matrix，或者单个embedding matrix可以通过row-wise的形式划分(partitioned)成多个block matrices。**partitioned blocking scheme的关键是，将n个total embedding rows映射成blocks**，其中，block-level row counts通过$$(n_0, \cdots, n_k)$$和offset vector $$t \in N^{k+1}$$给出，有：
+
+$$
+t_i := \sum_{j=0}^{i-1} n_j
+$$
 
 **Blocking for CF**
 
-在CF任务中，我们只有两个features——对应于users和items，对应的embedding matrices分别为：$$W \in R^{n \times d}$$和$$V \in R^{m \times d}$$。为了对mixed dimension embedding layer定size，我们会使用mixed dimentions，它使用单独的embedding matrices来进行划分。首先，我们基于row-wise frequency来对rows进行sort和re-index：$$i < i' \rightarrow f_i \geq f_{i'}$$。接着，我们将每个embedding matrix划分成k+1个blocks，比如在每个block中的total popularity（AUC）是常数，如算法2所示。对于一个给定的frequency f，k均分（k-equipartition）是唯一的并且很容易计算。在我们的实验中，我们看到，在(8,16)范围内的任意地方设置k是足够观察到由mixed dimensions带来的效果，以及这之外的递减效应（diminishing effect）。
+在CF任务中，我们只有两类features——分别对应于users和items，对应的embedding matrices分别为：
+
+- $$W \in R^{n \times d}$$
+- $$V \in R^{m \times d}$$
+
+为了对mixed dimension embedding layer定大小，我们会使用mixed dimensions，它使用单独的embedding matrices来对它们进行划分。
+
+- 首先，我们基于row-wise frequency来对rows进行排序（sort）和re-index：满足$$i < i' \rightarrow f_i \geq f_{i'}$$（即：索引i越小，频率越大）。
+- 接着，我们将每个embedding matrix划分成k+1个blocks，以便每个block内的total popularity（AUC）是常数，如算法2所示。
+
+对于一个给定的frequency f，k等分（k-equipartition）是唯一的，并且很容易计算。在我们的实验中可以看到，对于观察到由mixed dimensions带来的效果，以及这之外的递减效应（diminishing effect），在(8,16)范围内的任意地方设置k是足够的。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/1332f15bd41d50ce2ae0ea3841e878837005a1c6e4eedb507ebb21511617eceabace26fc24d8402098bf6f70ea0beb9a?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=alg2.jpg&amp;size=750">
 
@@ -74,7 +88,7 @@ $$
 
 **Blocking for CTR prediction**
 
-在CTR预测任务中，我们具有一些categorical features，它具有k+1对应的embedding matrics $$E^{(i)} \in R^{n_i \times d}$$。为了对ctr prediction应用的MD embedding layer进行size，我们会通过将它们进行stacking来在不同的embedding matrices间使用mixed dimension。因此，该问题结构定义了blocks数，在每个原始的embedding上的vectors数目定义了在md embedding layer中相应block的row counts $$n_i$$。
+在CTR预测任务中，我们有一些categorical features，以及k+1个相对应的embedding matrics： $$E^{(i)} \in R^{n_i \times d}$$。对于ctr prediction应用，为了界定MD embedding layer的size大小，我们会跨不同的embedding matrices上使用mixed dimensions来对它们进行stacking。因此，该问题结构定义了blocks数；在每个original embedding中的vectors数目定义了在md embedding layer中相应block的行数（row counts）$$n_i$$。
 
 ## 4.2 popularity-based mixed dimensions
 
