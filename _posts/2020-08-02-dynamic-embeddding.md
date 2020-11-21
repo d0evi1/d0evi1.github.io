@@ -85,7 +85,7 @@ def my_cell_forward(c):
 def my_cell_backward(op, w_feedback):
     """returns reaction c_feecback"""
 
-{%e ndhighlight %}
+{% endhighlight %}
 
 然而，需要特别注意：当w和c其中之一涉及到sparse features(比如：words)时，由于它可能发生在input或output layer（例如：一个softmax output layer来预测一个word）。已经存在的tensorflow实现总是需要一个字典和string-to-index转换（例如：通过tf.nn.embedding_lookup或tf.math.top_k），它们与我们的哲学（philosophy：用户只需要定义$$P(w \mid c)$$的形式，无需关注它的内容）不兼容。实际上，这些input/output操作是让tensorflow处理ever-growing的关键，它与input/output values相区别，通过将content processing的job转移给Dynamic Embedding service (DES)。另外，为了让tensorflow与DES无缝工作，我们使用单个protocol buffer来编码所有的配置，它在我们的tensorflow APIs中可以表示成input参数de_config。
 
