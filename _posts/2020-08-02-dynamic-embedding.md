@@ -20,15 +20,15 @@ tags:
 
 为了更好适应模型增长，我们尝试搜寻一个框架，**它可以将一个neural network layer的input/output看成是满足特定分布的充分统计(sufficient statistics)（即：embeddings），我们提出了一个与free energy principle的概念有关的新neuron model称为DynamicCell**。直觉上，通过对interal state进行调节(regulating)及行动(take actions)，可以最小化它的自由能（free energy）。另外，当input包含了non-digestive energy时，它也会通过reaction将它们排出(discharge)，以维持一个稳定的internal state。我们可以看到对free-energy priciple做小修改，可以让它与传统的gradient descent-based算法来关联。因此，对一个layer的一个input signal可以被连续（continuously）或组合（combinatorially）的方式处理。例如，**当在input端上看到一个新的input feature时，该layer可以为它动态分配一个embedding，并将它发送到upstream layers上以便进一步处理**。
 
-为了实现上述思想，会对tensorflow做出一些修改。特别的，会在tensorflow python API中添加一些新的op集合，来直接将symbolic strings作为input，同时当运行一个模型时，"intercept" forward和backward信号。这些op接着会访问一个称为“DynaimicEmbeddding Service(DES)”的新的server，来处理模型的content part。在模型的forward execution期间，这些op会为来自DES的layer input抽取底层的float values（embeddings），并将这们传递给layer output。与backward execution相似，计算的gradients或其它信息，会被传给DES，并基于用户定制的算法来更新interal states。
+为了实现上述思想，会对tensorflow做出一些修改。特别的，会在tensorflow python API中添加一些新的op集合，来直接将symbolic strings作为input，同时当运行一个模型时，"intercept" forward和backward信号。**这些op接着会访问一个称为“DynaimicEmbeddding Service(DES)”的新的server，来处理模型的content part**。在模型的forward execution期间，这些op会为来自DES的layer input抽取底层的float values（embeddings），并将这们传递给layer output。与backward execution相似，计算的gradients或其它信息，会被传给DES，并基于用户定制的算法来更新interal states。
 
 实际上，DES扮演着扩展Tensorflow的角色，主要有以下几方面影响：
 
-- embedding data的虚拟无限能力：通过与外部存储系统（比如：Bigtable或Spanner）合作，可以将模型能力逼近存储的上限。实际上，我们的系统可以与任意支持kv数据的lookup/update的存储系统相适应
-- 灵落的梯度下降更新：DES可以保持关于一个layer的全局信息，比如：词频或平均梯度变化，来帮助它决定何时更新一个embedding。Gradient descent update对于每个变量来说不再是均齐过程 (homogeneous process)，每个layer通过采用合适的actions可以维护它自己的“homeostasis”。同时，它也保证了我们的系统与任意gradient descent optimizers（SGD、AdaGrad、Momentum）是后向兼容的。
-- 高效：在DES上的计算/内存加载会自动分布到云平台的worker机上。训练速度与tensorflow workers成正比，模型容量（capacity）由DynamicEmbedding workers的数目决定。
-- 可靠性：有了DES，tensorflow模型可以变得非常小，因为大多数数据都被保存到像Bigtable的额外存储中。因此，当训练一个大模型时对于机器失败（由于超过资源限制）变得很有弹性。
-- 对迁移学习或多任务学习的支持：通过采用tensorflow的embedding data，多个模型可以共享相同的layer，只需要简单使用相同的op name以及DES配置即可。因此，模型会共享一个norm，而非一个option。
+- embedding data的虚拟无限容量（Virtually unlimited capacity）：通过与外部存储系统（比如：Bigtable或Spanner）合作，**可以将模型能力逼近存储的上限**。实际上，我们的系统可以与任意支持kv数据的lookup/update的存储系统相适应
+- 灵活的梯度下降更新：**DES可以保持关于一个layer的全局信息**，比如：词频或平均梯度变化，来帮助它决定何时更新一个embedding。Gradient descent update对于每个变量来说不再是均齐过程 (homogeneous process)，每个layer通过采用合适的actions可以维护它自己的“homeostasis”。同时，它也保证了我们的系统与任意gradient descent optimizers（SGD、AdaGrad、Momentum）是后向兼容的。
+- 高效：在DES上的计算/内存加载会自动分布到云平台的worker机上。**训练速度与tensorflow workers成正比，模型容量（capacity）由DynamicEmbedding workers的数目决定**。
+- 可靠性：有了DES，**tensorflow模型可以变得非常小**，因为大多数数据都被保存到像Bigtable的额外存储中。因此，当训练一个大模型时对于机器失败（由于超过资源限制）变得很有弹性。
+- 对迁移学习或多任务学习的支持：通过采用tensorflow的embedding data，**多个模型可以共享相同的layer**，只需要简单使用相同的op name以及DES配置即可。因此，模型会共享一个norm，而非一个option。
 
 我们的DynamicEmbedding系统被证明是，在大规模深度学习系统中非常重要，并在多个应用中稳定运行超过一年。带DynamicEmbedding的tensorflow模型可以和不带该功能的tensorflow运行一样快，新增的优点是：更大的capacity，更少的编码，更少的数据预处理工作。工程师切换到DynamicEmbedding的主要工作是，学习新的APIs和配置额外的存储（比如：Bigtable或Spanner），这可以尽可能的简化。
 
