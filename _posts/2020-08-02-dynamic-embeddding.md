@@ -10,11 +10,12 @@ tags:
 # 摘要
 
 
-深度学习模型的一个限制是：input的sparse features，需要在训练之前定义好一个字典。本文提出了一个理论和实践系统设计来解决该限制，并展示了模型结果在一个更大规模上要更好、更高效。特别的，我们通过将内容从形式上解耦，来分别解决架构演进和内存增长。为了高效处理模型增长，我们提出了一个新的neuron model，称为DynamicCell，它受free energy principle的启发，引入了reaction的概念来释放.
+深度学习模型的一个限制是：input的sparse features，需要在训练之前定义好一个字典。本文提出了一个理论和实践系统设计来解决该限制，并展示了模型结果在一个更大规模上要更好、更高效。特别的，我们通过将内容从形式上解耦，来分别解决架构演进和内存增长。为了高效处理模型增长，我们提出了一个新的neuron model，称为DynamicCell，它受free energy principle的启发，引入了reaction的概念来排出non-digestive energy，它将gradient descent-based方法看成是它的特例。我们在tensorflow中通过引入一个新的server来实现了DynamicCell，它会接管涉及模型增长的大部分工作。相应的，它允许任意已经存在的deep learning模型来有效处理任意数目的distinct sparse features（例如：search queries），可以不停增长无需重新定义模型。最显著的是，在生产环境中运行超过一年它仍是可靠的，为google smart campaingns的广告主提供高质量的keywords，并达到极大的accuracy增益。
+
 
 ## 1.2 核心
 
-为了更好适应模型增加，我们尝试搜寻一个框架，我们提出了一个新的neuron model称为DynamicCell：它能将一个neural network layer的input/output看成是满足特定分布的充分统计(sufficient statistics)（embeddings），并进一步将它连接到free energy principle。直觉上，通过对interal state进行正规化及行动，它允许neural network layer来最小化它的自由能（free energy）。。。
+为了更好适应模型增加，我们尝试搜寻一个框架，我们提出了一个新的neuron model称为DynamicCell：**它将一个neural network layer的input/output看成是满足特定分布的充分统计(sufficient statistics)（embeddings），并进一步将它连接到free energy principle**。直觉上，通过对interal state进行正规化及行动，它允许neural network layer来最小化它的自由能（free energy）。。。
 
 为了实现上述思想，会对tensorflow做出一些修改。特别的，会在tensorflow python API中添加一些新的op集合，来直接将symbolic strings作为input，同时当运行一个模型时，"intercept" forward和backward信号。这些op接着会访问一个称为“DynaimicEmbeddding Service(DES)”的新的server，来处理模型的content part。在模型的forward execution期间，这些op会为来自DES的layer input抽取底层的float values（embeddings），并将这们传递给layer output。与backward execution相似，计算的gradients或其它信息，会被传给DES，并基于用户定制的算法来更新interal states。
 
