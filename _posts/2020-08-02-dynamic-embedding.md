@@ -190,13 +190,13 @@ $$
 最终，我们来看下，上述过程是如何将常规的使用gradient descent的loss minimization做为它的一个特例的。为了观察到它，我们可以简单将action singal $$\vec{w}$$与一个loss function $$L{\vec{w}}$$相联系，假设$$\vec{w}$$返回loss的评估（例如：$$\vec{w} = L(\vec{w})$$）。从上述关系，在梯度近似时可以将有限差 step设置为1，我们可以得到：
 
 $$
-\frac{D_{KL}(P_{\vec{w}} \| P_c)}{\partial \vec{c}} \approx <\vec{w}>_{P_{\vec{w}}} - \langle \vec{w} \rangle_{P_c} \approx \frac{\partial{\vec{w}}}{\partial \vec{c}}
+\frac{D_{KL}(P_{\vec{w}} \| P_c)}{\partial \vec{c}} \approx \langle \vec{w} \rangle_{P_{\vec{w}}} - \langle \vec{w} \rangle_{P_c} \approx \frac{\partial{\vec{w}}}{\partial \vec{c}}
 $$
 
 ...(11)
 
 $$
-\frac{D_{KL}} (P_{\overleftarrow{w}} \| P_{\vec{w}}}){\partial \vec{w}} \approx \langle \ overleftarrow{w} \rangle_{P_{\overleftarrow{w}}}  - \langle \ overleftarrow{w} \rangle_{P_{\vec{w}}} \approx <L(\vec{w})>_{P_{\vec{w}}} - \langle L(\vec{w}) \rangle_{P_{\vec{w}}} \approx \frac{\partial L(\vec{w})}{\partial {\vec{w}}}
+\frac{D_{KL}} {(P_{\overleftarrow{w}} \| P_{\vec{w}}}){\partial \vec{w}} \approx \langle \ overleftarrow{w} \rangle_{P_{\overleftarrow{w}}}  - \langle \ overleftarrow{w} \rangle_{P_{\vec{w}}} \approx \langle L(\vec{w}) \rangle_{P_{\vec{w}}} - \langle L(\vec{w}) \rangle_{P_{\vec{w}}} \approx \frac{\partial L(\vec{w})}{\partial {\vec{w}}}
 $$
 
 ...(12)
