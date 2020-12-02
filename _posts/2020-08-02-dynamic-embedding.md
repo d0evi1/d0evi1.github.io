@@ -145,8 +145,8 @@ $$
 其中，$$H(\cdot)$$表示给定分布的entropy，它应该是相对稳定的。为了最小化等式(6)，一个cell需要达到一个这样的state：其中对应到input c的$$D_{KL} (P_{\vec{w}} \mid P_c)$$梯度是0:
 
 $$
-\frac{\partial D_{KL}(P_{\vec{w}} \| P_c)}{\partial \vec{c}} \Leftrightarrow - \sum_x P_{\vec{w}}(x) \frac{\partial \langle\vec{w}, \vec{c}\rangle}{\partial \vec{c}} + \frac{\partial log Z(\vec{c})}{\partial \vec{c}} \approx 0 &&
-\Leftrightarrow \langle\vec{w}\rangle P_c \approx \langle\vec{w}\rangle P_{\vec{w}}
+\frac{\partial D_{KL}(P_{\vec{w}} \| P_c)}{\partial \vec{c}} \Leftrightarrow - \sum_x P_{\vec{w}}(x) \frac{\partial \langle\vec{w}, \vec{c}\rangle}{\partial \vec{c}} + \frac{\partial log Z(\vec{c})}{\partial \vec{c}} \approx 0 \\
+ \Leftrightarrow \langle\vec{w}\rangle P_c \approx \langle\vec{w}\rangle P_{\vec{w}}
 $$
 
 ...(7)
@@ -248,7 +248,7 @@ def dynamic_embedding_lookup(keys, de_config, name):
 
 ### 3.1.2 Sparse Output
 
-当一个neural network的输出为sparse features时，它通常被用在inference问题上：$$argmax_w P(w \mid c)$$，其中c是来自之前layer的input，表示在neural network中的$$\bar{c}$$。根据第2.1节，如果我们假设$$P(W \MID C) \\propto exp(<\bar{w}, \bar{c}>)$$，其中，$$\bar{w}$$是w的embedding，接着$$argmax_w P(w \mid c) = argmax_w <\bar{w}, \bar{c}>$$，它可以简化为：在w的所有值中，离input query $$\vec{c}$$的最近点。实际上，softmax function通常被用在neural network中，它与我们的formulation最相关。为了观察到这一点，假设w的所有可能值集合为W，$$\forall a \in W$$，softmax概率可以被表示为：
+当一个neural network的输出为sparse features时，它通常被用在inference问题上：$$argmax_w P(w \mid c)$$，其中c是来自之前layer的input，表示在neural network中的$$\bar{c}$$。根据第2.1节，如果我们假设$$P(W \MID C) \propto exp(<\bar{w}, \bar{c}>)$$，其中，$$\bar{w}$$是w的embedding，接着$$argmax_w P(w \mid c) = argmax_w <\bar{w}, \bar{c}>$$，它可以简化为：在w的所有值中，离input query $$\vec{c}$$的最近点。实际上，softmax function通常被用在neural network中，它与我们的formulation最相关。为了观察到这一点，假设w的所有可能值集合为W，$$\forall a \in W$$，softmax概率可以被表示为：
 
 $$
 P(w=a \mid c) = \frac{exp()}{}
