@@ -173,7 +173,7 @@ $$
 upstream和downstream的不同之处是，前者的state预期是隐定的。为了对upstream states的稳定性进行measure，你可以将在upstream中信息处理的整个复杂过程看成是一个黑盒，并简单地对来自usual distribution的偏差（deviation）进行measure：
 
 $$
-D_{KL} (P_{\vec{w}} \| P_{\vec{w}} = \sum\limits_x P_{\overleftarrow{w}}(x) log \frac{P_{\overleftarrow{w}(x)}(x)}{P(x | w)}
+D_{KL} (P_{\overleftarrow{w}} \| P_{\vec{w}} )= \sum\limits_x P_{\overleftarrow{w}}(x) log \frac{P_{\overleftarrow{w}(x)}(x)}{P(x | w)}
 $$
 
 ...(8)
