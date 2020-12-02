@@ -46,7 +46,7 @@ tags:
 
 # 2.数学公式
 
-free energy priciple的一个基本思想是，规定：一个生态系统趋向于最小化“surprise”，定义为：
+free energy principle的一个基本思想是，规定：一个生态系统趋向于最小化“surprise”，定义为：
 
 $$
 log\frac{1}{P(s | m)}
@@ -57,22 +57,159 @@ $$
 - s是一个系统的当前internal和external state；
 - m是解释s的一个internal model
 
-我们可以将这样的思想与neural networks相关联，通过**将"surprise"重定义为一个具有contextual inputs与不具体congextual input的state分布间的差异（通过KL-divergence衡量）**，分别表示成：$$P(w \mid c)$$和$$P(w)$$。对于上述原始的公式，我们的新方式可以在一个cell level上实现，并可以取消一个复杂内部过程（预测模型m来解释state s）。我们展示了BP算法在embedding space的free-energy最小化的一个通用过程，它会给人工神经网络（artificial neural network：ANN)带来一个新的思路：一个ANN是一组inter-connected neurons，它会最小化自己的free energy。在其余部分，我们会详细解释neural networks的新方法，以及它带来的实际影响，比如：现实中的一个系统设计和提升。
+我们可以将这样的思想与neural networks相关联，通过**将"surprise"重定义为一个具有contextual inputs与不具体congextual input的state分布间的差异（通过KL-divergence衡量）**，分别表示成：$$P(w \mid c)$$和$$P(w)$$。对于上述原始的公式，我们的新方式可以在一个cell level上实现，不再需要使用一个内部预测模型m来解释state s（它本身可以是一个非常复杂的process）。我们展示了BP算法在embedding space的free-energy最小化的一个通用过程，它会给人工神经网络（artificial neural network：ANN)带来一个新的思路：一个ANN是一个关于inter-connected neurons的group，它会最小化自己的free energy。在其余部分，我们会详细解释neural networks的新方法，以及它带来的实际影响，比如：现实中的一个系统设计和提升。
 
 ## 2.1 Exponential family, embedding和人工神经网络
 
-使用neural networks的思想是，sparse features的represent已经在自然语言模型中广泛探索，本质上，在neural network中的layer仅仅只是它的variables对于特定分布$$P(w_1, \cdots, w_n \mid c_1, \cdots, c_m)$$的充分统计。[47]更进一步将这样的思想泛化到许多已经存在的DNN模型中，并派生了embedding space的一个新等式，来解释contextual input到output的相关度。例如，在NN中的一个layer可以被看成是在embedding空间中$$P(w \mid c)$$分布的一个表示，其中c是layer的contextual input，w是output。
+使用neural networks来表示sparse features的represent已经在自然语言模型中广泛探索。本质上，在neural network中的layer仅仅只是它的variables对于特定分布$$P(w_1, \cdots, w_n \mid c_1, \cdots, c_m)$$的充分统计。[47]更进一步将这样的思想泛化到许多已经存在的DNN模型中，并派生了embedding space的一个新等式，来解释contextual input到output的相关度。例如，在NN中的一个layer可以被看成是在embedding空间中$$P(w \mid c)$$分布的一个表示，其中：**c是layer的contextual input，w是output**。更进一步假设：$$P(w \mid c) \propto exp(<\vec{w}, \vec{c}>) $$，其中$$\vec{w}$$和$$\vec{c}$$分别表示w和c的embeddings，接着一个layer可以基于$$\vec{c}$$来简单计算$$\vec{w}$$。
+
+这与传统观念相冲突：neurons我非常ad规范鉔维护action potentials相互通信，表示成1D function（或binary or continuous）。另外，它偏向于一个更现实的观点：neurons实际上会与它们的firing patterns【9】相通信，以便单个neuron不会只与单个bit相通信。【47】采用了probability作为一种描述firing patterns分布的通用语言，并使用embeddings(sufficient statistics)来表示它们的近似形式。
+
+DNN的另一个视角的一个明显优化是：建模能力。如果我们限制AI来定义activation function的组合，不管我们赋予它们什么含义，他们总是会落入解决非常相似形式的问题：
+
+$$
+min_{\thete=\lbrace,\theta_1, \cdots, \theta_n\rbrace} \sum\limits_{x \in D} L(x, \theta) \equiv f_1(f_2(\cdots f_n(x, \theta_n), \cdots; \theta_2), \cdots, \theta_1), n \in N
+$$
+
+...(1)
+
+其中，D表示一整个training data或一个mini-batch。等式(1)的gradients可以通过使用chain rule来对可学习参数集合$$\theta_i$$进行计算，对于每个$$f_i, i=1, \cdots, n$$：
+
+$$
+\frac{\partial L(x, \theta)}{\partial \theta_i} = \frac{\partial L(x, \theta)}{\partial f_i} \frac{\partial f_i}{\partial \theta_i} = \frac{\partial L(x, \theta)}{\partial f_1} \frac{f_1}{f_2} \cdots \frac{\partial f_{i-1}}{\partial f_i} \frac{\partial f_i}{\partial \theta_i}
+$$
+
+...(2)
+
+从$$f_1$$到$$f_n$$递归计算$$\frac{\partial L(x,\theta)}{\partial f_i}$$和$$\frac{\partial L(x,\theta)}{\partial \theta_i}$$的算法，称为“back-propagation”。定义一个loss function，接着通过back-propagation算法来求解它是人工神经网络的标准做法。
+
+从上面的过程，如果back-propagation算法一次只运行一个batch，可以看到没人可以阻止我们更改x或$$\theta_i, i\in \lbrace 1,2,\cdots,n \rbrace$$的维度。然而，已存在的deep learning库的设计不会将它考虑成一个必要特性。在本节其余部分，我们提出了一个新框架来解释模型增长。
 
 
 ## 2.2 增长需要
 
-...
+一个智能系统的一个基本需要是：能够处理来自感知输入（sensory input）的新信息。当我们在一个neural network中处理一个新的input时，它必须将它转化成一个representation，可以由像等式（1）（其中$$x \in R^m$$）的loss function处理。特别的，如果该input涉太到离散对象（比如：words）时，它必须将它们映射到一个embedding space中。对于该需求的一个naive解释可以从neural network的视角看：一个discrete input c可以被表示成一个特征向量（one-hot）：$$\vec{c}_{0/1} = [0, \cdots, 1, \cdots, 0]^T$$，接着通过一个linear activation layer，它可以变成$$W \vec{c}_{0/1}=W_i$$，其中$$W_i$$表示real matrix W中的第i列，或等价的，c就是embedding。这样的解释可以说明：这限制了使用sparse input values的DNN实现，并且为什么总是需要一个字典（比如：一个字典定义为W）。
+
+实际上，特征向量$$\vec{c}_{0/1}$$的维度（比如：W中的列数）可以增长到任意大，embedding维度（比如：W中的行数）可以相应增长。为了观察embedding dimension为什么增长，我们对neural network layers采用sufficient statistics的视角，一个基本事实是一个embedding的每个dimension都应该被限定。也就是说，假设neural network的一个layer表示了$$P(w \mid c) \propto exp(<\vec{w}, \vec{c}>)$$。接着，两个inputs $$c_1$$和$$c_2$$可以被认为是不同的，如果它们相应的分布相互充分分离。假设：$$P_{c_1}(w) \equiv P(w \mid c_1)$$并且$$P_{c_2}(w) \equiv P(w \mid c_2)$$，这可以表示成：
+
+$$
+D_{KL} (P_{c_1} \| P_{c_2} \equiv \int_w P(w \mid c_1) \frac{log P(w | c_1)}{log P(w | c_2)} > \delta
+$$
+
+...(3)
+
+其中，$$D_{KL}(P \mid Q)$$表示两个分布P和Q间的KL散度，$$\delta > 0$$是一个threshold。通过将embedding的形式$$P(w \mid c)$$，例如：$$P(w \mid c) \propto exp(<\vec{w}, \vec{c}>)$$替代成上述的等式，我们可以获得：
+
+$$
+D_{KL}(P_{c_1} \| P_{c_2} \propto \int_w P(w | c_1) <\vec{w}, \vec{c_1} - \vec{c_2}>
+$$
+
+...(4)
+
+几何上，它会沿着方向$$\vec{c_1} - \vec{c_2}$$来计算vector $$\vec{w}$$的平均长度。由于$$\vec{c}$$的长度是限定的，当distinct c的数目增长时，让等式(3)的不等式总是成立的唯一方法是：增加$$\vec{c}$$和$$\vec{w}$$的维度。直觉上可以简单地说：为了在一个限定空间中填充更多objects，以便它们相互间隔得足够远，我们必须扩展到更高维度上。
 
 ## 2.3 新的neuron model: DynamicCell
 
+现在，我们已经解决了为什么（why）一个AI系统会增长，另一个问题是how：一组neurons只通过input/output signals相互连接，在一起工作来达到整体的可靠状态？一个理想的neuron model不应解释单个cell是如何工作的，而是要泛化到groups of cells，甚至groups of organisms。更好的是，它也能解释在deep learning中广泛使用的已经存在方法（比如：BP算法）的成功。
+
 ### 2.3.1 free energy principle的动机
 
+free energy principle是为了理解大脑的内部运作而发展起来的，它提供给我们一些线索：关于如何在neural network learning上构建一个更统一的模型。必要的，它假设一个生物系统通过一个马尔可夫毯(Markov blanket：它会将internal state与外部环境相隔离)闭环，通信只在通过sensory input和actions发生。生物系统的整体目标是，维持一个稳态(homeostasis)，不论内部和外部，从而减小内部和外部的free energy(surprises)。
+
+然而，如果一个组织，通过Markov blanket闭环，可以通过变更internal states来最小化free energy，并且/或者 与环境（environment）交互，如果两者都失败怎么办？例如，当一个人听到关于一个不幸新闻时，他不会有任何反映发生，变更internal state可能只会破坏身体的体内平衡（homeostasis）。从物理角度，如果信息和energy是内部可变的，那么总的energy是守恒的，non-digestive energy也是维持稳态的一个必要方式。
+
+因此，我们可以将reaction包含到图2中，来简单改进free energy principle的思想，它会遵循物理中的能量转化定律。在我们的新模型中，每个cell或一个group（称为：organism）可以遵循相似原则：通过变更internal states和/或 actions，来最小化free energy（来自input $$\vec{c}$$的surprise），不能被最小化的过多non-digestive energy会通过reaction抛弃。这里的action signal $$\vec{w}$$被在相同Markov blanket中的其它upstream cells接收，只会影响upstream feedback $$\overleftarrow{w}$$。注意，action singal $$\vec{w}$$不同于一个organism采取的与环境交互的物理动作。在我们的模型下，物理动作可以通过upstream singal $$\vec{w}$$来激活来做有用工作、或者通过downstream singal $$\ overleftarrow {c}$$来抛弃extra surprises（例如：通过笑或哭）。
+
 ### 2.3.2 Formulation
+
+对了对上述思想进行数学上的公式化，我们将[47]重新resort来构建一个新的neuron model。总体上，一个neuron表示分布$$P(w \mid c)$$并且遵循[47]，它的input和output singals可以通过它们的embeddings近似表示，比如：$$P(w \mid c) = \frac{1}{Z(\vec{c})} exp(<\vec{w}, \vec{c}>)$$，其中$$\vec{w}$$可能依赖于$$\vec{c}$$，并且$$Z(\vec{c})=\sum_{\vec{w}} exp(<\vec{w}, \vec{c}>)$$。给定这样的假设，我们可以将free energy（或surprise）的最小化表示成两部分：internal和external。
+
+**Internal state homeostasis稳态**
+
+一个cell的internal state的稳定性在图2中反应在action state $$\vec{w}$$上。一个cell的长期行为（long-term behavior）可以与它的context c相互独立，因此可以表示成分布$$P_{\vec{w}} = P(w)$$。这里，free energy（或surprise），来自一个给定input c的一个cell的internal state可以被简单表示成：
+
+$$
+D_{KL}(P_{\vec{w}} \| P_c) = \sum\limits_x P_{\vec{w}}(x) log \frac{P_{\vec{x}}(x)}{P(x | c)}
+$$
+
+...(5)
+
+并且，surprise最小化意味着调整$$P(w \mid c)$$的internal参数，以便$$P(w \mid c) \approx P(w)$$。为了观察surprise minimization是如何在embedding space中实现的，假设我们使用sufficient statistics representation $$P(w \mid c)$$，并将等式(5)重新改写：
+
+$$
+D_{KL}(P_{\vec{w}} \| P_c) = - \sum_{x} P_{\vec{w}}<\vec{w}, \vec{c}> + log Z(\vec{c}) - H(P_{\vec{w}})
+$$
+
+...(6)
+
+其中，$$H(\cdot)$$表示给定分布的entropy，它应该是相对稳定的。为了最小化等式(6)，一个cell需要达到一个这样的state：其中对应到input c的$$D_{KL} (P_{\vec{w}} \mid P_c)$$梯度是0:
+
+$$
+\frac{\partial D_{KL}(P_{\vec{w}} \| P_c)}{\partial \vec{c}} \Leftrightarrow - \sum_x P_{\vec{w}}(x) \frac{\partial <\vec{w}, \vec{c}>}{\partial \vec{c}} + \frac{\partial log Z(\vec{c})}{\partial \vec{c}} \approx 0 &&
+\Leftrightarrow <\vec{w}> P_c \approx <\vec{w}> P_{\vec{w}}
+$$
+
+...(7)
+
+其中，我们假设：$$\partial <\vec{w}, \vec{c}> / \partial {\vec{c}} \approx \vec{w}$$。注意，这与contrastive divergence算法在形式上相似，尽管他们基于完全不同的假设。
+
+**Upsteam state homeostasis稳态**
+
+upstream和downstream的不同之处是，前者的state预期是隐定的。为了对upstream states的稳定性进行measure，你可以将在upstream中信息处理的整个复杂过程看成是一个黑盒，并简单地对来自usual distribution的偏差（deviation）进行measure：
+
+$$
+D_{KL} (P_{\vec{w}} \| P_{\vec{w}} = \sum\limits_x P_{\overleftarrow{w}}(x) log \frac{P_{\ overleftarrow{w}(x)}(x)}{P(x | w)}
+$$
+
+...(8)
+
+其中，$$P_{\overleftarrow{w}}$$表示upstream feedback singal $$\overleftarrow(w)$$的分布（如图2所示）。这与等式(7)相似，我们可以获得该稳定upstream state的condition：
+
+$$
+\frac{\partial D_{KL}(P_{\overleftarrow{w} \| P_{\vec{w}}}}{\partial \vec{w}} \Leftrightarrow <\vec{w}> P_{\vec{w}} \approx <\overleftarrow{w}> P_{\overleftarrow{w}}
+$$
+
+...(9)
+
+通过变更$$P(w \mid c)$$的internal state，一个cell可以通过等式(6)和等式(8)进行optimize来最小化整体的surprise。均衡是在internal state和actions间的一个平衡。
+
+**Reaction**
+
+从上面的分析可知，free energy可以通过在满足等式(7)和等式(9)时达到最小化。然而，一个系统的overall state的entropy的天然趋势是增加的，因此，一个封闭的organic系统应期望来自input的一个常量的upcoming surprises。当这些surprises不能通过变更internal states（等式7）或taking actions（等式(9)）最小化时，他们必须抛弃到系统外，例如：通过reaction $$\overleftarrow{c}$$。例如，总和energy的一个选择可以表示成：
+
+$$
+\overleftarrow{c} \approx (| <\overleftarrow{w}>_{ P_{\overleftarrow{w}}} - <\overleftarrow{w}>_{P_{\vec{w}}} - <\vec{w}>_{P_c}|^2) / 2 \geq (<\overleftarrow{w}>_{P_{\overleft{w}}} - <\overleftarrow{w}>_{P_{\vec{w}}}) \odot (<\vec{w}>_{p_{\vec{w}}} - <\vec{w}>_{P_c}
+$$
+
+...(10)
+
+其中，$$\mid \cdot \mid^2 $$表示element-wise square，$$odot$$也是一个element-wise product。以下，我们会观察到该形式的选择可以天然地与loss function的梯度下降更新相联系。在定义reaction时存在许多其它可能，本paper不考虑。
+
+**与gradient descent update相联系**
+
+最终，我们来看下，上述过程是如何将常规的使用gradient descent的loss minimization做为它的一个特例的。为了观察到它，我们可以简单将action singal $$\vec{w}$$与一个loss function $$L{\vec{w}}$$相联系，假设$$\vec{w}$$返回loss的评估（例如：$$\vec{w} = L(\vec{w})$$）。从上述关系，在梯度近似时可以将有限差 step设置为1，我们可以得到：
+
+$$
+\frac{D_{KL}(P_{\vec{w}} \| P_c)}{\partial \vec{c}} \approx <\vec{w}>_{P_{\vec{w}}} - <\vec{w}>_{P_c} \approx \frac{\partial{\vec{w}}}{\partial \vec{c}}
+$$
+
+...(11)
+
+$$
+\frac{D_{KL}} (P_{\overleftarrow{w}} \| P_{\vec{w}}}){\partial \vec{w}} \approx <\ overleftarrow{w}>_{P_{\overleftarrow{w}}}  - <\ overleftarrow{w}>_{P_{\vec{w}}} \approx <L(\vec{w})>_{P_{\vec{w}}} - <L(\vec{w})>_{P_{\vec{w}}} \approx \frac{\partial L(\vec{w})}{\partial {\vec{w}}}
+$$
+
+...(12)
+
+最终，从等式(10)，我们可以达到熟悉的梯度形式：
+
+$$
+\overleftarrow{c} \approx \frac{\partial L(\vec{w})}{\partial \vec{w}} \cdot \frac{\partial \vec{w}}{\partial \vec{c}} = \frac{L}{\vec{c}}
+$$
+
+...(13)
+
+**这与认识场景的过程相一致，大脑实际上会做某些形式的back-propagations操作**。
 
 # 3.系统设计
 
