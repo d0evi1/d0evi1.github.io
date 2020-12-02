@@ -42,19 +42,22 @@ tags:
 
 图1
 
-图1展示了我们添加到tensorflow的扩展组件的总览。整体目标是：让存在的tensorflow APIs只处理模型的static part：定义nodes，connections，并将数据在相互间进行传递，并将tainable variable lookup/update/sample传到DynamicEmbedding Service(DES)上来允许它们构建和动态增长。另外，我们也需要定义一个新的python APIs集合，它可以直接将string Tensors作为input，将它们的embeddings作为output。这些tensorflow APIs可以直接访问一个称为DynamicEmbedding Master(DEM)的组件，它们会将实际job轮流分发给DynamicEmbedding Workers(DEWs)。DEWs负责embedding lookup/update/sample，并与外部云存储（比如：Bigtable或Spanner）进行通信，并基于多种gradient descentt算法来更新embedding values。
+图1展示了我们添加到tensorflow的扩展组件的总览。整体目标是：让存在的tensorflow APIs只处理模型的static part：定义nodes，connections，将数据相互间进行传递，并**将trainable variable的lookup/update/sample操作传到DynamicEmbedding Service(DES)上来允许它们构建和动态增长**。另外，我们也需要定义一个新的python APIs集合，它可以直接将string Tensors作为input，将它们的embeddings作为output。这些tensorflow APIs可以直接访问一个称为**DynamicEmbedding Master(DEM)的组件**，它们会将实际job轮流分发给**DynamicEmbedding Workers(DEWs)**。DEWs负责embedding lookup/update/sample，并与外部云存储（比如：Bigtable或Spanner）进行通信，并基于多种gradient descent算法来更新embedding values。
 
 # 2.数学公式
 
 free energy priciple的一个基本思想是，规定：一个生态系统趋向于最小化“surprise”，定义为：
 
 $$
-log\frac{1}{P(s \| m)}
+log\frac{1}{P(s | m)}
 $$
 
-其中，s是一个系统的当前internal和external state；m是解释s的一个internal model。
+其中：
 
-我们可以将这样的思想关联到neural networks上，通过将"surprise"重定义为一个是否具有contextual input的系统的state分布间的差异（通过KL-divergence衡量），分别表示成：$$P(w\|c)$$和$$P(w)$$，。对于上述原始的公式，我们的新方式可以在一个cell level上实现，并可以取消一个复杂内部过程（预测模型m来解释state s）。我们展示了BP算法在embedding space的free-energy最小化的一个通用过程，它会给人工神经网络（artificial neural network：ANN)带来一个新的思路：一个ANN是一组inter-connected neurons，它会最小化自己的free energy。在其余部分，我们会详细解释neural networks的新方法，以及它带来的实际影响，比如：现实中的一个系统设计和提升。
+- s是一个系统的当前internal和external state；
+- m是解释s的一个internal model
+
+我们可以将这样的思想与neural networks相关联，通过**将"surprise"重定义为一个具有contextual inputs与不具体congextual input的state分布间的差异（通过KL-divergence衡量）**，分别表示成：$$P(w \mid c)$$和$$P(w)$$。对于上述原始的公式，我们的新方式可以在一个cell level上实现，并可以取消一个复杂内部过程（预测模型m来解释state s）。我们展示了BP算法在embedding space的free-energy最小化的一个通用过程，它会给人工神经网络（artificial neural network：ANN)带来一个新的思路：一个ANN是一组inter-connected neurons，它会最小化自己的free energy。在其余部分，我们会详细解释neural networks的新方法，以及它带来的实际影响，比如：现实中的一个系统设计和提升。
 
 ## 2.1 Exponential family, embedding和人工神经网络
 
