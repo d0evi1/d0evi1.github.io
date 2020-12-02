@@ -158,7 +158,7 @@ $$
 upstream和downstream的不同之处是，前者的state预期是隐定的。为了对upstream states的稳定性进行measure，你可以将在upstream中信息处理的整个复杂过程看成是一个黑盒，并简单地对来自usual distribution的偏差（deviation）进行measure：
 
 $$
-D_{KL} (P_{\vec{w}} \| P_{\vec{w}} = \sum\limits_x P_{\overleftarrow{w}}(x) log \frac{P_{\ overleftarrow{w}(x)}(x)}{P(x | w)}
+D_{KL} (P_{\vec{w}} \| P_{\vec{w}} = \sum\limits_x P_{\overleftarrow{w}}(x) log \frac{P_{\overleftarrow{w}(x)}(x)}{P(x | w)}
 $$
 
 ...(8)
@@ -166,7 +166,7 @@ $$
 其中，$$P_{\overleftarrow{w}}$$表示upstream feedback singal $$\overleftarrow(w)$$的分布（如图2所示）。这与等式(7)相似，我们可以获得该稳定upstream state的condition：
 
 $$
-\frac{\partial D_{KL}(P_{\overleftarrow{w} \| P_{\vec{w}}}}{\partial \vec{w}} \Leftrightarrow \langle\vec{w}\rangle P_{\vec{w}} \approx \langle\overleftarrow{w}\rangle P_{\overleftarrow{w}}
+\frac{\partial D_{KL}(P_{\overleftarrow{w}} \| P_{\vec{w}}}{\partial \vec{w}} \Leftrightarrow \langle\vec{w}\rangle P_{\vec{w}} \approx \langle\overleftarrow{w}\rangle P_{\overleftarrow{w}}
 $$
 
 ...(9)
@@ -178,12 +178,12 @@ $$
 从上面的分析可知，free energy可以通过在满足等式(7)和等式(9)时达到最小化。然而，一个系统的overall state的entropy的天然趋势是增加的，因此，一个封闭的organic系统应期望来自input的一个常量的upcoming surprises。当这些surprises不能通过变更internal states（等式7）或taking actions（等式(9)）最小化时，他们必须抛弃到系统外，例如：通过reaction $$\overleftarrow{c}$$。例如，总和energy的一个选择可以表示成：
 
 $$
-\overleftarrow{c} \approx (| \langle\overleftarrow{w}\rangle_{ P_{\overleftarrow{w}}} - \langle\overleftarrow{w}rlangle_{P_{\vec{w}}} - \langle\vec{w}\rangle_{P_c}|^2) / 2 \geq (\langle\overleftarrow{w}\rangle_{P_{\overleft{w}}} - \langle\overleftarrow{w}\rangle_{P_{\vec{w}}}) \odot (\langle\vec{w}\rangle_{p_{\vec{w}}} - \langle\vec{w}\rangle_{P_c}
+\overleftarrow{c} \approx (| \langle \overleftarrow{w} \rangle_{ P_{\overleftarrow{w}}} - \langle\overleftarrow{w} \rlangle_{P_{\vec{w}}} - \langle\vec{w}\rangle_{P_c}|^2) / 2 \geq (\langle \overleftarrow{w} \rangle_{P_{\overleftarrow{w}}} - \langle \overleftarrow{w} \rangle_{P_{\vec{w}}}) \degree (\langle \vec{w} \rangle_{p_{\vec{w}}} - \langle \vec{w} \rangle_{P_c}
 $$
 
 ...(10)
 
-其中，$$\mid \cdot \mid^2 $$表示element-wise square，$$odot$$也是一个element-wise product。以下，我们会观察到该形式的选择可以天然地与loss function的梯度下降更新相联系。在定义reaction时存在许多其它可能，本paper不考虑。
+其中，$$\mid \cdot \mid^2 $$表示element-wise square，$$\degree$$也是一个element-wise product。以下，我们会观察到该形式的选择可以天然地与loss function的梯度下降更新相联系。在定义reaction时存在许多其它可能，本paper不考虑。
 
 **与gradient descent update相联系**
 
