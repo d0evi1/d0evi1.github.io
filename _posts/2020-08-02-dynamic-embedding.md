@@ -133,15 +133,15 @@ free energy principle是为了**理解大脑的内部运作**而发展起来的�
 图2 在DynamicCell模型中，我们通过引入reaction到free energy priciple中，构建了生命的基本单元（basic unit of life）(cell)。一个basic activity of life仍会维持它的稳态。另外，它通过变更internal states或actions，会将unexpected input “react”成一种排出过多不能被处理energy的方式。例如：笑与器都意味着分别排出good和bad surprises，它们不会对生存（survival）有贡献。换句话说：life reacts。
 
 
-因此，我们可以将reaction包含到图2中，来简单改进free energy principle的思想，它会遵循物理中的能量转化定律。在我们的新模型中，每个cell或一个group（称为：organism）可以遵循相似原则：通过变更internal states和/或 actions，来最小化free energy（来自input $$\vec{c}$$的surprise），不能被最小化的过多non-digestive energy会通过reaction抛弃。这里的action signal $$\vec{w}$$被在位于相同Markov blanket中的其它upstream cells接收，只会影响upstream feedback $$\overleftarrow{w}$$。注意，action singal $$\vec{w}$$不同于一个organism采取的与环境交互的物理动作。在我们的模型下，物理动作可以通过upstream singal $$\vec{w}$$进行激活来做有用工作、或者通过downstream singal $$\ overleftarrow {c}$$来排出extra surprises（例如：通过笑或哭）。
+因此，我们可以将reaction包含到图2中，来简单改进free energy principle的思想，它会遵循物理中的能量转化定律。在我们的新模型中，每个cell或一个group（称为：organism）可以遵循相似原则：**通过变更internal states和/或 actions，来最小化free energy（来自input $$\vec{c}$$的surprise），不能被最小化的过多non-digestive energy会通过reaction排出**。这里的action signal $$\vec{w}$$被在位于相同Markov blanket中的其它upstream cells接收，只会影响upstream feedback $$\overleftarrow{w}$$。注意，action singal $$\vec{w}$$不同于一个organism采取的与环境交互的物理动作。在我们的模型下，物理动作可以通过upstream singal $$\vec{w}$$进行激活来做有用工作、或者通过downstream singal $$\ overleftarrow {c}$$来排出extra surprises（例如：通过笑或哭）。
 
 ### 2.3.2 Formulation
 
-对了对上述思想进行数学上的公式化，我们将[47]重新resort来构建一个新的neuron model。总体上，一个neuron表示分布$$P(w \mid c)$$并且遵循[47]，它的input和output singals可以通过它们的embeddings近似表示，比如：$$P(w \mid c) = \frac{1}{Z(\vec{c})} exp(\langle\vec{w}, \vec{c}\rangle)$$，其中$$\vec{w}$$可能依赖于$$\vec{c}$$，并且$$Z(\vec{c})=\sum_{\vec{w}} exp(\langle\vec{w}, \vec{c}\rangle)$$。给定这样的假设，我们可以将free energy（或surprise）的最小化表示成两部分：internal和external。
+对了对上述思想进行数学上的公式化，我们将[47]重新resort来构建一个新的neuron model。总体上，一个neuron表示分布$$P(w \mid c)$$并且遵循[47]，它的input和output singals可以通过它们的embeddings近似表示，比如：$$P(w \mid c) = \frac{1}{Z(\vec{c})} exp(\langle\vec{w}, \vec{c}\rangle)$$，其中$$\vec{w}$$可能依赖于$$\vec{c}$$，并且$$Z(\vec{c})=\sum_{\vec{w}} exp(\langle\vec{w}, \vec{c}\rangle)$$。给定这样的假设，**我们可以将free energy（或surprise）的最小化表示成两部分：internal和external**。
 
 **Internal state homeostasis稳态**
 
-一个cell的internal state的稳定性在图2中反应在action state $$\vec{w}$$上。一个cell的长期行为（long-term behavior）可以与它的context c相互独立，因此可以表示成分布$$P_{\vec{w}} = P(w)$$。这里，free energy（或surprise），来自一个给定input c的一个cell的internal state可以被简单表示成：
+**一个cell的internal state的稳定性在图2中反应在action state $$\vec{w}$$上**。一个cell的长期行为（long-term behavior）可以与它的context c相互独立，因此可以表示成分布$$P_{\vec{w}} = P(w)$$。这里，**在来自一个给定input c的一个cell的internal state上的free energy（或surprise）**可以被简单表示成：
 
 $$
 D_{KL}(P_{\vec{w}} \| P_c) = \sum\limits_x P_{\vec{w}}(x) log \frac{P_{\vec{x}}(x)}{P(x | c)}
@@ -149,7 +149,7 @@ $$
 
 ...(5)
 
-并且，surprise最小化意味着调整$$P(w \mid c)$$的internal参数，以便$$P(w \mid c) \approx P(w)$$。为了观察surprise minimization是如何在embedding space中实现的，假设我们使用sufficient statistics representation $$P(w \mid c)$$，并将等式(5)重新改写：
+并且，surprise最小化（minimization）意味着调整$$P(w \mid c)$$的internal参数，以便$$P(w \mid c) \approx P(w)$$。为了观察surprise最小化（minimization）是如何在embedding space中实现的，假设我们使用sufficient statistics representation $$P(w \mid c)$$，并将等式(5)重新改写：
 
 $$
 D_{KL}(P_{\vec{w}} \| P_c) = - \sum_{x} P_{\vec{w}}\langle\vec{w}, \vec{c}\rangle + log Z(\vec{c}) - H(P_{\vec{w}})
@@ -166,7 +166,7 @@ $$
 
 ...(7)
 
-其中，我们假设：$$\partial \langle\vec{w}, \vec{c}\rangle / \partial {\vec{c}} \approx \vec{w}$$。注意，这与contrastive divergence算法在形式上相似，尽管他们基于完全不同的假设。
+其中，我们假设：$$\frac{\partial \langle\vec{w}, \vec{c}\rangle} {\partial {\vec{c}} }\approx \vec{w}$$。注意，这与contrastive divergence算法在形式上相似，尽管他们基于完全不同的假设。
 
 **Upsteam state homeostasis稳态**
 
