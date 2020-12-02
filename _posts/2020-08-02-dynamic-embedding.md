@@ -73,12 +73,12 @@ $$
 
 接着一个layer可以基于$$\vec{c}$$来简单计算$$\vec{w}$$。
 
-这与传统观念相冲突：neurons相互间基于单个动作电位（action potentials）通信，表示成1D function（二元binary or 连续continuous）。另外，它偏向于一个更现实的观点：neurons实际上会与它们的firing patterns【9】相通信，以便单个neuron不会只与单个bit相通信。【47】采用了probability作为一种描述firing patterns分布的通用语言，并使用embeddings(sufficient statistics)来表示它们的近似形式。
+这与传统观念：neurons相互间基于单个动作电位进行通信（action potentials：表示成1D function（二元binary or 连续continuous））来说是个挑战。另外，它偏向于一个更现实的观点：**neurons实际上会与它们的firing patterns【9】相通信，以便单个neuron不会只与单个bit相通信**。【47】采用了probability作为一种描述firing patterns分布的通用语言，并使用embeddings(sufficient statistics)来表示它们的近似形式。
 
 DNN的另一个视角的一个明显优化是：建模能力。如果我们限制AI来定义activation function的组合，不管我们赋予它们什么含义，他们总是会落入解决非常相似形式的问题：
 
 $$
-min_{\theta=\lbrace,\theta_1, \cdots, \theta_n\rbrace} \sum\limits_{x \in D} L(x, \theta) \equiv f_1(f_2(\cdots f_n(x, \theta_n), \cdots; \theta_2), \cdots, \theta_1), n \in N
+min_{\theta=\lbrace \theta_1, \cdots, \theta_n\rbrace} \sum\limits_{x \in D} L(x, \theta) \equiv f_1(f_2(\cdots f_n(x, \theta_n), \cdots; \theta_2), \cdots, \theta_1), n \in N
 $$
 
 ...(1)
