@@ -101,7 +101,7 @@ $$
 其中，$$D_{KL}(P \mid Q)$$表示两个分布P和Q间的KL散度，$$\delta > 0$$是一个threshold。通过将embedding的形式$$P(w \mid c)$$，例如：$$P(w \mid c) \propto exp(<\vec{w}, \vec{c}>)$$替代成上述的等式，我们可以获得：
 
 $$
-D_{KL}(P_{c_1} \| P_{c_2} \propto \int_w P(w | c_1) <\vec{w}, \vec{c_1} - \vec{c_2}>
+D_{KL}(P_{c_1} \| P_{c_2} \propto \int_w P(w | c_1) \langle\vec{w}, \vec{c_1} - \vec{c_2}\rangle
 $$
 
 ...(4)
@@ -122,7 +122,7 @@ free energy principle是为了理解大脑的内部运作而发展起来的，�
 
 ### 2.3.2 Formulation
 
-对了对上述思想进行数学上的公式化，我们将[47]重新resort来构建一个新的neuron model。总体上，一个neuron表示分布$$P(w \mid c)$$并且遵循[47]，它的input和output singals可以通过它们的embeddings近似表示，比如：$$P(w \mid c) = \frac{1}{Z(\vec{c})} exp(<\vec{w}, \vec{c}>)$$，其中$$\vec{w}$$可能依赖于$$\vec{c}$$，并且$$Z(\vec{c})=\sum_{\vec{w}} exp(<\vec{w}, \vec{c}>)$$。给定这样的假设，我们可以将free energy（或surprise）的最小化表示成两部分：internal和external。
+对了对上述思想进行数学上的公式化，我们将[47]重新resort来构建一个新的neuron model。总体上，一个neuron表示分布$$P(w \mid c)$$并且遵循[47]，它的input和output singals可以通过它们的embeddings近似表示，比如：$$P(w \mid c) = \frac{1}{Z(\vec{c})} exp(\langle\vec{w}, \vec{c}\rangle)$$，其中$$\vec{w}$$可能依赖于$$\vec{c}$$，并且$$Z(\vec{c})=\sum_{\vec{w}} exp(\langle\vec{w}, \vec{c}\rangle)$$。给定这样的假设，我们可以将free energy（或surprise）的最小化表示成两部分：internal和external。
 
 **Internal state homeostasis稳态**
 
@@ -137,7 +137,7 @@ $$
 并且，surprise最小化意味着调整$$P(w \mid c)$$的internal参数，以便$$P(w \mid c) \approx P(w)$$。为了观察surprise minimization是如何在embedding space中实现的，假设我们使用sufficient statistics representation $$P(w \mid c)$$，并将等式(5)重新改写：
 
 $$
-D_{KL}(P_{\vec{w}} \| P_c) = - \sum_{x} P_{\vec{w}}<\vec{w}, \vec{c}> + log Z(\vec{c}) - H(P_{\vec{w}})
+D_{KL}(P_{\vec{w}} \| P_c) = - \sum_{x} P_{\vec{w}}\langle\vec{w}, \vec{c}\rangle + log Z(\vec{c}) - H(P_{\vec{w}})
 $$
 
 ...(6)
@@ -145,13 +145,13 @@ $$
 其中，$$H(\cdot)$$表示给定分布的entropy，它应该是相对稳定的。为了最小化等式(6)，一个cell需要达到一个这样的state：其中对应到input c的$$D_{KL} (P_{\vec{w}} \mid P_c)$$梯度是0:
 
 $$
-\frac{\partial D_{KL}(P_{\vec{w}} \| P_c)}{\partial \vec{c}} \Leftrightarrow - \sum_x P_{\vec{w}}(x) \frac{\partial <\vec{w}, \vec{c}>}{\partial \vec{c}} + \frac{\partial log Z(\vec{c})}{\partial \vec{c}} \approx 0 &&
-\Leftrightarrow <\vec{w}> P_c \approx <\vec{w}> P_{\vec{w}}
+\frac{\partial D_{KL}(P_{\vec{w}} \| P_c)}{\partial \vec{c}} \Leftrightarrow - \sum_x P_{\vec{w}}(x) \frac{\partial \langle\vec{w}, \vec{c}\rangle}{\partial \vec{c}} + \frac{\partial log Z(\vec{c})}{\partial \vec{c}} \approx 0 &&
+\Leftrightarrow \langle\vec{w}\rangle P_c \approx \langle\vec{w}\rangle P_{\vec{w}}
 $$
 
 ...(7)
 
-其中，我们假设：$$\partial <\vec{w}, \vec{c}> / \partial {\vec{c}} \approx \vec{w}$$。注意，这与contrastive divergence算法在形式上相似，尽管他们基于完全不同的假设。
+其中，我们假设：$$\partial \langle\vec{w}, \vec{c}\rangle / \partial {\vec{c}} \approx \vec{w}$$。注意，这与contrastive divergence算法在形式上相似，尽管他们基于完全不同的假设。
 
 **Upsteam state homeostasis稳态**
 
@@ -166,7 +166,7 @@ $$
 其中，$$P_{\overleftarrow{w}}$$表示upstream feedback singal $$\overleftarrow(w)$$的分布（如图2所示）。这与等式(7)相似，我们可以获得该稳定upstream state的condition：
 
 $$
-\frac{\partial D_{KL}(P_{\overleftarrow{w} \| P_{\vec{w}}}}{\partial \vec{w}} \Leftrightarrow <\vec{w}> P_{\vec{w}} \approx <\overleftarrow{w}> P_{\overleftarrow{w}}
+\frac{\partial D_{KL}(P_{\overleftarrow{w} \| P_{\vec{w}}}}{\partial \vec{w}} \Leftrightarrow \langle\vec{w}\rangle P_{\vec{w}} \approx \langle\overleftarrow{w}\rangle P_{\overleftarrow{w}}
 $$
 
 ...(9)
@@ -178,7 +178,7 @@ $$
 从上面的分析可知，free energy可以通过在满足等式(7)和等式(9)时达到最小化。然而，一个系统的overall state的entropy的天然趋势是增加的，因此，一个封闭的organic系统应期望来自input的一个常量的upcoming surprises。当这些surprises不能通过变更internal states（等式7）或taking actions（等式(9)）最小化时，他们必须抛弃到系统外，例如：通过reaction $$\overleftarrow{c}$$。例如，总和energy的一个选择可以表示成：
 
 $$
-\overleftarrow{c} \approx (| <\overleftarrow{w}>_{ P_{\overleftarrow{w}}} - <\overleftarrow{w}>_{P_{\vec{w}}} - <\vec{w}>_{P_c}|^2) / 2 \geq (<\overleftarrow{w}>_{P_{\overleft{w}}} - <\overleftarrow{w}>_{P_{\vec{w}}}) \odot (<\vec{w}>_{p_{\vec{w}}} - <\vec{w}>_{P_c}
+\overleftarrow{c} \approx (| \langle\overleftarrow{w}\rangle_{ P_{\overleftarrow{w}}} - \langle\overleftarrow{w}rlangle_{P_{\vec{w}}} - \langle\vec{w}\rangle_{P_c}|^2) / 2 \geq (\langle\overleftarrow{w}\rangle_{P_{\overleft{w}}} - \langle\overleftarrow{w}\rangle_{P_{\vec{w}}}) \odot (\langle\vec{w}\rangle_{p_{\vec{w}}} - \langle\vec{w}\rangle_{P_c}
 $$
 
 ...(10)
@@ -190,13 +190,13 @@ $$
 最终，我们来看下，上述过程是如何将常规的使用gradient descent的loss minimization做为它的一个特例的。为了观察到它，我们可以简单将action singal $$\vec{w}$$与一个loss function $$L{\vec{w}}$$相联系，假设$$\vec{w}$$返回loss的评估（例如：$$\vec{w} = L(\vec{w})$$）。从上述关系，在梯度近似时可以将有限差 step设置为1，我们可以得到：
 
 $$
-\frac{D_{KL}(P_{\vec{w}} \| P_c)}{\partial \vec{c}} \approx <\vec{w}>_{P_{\vec{w}}} - <\vec{w}>_{P_c} \approx \frac{\partial{\vec{w}}}{\partial \vec{c}}
+\frac{D_{KL}(P_{\vec{w}} \| P_c)}{\partial \vec{c}} \approx <\vec{w}>_{P_{\vec{w}}} - \langle \vec{w} \rangle_{P_c} \approx \frac{\partial{\vec{w}}}{\partial \vec{c}}
 $$
 
 ...(11)
 
 $$
-\frac{D_{KL}} (P_{\overleftarrow{w}} \| P_{\vec{w}}}){\partial \vec{w}} \approx <\ overleftarrow{w}>_{P_{\overleftarrow{w}}}  - <\ overleftarrow{w}>_{P_{\vec{w}}} \approx <L(\vec{w})>_{P_{\vec{w}}} - <L(\vec{w})>_{P_{\vec{w}}} \approx \frac{\partial L(\vec{w})}{\partial {\vec{w}}}
+\frac{D_{KL}} (P_{\overleftarrow{w}} \| P_{\vec{w}}}){\partial \vec{w}} \approx \langle \ overleftarrow{w} \rangle_{P_{\overleftarrow{w}}}  - \langle \ overleftarrow{w} \rangle_{P_{\vec{w}}} \approx <L(\vec{w})>_{P_{\vec{w}}} - \langle L(\vec{w}) \rangle_{P_{\vec{w}}} \approx \frac{\partial L(\vec{w})}{\partial {\vec{w}}}
 $$
 
 ...(12)
