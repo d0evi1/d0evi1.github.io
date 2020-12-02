@@ -277,7 +277,7 @@ $$
 
 如果$$dim(\vec{w})=dim(\vec{c}) +1$$，其中$$dim(\cdot)$$表示一个vector的维度，即落到我们的特例上。
 
-然而，需要计算等式(14)，对于softmax output来说，当在W中的elements的数目非常大时，对于w的所有值计算cross entropy loss非常低效。幸运的是，efficient negative sampling方法已经被很好地研究[21]。在DES中必须支持它。
+然而，需要计算等式(14)，对于softmax output来说，当在W中的elements的数目非常大时，对于w的所有值计算cross entropy loss非常低效。**幸运的是，efficient negative sampling方法已经被很好地研究[21]。在DES中必须支持它**。
 
 **Candidate negatie sampling**
 
@@ -292,7 +292,7 @@ _compute_sampled_logits(pos_keys, c, num_samled, de_config, name):
 
 **TopK retrieval**
 
-这里，在训练期间需要candidate negative sampling，在inference期间，我们希望如上计算$$argmax_w P(w \mid c) = argmax_w <\vec{w},\vec{c}>$$，在实际上，它通常来检索到给定input的top-k最近点（例如：在语言inference中beam search）。topK retrieval的interface定义如下：
+这里，在训练期间需要candidate negative sampling，在inference期间，我们希望如上计算$$argmax_w P(w \mid c) = argmax_w \langle \vec{w},\vec{c} \rangle $$，在实际上，它通常来检索到给定input的top-k最近点（例如：在语言inference中beam search）。topK retrieval的interface定义如下：
 
 {% highlight python %}
 
@@ -305,7 +305,7 @@ def top_k(c, k, de_config, name):
 
 ### 3.1.3 Saving/restoring模型
 
-最终，在model training期间，一个模型需要被周期性保存。由于我们会将大多数数据移出tensorflow的graph外，对于维持在tensorflow与DynamicEmbedding两者保存的checkpoints间的一致性很重要。在API这一侧，每次调用DynamicEmbedding相关API时，相应的embedding data信息，会在一个global variable中保存唯一的(name, de_config)。寻于DynamicEmbedding的checkpoint saving/loading会与tensorflow非常相似：
+最终，在model training期间，一个模型需要被周期性保存。由于我们会将大多数数据移出tensorflow的graph外，对于**维持在tensorflow与DynamicEmbedding两者保存的checkpoints间的一致性**很重要。**在API这一侧，每次调用DynamicEmbedding相关API时，相应的embedding data信息，会在一个global variable中保存唯一的(name, de_config)**。寻于DynamicEmbedding的checkpoint saving/loading会与tensorflow非常相似：
 
 {% highlight python %}
 
@@ -330,29 +330,29 @@ loss = tf.reduce_sum(cross_ent)
 
 {% endhighlight %}
 
-注意，一个字典的需求被完全移除。
+**注意，字典的需求被完全移除**。
 
 ## 3.2 DynamicEmbedding serving设计
 
-如图1所示，我们的DynamicEmbedding Service(DES)涉及到两部分：DynamicEmbedding Master(DEM)和DynamicEmbedding Workers(DEWs)。前面定义的tensorflow API只会与DEM通信，它涉及到将real work分布到不同的DEWs上。为了同时达到效率和ever-growing模型，在DEWs中的每个worker会对local caching和remote storage进行balance。在该部分，我们会讨论在当前形式下DES的不同方面。
+如图1所示，我们的DynamicEmbedding Service(DES)涉及到两部分：DynamicEmbedding Master(DEM)和DynamicEmbedding Workers(DEWs)。前面定义的tensorflow API只会与DEM通信，它涉及到将real work分布到不同的DEWs上。**为了同时达到效率和ever-growing模型，在DEWs中的每个worker会对local caching和remote storage进行balance**。在该部分，我们会讨论在当前形式下DES的不同方面。
 
 ### 3.2.1 Embedding存储
 
-在第2节中讨论的，neurons间的通信会被表示成firing patterns(embedding)的充分统计，它们是floating values的vectors。这些firing patterns本质上是离散的（discrete），可以被表示成string ids。这里，这些embedding data的存储只涉及到(key, value) pairs，并且不吃惊的是，我们会使用protocol buffer来处理data transfer以及为每个embedding like string id, frequency等保存额外信息。
+在第2节中讨论的，neurons间的通信会被表示成firing patterns(embedding)的充分统计，**它们是floating values的vectors**。这些firing patterns本质上是离散的（discrete），可以被表示成string ids。这里，**这些embedding data的存储只涉及到(key, value) pairs**，并且不吃惊的是，我们会使用protocol buffer来处理data transfer、以及**为每个embedding保存像string id, frequency这类额外信息**。
 
-当特定数据被传递到由tensorflow API定义的node中时，它会与DES通信来处理实际job。例如，在运行dynamic_embedding_look op的forward pass期间，一个batch的strings会被传递给tensorflow computation graph的一个node，它接着会询问DEM来处理实际的lookup job。在backward pass期间，feedback信号（例如：对应output的gradients）会被传递给注册的backward node中，它也需要与DEM通信来进行数据更新。
+当特定数据被传递到由tensorflow API定义的node中时，它会与DES通信来处理实际job。**例如，在运行dynamic_embedding_look op的forward pass期间，一个batch的strings会被传递给tensorflow computation graph的一个node，它接着会询问DEM来处理实际的lookup job。在backward pass期间，feedback信号（例如：对应output的gradients）会被传递给注册的backward node中，它也需要与DEM通信来进行数据更新**。
 
-为了允许可扩展的embedding lookup/update，我们设计了一个称为EmbeddingStore的组件，它会专门与google内部的多个storage systems进行通信。每个支持的storage system实现了与基础操作（比如：Lookup(), Update(), Sample(), Import(), Export()）相似的接口，例如，一个InProtoEmbedding实现了EmbeddingStore接口，它通过将整个数据保存到一个protocol buffer格式中，它可以被用来进行local test以及训练小的data set。一个SSTableEmbedding会在training期间将数据加载进DEWs的内存中，并在GFS中将它们保存成immutable且非常大的文件。一个BigtableEmbedding允许数据同时存成local cache和remote、mutable及高度可扩展的Bigtables。因此，从worker failure中快速恢复，使得不必等待，直到所有之前的数据在接受到新请求前被加载。
+为了允许可扩展的embedding lookup/update，我们设计了一个称为**EmbeddingStore的组件，它会专门与google内部的多个storage systems进行通信**。每个支持的storage system实现了与基础操作（比如：Lookup(), Update(), Sample(), Import(), Export()）相似的接口，例如，一个InProtoEmbedding实现了EmbeddingStore接口，它通过将整个数据保存到一个protocol buffer格式中，它可以被用来进行local test以及训练小的data set。一个SSTableEmbedding会在training期间将数据加载进DEWs的内存中，并在GFS中将它们保存成immutable且非常大的文件。一个BigtableEmbedding允许数据同时存成local cache和remote、mutable及高度可扩展的Bigtables。因此，从worker failure中快速恢复，使得不必等待，直到所有之前的数据在接受到新请求前被加载。
 
 ### 3.2.2 embedding update
 
-在我们的框架中，embedding updates会在forward和backward passes期间同时发生。对于backpropagation算法，updates只发生在$$\partial{L}/\partial{w}$$到达时的backward feddback。为了职证我们的系统与已经存在的gradient descent算法（例如：tf.train.GradientDescentOptimizer或tf.train.AdagradOptimizer）完全兼容，我们需要在DEWs中实现每个算法。幸运的是，我们可以复用tensorflow相似的代码来保证一致性。注意，许多gradient descent算法，比如：Adagrad，会保存关于每个值的全局信息，它们应在gradient updates间一致。在我们的情况中，这意味着我们需要额外信息来存储到embedding中。
+在我们的框架中，**embedding updates会在forward和backward passes期间同时发生**。对于backpropagation算法，updates只发生在当backward feedback过程中信息$$\frac{\partial{L}}{\partial{w}}$$到达时。**为了保证我们的系统与已经存在的gradient descent算法（例如：tf.train.GradientDescentOptimizer或tf.train.AdagradOptimizer）完全兼容，我们需要在DEWs中实现每个算法**。幸运的是，我们可以复用tensorflow相似的代码来保证一致性。注意，**许多gradient descent算法（比如：Adagrad）会保存关于每个值的全局信息，它们应在gradient updates间一致**。在我们的情况中，这意味着我们需要额外信息来存储到embedding中。
 
 **long-short term memory**
 
 当一个学习系统可以处理一段长期的数据时（比如：数月和数年），解决long-short term memory的主题很重要，因为如果特定features只是随时出现，或者在一段较长时间内没有被更新，它对inference accuracy不会有帮助。在另一方面，一些短期输入（momentary input）可能包含需要特殊处理的信息，一个无偏的学习系统（unbiased learning system）yicce处理这些低频数据。接着，我们提出了两个基本技术来管理embedding data的生命周期。
 
-- frequency cutoff:
+- frequency cutoff: 
 - Bloom filter:
 
 ### 3.2.3 top-k sampling
