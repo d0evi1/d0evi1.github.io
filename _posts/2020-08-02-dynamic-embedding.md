@@ -30,11 +30,11 @@ tags:
 - 可靠性：有了DES，**tensorflow模型可以变得非常小**，因为大多数数据都被保存到像Bigtable的额外存储中。因此，当训练一个大模型时对于机器失败（由于超过资源限制）变得很有弹性。
 - 对迁移学习或多任务学习的支持：通过采用tensorflow的embedding data，**多个模型可以共享相同的layer**，只需要简单使用相同的op name以及DES配置即可。因此，模型会共享一个norm，而非一个option。
 
-我们的DynamicEmbedding系统被证明是，在大规模深度学习系统中非常重要，并在多个应用中稳定运行超过一年。带DynamicEmbedding的tensorflow模型可以和不带该功能的tensorflow运行一样快，新增的优点是：更大的capacity，更少的编码，更少的数据预处理工作。工程师切换到DynamicEmbedding的主要工作是，学习新的APIs和配置额外的存储（比如：Bigtable或Spanner），这可以尽可能的简化。
+我们的DynamicEmbedding系统被证明是在大规模深度学习系统中非常重要的，并且它在多个应用中稳定运行超过一年。**带DynamicEmbedding的tensorflow模型可以和不带该功能的tensorflow运行一样快**，新增的优点是：更大的capacity，更少的编码，更少的数据预处理工作。工程师切换到DynamicEmbedding的主要工作是：**学习新的APIs和配置额外的存储（比如：Bigtable或Spanner），这可以尽可能的简化**。
 
 在过去两年，由于我们的系统上线，我们移植了许多流行的模型，特别是涉及到在训练前需要sparse features的模型，它们可以满足来自input的持续增长。例如，image annotation中使用upgraded Google Inception模型，它可以从来自海量搜索queries的lables中进行学习；用于机器翻译的GNMT的模型，它可以被用于将句子翻译成多数语言描述；我们升级版的Word2vec可以以任意语言快速发现与任意root query相似的的queies。
 
-通过采用DynamicEmbedding, 我们发现，单个不需要任意预处理的模型足够达到令人满意的效果。特别的，对比其它rule-based系统，我们的sparse feature models之一可以达到相当高的accurate结果，。。。
+通过采用DynamicEmbedding, 我们发现，单个不需要任意预处理的模型足够达到令人满意的效果。特别的，对比其它rule-based系统，我们的sparse feature models之一（从网站内容中给出关键词suggesting）可以达到相当高的accurate结果。通过允许系统由**数据自我演化来驱动**，它可以快速胜过其它需要人工调整的系统。
 
 系统总览：
 
