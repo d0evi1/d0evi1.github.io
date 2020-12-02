@@ -350,10 +350,10 @@ loss = tf.reduce_sum(cross_ent)
 
 **long-short term memory**
 
-当一个学习系统可以处理一段长期的数据时（比如：数月和数年），解决long-short term memory的主题很重要，因为如果特定features只是随时出现，或者在一段较长时间内没有被更新，它对inference accuracy不会有帮助。在另一方面，一些短期输入（momentary input）可能包含需要特殊处理的信息，一个无偏的学习系统（unbiased learning system）yicce处理这些低频数据。接着，我们提出了两个基本技术来管理embedding data的生命周期。
+当一个学习系统可以处理一段长期的数据时（比如：数月和数年），解决long-short term memory的主题很重要*。**因为如果特定features只是短暂出现，或者在一段较长时间内没有被更新，它对inference accuracy不会有帮助**。在另一方面，一些短期输入（momentary input）可能包含需要特殊处理的有价值信息，一个无偏的学习系统（unbiased learning system）应该处理这些**低频数据**。接着，我们提出了两个基本技术来管理embedding data的生命周期(lifetime)。
 
-- frequency cutoff: 
-- Bloom filter:
+- Frequency cutoff: **每当一个embedding被更新时，使用一个定时器进行递增来记录它的更新频次（update frequency）**。因此，我们可以根据它的频次基于一个cutoff value来决定该embedding是否应该被保存成一个永久存储（比如：Bigtable）。对于涉及到多个epoches的训练，tensorflow的job会告诉你：一个example是否是首次见到。
+- Bloom filter: 另一个达到相似效果的流行的方法是：**使用bloom filter来对低频数据进行剪枝**，会更有存储效率。我们实现该特性是为了兼容已经存在的linear systems（它们已经处理了大量数据），但它们的模型比deep networks复杂度要低。
 
 ### 3.2.3 top-k sampling
 
