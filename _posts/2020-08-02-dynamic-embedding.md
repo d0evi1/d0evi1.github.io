@@ -108,7 +108,7 @@ $$
 
 ...(3)
 
-其中，$$D_{KL}(P \mid Q)$$表示两个分布P和Q间的KL散度，$$\delta > 0$$是一个threshold。通过将embedding的形式$$P(w \mid c)$$，例如：$$P(w \mid c) \propto exp(<\vec{w}, \vec{c}>)$$替代成上述的等式，我们可以获得：
+其中，$$D_{KL}(P \mid Q)$$表示两个分布P和Q间的KL散度，$$\delta > 0$$是一个threshold。通过**将embedding的形式$$P(w \mid c)$$（例如：$$P(w \mid c) \propto exp(<\vec{w}, \vec{c}>)$$）代入到上面的等式**，我们可以获得：
 
 $$
 D_{KL}(P_{c_1} \| P_{c_2} \propto \int_w P(w | c_1) \langle\vec{w}, \vec{c_1} - \vec{c_2}\rangle
@@ -120,13 +120,13 @@ $$
 
 ## 2.3 新的neuron model: DynamicCell
 
-现在，我们已经解决了为什么（why）一个AI系统会增长，另一个问题是how：一组neurons只通过input/output signals相互连接，在一起工作来达到整体的可靠状态？一个理想的neuron model不应解释单个cell是如何工作的，而是要泛化到groups of cells，甚至groups of organisms。更好的是，它也能解释在deep learning中广泛使用的已经存在方法（比如：BP算法）的成功。
+现在，我们已经解决了为什么（why）一个AI系统会增长，另一个问题是how：一组neurons只通过input/output signals相互连接，在一起工作来达到整体的稳态？**一个理想的neuron model不应解释单个cell是如何工作的，而是要泛化到groups of cells，甚至groups of organisms**。更好的是，它也能解释在deep learning中广泛使用的已经存在方法（比如：BP算法）的成功。
 
 ### 2.3.1 free energy principle的动机
 
-free energy principle是为了理解大脑的内部运作而发展起来的，它提供给我们一些线索：关于如何在neural network learning上构建一个更统一的模型。必要的，它假设一个生物系统通过一个马尔可夫毯(Markov blanket：它会将internal state与外部环境相隔离)闭环，通信只在通过sensory input和actions发生。生物系统的整体目标是，维持一个稳态(homeostasis)，不论内部和外部，从而减小内部和外部的free energy(surprises)。
+free energy principle是为了**理解大脑的内部运作**而发展起来的，它提供给我们一些线索：关于如何在neural network learning上构建一个更统一的模型。必要的，它假设一个生物系统通过一个马尔可夫毯(Markov blanket：它会将internal state与外部环境相隔离）闭环，通信只通过sensory input和actions发生。生物系统的整体目标是：**不论内部和外部，维持一个稳态(homeostasis)，从而减小内部和外部的free energy(surprises)**。
 
-然而，如果一个组织，通过Markov blanket闭环，可以通过变更internal states来最小化free energy，并且/或者 与环境（environment）交互，如果两者都失败怎么办？例如，当一个人听到关于一个不幸新闻时，他不会有任何反映发生，变更internal state可能只会破坏身体的体内平衡（homeostasis）。从物理角度，如果信息和energy是内部可变的，那么总的energy是守恒的，non-digestive energy也是维持稳态的一个必要方式。
+然而，如果一个组织（organism），通过Markov blanket闭环，可以通过变更internal states来最小化free energy，并且/或者 与环境（environment）交互，如果两者都失败怎么办？例如，当一个人听到关于一个不幸新闻时，他不会有任何反映发生，变更internal state可能只会破坏身体的体内平衡（homeostasis）。**从物理角度，如果信息和energy是内部可变的，那么总的energy是守恒的，non-digestive energy也是维持稳态的一个必要方式**。
 
 因此，我们可以将reaction包含到图2中，来简单改进free energy principle的思想，它会遵循物理中的能量转化定律。在我们的新模型中，每个cell或一个group（称为：organism）可以遵循相似原则：通过变更internal states和/或 actions，来最小化free energy（来自input $$\vec{c}$$的surprise），不能被最小化的过多non-digestive energy会通过reaction抛弃。这里的action signal $$\vec{w}$$被在相同Markov blanket中的其它upstream cells接收，只会影响upstream feedback $$\overleftarrow{w}$$。注意，action singal $$\vec{w}$$不同于一个organism采取的与环境交互的物理动作。在我们的模型下，物理动作可以通过upstream singal $$\vec{w}$$来激活来做有用工作、或者通过downstream singal $$\ overleftarrow {c}$$来抛弃extra surprises（例如：通过笑或哭）。
 
