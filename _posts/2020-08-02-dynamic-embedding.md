@@ -234,7 +234,7 @@ $$
 
 
 
-回顾上面，在neural network中的每个layer/neuron被认为是在embedding space中的特定分布$$p(w\mid c)$$（c为input，w为output）。对于在input和output间的中间层（intermediate layers），c已经被表示成一个embedding $$\bar{c} \rightharpoonup$$，我们只需要定义一个函数来计算$$\bar{w}$$。在这样的情况下，我们可以只使用在tensorflow中相同的计算图来进行forward计算（图2中的input和action）和backward执行（在图2中的feedback和reaction），non-gradients baesd update可以通过对tf.gradients做很微小的变化来达到。例如，一个典型的DynamicCell node可以被定义成：
+回顾上面，在neural network中的每个layer/neuron被认为是在embedding space中的特定分布$$p(w\mid c)$$（c为input，w为output）。对于在input和output间的中间层（intermediate layers），**c已经被表示成一个embedding $$\vec{c}$$，我们只需要定义一个函数来计算$$\vec{w}$$**。在这样的情况下，我们可以只使用在tensorflow中相同的计算图来进行**forward计算（图2中的input和action）**和**backward执行（在图2中的feedback和reaction）**，非基于梯度的更新（non-gradients based update）可以通过**对tf.gradients做很微小的变化来达到**。例如，一个典型的DynamicCell node可以被定义成：
 
 {% highlight python %}
 def my_cell_forward(c):
@@ -246,11 +246,11 @@ def my_cell_backward(op, w_feedback):
 
 {% endhighlight %}
 
-然而，需要特别注意：当w和c其中之一涉及到sparse features(比如：words)时，由于它可能发生在input或output layer（例如：一个softmax output layer来预测一个word）。已经存在的tensorflow实现总是需要一个字典和string-to-index转换（例如：通过tf.nn.embedding_lookup或tf.math.top_k），它们与我们的哲学（philosophy：用户只需要定义$$P(w \mid c)$$的形式，无需关注它的内容）不兼容。实际上，这些input/output操作是让tensorflow处理ever-growing的关键，它与input/output values相区别，通过将content processing的job转移给Dynamic Embedding service (DES)。另外，为了让tensorflow与DES无缝工作，我们使用单个protocol buffer来编码所有的配置，它在我们的tensorflow APIs中可以表示成input参数de_config。
+然而，需要特别注意：**当w和c其中之一涉及到sparse features(比如：words)时，由于它可能发生在input或output layer（例如：一个softmax output layer来预测一个word）**。已经存在的tensorflow实现总是需要一个字典和string-to-index转换（例如：通过tf.nn.embedding_lookup或tf.math.top_k），它们与我们的哲学（philosophy：用户只需要定义$$P(w \mid c)$$的形式，无需关注它的内容）不兼容。**实际上，这些input/output操作是让tensorflow处理日益增长（ever-growing）的关键，它与input/output values是有区别的，通过将content processing的job转移给Dynamic Embedding service (DES)**。另外，为了让tensorflow与DES无缝工作，我们使用单个protocol buffer来编码所有的配置，它在我们的tensorflow APIs中可以表示成input参数de_config。
 
 ### 3.1.1 Sparse Input
 
-如上所述，允许tensorflow直接采用任意string作为input，这非常有用。这里我们调用该process来任意string input转换成它的embedding dynamic embedding，使用tensorflow API定义成：
+如上所述，允许tensorflow直接采用任意string作为input，这非常有用。这里**我们调用该process来将任意string input转换成它的embedding dynamic embedding**，使用tensorflow API定义成：
 
 {% highlight python %}
 
@@ -259,7 +259,11 @@ def dynamic_embedding_lookup(keys, de_config, name):
 
 {% endhighlight %}
 
-其中，key是任意shape的string tensor，de_config包含了关于embedding的必要信息，包括希望的embedding维度，初始化方法（当key是首次见到时），embedding的存储等。name和config也可以唯一的区分embedding来进行数据共享（data sharing）。
+其中：
+
+- key：是任意shape的string tensor
+- de_config：包含了关于embedding的必要信息，包含：希望的embedding维度、初始化方法（当key是首次见到时）、embedding的存储等。
+- name：和config也可以唯一的区分embedding来进行数据共享（data sharing）
 
 ### 3.1.2 Sparse Output
 
