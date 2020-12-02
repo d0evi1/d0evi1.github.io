@@ -190,10 +190,10 @@ $$
 
 **Reaction**
 
-从上面的分析可知，free energy可以通过在满足等式(7)和等式(9)时达到最小化。然而，一个系统的overall state的entropy的天然趋势是增加的，因此，一个封闭的organic系统应期望来自input的一个常量的upcoming surprises。当这些surprises不能通过变更internal states（等式7）或taking actions（等式(9)）最小化时，他们必须排出到系统外，例如：通过reaction $$\overleftarrow{c}$$。例如，总和energy的一个选择可以表示成：
+从上面的分析可知，**free energy可以通过在满足等式(7)和等式(9)时达到最小化**。然而，一个系统的overall state的entropy的天然趋势是增加的，因此，一个封闭的organic系统应期望来自input的一个常量的upcoming surprises。**当这些surprises不能通过变更internal states（等式7）或taking actions（等式(9)）最小化时，他们必须排出到系统外（例如：通过reaction $$\overleftarrow{c}$$）**。例如，其中一种总和energy（total additional energy）可以表示成：
 
 $$
-\overleftarrow{c} \approx (| \langle \overleftarrow{w} \rangle _{ P_{\overleftarrow{w}}} - \langle\overleftarrow{w} \rangle _{P_{\vec{w}}} - \langle\vec{w}\rangle_{P_c}|^2) / 2 \geq (\langle \overleftarrow{w} \rangle_{P_{\overleftarrow{w}}} - \langle \overleftarrow{w} \rangle_{P_{\vec{w}}})  \circ (\langle \vec{w} \rangle_{p_{\vec{w}}} - \langle \vec{w} \rangle_{P_c})
+\overleftarrow{c} \approx (| \langle \overleftarrow{w} \rangle _{ P_{\overleftarrow{w}}} - \langle\overleftarrow{w} \rangle _{P_{\vec{w}}}|^2 + |\langle\vec{w} \rangle _{P_{\vec{w}}} - \langle\vec{w}\rangle_{P_c}|^2) / 2 \geq (\langle \overleftarrow{w} \rangle_{P_{\overleftarrow{w}}} - \langle \overleftarrow{w} \rangle_{P_{\vec{w}}})  \circ (\langle \vec{w} \rangle_{p_{\vec{w}}} - \langle \vec{w} \rangle_{P_c})
 $$
 
 ...(10)
@@ -202,18 +202,18 @@ $$
 
 **与gradient descent update相联系**
 
-最终，我们来看下，上述过程是如何将常规的使用gradient descent的loss minimization做为它的一个特例的。为了观察到它，我们可以简单将action singal $$\vec{w}$$与一个loss function $$L({\vec{w}})$$相联系，假设$$\vec{w}$$返回loss的评估（例如：$$\vec{w} = L(\vec{w})$$）。从上述关系，在梯度近似时可以将有限差 step设置为1，我们可以得到：
+最终，我们来看下，上述过程是如何将常规的使用gradient descent的loss minimization做为它的一个特例的。为了观察到它，我们可以简单将action singal $$\vec{w}$$与一个loss function $$L({\vec{w}})$$相联系，假设$$\vec{w}$$返回loss的评估(evaluation)（例如：$$\vec{w} = L(\vec{w})$$）。从上述关系，在梯度近似时可以将有限差 step设置为1，我们可以得到：
 
 $$
-\frac{D_{KL}(P_{\vec{w}} \| P_c)}{\partial \vec{c}} \approx \langle \vec{w} \rangle_{P_{\vec{w}}} - \langle \vec{w} \rangle_{P_c} \approx \frac{\partial{\vec{w}}}{\partial \vec{c}}
+\frac{\partial D_{KL}(P_{\vec{w}} \| P_c)}{\partial \vec{c}} \approx \langle \vec{w} \rangle_{P_{\vec{w}}} - \langle \vec{w} \rangle_{P_c} \approx \frac{\partial{\vec{w}}}{\partial \vec{c}}
 $$
 
 ...(11)
 
 $$
-\frac{\partial D_{KL}(P_{\overleftarrow{w}} \| P_{\vec{w}})}{\partial \vec{w}} \approx \langle \overleftarrow{w} \rangle_{P_{\overleftarrow{w}}}  - \langle \overleftarrow{w} \rangle_{P_{\vec{w}}} \\
-\approx \langle L(\vec{w}) \rangle_{P_{\vec{w}}} - \langle L(\vec{w}) \rangle_{P_{\vec{w}}}  \\
-\approx \frac{\partial L(\vec{w})}{\partial {\vec{w}}}
+\frac{\partial D_{KL}(P_{\overleftarrow{w}} \| P_{\vec{w}})}{\partial \vec{w}} &\approx \langle \overleftarrow{w} \rangle_{P_{\overleftarrow{w}}}  - \langle \overleftarrow{w} \rangle_{P_{\vec{w}}} \\
+&\approx \langle L(\vec{w}) \rangle_{P_{\vec{w}}} - \langle L(\vec{w}) \rangle_{P_{\vec{w}}}  \\
+&\approx \frac{\partial L(\vec{w})}{\partial {\vec{w}}}
 $$
 
 ...(12)
