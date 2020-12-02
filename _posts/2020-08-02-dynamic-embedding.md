@@ -61,7 +61,7 @@ $$
 
 ## 2.1 Exponential family, embedding和人工神经网络
 
-使用neural networks来表示sparse features的represent已经在自然语言模型中广泛探索。本质上，在neural network中的layer仅仅只是它的variables对于特定分布$$P(w_1, \cdots, w_n \mid c_1, \cdots, c_m)$$的充分统计。[47]更进一步将这样的思想泛化到许多已经存在的DNN模型中，并派生了embedding space的一个新等式，来解释contextual input到output的相关度。例如，在NN中的一个layer可以被看成是在embedding空间中$$P(w \mid c)$$分布的一个表示，其中：**c是layer的contextual input，w是output**。
+使用neural networks来表示sparse features的represent已经在自然语言模型中广泛探索。本质上，在neural network中的layer仅仅只是它的variables对于特定分布$$P(w_1, \cdots, w_n \mid c_1, \cdots, c_m)$$的充分统计。[47]更进一步将这样的思想泛化到许多已经存在的DNN模型中，并派生了embedding space的一个新等式，来解释contextual input到output的相关度。例如，**在NN中的一个layer可以被看成是在embedding空间中$$P(w \mid c)$$分布的一个表示**，其中：**c是layer的contextual input，w是output**。
 
 更进一步假设：
 
@@ -93,12 +93,12 @@ $$
 
 从$$f_1$$到$$f_n$$递归计算$$\frac{\partial L(x,\theta)}{\partial f_i}$$和$$\frac{\partial L(x,\theta)}{\partial \theta_i}$$的算法，称为“back-propagation”。定义一个loss function，接着通过back-propagation算法来求解它是人工神经网络的标准做法。
 
-从上面的过程，如果back-propagation算法一次只运行一个batch，可以看到没人可以阻止我们更改x或$$\theta_i, i\in \lbrace 1,2,\cdots,n \rbrace$$的维度。然而，已存在的deep learning库的设计不会将它考虑成一个必要特性。在本节其余部分，我们提出了一个新框架来解释模型增长。
+从上面的过程，**如果back-propagation算法一次只运行一个batch，可以看到我们可以更改x或$$\theta_i, i\in \lbrace 1,2,\cdots,n \rbrace$$的维度**。然而，已存在的deep learning库的设计不会将它考虑成一个必要特性。在本节其余部分，我们提出了一个新框架来解释模型增长。
 
 
 ## 2.2 增长需要
 
-一个智能系统的一个基本需要是：能够处理来自感知输入（sensory input）的新信息。当我们在一个neural network中处理一个新的input时，它必须将它转化成一个representation，可以由像等式（1）（其中$$x \in R^m$$）的loss function处理。特别的，如果该input涉太到离散对象（比如：words）时，它必须将它们映射到一个embedding space中。对于该需求的一个naive解释可以从neural network的视角看：一个discrete input c可以被表示成一个特征向量（one-hot）：$$\vec{c}_{0/1} = [0, \cdots, 1, \cdots, 0]^T$$，接着通过一个linear activation layer，它可以变成$$W \vec{c}_{0/1}=W_i$$，其中$$W_i$$表示real matrix W中的第i列，或等价的，c就是embedding。这样的解释可以说明：这限制了使用sparse input values的DNN实现，并且为什么总是需要一个字典（比如：一个字典定义为W）。
+一个智能系统的一个基本需要是：能够处理来自感知输入（sensory input）的新信息。当我们在一个neural network中处理一个新的input时，必须将它转化成一个representation，可以由像等式（1）（其中$$x \in R^m$$）的loss function处理。特别的，如果该input涉及到离散对象（比如：words）时，它必须将它们映射到一个embedding space中。对于该需求的一个naive解释可以从neural network的视角看：一个discrete input c可以被表示成一个特征向量（one-hot）：$$\vec{c}_{0/1} = [0, \cdots, 1, \cdots, 0]^T$$，接着通过一个linear activation layer，它可以变成$$W \vec{c}_{0/1}=W_i$$，其中$$W_i$$表示real matrix W中的第i列，或等价的，c就是embedding。这样的解释可以说明：这限制了使用sparse input values的DNN实现，并且为什么总是需要一个字典（比如：一个字典定义为W）。
 
 实际上，特征向量$$\vec{c}_{0/1}$$的维度（比如：W中的列数）可以增长到任意大，embedding维度（比如：W中的行数）可以相应增长。为了观察embedding dimension为什么增长，我们对neural network layers采用sufficient statistics的视角，一个基本事实是一个embedding的每个dimension都应该被限定。也就是说，假设neural network的一个layer表示了$$P(w \mid c) \propto exp(<\vec{w}, \vec{c}>)$$。接着，两个inputs $$c_1$$和$$c_2$$可以被认为是不同的，如果它们相应的分布相互充分分离。假设：$$P_{c_1}(w) \equiv P(w \mid c_1)$$并且$$P_{c_2}(w) \equiv P(w \mid c_2)$$，这可以表示成：
 
