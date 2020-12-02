@@ -103,7 +103,7 @@ $$
 实际上，特征向量$$\vec{c}_{0/1}$$的维度（比如：W中的列数）可以增长到任意大，embedding维度（比如：W中的行数）也会相应增长。为了观察embedding dimension为什么增长，我们对neural network layers采用sufficient statistics的视角，一个基本事实是一个embedding的每个dimension都应该被限定。也就是说，假设neural network的一个layer表示了$$P(w \mid c) \propto exp(\langle \vec{w}, \vec{c} \rangle)$$。接着，两个inputs $$c_1$$和$$c_2$$可以被认为是不同的，如果它们相应的分布相互充分分离。假设：$$P_{c_1}(w) \equiv P(w \mid c_1)$$并且$$P_{c_2}(w) \equiv P(w \mid c_2)$$，这可以表示成：
 
 $$
-D_{KL} (P_{c_1} \| P_{c_2} \equiv \int_w P(w \mid c_1) \frac{log P(w | c_1)}{log P(w | c_2)} > \delta
+D_{KL} (P_{c_1} \| P_{c_2}) \equiv \int_w P(w \mid c_1) \frac{log P(w | c_1)}{log P(w | c_2)} > \delta
 $$
 
 ...(3)
