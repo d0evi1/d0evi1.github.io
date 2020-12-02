@@ -128,7 +128,12 @@ free energy principle是为了**理解大脑的内部运作**而发展起来的�
 
 然而，如果一个组织（organism），通过Markov blanket闭环，可以通过变更internal states来最小化free energy，并且/或者 与环境（environment）交互，如果两者都失败怎么办？例如，当一个人听到关于一个不幸新闻时，他不会有任何反映发生，变更internal state可能只会破坏身体的体内平衡（homeostasis）。**从物理角度，如果信息和energy是内部可变的，那么总的energy是守恒的，non-digestive energy也是维持稳态的一个必要方式**。
 
-因此，我们可以将reaction包含到图2中，来简单改进free energy principle的思想，它会遵循物理中的能量转化定律。在我们的新模型中，每个cell或一个group（称为：organism）可以遵循相似原则：通过变更internal states和/或 actions，来最小化free energy（来自input $$\vec{c}$$的surprise），不能被最小化的过多non-digestive energy会通过reaction抛弃。这里的action signal $$\vec{w}$$被在相同Markov blanket中的其它upstream cells接收，只会影响upstream feedback $$\overleftarrow{w}$$。注意，action singal $$\vec{w}$$不同于一个organism采取的与环境交互的物理动作。在我们的模型下，物理动作可以通过upstream singal $$\vec{w}$$来激活来做有用工作、或者通过downstream singal $$\ overleftarrow {c}$$来抛弃extra surprises（例如：通过笑或哭）。
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b993903e3ff46c10bbb158a49e983a3090be6fff42bcaffa0c6adcf88289ca38380d8c7257850c00792f77591c1b6418?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
+
+图2 在DynamicCell模型中，我们通过引入reaction到free energy priciple中，构建了生命的基本单元（basic unit of life）(cell)。一个basic activity of life仍会维持它的稳态。另外，它通过变更internal states或actions，会将unexpected input “react”成一种排出过多不能被处理energy的方式。例如：笑与器都意味着分别排出good和bad surprises，它们不会对生存（survival）有贡献。换句话说：life reacts。
+
+
+因此，我们可以将reaction包含到图2中，来简单改进free energy principle的思想，它会遵循物理中的能量转化定律。在我们的新模型中，每个cell或一个group（称为：organism）可以遵循相似原则：通过变更internal states和/或 actions，来最小化free energy（来自input $$\vec{c}$$的surprise），不能被最小化的过多non-digestive energy会通过reaction抛弃。这里的action signal $$\vec{w}$$被在位于相同Markov blanket中的其它upstream cells接收，只会影响upstream feedback $$\overleftarrow{w}$$。注意，action singal $$\vec{w}$$不同于一个organism采取的与环境交互的物理动作。在我们的模型下，物理动作可以通过upstream singal $$\vec{w}$$进行激活来做有用工作、或者通过downstream singal $$\ overleftarrow {c}$$来排出extra surprises（例如：通过笑或哭）。
 
 ### 2.3.2 Formulation
 
@@ -225,9 +230,7 @@ $$
 
 ## 3.1 tensorflow API设计
 
-<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b993903e3ff46c10bbb158a49e983a3090be6fff42bcaffa0c6adcf88289ca38380d8c7257850c00792f77591c1b6418?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
-图2
 
 回顾上面，在neural network中的每个layer/neuron被认为是在embedding space中的特定分布$$p(w\mid c)$$（c为input，w为output）。对于在input和output间的中间层（intermediate layers），c已经被表示成一个embedding $$\bar{c} \rightharpoonup$$，我们只需要定义一个函数来计算$$\bar{w}$$。在这样的情况下，我们可以只使用在tensorflow中相同的计算图来进行forward计算（图2中的input和action）和backward执行（在图2中的feedback和reaction），non-gradients baesd update可以通过对tf.gradients做很微小的变化来达到。例如，一个典型的DynamicCell node可以被定义成：
 
