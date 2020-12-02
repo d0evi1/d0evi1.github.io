@@ -211,7 +211,8 @@ $$
 ...(11)
 
 $$
-\frac{D_{KL}} {(P_{\overleftarrow{w}} \| P_{\vec{w}}}){\partial \vec{w}} \approx \langle \ overleftarrow{w} \rangle_{P_{\overleftarrow{w}}}  - \langle \ overleftarrow{w} \rangle_{P_{\vec{w}}} \approx \langle L(\vec{w}) \rangle_{P_{\vec{w}}} - \langle L(\vec{w}) \rangle_{P_{\vec{w}}} \approx \frac{\partial L(\vec{w})}{\partial {\vec{w}}}
+\frac{\partial D_{KL}(P_{\overleftarrow{w}} \| P_{\vec{w}}}){\partial \vec{w}} \approx \langle \overleftarrow{w} \rangle_{P_{\overleftarrow{w}}}  - \langle \overleftarrow{w} \rangle_{P_{\vec{w}}} \approx \langle L(\vec{w}) \rangle_{P_{\vec{w}}} - \langle L(\vec{w}) \rangle_{P_{\vec{w}}}  \\
+\approx \frac{\partial L(\vec{w})}{\partial {\vec{w}}}
 $$
 
 ...(12)
