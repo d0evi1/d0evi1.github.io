@@ -6,6 +6,7 @@ modified: 2020-08-02
 tags: 
 ---
 
+google有一篇关于dynamic embedding的paper介绍。我们来看下。注：本paper的前面几部分感觉很凑数。最好直接从3节开始即可。
 
 # 摘要
 
