@@ -100,7 +100,7 @@ $$
 
 一个智能系统的一个基本需要是：能够处理来自感知输入（sensory input）的新信息。当我们在一个neural network中处理一个新的input时，必须将它转化成一个representation，可以由像等式（1）（其中$$x \in R^m$$）的loss function处理。特别的，**如果该input涉及到离散对象（比如：words）时，它必须将它们映射到一个embedding space中**。对于该需求的一个naive解释可以从neural network的视角看：一个discrete input c可以被表示成一个特征向量（one-hot）：$$\vec{c}_{0/1} = [0, \cdots, 1, \cdots, 0]^T$$，接着通过一个linear activation layer，它可以变成$$W \vec{c}_{0/1}=W_i$$，其中$$W_i$$表示real matrix W中的第i列，或等价的，c就是embedding。这样的解释可以说明：这对于使用sparse input values的DNN实现来说是个限制，以及为什么总是需要一个字典（比如：一个字典定义为W）。
 
-实际上，特征向量$$\vec{c}_{0/1}$$的维度（比如：W中的列数）可以增长到任意大，embedding维度（比如：W中的行数）也会相应增长。为了观察embedding dimension为什么增长，我们对neural network layers采用sufficient statistics的视角，一个基本事实是一个embedding的每个dimension都应该被限定。也就是说，假设neural network的一个layer表示了$$P(w \mid c) \propto exp(\langle \vec{w}, \vec{c} \rangle)$$。接着，两个inputs $$c_1$$和$$c_2$$可以被认为是不同的，如果它们相应的分布相互充分分离。假设：$$P_{c_1}(w) \equiv P(w \mid c_1)$$并且$$P_{c_2}(w) \equiv P(w \mid c_2)$$，这可以表示成：
+实际上，特征向量$$\vec{c}_{0/1}$$的维度（比如：W中的列数）可以增长到任意大，embedding维度（比如：W中的行数）也会相应增长。为了观察embedding dimension为什么增长，我们对neural network layers采用sufficient statistics的视角，一个基本事实是一个embedding的每个dimension都应该被限定。也就是说，假设neural network的一个layer表示了$$P(w \mid c) \propto exp(\langle \vec{w}, \vec{c} \rangle)$$。那么，两个inputs $$c_1$$和$$c_2$$它们相应的分布相互完全分离，它们可以被认为是不同的。假设：$$P_{c_1}(w) \equiv P(w \mid c_1)$$并且$$P_{c_2}(w) \equiv P(w \mid c_2)$$，这可以表示成：
 
 $$
 D_{KL} (P_{c_1} \| P_{c_2}) \equiv \int_w P(w \mid c_1) \frac{log P(w | c_1)}{log P(w | c_2)} > \delta
