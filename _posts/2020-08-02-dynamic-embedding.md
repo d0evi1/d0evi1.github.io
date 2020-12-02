@@ -361,7 +361,7 @@ loss = tf.reduce_sum(cross_ent)
 
 ### 3.2.4 Candidate sampling
 
-当它们被储存到像Bigtable的远程存储中时，Sampling可以是tricky的。这也是为什么需要metadata，它可以存储必要信息来进行高效采样候选。在很早时，我们支持由两个已存在的tensorflow ops：$$tf.nn.sampled_softmax_loss$$和$$tf.contrib.text.skip_gram_sample$$（基于frequency）所使用的sampling strategies。如果我们希望达到更好的word embedding，则相应地需要计算更高阶的信息比如PMI（互信息概率）或共现次数。因此，这些bookkeeping信息需要在高效采样进行embedding lookup期间被处理。
+**当它们被储存到像Bigtable的远程存储中时，Sampling可以是很tricky的**。这也是为什么需要metadata，它可以存储必要信息来进行高效采样候选。在很早时，我们支持由两个已存在的tensorflow ops：tf.nn.sampled_softmax_loss和tf.contrib.text.skip_gram_sample（基于frequency）所使用的sampling strategies。如果我们希望达到更好的word embedding，则相应地需要计算更高阶的信息比如PMI（互信息概率）或共现次数。因此，这些bookkeeping信息需要在高效采样进行embedding lookup期间被处理。
 
 这里，我们决定重新设计在DES中的candidate sampling，因上以下原因：
 
@@ -370,7 +370,7 @@ loss = tf.reduce_sum(cross_ent)
 
 在我们的新设计中，为了满足graph的需求：即graph是固定的，每个input中的true_labels数目会不同，我们会简单地将positive 和negative examples进行合并，并由用户来决定num_samples的值。我们的接着变为：
 
-{% highlight cplusplus %}
+{% highlight c++ %}
 
 class CandidateSampler {
   public:
