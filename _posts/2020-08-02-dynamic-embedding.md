@@ -57,13 +57,23 @@ $$
 - s是一个系统的当前internal和external state；
 - m是解释s的一个internal model
 
-我们可以将这样的思想与neural networks相关联，通过**将"surprise"重定义为一个具有contextual inputs与不具体congextual input的state分布间的差异（通过KL-divergence衡量）**，分别表示成：$$P(w \mid c)$$和$$P(w)$$。对于上述原始的公式，我们的新方式可以在一个cell level上实现，不再需要使用一个内部预测模型m来解释state s（它本身可以是一个非常复杂的process）。我们展示了BP算法在embedding space的free-energy最小化的一个通用过程，它会给人工神经网络（artificial neural network：ANN)带来一个新的思路：一个ANN是一个关于inter-connected neurons的group，它会最小化自己的free energy。在其余部分，我们会详细解释neural networks的新方法，以及它带来的实际影响，比如：现实中的一个系统设计和提升。
+我们可以将这样的思想与neural networks相关联，通过**将"surprise"重定义为一个具有contextual inputs与不具体congextual input的state分布间的差异（通过KL-divergence衡量）**，分别表示成：$$P(w \mid c)$$和$$P(w)$$。对于上述原始的公式，我们的新方式可以在一个cell level上实现，不再需要使用一个内部预测模型m来解释state s（它本身可以是一个非常复杂的process）。我们展示了BP算法在embedding space的free-energy最小化的一个通用过程，它会给人工神经网络（artificial neural network：ANN)带来一个新的思路：**一个ANN是关于inter-connected neurons的一个group，它会最小化自己的free energy**。在其余部分，我们会详细解释neural networks的新方法，以及它带来的实际影响，比如：现实中的一个系统设计和提升。
 
 ## 2.1 Exponential family, embedding和人工神经网络
 
-使用neural networks来表示sparse features的represent已经在自然语言模型中广泛探索。本质上，在neural network中的layer仅仅只是它的variables对于特定分布$$P(w_1, \cdots, w_n \mid c_1, \cdots, c_m)$$的充分统计。[47]更进一步将这样的思想泛化到许多已经存在的DNN模型中，并派生了embedding space的一个新等式，来解释contextual input到output的相关度。例如，在NN中的一个layer可以被看成是在embedding空间中$$P(w \mid c)$$分布的一个表示，其中：**c是layer的contextual input，w是output**。更进一步假设：$$P(w \mid c) \propto exp(\langle\vec{w}, \vec{c}\rangle) $$，其中$$\vec{w}$$和$$\vec{c}$$分别表示w和c的embeddings，接着一个layer可以基于$$\vec{c}$$来简单计算$$\vec{w}$$。
+使用neural networks来表示sparse features的represent已经在自然语言模型中广泛探索。本质上，在neural network中的layer仅仅只是它的variables对于特定分布$$P(w_1, \cdots, w_n \mid c_1, \cdots, c_m)$$的充分统计。[47]更进一步将这样的思想泛化到许多已经存在的DNN模型中，并派生了embedding space的一个新等式，来解释contextual input到output的相关度。例如，在NN中的一个layer可以被看成是在embedding空间中$$P(w \mid c)$$分布的一个表示，其中：**c是layer的contextual input，w是output**。
 
-这与传统观念相冲突：neurons我非常ad规范鉔维护action potentials相互通信，表示成1D function（或binary or continuous）。另外，它偏向于一个更现实的观点：neurons实际上会与它们的firing patterns【9】相通信，以便单个neuron不会只与单个bit相通信。【47】采用了probability作为一种描述firing patterns分布的通用语言，并使用embeddings(sufficient statistics)来表示它们的近似形式。
+更进一步假设：
+
+$$
+P(w \mid c) \propto exp(\langle\vec{w}, \vec{c}\rangle) 
+$$
+
+其中：$$\vec{w}$$和$$\vec{c}$$分别表示w和c的embeddings
+
+接着一个layer可以基于$$\vec{c}$$来简单计算$$\vec{w}$$。
+
+这与传统观念相冲突：neurons相互间基于单个动作电位（action potentials）通信，表示成1D function（二元binary or 连续continuous）。另外，它偏向于一个更现实的观点：neurons实际上会与它们的firing patterns【9】相通信，以便单个neuron不会只与单个bit相通信。【47】采用了probability作为一种描述firing patterns分布的通用语言，并使用embeddings(sufficient statistics)来表示它们的近似形式。
 
 DNN的另一个视角的一个明显优化是：建模能力。如果我们限制AI来定义activation function的组合，不管我们赋予它们什么含义，他们总是会落入解决非常相似形式的问题：
 
