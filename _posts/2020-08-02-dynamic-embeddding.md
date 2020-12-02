@@ -10,12 +10,15 @@ tags:
 # 摘要
 
 
-深度学习模型的一个限制是：input的sparse features，需要在训练之前定义好一个字典。本文提出了一个理论和实践系统设计来解决该限制，并展示了模型结果在一个更大规模上要更好、更高效。特别的，我们通过将内容从形式上解耦，来分别解决架构演进和内存增长。为了高效处理模型增长，我们提出了一个新的neuron model，称为DynamicCell，它受free energy principle的启发，引入了reaction的概念来排出non-digestive energy，它将gradient descent-based方法看成是它的特例。我们在tensorflow中通过引入一个新的server来实现了DynamicCell，它会接管涉及模型增长的大部分工作。相应的，它允许任意已经存在的deep learning模型来有效处理任意数目的distinct sparse features（例如：search queries），可以不停增长无需重新定义模型。最显著的是，在生产环境中运行超过一年它仍是可靠的，为google smart campaingns的广告主提供高质量的keywords，并达到极大的accuracy增益。
+深度学习模型的一个限制是：input的sparse features，需要在训练之前定义好一个字典。本文提出了一个理论和实践系统设计来解决该限制，并展示了模型结果在一个更大规模上要更好、更高效。特别的，我们通过将内容从形式上解耦，来分别解决架构演进和内存增长。为了高效处理模型增长，我们提出了一个新的neuron model，称为DynamicCell，它受free energy principle的启发，引入了reaction的概念来排出non-digestive energy，它将gradient descent-based方法看成是它的特例。我们在tensorflow中通过引入一个新的server来实现了DynamicCell，它会接管涉及模型增长的大部分工作。相应的，**它允许任意已经存在的deep learning模型来有效处理任意数目的distinct sparse features（例如：search queries），可以不停增长，无需重新定义模型**。最显著的是，在生产环境中运行超过一年它仍是可靠的，为google smart campaingns的广告主提供高质量的keywords，并达到极大的accuracy增益。
 
+## 1.1 Motivation
+
+为了理解一些已存在的深度学习库的限制，我们考虑一个简单示例：对每天的来自在线新闻上的新闻文章上训练一个skip-gram模型。这里模型的训练实例是相互挨着的一些words，期望的实现是将每个word映射到一个vector space上，它们在语义空间中也相接近。为了实验word2vec算法，我们需要定义一个字典变量，它包含了待学习embeddings的所有的words。**由于在训练前需要一个字典（dictionary），这限制了模型的增长，很难处理从未见过的words或者增加embedding的维度**。
 
 ## 1.2 核心
 
-为了更好适应模型增加，我们尝试搜寻一个框架，我们提出了一个新的neuron model称为DynamicCell：**它将一个neural network layer的input/output看成是满足特定分布的充分统计(sufficient statistics)（embeddings），并进一步将它连接到free energy principle**。直觉上，通过对interal state进行正规化及行动，它允许neural network layer来最小化它的自由能（free energy）。。。
+为了更好适应模型增长，我们尝试搜寻一个框架，**它可以将一个neural network layer的input/output看成是满足特定分布的充分统计(sufficient statistics)（即：embeddings），我们提出了一个与free energy principle的概念有关的新neuron model称为DynamicCell**。直觉上，通过对interal state进行调节(regulating)及行动(take actions)，可以最小化它的自由能（free energy）。另外，当input包含了non-digestive energy时，它也会通过reaction将它们排出(discharge)，以维持一个稳定的internal state。我们可以看到对free-energy priciple做小修改，可以让它与传统的gradient descent-based算法来关联。因此，对一个layer的一个input signal可以被连续（continuously）或组合（combinatorially）的方式处理。例如，**当在input端上看到一个新的input feature时，该layer可以为它动态分配一个embedding，并将它发送到upstream layers上以便进一步处理**。
 
 为了实现上述思想，会对tensorflow做出一些修改。特别的，会在tensorflow python API中添加一些新的op集合，来直接将symbolic strings作为input，同时当运行一个模型时，"intercept" forward和backward信号。这些op接着会访问一个称为“DynaimicEmbeddding Service(DES)”的新的server，来处理模型的content part。在模型的forward execution期间，这些op会为来自DES的layer input抽取底层的float values（embeddings），并将这们传递给layer output。与backward execution相似，计算的gradients或其它信息，会被传给DES，并基于用户定制的算法来更新interal states。
 
