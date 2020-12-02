@@ -267,10 +267,10 @@ def dynamic_embedding_lookup(keys, de_config, name):
 
 ### 3.1.2 Sparse Output
 
-当一个neural network的输出为sparse features时，它通常被用在inference问题中：$$argmax_w P(w \mid c)$$，其中c是来自之前layer的input，表示在neural network中的$$\vec{c}$$。根据第2.1节，如果我们假设$$P(W \mid C) \propto exp(\langle \bar{w}, \bar{c} \rangle )$$，其中，$$\vec{w}$$是w的embedding，接着$$argmax_w P(w \mid c) = argmax_w \langle \vec{w}, \vec{c} \rangle $$，它可以简化为：在w的所有值中，离input query $$\vec{c}$$的最近点。实际上，softmax function通常被用在neural network中，它与我们的formulation最相关。为了观察到这一点，假设w的所有可能值集合为W，$$\forall a \in W$$，softmax概率可以被表示为：
+当一个neural network的输出为sparse features时，它通常被用在inference问题中：$$argmax_w P(w \mid c)$$，其中c是来自之前layer的input，表示在neural network中的$$\vec{c}$$。根据第2.1节，如果我们假设$$P(W \mid C) \propto exp(\langle \bar{w}, \bar{c} \rangle )$$，其中，$$\vec{w}$$是w的embedding，接着$$argmax_w P(w \mid c) = argmax_w \langle \vec{w}, \vec{c} \rangle $$，它可以简化为：**在w的所有值中，离input query $$\vec{c}$$的最近点**。实际上，softmax function通常被用在neural network中，它与我们的formulation最相关。为了观察到这一点，假设w的所有可能值集合为W，$$\forall a \in W$$，softmax概率可以被表示为：
 
 $$
-P(w=a \mid c) = \frac{exp()}{}
+P(w=a | c) = \frac{exp(\vec{c}^T \vec{w}_a + b_a)}{\sum_{k \in W} exp(\vec{c}^T \vec{w}_k + b_k)} = \frac{exp(\langle  \left[ \begin{array}{c} \vec{c} \\  1 \end{array}\right],   \left[ \begin{array}{c} \vec{w}_a \\ b_a \end{array}\right] \rangle)}{\sum_{k \in W} exp(\langle \left[ \begin{array}{c} \vec{c} \\ 1 \end{array}\right], \left[ \begin{array}{c} \vec{w}_k \\ b_k \end{array}\right]\rangle)}
 $$
 
 ...(14)
