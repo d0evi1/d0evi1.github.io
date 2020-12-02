@@ -61,14 +61,14 @@ $$
 
 ## 2.1 Exponential family, embedding和人工神经网络
 
-使用neural networks来表示sparse features的represent已经在自然语言模型中广泛探索。本质上，在neural network中的layer仅仅只是它的variables对于特定分布$$P(w_1, \cdots, w_n \mid c_1, \cdots, c_m)$$的充分统计。[47]更进一步将这样的思想泛化到许多已经存在的DNN模型中，并派生了embedding space的一个新等式，来解释contextual input到output的相关度。例如，在NN中的一个layer可以被看成是在embedding空间中$$P(w \mid c)$$分布的一个表示，其中：**c是layer的contextual input，w是output**。更进一步假设：$$P(w \mid c) \propto exp(<\vec{w}, \vec{c}>) $$，其中$$\vec{w}$$和$$\vec{c}$$分别表示w和c的embeddings，接着一个layer可以基于$$\vec{c}$$来简单计算$$\vec{w}$$。
+使用neural networks来表示sparse features的represent已经在自然语言模型中广泛探索。本质上，在neural network中的layer仅仅只是它的variables对于特定分布$$P(w_1, \cdots, w_n \mid c_1, \cdots, c_m)$$的充分统计。[47]更进一步将这样的思想泛化到许多已经存在的DNN模型中，并派生了embedding space的一个新等式，来解释contextual input到output的相关度。例如，在NN中的一个layer可以被看成是在embedding空间中$$P(w \mid c)$$分布的一个表示，其中：**c是layer的contextual input，w是output**。更进一步假设：$$P(w \mid c) \propto exp(\langle\vec{w}, \vec{c}\rangle) $$，其中$$\vec{w}$$和$$\vec{c}$$分别表示w和c的embeddings，接着一个layer可以基于$$\vec{c}$$来简单计算$$\vec{w}$$。
 
 这与传统观念相冲突：neurons我非常ad规范鉔维护action potentials相互通信，表示成1D function（或binary or continuous）。另外，它偏向于一个更现实的观点：neurons实际上会与它们的firing patterns【9】相通信，以便单个neuron不会只与单个bit相通信。【47】采用了probability作为一种描述firing patterns分布的通用语言，并使用embeddings(sufficient statistics)来表示它们的近似形式。
 
 DNN的另一个视角的一个明显优化是：建模能力。如果我们限制AI来定义activation function的组合，不管我们赋予它们什么含义，他们总是会落入解决非常相似形式的问题：
 
 $$
-min_{\thete=\lbrace,\theta_1, \cdots, \theta_n\rbrace} \sum\limits_{x \in D} L(x, \theta) \equiv f_1(f_2(\cdots f_n(x, \theta_n), \cdots; \theta_2), \cdots, \theta_1), n \in N
+min_{\theta=\lbrace,\theta_1, \cdots, \theta_n\rbrace} \sum\limits_{x \in D} L(x, \theta) \equiv f_1(f_2(\cdots f_n(x, \theta_n), \cdots; \theta_2), \cdots, \theta_1), n \in N
 $$
 
 ...(1)
