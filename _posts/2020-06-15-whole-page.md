@@ -30,7 +30,7 @@ yahoo在2017年《Beyond Ranking: Optimizing Whole-Page Presentation》的一篇
 
 本文中，我们提出了一个新的框架，它可以为在SERP上的异构搜索结果学习最优的呈现（presentation）。**Page presentation被定义成：在SERP上呈现一个异构items集合的策略（strategy），它比一个ranked list更具表现力。它可以指定item positions、图片尺寸、文本字体、以及任意在商业限束下的元素变化风格**。一个presentation的好坏可以通过用户满意度指标来判断：更好的呈现（presentation）会让用户更满意。该框架会学到一个scoring function，它会将搜索结果和其它在SERP上的presentation映射成用户满意度。接着，给定由一个new query的搜索结果，该框架能计算出一个能最大化用户满意度的presentation。
 
-该框架相当通用。首先，我们可以灵活定义page presentation的范围。它可以将item positions（水平和垂直位置都行）、以及元素风格（图片大小、文本字体等）编码。ranked list只是它的一个特例。第二，不同应用场景可以采用不同的用户满意度指标。它不受click-based指标的限制，但也会将其它交互行为考虑其中，比如：停留时长（dwelling time）和首次点击时间（time-to-first-click）。最后，该框架也可以在其它交互搜索场景上实现，比如：移动端或tablelet devices的搜索结果呈现、在线社交网络的多媒体展示feeds、电商中的items布局（arranging） 。
+该框架相当通用。首先，我们可以灵活定义page presentation的范围。它可以将item positions（水平和垂直位置都行）、以及元素风格（图片大小、文本字体等）编码。ranked list只是它的一个特例。第二，不同应用场景可以采用不同的用户满意度指标。它不受click-based指标的限制，但也会将其它交互行为考虑其中，比如：停留时长（dwelling time）和首次点击时间（time-to-first-click）。最后，该框架也可以在其它交互搜索场景上实现，比如：**移动端或tablelet devices的搜索结果呈现**、在线社交网络的多媒体展示feeds、电商中的items布局（arranging） 。
 
 我们在synthetic和real data上都做了实验，演示了该框架的强大。仿真实验展示了框架可以适配不同类型的attention bias，并可以学会呈现相关结果来捕获用户眼球。这意味着我们的方法可以直接针对由综合搜索带来的挑战，其中，用户不会按顺序扫描结果，并且结果不会以ranked list的形式展示。在real data实验中，framework的简单实现效果要好于在综合搜索结果排序上的先进算法。这是因为：ranked list在结果呈现上使用probability ranking principle的ranking算法，而我们的框架不认可它的存在。然而，它会纯粹从数据中学到它自己的结果呈现准则（result presentation principle），并可以达到SOTA的效果。
 
@@ -38,7 +38,7 @@ yahoo在2017年《Beyond Ranking: Optimizing Whole-Page Presentation》的一篇
 
 - 1.我们对新问题（whole-page presentation optimization）进行公式化，它扩展了在ad hoc search上的异构文档排序
 - 2.我们提出了一个通用框架，它会为综合搜索结果（federated search results）计算最优化的呈现（presentation）
-- 3.
+- 3.在synthetic和real data上的实验表明：提出的框架可以解决新问题
 
 # 2.问题公式化
 
