@@ -10,13 +10,13 @@ yahoo在2017年《Beyond Ranking: Optimizing Whole-Page Presentation》的一篇
 
 # 摘要
 
-现代搜索引擎会从不同verticals中聚合结果：网页、新闻、图片、视频、购物（shopping）、知识页卡（knowledge cards）、本地地图（local maps）等。不同于“ten blue links”，这些搜索结果天然是异构的，并且不再以list的形式在页面上呈现。这样的变化直接挑战着在ad hoc搜索中传统的“ranked list”形式。因此，为这群异构结果发现合适的呈现（presentation）对于现代搜索引擎来说很重要。
+现代搜索引擎会从不同verticals中聚合结果：网页、新闻、图片、视频、购物（shopping）、知识页卡（knowledge cards）、本地地图（local maps）等。不同于“ten blue links”，**这些搜索结果天然是异构的，并且不再以list的形式在页面上呈现**。这样的变化直接挑战着在ad hoc搜索中传统的“ranked list”形式。因此，为这种异构结果group发现合适的呈现（presentation）对于现代搜索引擎来说很重要。
 
-我们提出了一个新框架来学习最优的页面呈现（page presentation），从而在搜索结构页（SERP：search result page）上渲染异构结果。页面呈现被广泛定义成在SERP上呈现一个items集合的策略，它要比一个ranked list要更丰富些。它可以指定：item位置、image sizes、文本字体、其它样式以及其它在商业和设计范围内的变体。学到的presentation是content-aware的，例如：为特定的queries和reruned results定制化的。模拟实验表明，框架可以为相关结果自动学习吸引眼球的呈现。在真实数据上的实现表明，该框架的简单实例可以胜过在整合搜索结果呈现上的先进算法。这意味着框架可以从数据中学到它自己的结果呈现策略，无需“probability ranking principle”。
+我们提出了一个新框架来学习**最优的页面呈现（page presentation）**，从而在搜索结构页（SERP：search result page）上渲染异构结果。**页面呈现被广泛定义成在SERP上呈现一个items集合的策略，它要比一个ranked list要更丰富些。它可以指定：item位置、image sizes、文本字体、其它样式以及其它在商业和设计范围内的变体**。学到的presentation是content-aware的，例如：为特定的queries和returned results定制化的。模拟实验表明，框架可以为相关结果自动学习到更吸引眼球的呈现。在真实数据上的实现表明，该框架的简单实例可以胜过在整合搜索结果呈现上的先进算法。这意味着框架可以从数据中学到它自己的结果呈现策略，无需“probability ranking principle”。
 
 # 1.介绍
 
-十年前，搜索引擎返回"十个蓝色链接（ten blue links）"。结果呈现（Result presentation）很简单：通过估计的相关度对webpages进行排序。它...
+十年前，搜索引擎返回"十个蓝色链接（ten blue links）"。结果呈现（Result presentation）很简单：通过估计的相关度对webpages进行排序。当用户往下扫描列表时会省力些，可以在top ranks点击到他希望的信息。这种“probability ranking principle”
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a230b179b24a16c10888c7d42a1e86be2dfeb5b41135e6eb4a35f5b9e5fb0ad816a160314b25a4552d5a0c1581bd49c6?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=f1.jpg&amp;size=750">
 
