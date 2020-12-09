@@ -16,11 +16,23 @@ yahoo在2017年《Beyond Ranking: Optimizing Whole-Page Presentation》的一篇
 
 # 1.介绍
 
-十年前，搜索引擎返回"十个蓝色链接（ten blue links）"。结果呈现（Result presentation）很简单：通过估计的相关度对webpages进行排序。当用户往下扫描列表时会省力些，可以在top ranks点击到他希望的信息。这种“probability ranking principle”
+十年前，搜索引擎返回"十个蓝色链接（ten blue links）"。结果呈现（Result presentation）很简单：通过估计的相关度对webpages进行排序。当用户往下扫描列表时会省力些，可以在top ranks点击到他希望的信息。这种“probability ranking principle”在1970年开始已经存在很久，并且在eye-tracking研究[20,19]以及搜索日志分析[24,15]中被证实。
+
+今天的搜索引擎会返回比“ten blue links”更丰富的结果。除了webpages，结果可能还包括：news、images、video、shopping、结构化知识、本地商业地图等。每个特定corpus可以通过一个垂类搜索引擎（vertical search engine）索引；他们联合（federated）在一起为用户信息提供服务。不同于“ten blue links”，垂类搜索结果具有不同的视角外观、布局和大小（sizes）。他们会在页面上跨多列，不会严格限制在mainline list上（图1）。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a230b179b24a16c10888c7d42a1e86be2dfeb5b41135e6eb4a35f5b9e5fb0ad816a160314b25a4552d5a0c1581bd49c6?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=f1.jpg&amp;size=750">
 
 图1
+
+综合搜索结果会在搜索结果页（SERPs）上转移用户交互样式（user interaction patterns）。人类眼球会自发地被图片结果（graphical results）吸引，从而产生一个显著的attention bias：vertical bias[12, 26, 31]。更有趣的是，在某个垂类结果（vertical result）周围的blue links被点击的概率也会增加[12]。在垂类结果中，在整个SERP上的用户满意度不能从成对结果的偏好判断中可靠地推断出。
+
+这些观察表明，用户不会按顺序扫描由综合搜索(federated search)返回的结果。尽管常规的"ranked list"公式仍会被用于综合搜索结果呈现上[5,4]，它本质上是一个一阶近似（first-order approximation）的问题。
+
+本文中，我们提出了一个新的框架，它可以为在SERP上的异构搜索结果学习最优的呈现（presentation）。Page presentation被定义成：在SERP上呈现一个异构items集合的策略（strategy），它比一个ranked list更具表现力。它可以指定item positions、图片尺寸、文本字体、以及任意在商业限束下的元素变化风格。一个presentation的好坏可以通过用户满意度指标来判断：更好的呈现（presentation）会让用户更满意。该框架会学到一个scoring function，它会将搜索结果和其它在SERP上的presentation映射成用户满意度。接着，给定由一个new query的搜索结果，该框架能计算出一个能最大化用户满意度的presentation。
+
+该框架相当通用。首先，我们可以灵活定义page presentation的范围。它可以将item positions（水平和垂直位置都行）、以及元素风格（图片大小、文本字体等）编码。ranked list只是它的一个特例。第二，不同应用场景可以采用不同的用户满意度指标。它不受click-based指标的限制，但也会将其它交互行为考虑其中，比如：停留时长（dwelling time）和首次点击时间（time-to-first-click）。最后，该框架也可以在其它交互搜索场景上实现，比如：移动端或tablelet devices的搜索结果呈现、在线社交网络的多媒体展示feeds、电商中的items布局（arranging） 。
+
+我们在synthetic和real data上都做了实验，演示了该框架的强大。仿真实验展示了框架可以适配不同类型的attention bias，并可以学会呈现相关结果来捕获用户眼球。这意味着我们的方法可以直接针对由综合搜索带来的挑战，其中，用户不会按顺序扫描结果，并且结果不会以ranked list的形式展示。在real data实验中，framework的简单实现效果要好于在综合搜索结果排序上的先进算法。这是因为：ranked list在结果呈现上使用probability ranking principle的ranking算法，而我们的框架不认可它的存在。然而，它会纯粹从数据中学到它自己的结果呈现准则（result presentation principle），并可以达到SOTA的效果。
 
 主要贡献：
 
