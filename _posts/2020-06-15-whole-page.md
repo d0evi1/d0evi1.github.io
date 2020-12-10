@@ -198,7 +198,10 @@ $$
 
 ## 4.3 User Response Models
 
-我们会使用两个模型来预测page-wise user response。第一个模型会采用在content和presentation间的特征二阶交叉（features quadratic interaction）。它会允许一个有效的最优化阶段（optimization stage）。第二个模型使用gradient boosted decision tree来捕获在content和presentation间的更复杂、非线性交叉。我们期等它来生成更好的效果。
+我们会使用两个模型来预测page-wise user response：
+
+- 第一个模型会采用在content和presentation间的特征二阶交叉（features quadratic interaction）。它会允许一个有效的最优化阶段（optimization stage）
+- 第二个模型使用gradient boosted decision tree来捕获在content和presentation间的更复杂、非线性交叉。我们期等它来生成更好的效果.
 
 **二阶特征模型（Quadratic Feature model）**
 
@@ -220,7 +223,9 @@ $$
 
 $$u_i, v_i, Q_i$$分别是是content-only特征、presentation-only特征、content-presentation二阶交叉特征。参数$$w_i = \lbrace u_i, v_i, Q_i \rbrace$$可以使用正则线性回归来估计。为了避免overfitting，我们会将$$u_i$$和$$v_i$$的$$L_2$$ norm进行正则化，并进一步在$$Q_i$$上利用low-rank regularization来处理二阶特征的稀疏性。
 
-总之， 我们具有了k个这样的模型，每个模型会预测y中的一个$$y_i$$。为了在概念上将k个模型分组，假设将系数(cofficients)写成：$$U=(u_1,\cdots, u_k)^{\top}, V=(v_1, \cdots, v_k)^{\top}, Q=diag(Q_1, \cdots, Q_k)$$，
+总之， 我们具有了k个这样的模型，每个模型会预测y中的一个$$y_i$$。为了在概念上将k个模型分组，假设将系数(cofficients)写成：
+
+$$U=(u_1,\cdots, u_k)^{\top}, V=(v_1, \cdots, v_k)^{\top}, Q=diag(Q_1, \cdots, Q_k)$$，
 
 其中：将x和p“拷贝（copy）” k次来获得matrix：$$X=diag(x^{\top}, \cdots, x^{\top})$$ 以及vector：$$t^{\top}=(p^{\top}, \cdots, p^{\top})$$
 
