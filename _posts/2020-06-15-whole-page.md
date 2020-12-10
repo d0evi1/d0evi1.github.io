@@ -204,13 +204,13 @@ $$
 
 首先，假设我们考虑一个关于user response模型的简单实现，它可以在optimization stage上进行高效求解。由于它使用x和p间的二阶交叉特征（quadratic features），我们称之为“Quadratic Feature Model”。
 
-假设：对于k个items存在k个positions。Page content x是关于k个item vectors的concatenation；page presentation使用二元指示$$p \in \lbrace 0,1 \rbrace^{k \times k}$$进行编码，如第4.1节定义。该模型也包含了x和p间的完全交叉作为features。假设 vec(A)表示包含了在matrix A中所有elements的row vector，一列挨一列，从左到右。Quadratic Feature Model的增广特征向量（augmented feature vector）$$\phi$$为：
+假设：对于k个items存在k个positions。Page content x是关于k个item vectors的concatenation；Page Presentation使用二元指示$$p \in \lbrace 0,1 \rbrace^{k \times k}$$进行编码，如第4.1节定义。该模型也包含了x和p间的完全交叉作为features。假设 vec(A)表示包含了在matrix A中所有elements的row vector，一列挨一列，从左到右。Quadratic Feature Model的增广特征向量（augmented feature vector）$$\phi$$为：
 
 $$
 \phi^{\top} = (x^{\top}, p^{\top}, vec(xp^{\top}))
 $$
 
-假设$$y \in R^k$$是user response vector；每个component $$y_i$$是在item i上的一个user response。线性模型$$f_i$$被用于预测在y中的每个$$y_i$$：
+假设：$$y \in R^k$$是User Response vector；每个component $$y_i$$是在item i上的一个User Response。线性模型$$f_i$$被用于预测在y中的每个$$y_i$$：
 
 $$
 y_i = f_i(\phi) = w_i^{\top} \phi = u_i^{\top} x + v_i^{\top} p + x^{\top} Q_i p
@@ -220,13 +220,21 @@ $$
 
 $$u_i, v_i, Q_i$$分别是是content-only特征、presentation-only特征、content-presentation二阶交叉特征。参数$$w_i = \lbrace u_i, v_i, Q_i \rbrace$$可以使用正则线性回归来估计。为了避免overfitting，我们会将$$u_i$$和$$v_i$$的$$L_2$$ norm进行正则化，并进一步在$$Q_i$$上利用low-rank regularization来处理二阶特征的稀疏性。
 
-总之， 我们具有了k个这样的模型，每个模型会预测y中的一个$$y_i$$。为了在概念上将k个模型分组，假设将系数(cofficients)写成：$$U=(u_1,\cdots, u_k)^{\top}, V=(v_1, \cdots, v_k)^{\top}, Q=diag(Q_1, \cdots, Q_k)$$，其中将x和p“拷贝（copy）” k次来获得matrix：$$X=diag(x^{\top}, \cdots, x^{\top})$$以及vector：$$t^{\top}=(p^{\top}, \cdots, p^{\top})$$。为了声明维度，如果$$x \in R^n, p \in R^m,$$，那么：$$U \in R^{k \times n}, V \in R^{k \times m}, X \in R^{k \times nk}, Q \in R^{nk \times mk}$$，其中$$t \in R^{mk}$$，user response model可以被写成：
+总之， 我们具有了k个这样的模型，每个模型会预测y中的一个$$y_i$$。为了在概念上将k个模型分组，假设将系数(cofficients)写成：$$U=(u_1,\cdots, u_k)^{\top}, V=(v_1, \cdots, v_k)^{\top}, Q=diag(Q_1, \cdots, Q_k)$$，
+
+其中：将x和p“拷贝（copy）” k次来获得matrix：$$X=diag(x^{\top}, \cdots, x^{\top})$$ 以及vector：$$t^{\top}=(p^{\top}, \cdots, p^{\top})$$
+
+为了声明维度，如果$$x \in R^n, p \in R^m,$$，那么：
+
+$$U \in R^{k \times n}, V \in R^{k \times m}, X \in R^{k \times nk}, Q \in R^{nk \times mk}$$
+
+其中：$$t \in R^{mk}$$，user response model可以被写成：
 
 $$
 y = f(x, p) = Ux + Vp + XQ_t
 $$
 
-将用户满意度metric表示为：$$g(y) = c^{\top} y$$。那么scoring function $$F=g \odot f$$为：
+将用户满意度metric表示为：$$g(y) = c^{\top} y$$。那么scoring function $$F=g \circ f$$为：
 
 $$
 F(x,p) = g(f(x, p)) \\
