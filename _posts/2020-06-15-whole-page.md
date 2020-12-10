@@ -220,23 +220,23 @@ $$
 
 $$u_i, v_i, Q_i$$分别是是content-only特征、presentation-only特征、content-presentation二阶交叉特征。参数$$w_i = \lbrace u_i, v_i, Q_i \rbrace$$可以使用正则线性回归来估计。为了避免overfitting，我们会将$$u_i$$和$$v_i$$的$$L_2$$ norm进行正则化，并进一步在$$Q_i$$上利用low-rank regularization来处理二阶特征的稀疏性。
 
-总之， 我们具有了k个这样的模型，每个模型会预测y中的一个$$y_i$$。为了在概念上将k个模型分组，假设将系数(cofficients)写成：$$U=(u_1,\cdots, u_k)^T, V=(v_1, \cdots, v_k)^T, Q=diag(Q_1, \cdots, Q_k)$$，其中将x和p“拷贝（copy）” k次来获得matrix：$$X=diag(x^T, \cdots, x^T)$$以及vector：$$t^T=(p^T, \cdots, p^T)$$。为了声明维度，如果$$x \in R^n, p \in R^m,$$，那么：$$U \in R^{k \times n}, V \in R^{k \times m}, X \in R^{k \times nk}, Q \in R^{nk \times mk}$$，其中$$t \in R^{mk}$$，user response model可以被写成：
+总之， 我们具有了k个这样的模型，每个模型会预测y中的一个$$y_i$$。为了在概念上将k个模型分组，假设将系数(cofficients)写成：$$U=(u_1,\cdots, u_k)^{\top}, V=(v_1, \cdots, v_k)^{\top}, Q=diag(Q_1, \cdots, Q_k)$$，其中将x和p“拷贝（copy）” k次来获得matrix：$$X=diag(x^{\top}, \cdots, x^{\top})$$以及vector：$$t^{\top}=(p^{\top}, \cdots, p^{\top})$$。为了声明维度，如果$$x \in R^n, p \in R^m,$$，那么：$$U \in R^{k \times n}, V \in R^{k \times m}, X \in R^{k \times nk}, Q \in R^{nk \times mk}$$，其中$$t \in R^{mk}$$，user response model可以被写成：
 
 $$
 y = f(x, p) = Ux + Vp + XQ_t
 $$
 
-将用户满意度metric表示为：$$g(y) = c^T y$$。那么scoring function $$F=g \odot f$$为：
+将用户满意度metric表示为：$$g(y) = c^{\top} y$$。那么scoring function $$F=g \odot f$$为：
 
 $$
 F(x,p) = g(f(x, p)) \\
-= c^T Ux + c^TVp + c^T XQ_t \\
-= c^T Ux + a^Tp
+= c^{\top} Ux + c^{\top} Vp + c^T XQ_t \\
+= c^{\top} Ux + a^{\top} p
 $$
 
 ...(2)
 
-其中，$$a=V^Tc + \sum\limits_{i=1}^k c_i Q_i^T x$$是一个已知vector。
+其中，$$a=V^{\top} c + \sum\limits_{i=1}^k c_i Q_i^{\top} x$$是一个已知vector。
 
 最后，optimization stage会找到将(2)最大化的p，并满足在p上的constraints。由于给定了page content x，在(2)中的第一项是一个常数，可以丢弃。第二项$$a^T p$$是一个关于p的线性项。由于$$p \in \lbrace  0, 1\rbrace^{k \times k}$$会编码成一个k排列（k-permutation），在$$a \in R^{k \times k}$$中的每个component表示成用户满意度的增益，如果item i被放置在position j上，$$1 \leq i,j \leq k$$。因此，optimzation问题会化简成maximum bipartite matching，这是线性分配问题的一个特例。它可以通过Hungarian算法高效求解，时间复杂度为：$$O(\mid p \mid^3)=O(k^6)$$。在一个具有2GHz CPU的单核计算机上，对于50个items，该问题可以在10ms内求解。
 
