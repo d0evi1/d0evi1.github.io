@@ -50,35 +50,35 @@ Page Content是在页面上被展示的搜索结果集合。每个搜索结果�
 
 **定义2（Page Presentation）**
 
-Page Presentation定义了要展示的page content x，比如：position、vertical type、size、color等。它可以被编码成一个vector p。p的domain通过在符合商业和设计约束下所有可能的page presentations进行定义，表示成P。
+Page Presentation定义了要展示的page content x，比如：position、vertical type、size、color等。**它可以被编码成一个vector p**。p的domain通过在符合商业和设计约束下所有可能的page presentations进行定义，表示成P。
 
 **定义3（Search Result Page, SERP）**
 
-当page cotent x根据呈现策略p被放置在页面上是，会生成一个SERP。换句话说，content x和presentation p唯一地决定了一个SERP。它可以被呈现成一个tuple $$(x, p) \in X \times P$$。
+当Page Content x根据呈现策略p被排布在页面上时，会生成一个SERP。换句话说，content x和presentation p唯一地决定了一个SERP。**它可以被呈现成一个tuple $$(x, p) \in X \times P$$**。
 
 **定义4（User Response）**
 
-User response包含了它在SERP上的动作（actions），比如：点击数、点击位置、点击停留时长、第一次点击的时间。该信息被编码成一个vector y。y的domain由所有可能的user responses进行定义，表示为Y。
+User Response包含了它在SERP上的动作（actions），比如：点击数、点击位置、点击停留时长、第一次点击的时间。**该信息被编码成一个vector y**。y的domain由所有可能的user responses进行定义，表示为Y。
 
 **定义5（User Satisfaction）**
 
-用户体验会随着他与SERP交互来确定满意度。我们假设，用户的满意度可以被校准成一个real value $$s \in R$$：s的更大值意味着更高的满意度。
+用户体验会随着他与SERP交互来确定满意度。我们假设，**用户的满意度可以被校准成一个real value $$s \in R$$：s越大意味着满意度越高**。
 
-user response是满意度的一个很强指标。直觉上，如果用户打开了SERP，并在top result上进行了合适的点击，接着在这些结果上花了较长的停留时间，她很可能会享受这些结果。
+User Response是满意度的一个很强指标。直觉上，如果用户打开了SERP，并在top result上进行了合适的点击，接着在这些结果上花了较长的停留时间，表明他很可能会享受这些结果。
 
 有了以上定义，我们可以将问题公式化：
 
-**Page Presentation Optimization**：是为了发现对于一个给定page content $$x \in X$$的presentation $$p \in P$$，从而使得：当$$SERP (x, p)$$被呈现给用户时，他的满意度得分可以被最大化。
+**Page Presentation Optimization**：对于一个给定page content $$x \in X$$，我们的目标是发现这样的presentation $$p \in P$$：当$$SERP (x, p)$$被呈现给用户时，他的满意度得分可以被最大化。
 
-如果我们假设，存在一个scoring function $$F: X \times P \rightarrow R $$，它可以将SERP(x, p) 映射到用户满意度得分s上，接着，page presentation optimization问题可以正式写成：
+如果我们假设，存在一个scoring function $$F: X \times P \rightarrow R $$，它可以将SERP(x, p) 映射到用户满意度得分s上，接着，Page Presentation Optimization问题可以正式写成：
 
 $$
-\underset{p \in P}{max} F(x, p)
+\underset{p \in P}{max} \ F(x, p)
 $$
 
-它遵循在presentation p上的constraints。
+它遵循在Presentation p上的constraints。
 
-page presentation optimization问题是全新且充满挑战的。它之所以为新是因为page presentation可以被灵活定义，这使我们们可以学习全新的方式来展示信息。检索和推荐系统通常会使用一个ranked list来展示异构内容（homogeneous content）。由于异构结果是网页形式编排，以极大化用户使用率的方式通过合理方式进行呈现很重要。该问题很具挑战性是因为：对于发现scoring function来将整个SERP(内容和呈现)映射成user satisfaction是非常不明确的。我们在下节提出我们的解决框架。
+Page Presentation Optimization问题是全新且充满挑战的。它之所以为新是因为page presentation可以被灵活定义，这使我们可以学习全新的方式来展示信息。检索和推荐系统通常会使用一个ranked list来展示异构内容（homogeneous content）。由于异构结果是网页形式编排，以极大化用户使用率的方式通过合理方式进行呈现很重要。该问题很具挑战性是因为：对于发现scoring function来将整个SERP（内容和呈现）映射成user satisfaction是非常不明确的。我们在下节提出我们的解决框架。
 
 # 3.Presentation Optimization framework
 
@@ -86,9 +86,9 @@ page presentation optimization问题是全新且充满挑战的。它之所以�
 
 ## 3.1 通过Exploration的数据收集
 
-supervised机器学习需要labelled训练数据。在数据收集中的警告（caveat）是，正常的搜索流量（normal search traffic）不能被当成训练数据来学习scoring function $$F(x,p)$$。这是因为在正常的搜索流量中，search engine具有一个deterministic policy来呈现page content x，它由在系统中已经存在的model/rules所控制。换句话说，page presentation p是由给定的page content x唯一确定的。然而，我们期望：随着我们通过不同的page presentations进行搜索，模型F可以告诉我们用户满意度。x和p间的混杂（confouding）会对学到的模型产生bias，这是一个非常严重的问题。
+supervised learning需要labelled训练数据。在数据收集中的警告（caveat）是，**正常的搜索流量（normal search traffic）不能被当成训练数据来学习scoring function $$F(x,p)$$**。这是因为：**在正常的搜索流量中，search engine具有一个deterministic policy来呈现page content x，它由在系统中已经存在的model/rules所控制**。换句话说，Page Presentation p是由给定的Page Content x唯一确定的。然而，我们期望：随着我们通过不同的Page Presentations进行搜索，模型F可以告诉我们用户满意度。x和p间的混杂（confouding）会对学到的模型产生bias，这是一个非常严重的问题。
 
-为了消除混杂（confouding），我们会分配“presentation exploration bucket”来做随机实验。对于在该bucket中的请求，我们会使用随机的page presentation对page content进行组织。这里“随机（random）”意味着会在商业和设计约束下均匀地抽取presentation strategies，这样用户体验也不会损伤太大。更进一步，presentation exploration traffic由一个非常小量控制，因此不会影响整体的搜索服务质量。在这种方式下的数据收集保证了scoring function的无偏估计。
+**为了消除混杂（confouding），我们会分配“Presentation Exploration Bucket”来做随机实验**。对于在该bucket中的请求，我们会使用随机的Page Presentation对Page Content进行组织。这里“随机（random）”意味着：会在商业和设计约束下均匀地抽取Presentation strategies，这样用户体验也不会损伤太大。更进一步，Presentation Exploration traffic由一个非常小量控制，因此不会影响整体的搜索服务质量。在这种方式下的数据收集保证了scoring function的无偏估计。
 
 对用户随机曝光结果并不是我们想要的，也可以雇人工标注者来标记page，或者从使用不同的固定呈现策略（fixed presentation strategy）的多个buckets来收集数据，因为每个互联网公司都会测试他们的UI变化。由于我们已经在生产系统上开发了一种通过exploration framework的数据收集， 我们选择采用该方法来进行数据收集。
 
