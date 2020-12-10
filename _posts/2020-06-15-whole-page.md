@@ -274,11 +274,27 @@ $$
 
 其中，$$a=V^{\top} c + \sum\limits_{i=1}^k c_i Q_i^{\top} x$$是一个已知vector。
 
-最后，optimization stage会找到将(2)最大化的p，并满足在p上的constraints。由于给定了page content x，在(2)中的第一项是一个常数，可以丢弃。第二项$$a^T p$$是一个关于p的线性项。由于$$p \in \lbrace  0, 1\rbrace^{k \times k}$$会编码成一个k排列（k-permutation），在$$a \in R^{k \times k}$$中的每个component表示成用户满意度的增益，如果item i被放置在position j上，$$1 \leq i,j \leq k$$。因此，optimzation问题会化简成maximum bipartite matching，这是线性分配问题的一个特例。它可以通过Hungarian算法高效求解，时间复杂度为：$$O(\mid p \mid^3)=O(k^6)$$。在一个具有2GHz CPU的单核计算机上，对于50个items，该问题可以在10ms内求解。
+最后，optimization stage会找到将(2)最大化的p，并满足在p上的constraints。由于给定了page content x，在(2)中的第一项是一个常数，可以丢弃。第二项$$a^T p$$是一个关于p的线性项。由于$$p \in \lbrace  0, 1\rbrace^{k \times k}$$会编码成一个k排列（k-permutation），在$$a \in R^{k \times k}$$中的每个component表示成用户满意度的增益，如果item i被放置在position j上，$$1 \leq i,j \leq k$$。因此，optimzation问题会化简成：最大二部图匹配（maximum bipartite matching），这是线性分配问题的一个特例。它可以通过Hungarian算法高效求解，时间复杂度为：$$O(\mid p \mid^3)=O(k^6)$$。在一个具有2GHz CPU的单核计算机上，对于50个items，该问题可以在10ms内求解。
 
 **GBDT**
 
-略
+为了捕获在content x和presentation p间更复杂的非线性交叉，我们将前面章节的quadratic feature model $$f_i$$替换成gbdt模型：$$h_i^{GBDT}$$。GBDT是学习非线性函数的一个非常有效的方法。
+
+我们的feature vector为：
+
+$$
+\phi^{\top} = (x^{\top}, p^{\top})
+$$
+
+在y中的每个user response $$y_i$$通过一个GBDT模型来预测：
+
+$$
+y_i = h_i^{GBDT}(x, p)
+$$
+
+用户满意度指标是：$$g(y) = c^{\top} = \sum\limits_{i=1}^k c_i y_i$$
+
+在optimization阶段，由于每个$$h_i$$是一个无参数模型，我们不能根据p来获得$$F(x,p) = \sum\limits_{i=1}^k c_i h_i^{GBDT}(x, p)$$的解析形式。也就是说，在p上的optimization是棘手的。**在实际settings中，由于商业和设计约束，p的搜索空间通常会被减技到十位数的可能值**。我们可以实现并行枚举(paralled enumeration)来快速发现最优的presentation来最大化用户满意度。
 
 ## 4.4 特例：L2R
 
