@@ -364,7 +364,7 @@ $$
 
 ## 6.1 数据收集
 
-我们使用一个非常小部分的搜索流量作为presentation exploration buckets。该数据会通过2013年收集。垂类搜索结果（vertical search results）的presentation会包括：news、shopping和local listings进行探索（exploration）。在exploration buckets中，web结果的顺序会保持不变，verticals会被随机地slot落到具有均匀概率的positions上。随机生成的SERPs不会受系统ranking算法的影响。如3.1节所示，当训练模型时，这还需要消除page content confouding。该exploration SERP接着被呈现给正常方式交互的用户。用户在SERP上做出response，与page-wise content信息（比如：query、以及来自后端的document features）会被日志化。
+我们使用一个非常小部分的搜索流量作为presentation exploration buckets。该数据会通过2013年收集。垂类搜索结果（vertical search results）的presentation会包括：news、shopping和local listings进行探索（exploration）。**在exploration buckets中，web结果的顺序会保持不变，verticals会被随机地slot落到具有均匀概率的positions上**。随机生成的SERPs不会受系统ranking算法的影响。如3.1节所示，**当训练模型时，还需要消除page content confouding**。该exploration SERP接着被呈现给正常方式交互的用户。用户在SERP上做出response，与page-wise content信息（比如：query、以及来自后端的document features）会被日志化。
 
 ## 6.2 方法
 
@@ -388,7 +388,7 @@ $$
 
 ## 6.3 评估
 
-我们使用一半的exploration SERAP作为训练集（1月到6月），其余做为测试集。它包括了上亿的pageview，从真实流量中获取。对比标准的supervised learning setup，它很难做一个无偏的离线效果评估，因为该任务的天然交互性。这是因为offline data $$x^{(n)}, p^{(p)}, y^{(n)}$$使用一个特别的logging policy收集得到，因此我们只能观察到对于一个指定page presentation $$p^{(n)}$$的user response $$y^{(n)}$$。在offline评估中，当在给定了page content $$x^{(n)}$$时，该算法会output一个presentation $$p^{*(n)} \neq p^{(n)}$$，我们不会观察到user response，因此不能评估它的好坏。为了解决该问题，我们使用一个offline policy evaluation方法[28]来评估online推荐系统。它的实现很简单，可以提供一个无效的效果估计，依赖于通过random exploration的数据收集。给定通过random exploration收集到的一个关于events的stream $$(x^{(n)}, p^{(n)}), Pr(p^{(n)}), y^{(n)})$$，其中，$$Pr(p^{(n)})$$是$$SERP(X^{(n)}, p^{(n)})$$的概率，它从均匀随机曝光中生成，对于N个offline events的平均用户满意度可以计算为：
+**我们使用一半的exploration SERAP作为训练集（1月到6月），其余做为测试集。它包含了上亿的pageview，从真实流量中获取**。对比标准的supervised learning setup，它很难做一个无偏的离线效果评估，因为该任务存在天然交互性。这是因为offline data $$x^{(n)}, p^{(p)}, y^{(n)}$$使用一个特别的logging policy收集得到，因此我们只能观察到对于一个指定page presentation $$p^{(n)}$$的user response $$y^{(n)}$$。在offline评估中，当在给定了page content $$x^{(n)}$$时，该算法会output一个presentation $$p^{*(n)} \neq p^{(n)}$$，我们不会观察到user response，因此不能评估它的好坏。为了解决该问题，我们使用一个offline policy evaluation方法[28]来评估online推荐系统。它的实现很简单，可以提供一个无效的效果估计，依赖于通过random exploration的数据收集。给定通过random exploration收集到的一个关于events的stream $$(x^{(n)}, p^{(n)}), Pr(p^{(n)}), y^{(n)})$$，其中，$$Pr(p^{(n)})$$是$$SERP(X^{(n)}, p^{(n)})$$的概率，它从均匀随机曝光中生成，对于N个offline events的平均用户满意度可以计算为：
 
 $$
 \bar{s} = \frac{1}{N} \sum\limits_{n=1}^N \frac{g(y^{n}) 1_{\lbrace  p^{*(n)} == p^{(n)}\rbrace}}{Pr(p^{(n)})}
