@@ -159,14 +159,14 @@ $$
 
 content features包含了query和相应搜索结果的信息，这与l2r中所使用的相似。我们采用与[23]中所使用相近的content features来进行实验对比：
 
-- **全局结果集特征（Global result set features）**：由所有返回结果派生的features。他们表示了每个vertical的内容availability。
+- **全局结果集特征（Global result set features）**：由所有返回结果派生的features。他们指示了每个垂类（vertical）内容的是否有提供（availability）。
 - **Query特征（Query features）**：词汇特征，比如：query unigrams、bigrams、共现统计等。我们也会使用query分类器的outputs、基于query features的历史session等
-- **语料级特征（corpus level features）**：来自每个vertical及web文档的query-independent features，比如：历史ctr、用户偏好等
+- **语料级特征（Corpus Level Features）**：来自每个vertical及web文档的query-independent features，比如：历史ctr、用户偏好等
 - **搜索结果特征（search result features）**：从每个搜索结果中抽取得到。它是一个统计归纳特征列表（比如：每个单独结果的相关度得分、ranking features等）。对于一些verticals，我们也会抽取一些domain-specific meta features，比如：电影是否是在屏幕上，在movie vertical中是否提供电影海报，在news vertical中最新几小时的新闻文章的点击数。
 
 ## Presentation Features
 
-Presentation features会在SERP上被展示的搜索结果进行编码，它是在框架中的novel features。具体示例包括：
+Presentation features会在SERP上被展示的搜索结果进行编码，它是在框架中的新features。具体示例包括：
 
 - **Binary indicators**：是否在某一位置上展示某个item。该scheme可以编码在线框（wireframe）中的position，比如：一个list或多列panels。假设在frame中存在k个positions，会展示k个items。假设i是items的索引，j是positions的索引，$$1 \leq i, j \leq k$$。item i的presentation，$$p_i$$，是一个1-of-k的binary encoding vector。如果document i被放置在position j，那么$$p_i$$的第j个component是1，其余为0. 在本case中，我们将$$p_i$$的值表示为$$p_{ij}-1$$。page presentation $$p^T = (p_1^T, \cdots, p_k^T)$$包含了$$k \times k$$的二元指示变量（binary indicator variables）、本质上编码了k个对象(objects)的排列（permutation）。
 - **Categorical features**：page items的离散（discrete）属性，比如：一个item的多媒体类型（text还是image），一个textual item的字体（typeface）
@@ -180,7 +180,7 @@ Presentation features会在SERP上被展示的搜索结果进行编码，它是�
 我们会假设：用户满意度指标 g(y)是对y中components的加权和的某种形式：
 
 $$
-g(y) = c^T y
+g(y) = c^{\top} y
 $$
 
 在该实验中，我们使用关于k items的click-skip metric[23]：
@@ -189,7 +189,12 @@ $$
 g(y) = \sum\limits_{i=1}^k y_i
 $$
 
-其中，如果item i被点击，则有$$y_i=1$$；如果item i被跳过并且下面的某些item被点击，则有$$y_i=-1$$。一个skip通常表示浪费性检查（wasted inspection），因此我们会将它设置成一个单位的negative utility。该metric会强烈地偏向于在top positions上的邻近点击（adjacent click）。
+其中：
+
+- 如果item i被点击，则有$$y_i=1$$；
+- **如果item i被跳过并且它下面的某些item被点击**，则有$$y_i=-1$$。
+
+一个skip通常表示浪费性检查（wasted inspection），因此我们会将它设置成一个单位的negative utility。该metric会强烈地偏向于在top positions上的邻近点击（adjacent click）。
 
 ## 4.3 User Response Models
 
@@ -197,18 +202,18 @@ $$
 
 **二阶特征模型（Quadratic Feature model）**
 
-首先，假设我们考虑一个关于user response模型的简单实现，它可以在optimization stage上进行高效求解。由于它使用x和p间的二阶交叉特征（quadratic features），我们称之为“Quaddratic Feature Model”。
+首先，假设我们考虑一个关于user response模型的简单实现，它可以在optimization stage上进行高效求解。由于它使用x和p间的二阶交叉特征（quadratic features），我们称之为“Quadratic Feature Model”。
 
 假设对于k个items存在k个positions。Page content x是关于k个item vectors的concatenation；page presentation使用二元指示$$p \in \lbrace 0,1 \rbrace^{k \times k}$$进行编码，如第4.1节定义。该模型也包含了x和p间的完全交叉作为features。假设 vec(A)表示包含了在matrix A中所有elements的row vector，一列挨一列，从左到右。Quadratic Feature Model的增广特征向量（augmented feature vector）$$\phi$$为：
 
 $$
-\phi^T = (x^T, p^T, vec(xp^T))
+\phi^{\top} = (x^{\top}, p^{\top}, vec(xp^{\top}))
 $$
 
 假设$$y \in R^k$$是user response vector；每个component $$y_i$$是在item i上的一个user response。线性模型$$f_i$$被用于预测在y中的每个$$y_i$$：
 
 $$
-y_i = f_i(\phi) = w_i^T \phi = u_i^T x + v_i^T p + x^T Q_i p
+y_i = f_i(\phi) = w_i^{\top} \phi = u_i^{\top} x + v_i^{\top} p + x^{\top} Q_i p
 $$
 
 ...(1)
