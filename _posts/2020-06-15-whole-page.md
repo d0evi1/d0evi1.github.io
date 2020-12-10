@@ -396,7 +396,7 @@ $$
  (x^{(n)}, p^{(n)}, Pr(p^{(n)}), y^{(n)})
  $$
  
-其中，$$Pr(p^{(n)})$$是$$SERP(X^{(n)}, p^{(n)})$$的概率，它从均匀随机曝光中生成，对于N个offline events的平均用户满意度可以计算为：
+其中，$$Pr(p^{(n)})$$是指的是从均匀随机曝光中生成$$SERP(X^{(n)}, p^{(n)})$$的概率，对于N个offline events的平均用户满意度可以计算为：
 
 $$
 \bar{s} = \frac{1}{N} \sum\limits_{n=1}^N \frac{g(y^{n}) 1_{\lbrace  p^{*(n)} == p^{(n)}\rbrace}}{Pr(p^{(n)})}
