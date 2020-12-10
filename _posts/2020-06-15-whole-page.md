@@ -42,16 +42,15 @@ yahoo在2017年《Beyond Ranking: Optimizing Whole-Page Presentation》的一篇
 
 # 2.问题公式化
 
-page presentation optimization的问题声明如下：“给定在一个页面上要展示的搜索结果，发现可以最大化用户满意度（user satisfaction）的最优呈现，”。我们假设以下setting：搜索引擎返回针对某一query的一个结果集，并在SERP上根据一些呈现策略（presentation strategy）对items进行渲染。由于SERP会被展示给用户，用户可以与它交互来获得特定的用户满意度。现在假设我们在setting中定义了些重要概念：
+Page Presentation Optimization的问题声明如下：“**给定在一个页面上要展示的搜索结果，发现可以最大化用户满意度（user satisfaction）的最优呈现**”。我们假设以下setting：搜索引擎返回针对某一query的一个结果集，并在SERP上根据一些呈现策略（presentation strategy）对items进行渲染。由于SERP会被展示给用户，用户可以与它交互来获得特定的用户满意度。现在假设我们在setting中定义了些重要概念：
 
 **定义1（Page Content）**
 
-page content是在页面上被展示的搜索结果集合。每个搜索结果是一个item。在搜收到用户的query后，搜索引擎后台会返回一个关于k个items的集合。每个item被表示成为一个vector $$x_i$$。注意，不同的users和不同的queries会生成不同的items集合，因此$$x_i$$也可以从实际users和queries中编码信息。Page content被呈现成k个item vectors的concatenation：$$x^T = (x_1^T, \cdots, x_i^T, \cdots, x_k^T$$。x的domain通过由后台返回的所有可能page content进行定义，被表示为X。
-
+Page Content是在页面上被展示的搜索结果集合。每个搜索结果是一个item。在接收到用户的query后，搜索引擎后台会返回一个关于k个items的集合。每个item被表示成为一个vector $$x_i$$。注意，不同的users和不同的queries会生成不同的items集合，因此$$x_i$$也可以从实际users和queries中编码信息。**Page Content被呈现成k个item vectors的concatenation：$$x^{\top}= (x_1^{\top}, \cdots, x_i^{\top}, \cdots, x_k^{\top})$$**。x的domain通过由后台返回的所有可能page content进行定义，被表示为X。
 
 **定义2（Page Presentation）**
 
-page presentation定义了要展示的page content x，比如：position、vertical type、size、color等。它可以被编码成一个vector p。p的domain通过在符合商业和设计约束下所有可能的page presentations进行定义，表示成P。
+Page Presentation定义了要展示的page content x，比如：position、vertical type、size、color等。它可以被编码成一个vector p。p的domain通过在符合商业和设计约束下所有可能的page presentations进行定义，表示成P。
 
 **定义3（Search Result Page, SERP）**
 
