@@ -242,11 +242,19 @@ V=(v_1, \cdots, v_k)^{\top}, \\
 Q=diag(Q_1, \cdots, Q_k)
 $$
 
-其中：将x和p“拷贝（copy）” k次来获得matrix：$$X=diag(x^{\top}, \cdots, x^{\top})$$ 以及vector：$$t^{\top}=(p^{\top}, \cdots, p^{\top})$$
+其中，将x和p“拷贝（copy）” k次来获得以下：
+
+- matrix：$$X=diag(x^{\top}, \cdots, x^{\top})$$ 
+- vector：$$t^{\top}=(p^{\top}, \cdots, p^{\top})$$
 
 为了声明维度，如果$$x \in R^n, p \in R^m$$，那么：
 
-$$U \in R^{k \times n}, V \in R^{k \times m}, X \in R^{k \times nk}, Q \in R^{nk \times mk}$$
+$$
+U \in R^{k \times n}, \\
+V \in R^{k \times m}, \\
+X \in R^{k \times nk}, \\
+Q \in R^{nk \times mk}
+$$
 
 其中：$$t \in R^{mk}$$，user response model可以被写成：
 
