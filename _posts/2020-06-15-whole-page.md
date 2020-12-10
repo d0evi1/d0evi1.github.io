@@ -145,7 +145,7 @@ $$
 
 它遵循presentation p的约束（constraints）。
 
-计算该optimization问题的计算开销，依赖于objective function $$F=g \odot f$$的实际形式，以及在presentation p上的constraints。在下一节中，我们展示了，对于f和g的特定实例，$$p^*$$可以被相当有效地进行计算。
+计算该optimization问题的计算开销，依赖于objective function $$F=g \circ f$$的实际形式，以及在presentation p上的constraints。在下一节中，我们展示了对于f和g的特定实例，$$p^*$$可以被相当有效地进行计算。
 
 # 4.Presentation Optimization Framework
 
