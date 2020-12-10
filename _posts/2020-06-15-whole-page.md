@@ -94,10 +94,10 @@ supervised learning需要labelled训练数据。在数据收集中的警告（ca
 
 ## 3.2 Learning Stage
 
-page presentation optimization的核心是，估计scoring function $$s = F(x, p)$$。我们可以考虑以下两个方法：
+Page Presentation Optimization的核心是，估计scoring function $$s = F(x, p)$$。我们可以考虑以下两个方法：
 
-- (I) Direct方法：收集page-wise的用户满意度ratings，并直接对SERP和用户满意度间的依赖关系建模。该依赖路径（dependency path）是“(x,p) - s”。
-- (II) Factorized方法：首先，在SERP上预测user response y，接着寻找一个函数来从这些responses上measure用户满意度。该依赖路径（dependency path）是“(x,p) - y - s”。
+- (I) Direct方法：收集page-wise的用户满意度ratings，并直接对SERP和用户满意度间的依赖关系建模。该依赖路径（dependency path）是“$$(x,p) \rightarrow s$$”。
+- (II) Factorized方法：首先，在SERP上预测user response y，接着寻找一个函数来从这些responses上measure用户满意度。该依赖路径（dependency path）是“(x,p) \rightarrow y \rightarrow s”。
 
 方法(I)是简单的。然而，它非常难（当数据规模很大时，获得对于entire SERP的显式用户评分（explicit user rating）s很困难）。为了构建这样的数据集，我们需要大量的observations和人工标注来克服训练数据的稀疏性。
 
