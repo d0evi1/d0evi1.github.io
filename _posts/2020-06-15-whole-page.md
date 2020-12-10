@@ -168,7 +168,7 @@ content features包含了query和相应搜索结果的信息，这与l2r中所�
 
 Presentation features会在SERP上被展示的搜索结果进行编码，它是在框架中的新features。具体示例包括：
 
-- **Binary indicators**：是否在某一位置上展示某个item。该scheme可以编码在线框（wireframe）中的position，比如：一个list或多列panels。假设在frame中存在k个positions，会展示k个items。假设i是items的索引，j是positions的索引，$$1 \leq i, j \leq k$$。item i的presentation，$$p_i$$，是一个1-of-k的binary encoding vector。如果document i被放置在position j，那么$$p_i$$的第j个component是1，其余为0. 在本case中，我们将$$p_i$$的值表示为$$p_{ij}-1$$。page presentation $$p^T = (p_1^T, \cdots, p_k^T)$$包含了$$k \times k$$的二元指示变量（binary indicator variables）、本质上编码了k个对象(objects)的排列（permutation）。
+- **Binary indicators**：是否在某一位置上展示某个item。该scheme可以编码在线框（wireframe）中的position，比如：一个list或多列panels。假设在frame中存在k个positions，会展示k个items。假设i是items的索引，j是positions的索引，$$1 \leq i, j \leq k$$。item i的presentation，$$p_i$$，是一个1-of-k的binary encoding vector。如果document i被放置在position j，那么$$p_i$$的第j个component是1，其余为0. 在本case中，我们将$$p_i$$的值表示为$$p_{ij}-1$$。page presentation $$p^{\top} = (p_1^{\top}, \cdots, p_k^{\top})$$包含了$$k \times k$$的二元指示变量（binary indicator variables）、本质上编码了k个对象(objects)的排列（permutation）。
 - **Categorical features**：page items的离散（discrete）属性，比如：一个item的多媒体类型（text还是image），一个textual item的字体（typeface）
 - **Numerical features**：pape items的连续（continuous）属性，比如：一个graphical item的亮度、以及对比度
 - **其它特征**：page content和presentation间的特定交叉可能会影响user response，比如：“在graphical item之上紧接一个textual item”
@@ -204,7 +204,7 @@ $$
 
 首先，假设我们考虑一个关于user response模型的简单实现，它可以在optimization stage上进行高效求解。由于它使用x和p间的二阶交叉特征（quadratic features），我们称之为“Quadratic Feature Model”。
 
-假设对于k个items存在k个positions。Page content x是关于k个item vectors的concatenation；page presentation使用二元指示$$p \in \lbrace 0,1 \rbrace^{k \times k}$$进行编码，如第4.1节定义。该模型也包含了x和p间的完全交叉作为features。假设 vec(A)表示包含了在matrix A中所有elements的row vector，一列挨一列，从左到右。Quadratic Feature Model的增广特征向量（augmented feature vector）$$\phi$$为：
+假设：对于k个items存在k个positions。Page content x是关于k个item vectors的concatenation；page presentation使用二元指示$$p \in \lbrace 0,1 \rbrace^{k \times k}$$进行编码，如第4.1节定义。该模型也包含了x和p间的完全交叉作为features。假设 vec(A)表示包含了在matrix A中所有elements的row vector，一列挨一列，从左到右。Quadratic Feature Model的增广特征向量（augmented feature vector）$$\phi$$为：
 
 $$
 \phi^{\top} = (x^{\top}, p^{\top}, vec(xp^{\top}))
@@ -266,7 +266,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a9a917ddf7587ddf8fb7a3f14428b74da0cbbd1083eaf07af8429f5afa1c9029b5f16f79688dd7576eb6a6026c88657f?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=f2.jpg&amp;size=750">
 
-图2
+图2 
 
 当"presentation exploration bucket"生成一个page时，“user”带有attention bias去检查它时，就发生一次“interaction”。当用户检查一个item时，他会接受到相应的reward。对该page的用户满意度是rewards的总和。page content、presentation、以及被检查的items和positions（user responses），会变成框架希望学习的数据。最终，我们会测试该框架是否成功学到用户的attention bias。给定items的一个新集合，我们会希望看到，该框架会将具有更高rewards的items放置到更容易获得注意力的positions上来达到最大化用户满意度。因此，为了对模型在user attention bias上的当前置信（current belief）进行可视化，我们可以在该page上绘制item rewards的分布。
 
