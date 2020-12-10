@@ -97,11 +97,21 @@ supervised learning需要labelled训练数据。在数据收集中的警告（ca
 Page Presentation Optimization的核心是，估计scoring function $$s = F(x, p)$$。我们可以考虑以下两个方法：
 
 - (I) Direct方法：收集page-wise的用户满意度ratings，并直接对SERP和用户满意度间的依赖关系建模。该依赖路径（dependency path）是“$$(x,p) \rightarrow s$$”。
-- (II) Factorized方法：首先，在SERP上预测user response y，接着寻找一个函数来从这些responses上measure用户满意度。该依赖路径（dependency path）是“(x,p) \rightarrow y \rightarrow s”。
+- (II) Factorized方法：首先，在SERP上预测user response y，接着寻找一个函数来从这些responses上measure用户满意度。该依赖路径（dependency path）是“$$(x,p) \rightarrow y \rightarrow s$$”。
 
 方法(I)是简单的。然而，它非常难（当数据规模很大时，获得对于entire SERP的显式用户评分（explicit user rating）s很困难）。为了构建这样的数据集，我们需要大量的observations和人工标注来克服训练数据的稀疏性。
 
-方法(II)分两步。第一步：预测在一个给定页上的user responses；第二步：基于它的page-wise response对用户满意度进行measure。引入user response变量y可以在概念上进行分开。一方面，在page上的user response是一个与页面交互的直接推论（direct consequence）。另一方面，用户满意度通常只通从user responses中进行估计（比如：总点击数、或停留时长）。在方法（II）中，$$F(\cdot,\cdot)$$的复杂依存被解耦成两个相对独立的因子。在实际上，方法（II）对于当前的web技术来说更现实，因为在SERP上的user response可以通过javascript很容易收集，而显式地询问用户来评估whole page是非常罕见的。因此，我们采用factorized方法。
+方法(II)分两步：
+
+- 第一步：预测在一个给定页上的user responses；
+- 第二步：基于它的page-wise response对用户满意度进行measure。
+
+引入user response变量y可以在概念上进行分开：
+
+- 一方面，在page上的user response是一个与页面交互的直接结果（direct consequence）
+- 另一方面，用户满意度通常只通过从user responses中进行估计（比如：总点击数、或停留时长）
+
+在方法（II）中，$$F(\cdot,\cdot)$$的复杂依赖被解耦成两个相对独立的因子。在实际上，**方法（II）对于当前的web技术来说更现实**，因为在SERP上的user response可以通过javascript很容易收集，而显式地询问用户来评估whole page是非常罕见的。因此，我们采用factorized方法。
 
 在factorized方法中，第一步是学习一个user response模型：
 
@@ -109,7 +119,7 @@ $$
 y = f(x, p), \forall x \in X, p \in P
 $$
 
-这是一个supervised learning任务；f(x,p)的实际形式可以被灵活选择。我们可以简单地为在y中的每个component $$y_i$$构建一个模型，或者我们可以直接使用结构化的输出预测（structured output prediction）联合预测y的所有component。在任意case中，用户在页面上的responses同时依赖于content（相关的、多样化的、吸引人的）和presentation（是否接近top、在图片块周围、或以big size展示）。
+这是一个supervised learning任务；f(x,p)的实际形式可以被灵活选择。**我们可以简单地为在y中的每个component $$y_i$$构建一个模型（我注：类似于多目标?），或者我们可以直接使用结构化的输出预测（structured output prediction）联合预测y的所有component**。在任意case中，用户在页面上的responses同时依赖于content（相关的、多样化的、吸引人的）和presentation（是否接近top、在图片块周围、或以big size展示）。
 
 第二步是一个utility function，它定义了一个用户满意度指标：
 
@@ -122,7 +132,7 @@ $$
 最终，对于整个SERP我们的scoring function为：
 
 $$
-s = F(x,p).= (g \odot f) (x, p) = g(f(x, p))
+s = F(x,p)= (g \circ f) (x, p) = g(f(x, p))
 $$
 
 ## 3.3 Optimization stage
