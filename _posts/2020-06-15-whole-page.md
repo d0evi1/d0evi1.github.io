@@ -304,27 +304,27 @@ $$
 
 # 5.仿真研究
 
-通过仿真（simulation），我们展示了presentation optimization framework的潜能。我们使用synthetic dataset，以便我们可以知道“ground truth”机制来最大化用户满意度，因此，我们可以轻易地确认该算法是否可以真正学到optimal page presentation来最大化用户满意度。在该研究中，我们已经有两个目标：
+通过仿真（simulation），我们展示了presentation optimization framework的潜能。我们使用synthetic dataset，以便我们可以知道“ground truth”机制来最大化用户满意度，因此，我们可以轻易地确认该算法是否可以真正学到最优的page presentation来最大化用户满意度。在该研究中，我们已经有两个目标：
 
 - (1) 我们展示了该framework允许page presentation的通用定义
 - (2) 我们使用position bias和item-specific bias两者来展示framework可以自动适配用户交叉习惯
 
 ## 5.1 总览
 
-我们首先给定一个关于simulation workflow的总览。该仿真的“presentation exploration bucket”会生成一个包含由random presentation的items set组合成的页面。每次生成一个新页面时，每个item被分配一些从一个底层分布中抽样的reward（例如：相关信息）。仿真的“user”会具有一个特定类型的attention bias：
+我们首先给定一个关于simulation workflow的总览。**该仿真的“Presentation Exploration Bucket”会生成一个包含由random presentation的items set组合成的页面**。每次生成一个新页面时，每个item被分配一些从一个底层分布中抽样的reward（例如：相关信息）。仿真的“user”会具有一个特定类型的attention bias：
 
 - (1) position bias：比起其它地方，用户会花更多注意力在页面的特定区域（图2a所示）
-- (2) vertical bias，或item-specific bias：某一特定类型item及它的周围会更吸引人的注意力
+- (2) vertical bias（或item-specific bias）：某一特定类型item及它的周围会更吸引人的注意力
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a9a917ddf7587ddf8fb7a3f14428b74da0cbbd1083eaf07af8429f5afa1c9029b5f16f79688dd7576eb6a6026c88657f?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=f2.jpg&amp;size=750">
 
-图2 
+图2 不同类型的user attention bias
 
-当"presentation exploration bucket"生成一个page时，“user”带有attention bias去检查它时，就发生一次“interaction”。当用户检查一个item时，他会接受到相应的reward。对该page的用户满意度是rewards的总和。page content、presentation、以及被检查的items和positions（user responses），会变成框架希望学习的数据。最终，我们会测试该框架是否成功学到用户的attention bias。给定items的一个新集合，我们会希望看到，该框架会将具有更高rewards的items放置到更容易获得注意力的positions上来达到最大化用户满意度。因此，为了对模型在user attention bias上的当前置信（current belief）进行可视化，我们可以在该page上绘制item rewards的分布。
+(**当"Presentation Exploration Bucket"生成一个page时，“user”带有attention bias去检查它时，就发生一次“interaction”。当用户检查一个item时，他会接受到相应的reward。对该page的用户满意度是rewards的总和**。Page Content、Presentation、以及被检查的items和positions（user responses），会变成框架希望学习的数据。最终，我们会测试该框架是否成功学到用户的attention bias。给定items的一个新集合，我们会希望看到，该框架会将具有更高rewards的items放置到更容易获得注意力的positions上来达到最大化用户满意度。因此，为了对模型在user attention bias上的当前置信（current belief）进行可视化，我们可以在该page上绘制item rewards的分布。
 
 ## 5.2 数据生成过程
 
-在“search engine”侧，一个page（不管是1D list还是2D grid）包含了k个positions。page content $$x=(x_1, \cdots, x_k)^T, x_i \sim N(\mu_i, \sigma)$$表示k个items的内在奖励（intrinsic reward）。对于1-D list我们设置k=10，对于2-D grid设置k=7 x 7. $$\mu_i$$是从[0, 1]中抽取的随机数字，$$\sigma=0.1$$。page presentation p从k-permutations中随机均匀抽取。whole page被表示成：(x, p)。
+在“search engine”侧，一个page（不管是1D list还是2D grid）包含了k个positions。Page Content $$x=(x_1, \cdots, x_k)^T$$ 以及 $$x_i \sim N(\mu_i, \sigma)$$表示了k个items的内在奖励（intrinsic reward）。对于1-D list我们设置k=10，对于2-D grid设置k=7 x 7。 $$\mu_i$$是从[0, 1]中抽取的随机数字，$$\sigma=0.1$$。page presentation p从k-permutations中随机均匀抽取。**whole page被表示成：(x, p)**。
 
 在"user"侧，attention bias按如下方式仿真：
 
@@ -340,23 +340,23 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/2078c92e27115bf2df3c7e60dfb2b5d5d38b6373e2ba5789d0ee0405012f008b805986121bc9e633221cc892d7e8020c?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=f3.jpg&amp;size=750">
 
-图3
+图3 1-D list中的top position bias和presentation
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/94c493368548e7361e44d064a70bccf9d3c944ac1e13b1b3e80c22789a4343e15c76736612f520a9530c94aab88de0e1?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=f4.jpg&amp;size=750">
 
-图4
+图4 2-D canvas上的top-left position bias
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/3474ca896a820ad8b7af01b2a4a575e6826d294f6d4b1882ca9519b8458dafed33cdb98ac65af5c669e2f2566234e51e?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=f5.jpg&amp;size=750">
 
-图5
+图5 2-D canvas上的two-end position bias和presentation
 
-图3、4、5在多个position biases上对presentation结果进行了可视化。我们可以看到，该算法的确学到将“更好内容（better content）”放置到具有更多user attention的position上。由于page presentation的定义是通用的，对于1-D list和2-D grid它都可以处理。另外，它可以捕获在2-D canvas上的position bias的复杂分布：在图4上的top-left position bias，以及在图5上的top-bottom position bias。
+图3、4、5在多个position biases上对presentation结果进行了可视化。我们可以看到，**该算法的确能学到将“更好内容（better content）”放置到具有更多user attention的position上**。由于Page Presentation的定义是通用的，对于1-D list和2-D grid它都可以处理。另外，它可以捕获在2-D canvas上的position bias的复杂分布：在图4上的top-left position bias，以及在图5上的top-bottom position bias。
+
+图6展示了在item-specific bias下的结果可视化。这是个很有意思的case，其中在page上的一个item是非常夺人眼球的，并且它也会吸引用户的attention到它周围的items上（例如：一个image会吸引用户的眼球，同时也会吸引注意力在在大标题(caption)和描述文本上）。另外假设：对于那些远离eye-catchy item的items，用户的attention会进一步下降。那么，最优的presentation strategy是放置item在page的中心，以便whole page会分派最大的reward。在图6中，我们可以看到：当该item（深红色区域）位于页面中心时，用户满意度值s是最高的。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/68aeb5c0315ccd287d6b9f28e36296f84cf74f9dd07d6d79e78dbda08faa3fbfe40967b28ecc6771ce336720a36bd2a9?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=f6.jpg&amp;size=750">
 
-图6
-
-图6展示了在item-specific bias下的结果可视化。这是个很有意思的case，其中在page上的一个item是非常夺人眼球的，并且它也会吸引用户的attention到它周围的items上（例如：一个image会吸引用户的眼球，同时也会吸引注意力在在大标题(caption)和描述文本上）。另外假设：对于那些远离eye-catchy item的items，用户的attention会进一步下降。那么，最优的presentation strategy是放置item在page的中心，以便whole page会分派最大的reward。在图6中，我们可以看到：当该item（深红色区域）位于页面中心时，用户满意度值s是最高的。
+图6 Item-Specific bias。s: page-wise user satisfaction。当一个specific item(例如：图片)吸引了用户的注意力时，它周围的结果也会受到关注，那么: **当垂类（vertical）被放置在页面中心时，page-wise reward最高**
 
 # 6.真实数据实验
 
