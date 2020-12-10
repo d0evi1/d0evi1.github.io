@@ -393,7 +393,7 @@ $$
 给定通过random exploration收集到的一个关于events的stream：
 
  $$
- (x^{(n)}, p^{(n)}), Pr(p^{(n)}), y^{(n)})
+ (x^{(n)}, p^{(n)}, Pr(p^{(n)}), y^{(n)})
  $$
  
 其中，$$Pr(p^{(n)})$$是$$SERP(X^{(n)}, p^{(n)})$$的概率，它从均匀随机曝光中生成，对于N个offline events的平均用户满意度可以计算为：
