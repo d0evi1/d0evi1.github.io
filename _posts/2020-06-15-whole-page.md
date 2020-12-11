@@ -388,7 +388,9 @@ $$
 
 ## 6.3 评估
 
-**我们使用一半的exploration SERAP作为训练集（1月到6月），其余做为测试集。它包含了上亿的pageview，从真实流量中获取**。对比标准的supervised learning setup，它很难做一个无偏的离线效果评估，因为该任务存在天然交互性。这是因为offline data $$x^{(n)}, p^{(p)}, y^{(n)}$$使用一个指定的logging policy收集得到，因此我们只能观察到对于一个指定page presentation $$p^{(n)}$$的user response $$y^{(n)}$$。在离线评估中，当给定Page Content $$x^{(n)}$$时，该算法会输出一个presentation $$p^{*(n)} \neq p^{(n)}$$，但在离线时我们观察不到user response，因此不能评估它的好坏。**为了解决该问题，我们使用一个offline policy evaluation方法[28]来评估online推荐系统**。它的实现很简单，可以提供一个无偏的效果估计（unbiased performance estimate），依赖于通过random exploration的数据收集。
+**我们使用一半的exploration SERAP作为训练集（1月到6月），其余做为测试集。它包含了上亿的pageview，从真实流量中获取**。对比标准的supervised learning setup，它很难做一个无偏的离线效果评估，因为该任务存在天然交互性。这是因为offline data $$x^{(n)}, p^{(p)}, y^{(n)}$$使用一个指定的logging policy收集得到，因此我们只能观察到对于一个指定page presentation $$p^{(n)}$$的user response $$y^{(n)}$$。
+
+在离线评估中，当给定Page Content $$x^{(n)}$$时，该算法会输出一个presentation $$p^{*(n)} \neq p^{(n)}$$，但在离线时我们观察不到user response，因此不能评估它的好坏。**为了解决该问题，我们使用一个offline policy evaluation方法[28]来评估online推荐系统**。它的实现很简单，可以提供一个无偏的效果估计（unbiased performance estimate），依赖于通过random exploration的数据收集。
 
 给定通过random exploration收集到的一个关于events的stream：
 
@@ -396,7 +398,14 @@ $$
  (x^{(n)}, p^{(n)}, Pr(p^{(n)}), y^{(n)})
  $$
  
-其中，$$Pr(p^{(n)})$$是指的是从均匀随机曝光中生成$$SERP(X^{(n)}, p^{(n)})$$的概率，对于N个offline events的平均用户满意度可以计算为：
+其中：
+
+- $$x^{(n)}$$：指定Page Content
+- $$p(n)$$：指定Page presentation
+- $$Pr(p^{(n)})$$：指的是从均匀随机曝光中生成$$SERP(X^{(n)}, p^{(n)})$$的概率
+- $$y^{(n)}$$：得到的User Response
+
+对于N个offline events的平均用户满意度可以计算为：
 
 $$
 \bar{s} = \frac{1}{N} \sum\limits_{n=1}^N \frac{g(y^{n}) 1_{\lbrace  p^{*(n)} == p^{(n)}\rbrace}}{Pr(p^{(n)})}
