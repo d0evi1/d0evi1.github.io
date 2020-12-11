@@ -400,8 +400,8 @@ $$
  
 其中：
 
-- $$x^{(n)}$$：指定Page Content
-- $$p(n)$$：指定Page presentation
+- $$x^{(n)}$$：Page Content
+- $$p(n)$$：对应的Page presentation
 - $$Pr(p^{(n)})$$：指的是从均匀随机曝光中生成$$SERP(X^{(n)}, p^{(n)})$$的概率
 - $$y^{(n)}$$：得到的User Response
 
@@ -411,13 +411,18 @@ $$
 \bar{s} = \frac{1}{N} \sum\limits_{n=1}^N \frac{g(y^{n}) 1_{\lbrace  p^{*(n)} == p^{(n)}\rbrace}}{Pr(p^{(n)})}
 $$
 
-其中，$$1_{\lbrace \cdot \rbrace}$$是indicator function，$$g(y^{(n)})$$是对SERP n的用户满意度。这意味着该算法会在这些exploration SERPs（它们的presentation会与算法选的相匹配）上被评估；否则SERP在离线评估中会被抛弃。
+其中：
+
+- $$1_{\lbrace \cdot \rbrace}$$是indicator function
+- $$g(y^{(n)})$$是对SERP n的用户满意度
+
+这意味着该算法会在这些exploration SERPs上会评估：**哪个presentation会与算法选的相匹配（match）**；否则在离线评估中该SERP会被抛弃。
 
 正如该match会沿页面往下越深入，match rate会下降（表1）。如果我们需要在预测$$p^{*(n)}$$和实际$$p^{(n)}$$间的exact match，大部分test set会被抛弃，效果评估会趋向于具有大的variance，从而不可信。我们的评估只关注在第一、第二、第三个webpage result之上的垂类结果。注意，第一个webpage result不总是在top rank上；top rank经常被垂类结果占据。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/33e137e0af2cf51c9c1e79281729958462f5bc368e2d9ae48c98396db5eb809b99f4cf166b45e1caa8e583bdb943dc86?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=t1.jpg&amp;size=750">
 
-表1
+表1 random exploration presentation p与predicted optimal presentation $$p^*$$间的match rate。“Until Web1”意味着p和$$p^*$$会在第1个webpage结果之上编码相同的presentation
 
 ## 6.4 结果
 
