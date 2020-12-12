@@ -6,7 +6,7 @@ modified: 2020-06-15
 tags: 
 ---
 
-yahoo在2017年《Beyond Ranking: Optimizing Whole-Page Presentation》的一篇paper里提出了针对whole-page优化的方法，我们来看下。
+yahoo在2016年《Beyond Ranking: Optimizing Whole-Page Presentation》的一篇paper里提出了针对whole-page优化的方法，我们来看下。
 
 # 摘要
 
@@ -418,7 +418,7 @@ $$
 
 这意味着该算法会在这些exploration SERPs上会评估：**哪个presentation会与算法选的相匹配（match）**；否则在离线评估中该SERP会被抛弃。
 
-正如该match会沿页面往下越深入，match rate会下降（表1）。如果我们需要在预测$$p^{*(n)}$$和实际$$p^{(n)}$$间的exact match，大部分test set会被抛弃，效果评估会趋向于具有大的variance，从而不可信。我们的评估只关注在第一、第二、第三个webpage result之上的垂类结果。注意，第一个webpage result不总是在top rank上；top rank经常被垂类结果占据。
+随着match沿页面往下走，match rate会下降（表1）。**如果我们需要针对预测$$p^{*(n)}$$和实际$$p^{(n)}$$间的exact match，那么大部分test set会被抛弃，效果评估会趋向于具有大的variance，从而不可信**。我们的评估只关注在第一、第二、第三个webpage result之上的垂类结果。注意，第一个webpage result不总是在top rank上；top rank经常被垂类结果（vertical results）占据。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/33e137e0af2cf51c9c1e79281729958462f5bc368e2d9ae48c98396db5eb809b99f4cf166b45e1caa8e583bdb943dc86?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=t1.jpg&amp;size=750">
 
@@ -426,17 +426,41 @@ $$
 
 ## 6.4 结果
 
-表2展示了平均page-wise用户满意度。可以看到whole-page优化方法要胜过ranking方法，由于ranking方法会使用probability ranking principle通过相关度来对结果进行排序，它会假设存在一个top-down position bias。QUAD-PRES和GBDT-PRES不会做出这样的假设，它们只会纯粹从数据中学到它们自己的result presentation principle。GBDT模型的效果好于logistic regression模型的原因是，logistic regression假设线性边界，而GBDT则是对非线性边界建模。
+表2展示了平均page-wise用户满意度。可以看到whole-page优化方法要胜过ranking方法，由于ranking方法会使用probability ranking principle通过相关度来对结果进行排序，它会假设存在一个top-down position bias。**QUAD-PRES和GBDT-PRES不会做出这样的假设，它们只会纯粹从数据中学到它们自己的result presentation principle**。GBDT模型的效果好于logistic regression模型的原因是：logistic regression假设线性边界，而GBDT则是对非线性边界建模。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/8f5fe4ee820edaad8edefd09c5d9ecf03b453cb0dcb9963c230777579339850e03aab941db14ee1f7aebc53264f48f9c?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=t2.jpg&amp;size=750">
 
 表2
 
-注意，在我们的关于用户满意度metric（$$g(y)$$）的定义中，一个skip会产生negative utility $$y_i=-1$$。QUAD-PRES和GBDT-PRES通常会比baseline方法更好，这是因为会考虑retrieved items、page presentation、以及在entire SERP上的交互，不只是单个结果。presentation-blind模型会建模logit-rank和gbdt-rank，它们总是希望将最可能获得点击的结果放置在top位置上。然而，对于特定queries，人们可能倾向于跳过图片结果（graphical results）（例如：当用户真实搜索意图是information时，会跳过shopping ads）。在这样的case中，一个click会趋向于发生在top rank之下。作为对比，presentation optimization方法会同时考虑在页面上的结果和它们的position。这会生成更易觉察的结果安置（arrangement）。当我们越往下的SERP时，我们可以看到GBDT-PRES会吸引更多的点击，并具有越少的跳过。
+**注意：在我们的关于用户满意度metric（$$g(y)$$）的定义中，一个skip会产生negative utility $$y_i=-1$$**。QUAD-PRES和GBDT-PRES通常会比baseline方法更好，这是因为会考虑retrieved items、page presentation、以及在entire SERP上的交互，不只是单个结果。presentation-blind模型会建模logit-rank和gbdt-rank，它们总是希望将最可能获得点击的结果放置在top位置上。然而，**对于特定queries，人们可能倾向于跳过图片结果（graphical results）（例如：当用户真实搜索意图是information时，会跳过shopping ads）**。在这样的case中，一个click会趋向于发生在top rank之下。作为对比，presentation optimization方法会同时考虑在页面上的结果和它们的position。这会生成更易觉察的结果安置（arrangement）。当我们越往下的SERP时，我们可以看到GBDT-PRES会吸引更多的点击，并具有越少的跳过。
 
 表3、4、5展示了在Web1、Web2、Web3上的CTR。"S. Local"表示本地商业结果的单个(single)条目（比如：餐馆）；“M. Local”表示本地商业结果的多个（mutiple）条目。对于相同的vertical/genre结果，会呈现不同的size。在CTR项上，ranking方法会具有非常强的效果，因为他们会直接对高CTR进行最优化。然而，whole-page最优化方法仍具竞争力，通过考虑page-wise信息，有时会具有更好的CTR。
 
-...
+有意思的是，对于News vertical，对SERP上的其它结果、以及presentation并不会有过多帮助。作为对比，明知的（knowing）page-wise结果可以帮助提升top-ranked local listings上的CTR一大截。一个可能的解释是：新闻与常规网页类似，包含了丰富的文本信息以及他们的内容相关度可以通过标准ranking函数进行建模。另一方面，local listings...
+
+
+# 7.相关工作
+
+## 7.1 检索中的文档排序
+
+
+## 7.2 综合搜索（Federated Search）
+
+综合搜索（Federated Search或aggregated search）指的是通过一个特定垂类搜索引擎集合，在SERP上聚合结果。通常，来自不同垂类的内容是异构的，并且视觉上更丰富。综合搜索具有两个子任务：垂类选择（vertical selection）和结果呈现（result presentation）。给定一个query，vertical selection的任务会精准地决定哪个候选垂类提供可能的相关结果。在从候选垂类中获得结果后，result presentation则将垂类结果进行合并（merge）来生成相同页上的网页结果。
+
+该paper主要关注result presentation。之前的方法将它看成是一个ranking问题[5,34,23]。特别的，[5,23]采用pointwise ranking函数来排序结果（results）和块（blocks），而[5,34]也构建了pairwise的偏好判断来训练一个ranking函数。[14]考虑了图片和电商结果（shopping results）的2-D grid presentation。比起rankedlist和2-D grid，我们的框架则允许presentation的灵活定义，允许任意的frames、image sizes、文本字体。
+
+综合搜索结果极大地改变了SERP的景观（landscape），它也反过来要求在评估方法上做出变更。[9]提出了一个whole-page relevance的概念。他们主张Cranfield-style evaluation对于在现代SERP上量化用户的整体体验是不充分的。它建议通过为多个SERP elements分配等级来评估整页相关度（whole-page relevance）。我们的框架通过定义一个合适的用户满意度指标来体现该思想。
+
+我们的工作与商业搜索或在线广告竞价的whole-page最优化相关，主要关注于优化搜索服务提供者的回报。我们的框架更通用，并且可以通过更改optimization objective来应用到这些问题上。
+
+## 7.3 搜索行为建模（Search Behavior Modeling）
+
+为了分发好的搜索体验，在SERP上理解用户行为很重要。眼球跟踪实验和点击日志分析观察到：用户在浏览blue-link-only的SERPs上会遵从序列顺序。更低ranked results会使用更低概率被examined到。在另一方面，这些结果也证实了probability ranking principle，鼓励搜索引擎在top上放置更多相关结果。另一方面，当使用click-through data作为相关性来评估训练ranking functions时，必须处理position bias。
+
+由于异构结果出现在SERP上，用户在浏览结果时不再遵循序列顺序。
+
+
 
 # 参考
 
