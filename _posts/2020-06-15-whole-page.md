@@ -232,7 +232,7 @@ $$
 
 ...(1)
 
-$$u_i, v_i, Q_i$$分别是content-only特征、presentation-only特征、content-presentation二阶交叉特征。参数$$w_i = \lbrace u_i, v_i, Q_i \rbrace$$可以使用正则线性回归来估计。为了避免overfitting，我们会将$$u_i$$和$$v_i$$的$$L_2$$ norm进行正则化，并进一步在$$Q_i$$上利用low-rank regularization来处理二阶特征的稀疏性。
+$$u_i, v_i, Q_i$$分别是content-only特征、presentation-only特征、content-presentation二阶交叉特征各自对应的参数。参数$$w_i = \lbrace u_i, v_i, Q_i \rbrace$$可以使用正则线性回归来估计。为了避免overfitting，我们会将$$u_i$$和$$v_i$$的$$L_2$$ norm进行正则化，并进一步在$$Q_i$$上利用low-rank regularization来处理二阶特征的稀疏性。
 
 总之， 我们具有了k个这样的模型，每个模型会预测y中的一个$$y_i$$。为了在概念上将k个模型分组，假设将系数(cofficients)写成：
 
