@@ -461,8 +461,113 @@ $$
 由于异构结果出现在SERP上，用户在浏览结果时不再遵循序列顺序。
 
 
+# RL公式
+
+Y. Wang在<Optimizing Whole-Page Presentation for Web Search>中，补充了RL的方式。
+
+# 8. RUNTIME-EFFICIENT PAGE PRESENTATION POLICY
+
+在本节中，我们提供了在page presentation optimization问题上的一个关于RL的新视角。第三节的方法实验是求解一个RL问题的众多可能方式之一。基于新公式，我们提供了一个policy learning方法，它可以求解相同问题，运行也很高效。最终，我们通过仿真实验展示新方法的高效性。
+
+## 8.1 RL Formulation
+
+我们引入普用的RL setup，接着将page presentation optimization转化成为一个RL问题。
+
+在一个通用的RL setup中，一个agent会扮演着一个随机环境（stochasitc environment）的角色，它会在一个timesteps序列上顺序选择actions，最大化累积收益。它可以被看成是以下的MDP（Markov decision process）：
+
+- state space S
+- action space A
+- initial state分布$$p(s_0)$$，state转移动态分布$$p(s_{t+1}|s_t, a_t)$$，满足Markov性质：$$p(s_{t+1}| s_0, a_0, \cdots, s_t, a_t) = p(s_{t+1}| s_t, a_t)$$
+- 一个reward function $$r: S \times A \rightarrow R$$
+- 在给定state上选择actions的一个policy: $$S \rightarrow P(A)$$，其中$$P(A)$$是在A上measure的概率集合，$$\theta \in R^m$$是一个关于m个参数的vector。$$\pi_{\theta}(a \mid s)$$是在state s上采取action a的概率。一个deterministic policy是一个特例，其中：一个action a在任意state上满足$$\pi_{\theta}(a \mid s) = 1$$
+- 该agent会使用它的policy来与MDP交互来给出关于states、actions、rewards的一个trajectory（$$S \times A \times R$$）：$$h_{0:T}=s_0,a_0,r_0, \cdots, s_T, a_T, r_T$$。cumulative discounted reward(return)是：$$R_{\gamma} = \sum\limits_{t=0}^{\infty} \gamma^t r(s_t, a_t)$$，其中，discount factor $$\gamma \in [0, 1]$$决定了future rewards的present value
+- action-value function $$Q^{\pi} (s, a) = E[R_{\gamma} \mid s_0=s, a_0=a;\pi]$$是在state s上采用action a的expected return，接着following policy $$\pi . Q^*(s,a) = max_{\pi} E[R_{\gamma} \mid s_0=s, a_0=a; \pi]$$是最优的action-value function
+- agent的目标是获得一个policy $$\pi$$，它可以最大化expected return，表示为$$J(\pi)=E[R_{\gamma} \ \pi]$$
+
+在page presentation optimization中，agent是这样的算法：对于每个到来的search query，它决定了在对应SERP上page content的presentation。相关概念对应如下：
+
+- (1) 一个query的page content x是state，state space为X
+- (2) page presentation p是一个action，action space为P
+- (3) intial state distribution $$p(x)$$通过query分布来决定。由于我们不会建模在搜索引擎与用户之间的顺序交互，因此没有state transition dynamics
+- (4) reward function是在一个给定SERP上的用户满意度v，我们会通过scoring function $$v=F(x,p)$$进行估计。在state-action space $$X \times P$$中的每个点是一个SERP
+- (5) 一个policy会为给定的page content x选择一个presentation strategy p。这也是公式(1)的page presentation optimization问题。
+-(6)由于没有state transition，收益 $$R_{\gamma}=v$$，discount factor $$\gamma=0$$，effective time horizon $$T=0$$
+- (7) 由于该policy不会在initial timestep之后起效果，action-value function等于reward function，$$Q^{\pi}=F(x,p), \forall \pi$$，因而：$$F(x,p) = Q^*(s,a)$$
+- (8)expected return $$J(\pi) = E[v \mid \pi] = E_{x \sim p(x)} [E_{p \sim \pi(p \mid x)}[F(x,p)]]$$是agent希望最大化的平均用户满意度
+
+因此，page presentation optimization问题可以被看成是一个RL问题。第3节的方法实际上是一个Q-learning方法。它首先在exploration数据上通过supervised learning来学习最优的action-value function（在我们的case中，它与reward function/scoring function相一致）F(x,p)。接着，它通过选择能最大化optimal action-value function $$\pi(\ \mid x)=1$$的action来生成一个deterministic policy，如果：p能求解$$max_{p \in P}F(x,p)$$以及$$\pi(p \mid x)=0$$
+
+该方法的一个主要缺点是，它必须在运行时为每个query求解一个组合最优问题（combinatorial optimization problem），这对于$$F(\cdot, \cdot)$$的复杂函数形式来说很难。幸运的是，在RL中将该问题进行重塑对于runtime-efficient solutions带来了新曙光。以下我们描述了policy learning的一种解决方案。
+
+## 8.2 Page Presentation的Policy learning
+
+我们会找寻一个新的page presentation算法：
+
+- (1) 它在runtime时很高效
+- (2) 表现力足够，例如：能捕获在一个页面上的综合交互
+- (3) 通过exploration buckets上收集到的数据进行离线训练
+
+这些需求对于Web-scale online应用来说很重要，因为：
+
+- (1) runtime高效性直接影响着用户体验
+- (2) 不同的items在一个SERP上进行展示时可能会有依赖
+- (3) 搜索算法的离线更新可以减少未知exploration行为的风险
+
+一个policy-based agent会满足上述所有要求。通过experience，agent会学到一个policy $$\pi_{\theta}(a \mid s)$$而非一个value function。在runtime时，对于给定的state s，它会从$$\pi_{\theta}(a \mid s)$$中抽取一个action a，在action space上不会执行optimization。在RL场景中，action space是高维或连续的，通常采用policy-based agent。
+
+在我们的问题setting中，agent会从exploration data中学到一个policy $$\pi_{\theta}(p \mid x)$$。对于一个search presentation policy，它更希望是deterministic的，因为搜索引擎用户更希望搜索服务是可预期和可靠的。我们可以将一个deterministic policy写成：$$p.= \pi_{\theta}(x)$$。在runtime时，给定page content x，policy会输出一个page presentation p，它会渲染内容到页面上。为了捕获在page contents间的复杂交叉，$$\pi_{\theta}(\cdot)$$可以采用非线性函数形式。
+
+现在，我们描述presentation policy的设计和训练：
+
+### 8.2.1 Policy Funciton设计
+
+policy $$\pi_{\theta}$$采用page content vector作为input，并输出一个presentation vector。output vector会编码一个关于k个items的排列（permutation）：$$x^T=(x_1^{top},\cdots, x_k^{\top})$$，同时带有其它categorical和numerical性质（例如：image sizes、font types）。它不会去询问$$\pi_{\theta}$$来直接输出一个关于k-permutation作为$$k \times k$$的binary indicators的一个vector，我们会考虑隐式输出一个k-permutation的函数。至少有两种方法可以考虑：
+
+- (1) 通用排序方法（Generalized ranking approach）：$$\pi_{\theta}$$会为每个item输入一个sorting score，它定义了一个顺序：可以将k个items安排在k个位置上。
+- (2) 通用的seq2seq方法（Generalized sequence-to-sequence approach）：$$\pi_{\theta}$$会为每个item-position pair输出一个matching score，这需要在k个items和k个positions间的一个二部图匹配（bipartite matching）
+
+注意，在上面的两种方法中，k个positions可以采用任意任意layout，不限于1-D list。如果$$\pi_{\theta}$$会综合考虑所有items和它们的依赖，那么两种方法都是可行的。在本文中，我们会考虑方法（1）。我们在未来会探索方法(2)。
+
+在方法(1)中，每个item i会具有一个sorting score $$f_{\theta}(\bar{x_i})$$。该sorting scores会通过相同的function $$f_{\theta}$$来生成。feature vector $$\bar{x_i}$$对于每个item i是不同的，并且会包含整个page content feature x。这可以通过将item i的维度放置到x的前面、并将item i的原始维度设置为0来达到。也就是说：对于$$i=1, \cdots, k$$， 有$$\bar{x_i}^{\top}= (x_i^{\top}, x_1^{\top}, \cdots, x_{i-1}^{\top}, 0^{\top}, x_{i+1}^{\top}, \cdots, x_k^{\top}$$。这允许函数$$f_{\theta}$$考虑整个page content，但会为每个item输出一个不同的score。为了捕获在items间的复杂交互，每个$$F_{\theta}$$是一个LambdaMart模型（例如：GBDT模型）。
+
+### 7.2.2 Policy Training
+
+有多种方法以离线方式来训练一个policy，包括：model-based方法、off-policy actor-critic方法。这里我们使用一个model-based方法，它需要首先学到reward function和state transition dynamics。在我们的setting中，reward function是scoring function $$F(x, p)$$，不存在state transition。因此我们采用两个steps来训练policy $$\pi_{\theta}$$：
+
+- (1) 从exploration data中学习scoring function F(x, p)
+- (2) 通过最大化expected return $$J(\pi_{\theta}) = E_{x \sim p(x)} [F(x, \pi_{\theta}(x))]$$来训练policy $$\pi_{\theta}$$
+
+注意，step(1)和step(2)涉及到optimization step $$max_{p \in P} F(x, p)$$。它允许我们选择关于F和$$\pi$$的复杂函数形式来捕获每个页面间的复杂依赖。
+
+在RL文献中，policy通常根据policy gradient方法进行训练。也就是说，$$\pi_{\theta}$$会通过沿$$\Delta_{\theta}J$$方法上移动$$\theta$$来逐渐改进。对于deterministic policies，计算$$\Delta_{\theta}J$$是non-trivial的，正如我们的case。我们在LambdaMart中使用$$\lambda-gradients$$的思想来最优化policy。
+
+由于我们的policy $$\pi_{\theta}$$会通过soring来生成一个permutation，我们可以将$$F(x, \pi_{\theta}(x))$$看成是一种“list-wise objective”。确实：x包含了k个items，$$p=\pi_{\theta}(x)$$定义了一个关于它们的permutation，尽管该layout并不是一个"list"。在$$F(x, \pi_{\theta}(x))$$与常规listwise IR measures间（比如：NDCG和MAP）的差异是：NDCG和MAP基于人工分配的per-item relevance，而$$F(x, \pi_{\theta}(x))$$会自动从数据中学到。对$$J(\pi_{\theta})$$最优化会转化成对listwise objective $$F(x,\pi_{\theta}(x))$$进行最优化。listwise l2r方法LambdaMart很适合该场景，它可以对大多数IR measures进行优化。
+
+LambdaMart使用了一系列的回归树（regression trees），每个会估计$$\lambda$$。对于一个query q，$$\lambda_i \in R$$是一个分配给文档$$d_i$$的数字，它表示当前sorting score $$u_i$$会被改变多少来提升由q检索到的ranked list的NDCG。因此，$$\lambda$$是NDCG对应于soring scores的gradients。他们可以在预测的ranking中，通过交换两个documents $$d_i$$和$$d_j$$进行计算，接着观察在NDCG上的变化：
+
+$$
+...
+$$
+
+其中，。。。
+
+## 8.3 仿真实验
+
+在与第5节中相同的仿真setup下，我们实现了上述的policy-based算法。我们的目标是展示：policy-based方法可以同时学到1D和2D layouts，它的表现与原始的page presentation算法（Q-learning算法）是可比的。
+
+表6展示了在1D和2D场景上的page presentation算法的用户满意度。由于仿真用户满意度是stochastic的，我们会在每个setup上运行1000次求平均方差和标准差。
+
+- Ideal算法如图3(b)和4(b)所示。它会将具有最高reward的item放置到具有最高检查可能性的位置上。它会给出效果的上界。
+- Q-Learning算法是QUAD-PRES。它的作用如图3(c)和4(c)所类似
+- 我们包含了Policy算法的两个变种。他们在scoring function F的实现上有差异。一个使用factorized方法，其中每个item的reward会使用一个GBDT模型来估计，并且pagewise用户满意度是估计的item rewards的求和。另一个使用direct方法，其中，单个GBDT模型会使用整个SERP信息(x,p)来直接预测pasewise的用户满意度。
+- RANDOM算法则将items进行随机shuffle到各个位置上。它给出了算法的下界。
+
+在两种场景下，Q-LEARNING的效果几乎与IDEAL一样好。使用factorized F的policy与在1D case中的Q-LEARNING差不多，比在2D case中的Q-LEARNING稍微差一些。这是因为我们使用了一个policy function $$\pi_{\theta}(x)$$来逼近在Q-LEARNING中的"$$argmax_{p \in P} F(x, p)$$" global optimization过程。它会在presentation质量和runtime效率间做一个tradeoff。
+
+scoring function在policy-based方法上扮演着重要角色。在direct方法中，F会丢失pagewise用户满意度的内部结果，它对于泛化到未见过的presentations是必要的，可以在policy training期间提供accurate feedback。factorized方法会保留在$$F=g \circ f$$的结果，因此它会比direct方法训练一个更好的policy。
 
 # 参考
 
 
 - 1.[Beyond Ranking: Optimizing Whole-Page Presentation](http://www-personal.umich.edu/~qmei/pub/wsdm2016-ranking.pdf)
+- 2.[Optimizing Whole-Page Presentation for Web Search](https://dl.acm.org/doi/pdf/10.1145/3204461)
