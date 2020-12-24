@@ -15,7 +15,7 @@ for Memory-Efficient Recommendation Systems》，提出了一种compositional em
 
 DLRMs的设计是为了处理大量categorical (or sparse) features的情况。对于个性化或CTR预估任务，categorical features的示例可以包括：users、posts、pages、以及成百上千的这些features。在每个categorical feature中，categories的集合可能会有许多多样性的含义。例如，社交媒体主页（socal media pages）可能包含的主题范围是：从sports到movies。
 
-为了利用这些categorical信息，DLRMs利用embeddings将每个category映射到在一个embedded空间中的一个唯一的dense representation；见[2,4,5等]。更精确的，给定一个关于categories的集合S以及它的基数 $$\mid S \mid$$，每个categorical实例会被映射到一个在一个embedding table $$W \in R^{{\mid S \mid} \times D}$$的indexed row vector上，如图1所示。我们不用预先决定embedding的weights，对于生成准确的模型，在neural network的其余部分对embeddings进行jointly training更有效。
+为了利用这些categorical信息，DLRMs利用embeddings将每个category映射到在一个embedded空间中的一个唯一的dense representation；见[2,4,5等]。更精确的，给定一个关于categories的集合S以及它的基数 $$\mid S \mid$$，每个categorical实例会被映射到一个在一个embedding table $$W \in R^{\mid S \mid \times D}$$的indexed row vector上，如图1所示。我们不用预先决定embedding的weights，对于生成准确的模型，在neural network的其余部分对embeddings进行jointly training更有效。
 
 每个categorical feature，可有具有数千万可能不同的categories（比如：$$\mid S \mid \approx 10^7 $$），采用的embedding vector的维度为$$D \approx 100$$。在DLRM的training和inference期，由于存在大量的categories，每个table可能需要多个GBs进行存储，因此embedding vectors的数目构成了主要的内存瓶颈。
 
