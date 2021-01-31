@@ -96,9 +96,7 @@ $$
  
  作为一个具体示例，考虑集合 $$S=\lbrace 0,1,2,3,4 \rbrace$$。接着，以下三个set partitions是complementary：
  
-{% highlight python %}
- {{0}, {1,3,4},{2}}, {{0,1,3}, {2,4}}, {{0,3},{1,2,4}}
-{% endhighlight %} 
+    {{0}, {1,3,4},{2}}, {{0,1,3}, {2,4}}, {{0,3},{1,2,4}}
  
 特别的，根据这些partitions中至少一个，你可以确认每个element与其它element是不同的。
  
