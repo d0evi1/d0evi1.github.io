@@ -94,10 +94,10 @@ $$
  
  定义1: 。。。
  
- 作为一个具体示例，考虑集合 $$S=\lbrace 0,1,2,3,4 \rbrace$$。接着，以下三个set partitions是complementary：
- 
-    {{0}, {1,3,4},{2}}, {{0,1,3}, {2,4}}, {{0,3},{1,2,4}}
- 
+作为一个具体示例，考虑集合 $$S=\lbrace 0,1,2,3,4 \rbrace$$。接着，以下三个set partitions是complementary：
+
+    { {0}, {1,3,4}, {2} }, { {0,1,3}, {2,4} }, { {0,3}, {1,2,4} }
+
 特别的，根据这些partitions中至少一个，你可以确认每个element与其它element是不同的。
  
  注意，一个给定partition的每个等价类指定了一个“bucket”，它可以映射到一个embedding vector上。因而，每个partition对应到单个embedding table上。在complementary partitions下，在对来自每个partitions的每个embedding会通过一些操作进行组合之后，每个index会被映射到不同的embedding vector上，如第4节所示。
