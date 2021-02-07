@@ -1,6 +1,6 @@
 ---
 layout: post
-title: md embedding介绍
+title: QR embedding介绍
 description: 
 modified: 2020-07-01
 tags: 
