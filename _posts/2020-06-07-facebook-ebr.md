@@ -1,6 +1,6 @@
 ---
 layout: post
-title: baidu Query-Ad Matching算法介绍
+title: facebook EBR介绍
 description: 
 modified: 2020-06-05
 tags: 
