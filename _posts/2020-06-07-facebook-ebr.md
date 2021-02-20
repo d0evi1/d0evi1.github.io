@@ -121,25 +121,25 @@ $$
 
 encoders的inputs可以从常规的text embedding模型区分unified embedding。unified embedding可以编码textual、social以及其它有意义的contextual features来分别表示query和document。例如，对于query side，我们可以包含searcher location以及其它social connections；而对于document side，以社群搜索（groups search）为例，我们可以包括aggregated location以及关于一个Facebook group的social clusters。
 
-大多数features是具有较高基数（cardinality）的categorical features，它们可以是one-hot或multi-hot vectors。对于每个categorical feature，一个embedding lookup layer会被插入来学习，输出它的dense vector表示，接着feed给encoders。对于multi-hot vectors，最终的feature-level embedding会使用一个关于多个embeddings的加权组合。图2表示我们的unified embedding模型架构。
+大多数features是具有较高基数（cardinality）的categorical features，它们可以是one-hot或multi-hot vectors。**对于每个categorical feature，会插入一个embedding lookup layer进行学习，输出它的dense vector表示，接着feed给encoders**。**对于multi-hot vectors，最终的feature-level embedding会使用一个关于多个embeddings的加权组合(weighted combination)**。图2表示我们的unified embedding模型架构。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b76d72344662d37778263f9d882ca19a616991ebce7841a5ffad90fe064959c783fd01c10c1554c24d3c181e92af9efb?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.png&amp;size=750">
 
-图2
+图2  Unified Embedding Model架构
 
 ## 2.4 训练数据的挖掘
 
-对于一个检索任务，定义positive和negative labels是non-trivial问题。这里我们会基于模型的recall metric来对比一些选择（options）。对于负样本（negative），我们会在以下的两种negatives options中进行实验；而使用click作为正样本（positive）：
+对于一个检索任务，定义positive和negative labels是non-trivial问题。这里我们会基于模型的recall metric来对比一些选择方式（options）。；我们会使用click作为正样本（positive）；而对于负样本（negative），我们会使用以下的两种negatives options进行实验：
 
-- 随机抽样（random samples）：对于每个query，我们会随机从document pool中随机抽样documents作为negatives
-- 非点击曝光（non-click impressions）：对于每个query，我们会在相同的session中随机抽样这样的曝光未点击数据来生成negatives
+- **随机抽样（random samples）**：对于每个query，我们会随机从document pool中随机抽样documents作为负样本
+- **非点击曝光（non-click impressions）**：对于每个query，我们会在相同的session中随机抽样这样的曝光未点击数据来生成负样本
 
-对比起使用random negative，使用non-click impressions作为负样本训练的模型会具有更差的model recall：对于people embedding model来说在recall上相差55%的regression。我们认为：这是因为对于hard cases（它们在一或多个因子上会与query相match）存在negatives bias，在索引index中的大部分documents都是easy cases，它们不需要与query完全匹配。将所有negatives作为这样的hard negatives会将训练数据的表示变更成为真实的retrieval任务，这会引入non-trivial bias到学到的embeddings中。
+**对比起使用随机负样本（random negative），使用非点击曝光（non-click impressions）作为负样本训练的模型会具有更差的model recall**：对于people embedding model来说在recall上相差55%的退化（regression）。我们认为：这是因为对于**hard cases**（它们在一或多个因子上会与query相match）存在**负样本偏差（negatives bias）**，在索引index中的大部分documents都是**easy cases**，它们不需要与query完全匹配。**将所有负样本(negatives)都变成这样的hard negatives，会将训练数据的表示变更成为真实的retrieval任务，这样可以将non-trivial bias强加到学到的embeddings中**。
 
 我们也会使用不同方式的mining positives进行实验，并发现以下的有意思的现象：
 
-- 点击（clicks）：它使用点击结果作为正样本，因为clicks表示用户对于结果的反馈，它很可能与用户的搜索意图相匹配
-- 曝光（impressions）：我们将retrieval看成是一个ranker的近似，但它执行的很快。因此，我们希望设计retrieval模型来学习返回相同集合的结果，它们可以被ranker排得更高。从这个意义上说，对于retrieval model learning来说，展示或曝光给用户的所有结果是相同的。
+- **点击（clicks）**：它使用点击结果作为正样本，因为clicks表示用户对于结果的反馈，它很可能与用户的搜索意图相匹配
+- **曝光（impressions）**：我们将retrieval看成是一个ranker的近似，但它执行的很快。因此，我们希望设计retrieval模型来学习返回相同集合的结果，它们可以被ranker排得更高。从这个意义上说，对于retrieval model learning来说，展示或曝光给用户的所有结果是相同的。
 
 我们的实验结果表明，两种定义效果相当；模型使用click vs. impressions进行训练，给定相同的data volume，会导致相似的recalls。另外，我们会对click-based训练数据与impression-based数据达成一致，然而我们没有观察到在click-based模型上有额外的收益。这表明增加impression data不会提供额外的值，模型也不会从增加的训练数据量上获得收益。
 
