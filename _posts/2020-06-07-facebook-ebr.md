@@ -10,7 +10,7 @@ facebook在《Embedding-based Retrieval in Facebook Search》介绍了它们的�
 
 # 摘要
 
-社交网络中的搜索（比如：Facebook）会比其它经典web搜索构成更大挑战：除了query text外，很重要的是，考虑上搜索者（searcher）的context来提供相关结果。它们的社交图谱（social graph）是这些context的一个主要部分，这是Facebook search的独特之处。而embedding-based retrieval(EBR)被应用到web搜索引擎中已经好多年了，Facebook search仍主要基于Boolean matching模型。在本paper中，我们会讨论使用统一embedding framebook来构建semantic embeddings来进行个性化搜索，该系统会在一个经典搜索系统中基于一个inverted index来提供embedding-based retrieval服务。我们讨论了一些tricks和experiences在整个系统的end-to-end optimization上，包括ANN参数tuning和full-stack optimization。最终，我们将整个过程表述成两个selected advanced topics。我们会为Facebook Search的verticals上评估EBR，并在online A/B experimenets上获取大的metrics提升。我们相信，该paper会提供给你在search engines上开发embeddinb-based retrieval systems一些观点和经验。
+社交网络中的搜索（比如：Facebook）会比其它经典web搜索构成更大挑战：除了query text外，更重要的是，考虑上搜索者（searcher）的context来提供相关结果。searcher的社交图谱（social graph）是这些context的一个主要部分，这是Facebook search的独特之处。而embedding-based retrieval(EBR)被应用到web搜索引擎中已经好多年了，Facebook search仍主要基于Boolean matching模型。在本paper中，我们会讨论使用unified embedding framework来构建semantic embeddings来进行个性化搜索，该系统会在一个经典搜索系统中基于一个inverted index来提供embedding-based retrieval服务。我们讨论了一些tricks和experiences在整个系统的end-to-end optimization上，包括ANN参数tuning和full-stack optimization。最终，我们将整个过程表述成两个selected advanced topics。我们会为Facebook Search的verticals上评估EBR，并在online A/B experimenets上获取大的metrics提升。我们相信，该paper会提供给你在search engines上开发embeddinb-based retrieval systems一些观点和经验。
 
 # 1.介绍
 
@@ -18,40 +18,40 @@ search engine是一个很重要的工具，帮助用户访问大量在线信息�
 
 在最近几年，deep learning在语音识别，CV、NLP上得到了巨大进步。在它们之中，embedding已经被证明是成功的技术贡献。本质上，embedding可以将ids的sparse vector表示成一个dense feature vector，它也被称为：semantic embedding，可以提供语义的学习。一旦学到该embeddings，它可以被用于query和documents的表示，应用于搜索引擎的多个stages上。由于该技术在其它领域的巨大成功，它在IR领域以及工业界也是个活跃的研究主题，被看成是next generation search technology。
 
-总之，搜索引擎由：
+总之，搜索引擎由二个layer组成：
 
-- 一个recall layer：目标是检索一个相关文档集合（低时延和低开销），通常被称为“retrieval”；
-- 一个precision layer：目标是使用复杂算法和模型对最想要的文档进行top rank，通常被称为“ranking”
+- **recall layer**：目标是检索一个相关文档集合（低时延和低开销），通常被称为“retrieval”；
+- **precision layer**：目标是使用复杂算法和模型对最想要的文档进行top rank，通常被称为“ranking”
 
-组成。而embeddings可以被应用到这两个layers上，它通常在retrieval layer上使用embeddings机会更多些，因为它在系统底层（bottom），通常会是瓶颈。在retrieval中的embeddings的应用被称为“embedding-based retrieval”或"EBR"。出于简洁性，EBR是一种使用embeddings来表示query和documents的技术，接着retrieval问题被转换成一个在embedding space上的NN search问题。
+embeddings理论上可以被应用到这两个layers上，但通常在retrieval layer上使用embeddings会更多些，因为它在系统更底层（bottom），通常会是瓶颈。在retrieval中的embeddings的应用被称为“embedding-based retrieval”或"EBR"。出于简洁性，EBR是一种使用embeddings来表示query和documents的技术，接着retrieval问题被转换成一个在embedding space上的NN search问题。
 
-EBR在搜索问题中是个挑战，因为数据的规模很大。不同于ranking layers：该layers通常会在每个session考虑数百个documents，retrieval layer需要在search engine的index上处理billions或trillions的文档。在embeddings的training和serving上都具在大规模的挑战。第二，不同于CV任务中embedding-based retrieval，search engine通常在retrieval layer上需要同时包括：embedding-based retrieval和term matching-based retrieval来进行打分。
+EBR在搜索问题中是个挑战，因为数据的规模很大。**retrieval layer需要在search engine的index上处理billions或trillions的文档**，这不同于ranking layers：通常它在每个session只考虑数百个documents。在embeddings的training和serving上都具在大规模的挑战。第二，不同于CV任务中embedding-based retrieval，search engine通常在retrieval layer上需要同时包括：embedding-based retrieval和term matching-based retrieval来进行打分。
 
-Facebook search，作为一个社交搜索引擎，与传统搜索引擎相比具有独特挑战。在facebook search中，搜索意图（search intent）不只依赖于query text，同时对于发起该query的用户以及searcher所处的context具有很深的依赖。因此，facebook的embedding-based retrieval不是一个text embedding问题，而是一个IR领域的活跃的研究主题。另外，它是个相当复杂的问题，需要一起考虑：text、user、context。
+Facebook search，作为一个社交搜索引擎，与传统搜索引擎相比具有独特挑战。**在facebook search中，搜索意图（search intent）不只依赖于query text，同时对于发起该query的用户以及searcher所处的context具有很强的依赖**。因此，facebook的embedding-based retrieval不是一个text embedding问题，而是一个IR领域的活跃的研究主题。另外，它是个相当复杂的问题，需要一起考虑：text、user、context。
 
-为了部署ebr，我们开发了一个方法来解决modeling、serving、full-stack optimization的挑战。在modeling上，我们提出了unified embedding，它是一个two-sided model，一个side是：query text、searcher、context组成的search request，另一个side是：document。为了有效地训练该模型，我们开发了方法来从search log中挖掘训练数据，并从searcher、query、context、documents中抽取featrues。为了快速进行模型迭代，我们采用了离线评估集来进行一个recall metric评估。
+为了部署EBR，我们开发了一个方法来解决modeling、serving、full-stack optimization的挑战。在modeling上，我们提出了unified embedding，它是一个two-sided model。**一个side是：query text、searcher、context组成的search request，另一个side是：document**。为了有效地训练该模型，我们开发了方法来从search log中挖掘训练数据，并从searcher、query、context、documents中抽取featrues。为了快速进行模型迭代，我们采用了离线评估集来进行一个recall metric评估。
 
 对于搜索引擎，构建retrieval models具有独特挑战，比如：如何构建representative training task建模和有效、高效学习。我们调查了两个不同的方法：
 
 - hard mining：来有效解决representing和learning retrieval 任务的挑战
 - ensemble embedding：将模型划分成多个stages，其中每个stage具有不同的recall/precision tradeoff
 
-在模型被开发后，我们需要在tetrieval stack上进行开发以支持高效的模型serving。使用已存在的retrieval和embedding KNN来构建这样的系统很简单，然而我们发现这是次优（suboptimal）方案，原因如下：
+在模型被开发后，我们需要在retrieval stack上进行开发以支持高效的模型serving。使用已存在的retrieval和embedding KNN来构建这样的系统很简单，然而我们发现这是次优（suboptimal）方案，原因如下：
 
 - 1) 从我们的初始实验看存在巨大性能开销
 - 2) 由于dual index，存在维护开销
 - 3) 两个candidate sets 可能会有大量重合，整体上低效
 
-因此，我们开发了一个混合retrieval framework来将embedding KNN与Boolean matching进行整合，来给retrieval的文档进行打分。出于该目的，我们采用Faiss来进行embedding vector quantization，并结合inverted index-based retrieval来提供混合检索系统。除了解决上述挑战外，该系统也有两个主要优点：
+因此，**我们开发了一个混合retrieval framework来将embedding KNN与Boolean matching进行整合，来给retrieval的文档进行打分**。出于该目的，我们采用Faiss来进行embedding vector quantization，并结合inverted index-based retrieval来提供混合检索系统。除了解决上述挑战外，该系统也有两个主要优点：
 
 - 1) 它可以允许embedding和term matching进行joint optimization来解决search retrieval问题
 - 2) 它允许基于term matching限制的embedding KNN, 它不仅可以帮助解决系统性能开销，也可以提升embedding KNN results的precision
 
-search是一个multi-stage ranking系统，其中retrieval是第一个stage，紧接着还有ranking、filtering等多个stages。为了整体优化系统来返回new good results，假设在结尾有new bad results，我们会执行later-stage optimization。特别的，我们合并embedding到ranking layers中，并构建一个training data feedback loop来actively learn来从embedding-based retrieval中标识这些good和bad results。图1是EBR系统的一个图示。我们在facebook search的verticals上评估了EBR，它在A/B实验上具有大的提升。
+**search是一个multi-stage ranking系统，其中retrieval是第一个stage，紧接着还有ranking、filtering等多个stages**。为了整体优化系统来返回new good results，假设在结尾有new bad results，我们会执行later-stage optimization。特别的，我们合并embedding到ranking layers中，并构建一个training data feedback loop来actively learn来从embedding-based retrieval中标识这些good和bad results。图1是EBR系统的一个图示。我们在facebook search的verticals上评估了EBR，它在A/B实验上具有大的提升。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b9ff5151f853c3f5ffb37ecdff94950374dd3acf9f6d40eb732bbc507079170e7d760d6c73da40f16a0e902936f72556?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
 
-图1
+图1  EBR系统总览
 
 # 2.模型
 
@@ -63,15 +63,15 @@ $$
 
 ...(1)
 
-target results是基于特定准则与给定query相关的documents。例如，它可以是user clicks的结果，或者是基于human rating的相关文档。
+**target results是基于特定准则与给定query相关的documents。例如，它可以是user clicks的结果，或者是基于human rating的相关文档**。
 
 我们基于query和documents之间的距离计算，将一个ranking problem公式化为recall optimization。query和documents使用一个neural network model被编码成dense vectors，我们基于它使用cosine similarity作为距离metric。我们提出使用triplet loss来近似recall objective来学习neural network encoder，它也被称为embedding model。
 
-而semantic embedding通常被公式化成在IR上的text embedding problem，它在facebook search上是低效的，它是一个个性化搜索引擎，不仅会考虑text query，也会考虑searcher的信息、以及search task中的context来满足用户个性化信息的需要。以people search作为一个示例，它具有上千个名为“john Smith”的user profiles，实际的target person是使用"John Simth"作为query搜索的这个用户，很可能是它们的朋友或者相互认识。为了建模该问题，我们提出了unified embedding，它不只会考虑text，也会在生成的embeddings上考虑user和context信息。
+而semantic embedding通常被公式化成在IR上的text embedding problem，它在facebook search上是低效的，它是一个个性化搜索引擎，不仅会考虑text query，也会考虑searcher的信息、以及search task中的context来满足用户个性化信息的需要。**以people search为例，有上千个名为“john Smith”的user profiles，当一个用户使用"John Simth"作为query搜索时，实际的target person很可能是他的朋友或者相互认识的人**。为了建模该问题，我们提出了unified embedding，它不只会考虑text，也会在生成的embeddings上考虑user和context信息。
 
 ## 2.1 评估metrics
 
-由于我们的最终目标是，通过online A/B test，以端到端的方式来达到质量提升，开发离线metrics很重要，在在线实验前可以快速评估模型质量，从复杂的online实验setup中隔离问题。我们提出在整个index上运行KNN search，接着使用等式(1)中的recall@K作为模型评估指标。特别的，我们会抽样10000个search sessions来收集query和target result set pairs作为evaluation set，接着报告在10000 sessions上的平均recall@K。
+由于我们的最终目标是：通过online A/B test，以端到端的方式来达到质量提升。**开发offline metrics很重要，在在线实验前可以快速评估模型质量，从复杂的online实验setup中隔离问题**。我们提出在整个index上运行KNN search，接着使用等式(1)中的recall@K作为模型评估指标。特别的，我们会抽样10000个search sessions来收集query和target result set pairs作为evaluation set，接着报告在10000 sessions上的平均recall@K。
 
 ## 2.2 Loss function
 
@@ -88,9 +88,15 @@ $$
 
 ...(2)
 
-其中，$$D(u, v)$$是一个在vector u和v间的distance metric，m是在positive和negative pairs间的margin，N是triplets的总数。该loss function的意图是：通过一个distance margin从negative pair中分离出positive pair。我们发现：调整margin value很重要——最优的margin value会随不同的训练任务变化很大，不同的margin values会产生5-10%的KNN recall variance。
+其中：
 
-我们相似，使用random samples来为triplet loss生成negative pairs可以逼近recall optimization任务。原因如下：
+- $$D(u, v)$$是一个在vector u和v间的distance metric
+- m是在positive和negative pairs间的margin
+- N是triplets的总数
+
+该loss function的意图是：通过一个distance margin从negative pair中分离出positive pair。**我们发现：调整margin value很重要——最优的margin value会随不同的训练任务变化很大，不同的margin values会产生5-10%的KNN recall variance**。
+
+相似的，我们使用random samples来为triplet loss生成negative pairs可以逼近recall optimization任务。原因如下：
 
 当candidate pool size为n时，如果我们在训练数据中对每个positive抽样n个negatives，该模型将会在recall@top1的位置上进行最优化。假设实际的serving candidate pool size为N，我们可以近似最优化recall@topK $$ K \approx  N/n$$。在第2.4节，我们将验证该hypothesis并提供不同positive和negative label定义的对比。
 
