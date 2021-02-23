@@ -143,15 +143,24 @@ $$
 
 ...(2)
 
-其中，$$W_{g^k} \in R^{n \times d}$$是线性变换的自由参数。与[32]中提到的sparse gating network对比，experts的数目会大些，每个训练样本只利用top experts，我们会使用一个相当小数目的experts。这样的设置是为了鼓励在多个gating networks间共享experts，并高效进行训练。
+其中：
+
+$$W_{g^k} \in R^{n \times d}$$是线性变换的自由参数
+
+与[32]中提到的sparse gating network对比，experts的数目会大些，每个训练样本只利用top experts，我们会使用一个相当小数目的experts。**这样的设置是为了鼓励在多个gating networks间共享experts，并高效进行训练**。
 
 ## 4.4 建模和移除Position和Selection Baises
 
 隐式反馈被广泛用于训练l2r模型。大量隐式反馈从user logs中抽取，从而训练复杂的DNN模型。然而，隐式反馈是有偏的，因为它由已经存在的ranking system所生成。Position Bias以及其它类型的selection biases，在许多不同的ranking问题中被研究和验证[2,23,41]。
 
-在我们的ranking系统中，query是当前被观看过的视频，candidates是相关视频，用户倾向于点击和观看更接近toplist展示的视频，不管它们实际的user utility——根据观看过的视频的相关度以及用户偏好。我们的目标是移除从ranking模型中移除这样的position bias。在我们的训练数据中、或者在模型训练期间，建模和减小selection biases可以产生模型质量增益，打破由selection biases产生的feedback loop。
+在我们的ranking系统中，query是当前被观看过的视频，candidates是相关视频，用户倾向于点击和观看更接近toplist展示的视频，不管它们实际的user utility——根据观看过的视频的相关度以及用户偏好。**我们的目标是移除从ranking模型中移除这样的position bias**。在我们的训练数据中、或者在模型训练期间，建模和减小selection biases可以产生模型质量增益，打破由selection biases产生的feedback loop。
 
-我们提出的模型结构与Wide&Deep模型结构相似。我们将模型预测分解为两个components：来自main tower的一个user-utility component，以及来自shallow tower的一个bias component。特别的，我们使用对selection bias有贡献的features来训练了一个shallow tower，比如：position bias的position feature，接着将它添加到main model的最终logit中，如图3所示。在训练中，所有曝光（impressions）的positions都会被使用，有10%的feature drop-out rate来阻止模型过度依赖于position feature。在serving时，position feature被认为是缺失的(missing)。为什么我们将position feature和device feature相交叉(cross)的原因是，不同的position biases可以在不同类型的devices上观察到。
+我们提出的模型结构与Wide&Deep模型结构相似。我们将模型预测分解为两个components：
+
+- 来自main tower的一个**user-utility component**
+- 以及来自shallow tower的一个**bias component**
+
+特别的，我们使用对selection bias有贡献的features来训练了一个shallow tower，比如：position bias的position feature，接着将它添加到main model的最终logit中，如图3所示。在训练中，所有曝光（impressions）的positions都会被使用，有10%的feature drop-out rate来阻止模型过度依赖于position feature。在serving时，position feature被认为是缺失的(missing)。为什么我们将position feature和device feature相交叉(cross)的原因是，不同的position biases可以在不同类型的devices上观察到。
 
 <img src="http://pic.yupoo.com/wangdren23_v/bf2e9999/53795a2d.jpg">
 
