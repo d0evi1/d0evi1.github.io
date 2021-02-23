@@ -55,8 +55,8 @@ youtube在2019公布了它的MMoE多目标排序系统《Recommending What Video
 主要贡献有：
 
 - 介绍了一种end-to-end的排序系统来进行视频推荐
-- 将ranking问题公式化成一个金目标学习问题，并扩展了Multi-gate Mixture-of-Experts架构来提升在所有objectives上的效果
-- 我们提出应用一个Wide&Deep模型架构来建模和缓和position bias
+- 将ranking问题公式化成一个多目标学习问题，并扩展了Multi-gate Mixture-of-Experts架构来提升在所有objectives上的效果
+- 我们提出使用一个Wide&Deep模型架构来建模和缓和position bias
 - 我们会在一个真实世界的大规模视频推荐系统上评估我们的方法，以及相应的提升
 
 # 2.相关工作
@@ -67,8 +67,10 @@ youtube在2019公布了它的MMoE多目标排序系统《Recommending What Video
 
 除了上述提到的使用隐式反馈来构建ranking systems挑战外，对于真实的大规模视频推荐问题，我们需要考虑以下因素：
 
-- 多模态特征空间(Multimodal feature space)。在一个context-aware个性化推荐系统中，我们需要使用从多模态（例如：视频内容、预览图、音频、标题、描述、用户demographics）来学习候选视频的user utility。从多模态特征空间中为推荐学习表示，对比其它机器学习应用来说是独一无二的挑战。它分为两个难点：1) 桥接从low-level的内容特征中的语义gap，以进行内容过滤(content filtering) 2) 为协同过滤学习items的稀疏表示
-- 可扩展性（Scalability）。可扩展性相当重要，因为我们正构建一个数十亿用户和视频的推荐系统。模型必须在训练期间有效训练，在serving期间高效运行。尽管ranking system在每个query会对数百个candidates进行打分，真实世界场景的scoring需要实时完成，因为一些query和context信息不仅仅需要学习数十亿items和users的表示，而且需要在serving时高效运行。
+- **多模态特征空间(Multimodal feature space)**。在一个context-aware个性化推荐系统中，我们需要使用从多模态（例如：视频内容、预览图、音频、标题、描述、用户demographics）来学习候选视频的user utility。从多模态特征空间中为推荐学习表示，对比其它机器学习应用来说是独一无二的挑战。它分为两个难点：
+	- 1) 桥接来自low-level的内容特征中的语义gap，以进行内容过滤(content filtering) 
+	- 2) 为协同过滤学习items的稀疏表示
+- **可扩展性（Scalability）**。可扩展性相当重要，因为我们正构建一个数十亿用户和视频的推荐系统。模型必须在训练期间有效训练，在serving期间高效运行。尽管ranking system在每个query会对数百个candidates进行打分，真实世界场景的scoring需要实时完成，因为一些query和context信息不仅仅需要学习数十亿items和users的表示，而且需要在serving时高效运行。
 
 回顾下我们的推荐系统的目标是：在给定当前观看的视频和上下文(context)时，提供一个关于视频的ranked list。为了处理多模态特征空间，对于每个视频，我们会抽取以下特征（比如：视频的meta-data和视频内容信号）来作为它的表示。对于context，我们会使用以下特征（比如：人口统计学user demographics、设备device、时间time、地点location）。
 
@@ -86,33 +88,38 @@ youtube在2019公布了它的MMoE多目标排序系统《Recommending What Video
 
 ## 4.1 系统总览
 
-我们的ranking system会从两类用户反馈数据中学习：1) engagement行为（比如：点击和观看） 2)satisfaction行为（比如：likes和dismissals）。给定每个candidate，ranking system会使用该candidate、query和context的的特征作为输入，学习预测多个user behaviors。
+我们的ranking system会从两类用户反馈数据中学习：
 
-对于问题公式，我们采用l2r的框架。我们会将ranking问题建模成：一个具有多个objectives的分类问题和回归问题的组合。给定一个query、candidate和context，ranking模型会预测用户采用actions（比如：点击、观看、likes和dismissals）的概率。
+- 1) **engagement行为**（比如：点击和观看） 
+- 2) **satisfaction行为**（比如：喜欢(likes)和dismissals）
 
-为每个candidate做出预测的方法是point-wise的方法。作为对比，pair-wise或list-wise方法可以在两个或多个candidates的顺序上做出预测。pair-wise或list-wise方法可以被用于潜在提升推荐的多样性（diversity）。然而，我们基于serving的考虑主要使用point-wise ranking。在serving时，point-wise ranking很简单，可以高效地扩展到大量candidates上。作为比较，对于给定的candidates集合，pair-wise或list-wise方法需要对pairs或lists打分多次，以便找到最优的ranked list，限制了它们的可扩展性。
+给定每个candidate，ranking system会使用该candidate、query和context的的特征作为输入，学习预测多个user behaviors。
+
+对于问题公式，我们采用l2r的框架。我们会将ranking问题建模成：一个具有多个objectives的分类问题和回归问题的组合。**给定一个query、candidate和context，ranking模型会预测用户采用actions（比如：点击、观看、likes和dismissals）的概率**。
+
+为每个candidate做出预测的方法是point-wise的方法。作为对比，pair-wise或list-wise方法可以在两个或多个candidates的顺序上做出预测。pair-wise或list-wise方法可以被用于潜在提升推荐的多样性（diversity）。然而，**我们基于serving的考虑主要使用point-wise ranking。在serving时，point-wise ranking很简单，可以高效地扩展到大量candidates上**。作为比较，对于给定的candidates集合，pair-wise或list-wise方法需要对pairs或lists打分多次，以便找到最优的ranked list，限制了它们的可扩展性。
 
 ## 4.2 ranking objectives
 
-我们使用user behaviors作为训练labels。由于用户可以对推荐items具有不同类型的behaviors，我们将我们的ranking system设计成支持多个objectives。每个objective的目标是预测一种类型的与user utility相关的user behavior。为了描述，以下我们将objectives分离成两个类别：engagement objectives和satisfaction objectives。
+我们使用user behaviors作为训练labels。**由于用户可以对推荐items具有不同类型的behaviors，我们将我们的ranking system设计成支持多个objectives**。每个objective的目标是预测一种类型的与user utility相关的user behavior。为了描述，以下我们将objectives分离成两个类别：engagement objectives和satisfaction objectives。
 
-Engagement objectives会捕获user behaviors（比如：clicks和watches）。我们将这些行为的预测公式化为两种类型的任务：对于像点击这样行为的二元分类任务，以及对于像时长(time spent)相关的行为的回归任务。相似的，对于satisfaction objectives，我们将：与用户满意度相关的行为预测表示成二元分类任务或者回归任务。例如，像点击/like这样的行为可以公式化成一个二元分类任务，而像rating这样的行为被公式化成regression任务。对于二元分类任务，我们会计算cross entropy loss。而对于regression任务，我们会计算squared loss。
+**Engagement objectives会捕获user behaviors（比如：clicks和watches）**。我们将这些行为的预测公式化为两种类型的任务：对于像点击这样行为的二元分类任务，以及对于像时长(time spent)相关的行为的回归任务。相似的，**对于satisfaction objectives，我们将：与用户满意度相关的行为预测表示成二元分类任务或者回归任务**。例如，像点击/like这样的行为可以公式化成一个二元分类任务，而像rating这样的行为被公式化成regression任务。对于二元分类任务，我们会计算cross entropy loss。而对于regression任务，我们会计算squared loss。
 
-一旦多个ranking objectives和它们的问题类型被定下来，我们可以为这些预测任务训练一个multitask ranking模型。对于每个candidate，我们将它们作为多个预测的输入，并使用一个形如加权乘法的组合函数(combination function)来输出一个组合分（combined score）。该权值通过人工调参，以便在user engagements和user satisfactions上达到最佳效果。
+一旦多个ranking objectives和它们的问题类型被定下来，我们可以为这些预测任务训练一个multitask ranking模型。对于每个candidate，我们将它们作为多个预测的输入，并**使用一个形如加权乘法的组合函数(combination function)来输出一个组合分（combined score）**。该权值通过**人工调参**，以便在user engagements和user satisfactions上达到最佳效果。
 
 ## 4.3 使用MMoE建模任务关系和冲突
 
-多目标的ranking systems常使用一个共享的bottom模型架构。然而，当任务间的关联很低时，这样的hard-parameter sharing技术有时会伤害到多目标学习。为了缓和多目标间的冲突，我们采用并扩展了一个最近发布的模型架构：MMoE（Multi-gate Mixture-of-Experts）【30】。
+多目标的ranking systems常使用一个共享的bottom模型架构。然而，当任务间的关联很低时，这样的**hard-parameter sharing技术有时会伤害到多目标学习**。为了缓和多目标间的冲突，我们采用并扩展了一个最近发布的模型架构：MMoE（Multi-gate Mixture-of-Experts）【30】。
 
-MMoE是一个soft-parameter sharing模型结构，它的设计是为了建模任务的冲突(conflicts)与关系(relation)。通过在跨多个任务上共享experts，它采用Mixture-of-Experts(MoE)结构到多任务学习中，而对于每个task也具有一个gating network进行训练。MMoE layer的设计是为了捕获任务的不同之处，对比起shared-bottom模型它无需大量模型参数。关键思路是，使用MoE layer来替代共享的ReLU layer，并为每个task添加一个独立的gating network。
+**MMoE是一个soft-parameter sharing模型结构，它的设计是为了建模任务的冲突(conflicts)与关系(relation)**。通过在跨多个任务上共享experts，它采用Mixture-of-Experts(MoE)结构到多任务学习中，而**对于每个task也具有一个gating network进行训练**。MMoE layer的设计是为了捕获任务的不同之处，对比起shared-bottom模型它无需大量模型参数。关键思路是，使用MoE layer来替代共享的ReLU layer，并为每个task添加一个独立的gating network。
 
-对于我们的ranking system，我们提出在一个共享的hidden layer的top上添加experts，如图2b所示。这是因为MoE layer可以帮助学习来自input的模态信息（modularized information）。当在input layer的top上、或lower hidden layers上直接使用它时，它可以更好地建模多模态特征空间。然而，直接在input layer上应用MoE layer将极大增加模型training和serving的开销。这是因为，通常input layer的维度要比hidden layers的要更高。
+对于我们的ranking system，我们提出**在一个共享的hidden layer的top上添加experts**，如图2b所示。这是因为MoE layer可以帮助学习来自input的模态信息（modularized information）。当在input layer的top上、或lower hidden layers上直接使用它时，它可以更好地建模多模态特征空间。然而，直接在input layer上应用MoE layer将极大增加模型training和serving的开销。这是因为，通常**input layer的维度要比hidden layers的要更高**。
 
 <img src="http://pic.yupoo.com/wangdren23_v/ee35bbe0/8294e851.jpg">
 
 图2 使用MMoE来替换shared-bottom layers
 
-我们关于expert networks的实现，等同于使用ReLU activations的multilayer perceptrons。给定task k， prediction $$y_k$$，以及最后的hidden layer $$h^k$$，对于task k的具有n个experts output的MMoE layer为：$$f^k(x)$$，可以用以下的等式表示：
+我们关于expert networks的实现，等同于使用ReLU activations的multilayer perceptrons。给定task k、 prediction $$y_k$$、以及最后的hidden layer $$h^k$$，对于task k的具有n个experts output的MMoE layer为：$$f^k(x)$$，可以用以下的等式表示：
 
 $$
 y_k = h^k (f^k(x)), \\
@@ -121,7 +128,14 @@ $$
 
 ...(1)
 
-其中：$$x \in R^d$$是一个lower-level shared hidden embedding，$$g^k$$是task k的gating network，$$g_{(i)}^k(x) \in R^n$$是第i个entry，$$f_i(x)$$是第i个expert。gating networks是使用一个softmax layer的关于input的简单线性转换。
+其中：
+
+- $$x \in R^d$$是一个lower-level shared hidden embedding
+- $$g^k$$是task k的gating network
+- $$g_{(i)}^k(x) \in R^n$$是第i个entry
+- $$f_i(x)$$是第i个expert
+
+gating networks是使用一个softmax layer的关于input的简单线性转换。
 
 $$
 g^k(x) = softmax(W_{g^k} x)
