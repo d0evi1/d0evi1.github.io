@@ -223,11 +223,11 @@ EBR需要大量研究来继续提升效果。我们研究了两个重要的embed
 
 ## 6.1 Hard mining
 
-在文本/语义/社交匹配上，对于一个retrieval任务的数据空间，具有多样性的数据分布，对于一个embedding模型来说，在这样的空间上进行高效学习需要设计一个特别的training dataset。为了解决该问题，hard mining是一个主要方向，对于embedding learning来说也是一个活跃的领域。然而，大多数CV的研究用于分类任务，而搜索检索没有“classes”的概念，因此唯一的问题是已经存在的技术不一定能work。在该方向上，我们划分为两部分：hard negative mining和hard positive mining。
+在文本/语义/社交匹配问题上，对于一个retrieval任务的数据空间，具有多样性的数据分布，对于一个embedding模型来说，在这样的空间上进行高效学习**需要设计一个特别的training dataset**。为了解决该问题，hard mining是一个主要方向，对于embedding learning来说也是一个活跃的领域。然而，大多数CV的研究用于分类任务，而搜索检索没有“classes”的概念，因此唯一的问题是已经存在的技术不一定能work。在该方向上，我们划分为两部分：hard negative mining和hard positive mining。
 
 ### 6.1.1 Hard negative mining（HNM)
 
-当分析我们的embedding模型时，我们发现：给定一个query，来自embeddings的topK个结果通常具有相同的名字，尽管会有social features，该模型不会总是对高于其它的target结果进行排序。这驱使我们相信：模型不能合理利用social features，这很可能是因为：negative training data很容易，因为他们是随机样本，通常具有不同的名字。为了使得模型在区分相似结果间的不同表现的更好，我们可以使用在embedding space中与positive样本更接近的样本作为hard negatives。
+以people search为例，当分析我们的embedding模型时，我们发现：给定一个query，从embeddings返回的topK个结果通常具有相同的名字。尽管引入了social features，该模型不会总是将target results排得比其它要高。这使我们认为：模型不能合理利用social features，这很可能是因为：负样本（negative training data）太容易(easy)，因为是随机样本，通常具有不同的名字。**为了使得模型能更好地区分相似结果，我们可以使用在embedding space中与正样本（positive）更接近的样本作为hard negatives**。
 
 **online hard negative mining**
 
