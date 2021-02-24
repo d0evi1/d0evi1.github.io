@@ -231,7 +231,7 @@ EBR需要大量研究来继续提升效果。我们研究了两个重要的embed
 
 **online hard negative mining**
 
-由于模型训练是基于mini-batch更新的，hard negatives会在每个动态的batch中被高效选中。每个batch由n个positive pairs组成（$$\lbrace q^{(i)}, d_{+}^{(i)} \rbrace_{i=1}^{n}$$）。接着对于每个query $$q^{(i)}$$，我们会构成一个小的document pool，它使用所有其它positive documents $$\lbrace d_{+}^{(1)}, \cdots,  d_{+}^{(n)} \mid j \neq i \rbrace$$，并选择具有最高相似度得分的documents作为hardest negatives来创建training triplets。允许online hard negative mining是我们模型提升的一个主要contributor。它可以极地提升跨所有verticals的embedding模型质量：对于people search的recall具有+8.38%的recall；对于groups search具有+7%的recall，对于events search具有+5.33%的recall。我们也观察到：最优的setting是每个positive最多有两个hard negatives。使用超过两个hard negatives会启动regress model quality。
+由于模型训练是基于mini-batch更新的，hard negatives会在每个动态的batch中被高效选中。每个batch由n个positive pairs组成：（$$\lbrace q^{(i)}, d_{+}^{(i)} \rbrace_{i=1}^{n}$$）。**接着对于每个query $$q^{(i)}$$，我们会它使用所有其它positive documents $$\lbrace d_{+}^{(1)}, \cdots, d_{+}^{(j)}, \cdots,  d_{+}^{(n)} \mid j \neq i \rbrace$$来构建一个小的document pool，并选择具有最高相似度得分的documents作为hardest negatives来创建training triplets**。允许online hard negative mining是我们模型提升的一个主要contributor。它可以极地提升跨所有verticals的embedding模型质量：对于people search的recall具有+8.38%的recall；对于groups search具有+7%的recall，对于events search具有+5.33%的recall。我们也观察到：最优的setting是每个positive最多有两个hard negatives。使用超过两个hard negatives会启动regress model quality。
 
 online HNM的一个限制是，具有来自random samples的任意hard negative的probability可能很低，因此不能产生hard enough negatives。接着，我们会基于整个result pool来生成harder negatives，也就是：offline Hard Negative Mining。
 
