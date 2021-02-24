@@ -243,28 +243,86 @@ online HNM的一个限制是：**随机抽样（random samples）中存在任意
 
 **Offline hard negative mining**
 
-offline hard negative mining具有以下的procedure：
+offline hard negative mining由以下的过程生成：
 
 - 1) 为每个query生成top K的结果
 - 2) 基于hard selection strategy选择hard negatives
 - 3) 使用最新生成的triplets来重新训练embedding模型
-- 4) 该过程可以是迭代式的
+- 4) 反复进行整个过程
 
-我们执行大量实验来对比offline hard negative mining和online hard negative mining。一个发现是，使用hard negatives进行简单训练的模型，比不过random negatives训练的模型。更进一步分析表明：“hard”模型会在non-text features上放置更多的weights，但在text match上会比"easy"模型表现更差。因此，我们会调整sampling strategy，并最终生成能胜过online HNM模型的一个模型。
+我们执行大量实验来对比offline hard negative mining和online hard negative mining。一个发现是：**使用hard negatives进行简单训练的模型，比不过random negatives训练的模型**。更进一步分析表明：“hard”模型会在non-text features上放置更多的weights，但在text match上会比"easy"模型表现更差。因此，我们会调整sampling strategy，并最终生成能胜过online HNM模型的一个模型。
 
-第一个insight是关于hard selection strategy。我们发现，使用hardest examples并不是最好的strategy。我们会对比来自不同的rank positions中的抽样，并发现在rank 101-500间的抽样能达到最好的model recall。第二个insight是retrieval task optimization。我们的hypothesis是：训练数据中的easy negatives的出现仍然是必要的，因为检索模型是在一个input space上操作的，它混合了不同levels的hardness数据组成。因此，我们探索一些方式来与hard negatives一起集成random negatives，包括：从一个easy model中的transfer learning。从经验上看，以下两种技术具有最好的效果：
+第一个insight是关于hard selection strategy。我们发现，使用hardest examples并不是最好的strategy。我们会对比来自不同的rank positions中的抽样，并发现在**rank 101-500间的抽样能达到最好的model recall**。
+
+第二个insight是retrieval task optimization。我们的hypothesis是：**训练数据中的easy negatives的出现仍然是必要的**，因为检索模型是在一个input space上操作的，它混合了不同levels的hardness数据组成。因此，我们探索一些方式来与hard negatives一起集成random negatives，包括：从一个easy model中的transfer learning。从经验上看，**以下两种技术具有最好的效果**：
 
 - **Mix easy/hard training**：在训练中混合random和hard negatives是有益的。在easy:hard=100:1时，可以增加easy/hard negatives的ratio可以提升model recall和饱和度。
-- 从“hard”模型到"easy"模型的transfer learning：从easy到hard模型的transfer learning不会生成一个更好的模型，从hard到easy的transfer learning可以达到一个更好的model recall的提升
+- **从“hard”模型到"easy"模型的transfer learning**：从easy到hard模型的transfer learning不会生成一个更好的模型，从hard到easy的transfer learning可以达到一个更好的model recall的提升
 
-最后，在training data中为每个data point计算穷举KNN是非常time-consuming的，由于计算资源限制，总的模型训练时间会变得不切实际。对于offline hard negative mining算法来说，具有一个高效地top K generation很重要。。。
+最后，在training data中为每个data point计算穷举KNN是非常time-consuming的，由于计算资源限制，总的模型训练时间会变得不切实际。对于offline hard negative mining算法来说，具有一个高效地top K generation很重要。ANN search是实际的解法，它可以极大减小总的计算时间。更进一步，在一个random shard上运行ANN search是足够生成有效的hard negatives的，因为我们在训练期间只依赖semi-hard negatives。
 
+**6.1.2 hard positive mining**
+
+我们的baseline embedding模型使用点击或曝光（clicks或impressions）作为正样本，它由生产系统返回。为了最大化EBR的互补增益（complementary gain），一个方向是：标识出那些由生产系统中没有被成功检索但是positive的新结果。为了该目标，我们会从searchers的activity log中的失败搜索会话（failed search sessions）中挖掘潜在的target results。我们发现，通过该方法挖掘的positive samples可以有限地帮助模型训练。只使用hard positives训练的模型可以达到与只使用点击训练数据（click training data）相同level的model recall，而数据容量只有4%。通过将hard positives和impressions作为训练数据进行组合，可以进一步提升model recall。
 
 ## 6.2 embedding ensemble
 
+我们从HNM的实验发现：easy和hard样本对于EBR模型训练都很重要——我们需要hard examples来提升model precision，但easy example对于表示retrieval space来说也很重要。**使用random negatives训练的模型会模拟检索数据分布**，当在一个非常大的K上进行recall时可以优化更好，但当K很小时，在topK上会有很差的precision。另一方面，该模型训练的目标是优化precision，例如：使用非点击曝光作为negatives或者offline hard negatives的模型，对于更小候选集合的排序(ranking)要更好，但对于检索任务会失败（failed）。因此，我们提出了通过一个multi-stage方法，使用不同levels的hardness训练的模型进行组合：第一个stage时模型会关注recall，第二个stage时模型会专注于区分由第一个stage返回的相似结果间的不同之处。我们会使用与在[18]中的 cascaded embedding training相类似的方式，以cascaded的方式对不同level的hardness的训练进行ensemble。我们会探索不同形式的ensemble embeddings，包括：weighted concatenation、cascade model。我们发现两者很有效。
+
+**Weighted Concatenation**
+
+对于(query, document) pair，由于不同模型会提供不同的cosine相似度，我们会使用cosine similarity的加权求和作为metric来定义该pair有多接近。为了更特别，给定一个模型集合$$\lbrace M_1, \cdots, M_n \brace$$以及它们相应的weights：$$\alpha_1, \cdots, \alpha_n > 0$$，对于任意的query Q和document D，我们定义Q与D间的weighted ensemble similarity score $$S_w(Q, D)$$：
+
+$$
+S_w(Q, D) = \sum\limits_{i=1}^n \alpha_i cos(V_{Q,i}, U_{D,i})
+$$
+
+其中：
+
+- $$V_{Q,i}, 1 \leq i \leq n$$：表示由模型$$M_i$$关于Q的query vector
+- $$U_{D,i}, 1 \leq i \leq n$$：表示由模型$$M_i$$关于D的document vector
+
+在serving时，我们需要将多个embedding vecgtors进行ensemble到单个representation中，对于query和document侧，可以满足以上的metric属性。我们可以证明：使用weighting multiplication到normalized vector的一侧，可以满足该需求。特别的，我们会以如下方式构建query vector和document vector：
+
+$$
+E_Q = (\alpha_1 \frac{V_{Q,1}}{|| V_{Q,1}} ||, \cdots, \alpha_n \frac{V_{Q,n}}{|| V_{Q,n} ||}
+$$
+
+...(4)
+
+以及：
+
+$$
+E_D = (\frac{U_{D,1}}{|| U_{D,1} ||}, \cdots, \frac{U_{Q,n}}{|| U_{Q,n}||}
+$$
+
+...(5)
+
+很容易看到，在$$E_Q$$和$$E_D$$间的cosine相似度与$$S_w(Q,D)$$成比例：
+
+$$
+cos(E_Q, E_D) = \frac{S_w(Q,D)}{ \sqrt{\sum\limits_{i=1}^n a_i^2} \cdot \sqrt{n}}
+$$
+
+...(6)
+
+我们使用ensemble embedding进行serving，与第4节描述的方式相似。weights的选择会根据在evaluation data set上的效果进行经验选择。
+
+在第二个stage embedding models上，我们探索了许多模型选项。实验表明，使用non-click impressions的模型可以达到最好的kNN recall（对比baseline模型，具有4.39% recall提升）然而，当使用embedding quantization时，对比于single model，ensemble会在accuracy上损失更多，因为当在online进行serving时实际收益会减小。我们发现，在embedding quantization之后具有一个最好的recall，最好的strategy会对一个相对简单的模型以及一个使用offline hard negative mining的模型进行ensemble，其中，训练负样本的hardness lebel可以被修改和调节。该ensemble候选可以轻微降低offline的模型提升，但能在online上达到极大的recall提升。
+
+**Cascade Model**
+
+不同于weighted ensemble的并行组合，cascade model会顺序地在第一stage模型后运行第二个stage模型。我们对比了不同的2-stage模型选择。我们发现，使用non-click impressions训练的模型并不是一个好的候选；整体提升会小于weighted ensemble的方法。另外，通过增加第二stage的模型，增益会随rerank的结果数而减小。然而，在第二stage上使用offline hard negative model会达到3.4%的recall提升。这对于cascade来说是一个更合适的模型候选，因为基于第一stage模型的output对于offline HNM的训练数据构建会更精准。
+
+另外，我们探索了另一个cascade模型组合。我们观察到，当unified embedding总体上会比text embedding具有更大的model recall。它会生成新的text match failures，因为它偏向于social和location matches。为了增强模型的text matching能力，我们会采用cascade策略：使用text embedding来预选择text-matching的候选，接着使用unified embedding模型来对结果进行re-rank返回最终的top候选。这对比起单独使用unified embedding模型会达到一个极大的在线提升。
+
 # 7.结论
 
+通过使用deep learning，引入语义embeddings到search retrieval中是有长期收益的，可以解决semantic matching问题。然而，由于建模难度、系统实现以及cross-stack optimization复杂度，特别是对于一个大规模个性化社交搜索引擎来说，这是个高度具有挑战性的问题。本paper中，提出了unfied embedding来为social search建模语义，并在经典的基于搜索系统的inverted index上提出了embedding-based retrieval的实现。
 
+第一个step是实现unified embedding模型和EBR系统。对于端到端地方式优化系统的结果质量和系统效果来说，仍有很长的路到走。我们会在模型提升、serving算法调参、以及later-stage optimzation上引入我们的经验。我们相信，这对于那些基于EBR的用户可以具有更有价值的体验。EBR的成功部署可以利用最新的语义embedding学习技术来提升检索的质量。我们沿该方向在第一个step引入了我们的进展和学习，尤其是hard mining和embedding ensemble。
+
+对于持续提升该系统存在着许多机会。未来，主要有两个方向。一个方向是：更deep。我们会使用更高级的模型如：BERT、以及构建task-specific模型来解决问题的特定部分。我们会在不同的stages进行深入研究，包括：serving算法tuning以及ranking模型的提升，通过对full-stack failure分析来确认在不同stacks上的提升机会。另一个方向是：universal。我们会利用pre-trained text embedding模型来开发一个universal text embedding sub-model，并应用到不同的任务上。另外，我们也会跨多个用例开发一个universal query embedding模型。
 
 # 参考
 
