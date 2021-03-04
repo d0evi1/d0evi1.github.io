@@ -160,7 +160,7 @@ $$W_{g^k} \in R^{n \times d}$$是线性变换的自由参数
 - 来自main tower的一个**user-utility component**
 - 以及来自shallow tower的一个**bias component**
 
-特别的，我们使用对selection bias有贡献的features来训练了一个shallow tower，比如：position bias的position feature，接着将它添加到main model的最终logit中，如图3所示。在训练中，所有曝光（impressions）的positions都会被使用，有10%的feature drop-out rate来阻止模型过度依赖于position feature。在serving时，position feature被认为是缺失的(missing)。为什么我们将position feature和device feature相交叉(cross)的原因是，不同的position biases可以在不同类型的devices上观察到。
+特别的，我们使用对selection bias有贡献的features来训练了一个shallow tower，比如：position bias的position feature，接着将它添加到main model的最终logit中，如图3所示。**在训练中，所有曝光（impressions）的positions都会被使用，有10%的feature drop-out rate来阻止模型过度依赖于position feature**。在serving时，position feature被认为是缺失的(missing)。**为什么我们将position feature和device feature相交叉(cross)的原因是：不同的position biases可以在不同类型的devices上观察到**。
 
 <img src="http://pic.yupoo.com/wangdren23_v/bf2e9999/53795a2d.jpg">
 
