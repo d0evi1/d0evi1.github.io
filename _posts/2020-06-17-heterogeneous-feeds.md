@@ -53,7 +53,12 @@ alibaba自己拥有CSE(Content Search Engine)和ISE（Item Search engine），�
 
 ### 2.2.2 用户点击流数据
 
-来自ISE和CSE的用户行为序列数据对于训练一个个性化feed ranking结果来说是有用的。为了构建user profile，我们会设置一个window size w，它只考虑用户在ISE上的最新w个行为。该行为可以表示为两种类型的triplet：<user, issue, query>和<user, click, item>。用户在items上的点击次数表明users和items间的关系，而用户(users)发起（issue）相同query的次数表明：users和queries间的关系强度。基于此，一个给定维度的embedding可以在相同的latent space上从每个user/query中学习得到。另外，在每个slot中的feed type通过one-hot encoder进行编码。最后，所有users、queries、feed types可以被表示成vectors。示例如表2所示。前两列指的是每个user $$f_u$$学到的表示，以及一个issued query $$f_q$$。第三列指的是在每个slot中feed type $$f_t$$的one-hot表示。
+来自ISE和CSE的用户行为序列数据对于训练一个个性化feed ranking结果来说是有用的。**为了构建user profile，我们会设置一个window size w，它只考虑用户在ISE上的最新w个行为**。该行为可以表示为两种类型的triplet：<user, issue, query>和<user, click, item>。
+
+- 用户在items上的点击次数表明users和items间的关系，
+- 而用户(users)发起（issue）相同query的次数表明：users和queries间的关系强度。
+
+基于此，可以在相同的latent space上从每个user/query中学习得到一个给定维度的embedding。另外，**在每个slot中的feed type通过one-hot encoder进行编码。最后，所有users、queries、feed types可以被表示成vectors**。示例如表2所示。前两列指的是每个user $$f_u$$学到的表示，以及一个issued query $$f_q$$。第三列指的是在每个slot中feed type $$f_t$$的one-hot表示。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/0689a49c79b288b56e8ab2f953d3da07dbef6426e4fcf74909e6f0cdb999bfc42ee1b08d8a8d37876054fbf161a41cc1?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=t2.jpg&amp;size=750">
 
@@ -61,18 +66,40 @@ alibaba自己拥有CSE(Content Search Engine)和ISE（Item Search engine），�
 
 # 3.方法
 
-对于用户体验，我们希望观察到更好的异构feeds ranking。整个过程包含了Heterogeneous Type Sorting step以及Homogeneous Feed Rnking step。对于第一个step，对于slot independent场景，一个independent Multi-Armed Bandit(iMAB)模型会设计；对于slot denpendent场景，会设计一个改进版的personlized Markov DNN(pMDNN)模型。第3.1节和3.2节会分别引入两个模型。对于第二个step，会使用一个DSSM模型来在每个slot上分配合适类型的feeds。第3.3节会详细介绍，pMDNN可以与DSSM一起训练来构成一个end-to-end模型。
+对于用户体验，我们希望观察到更好的异构feeds ranking。整个过程包含了Heterogeneous Type Sorting step以及Homogeneous Feed Ranking step。
+
+- 对于第一个step，对于slot independent场景，会设计一个independent Multi-Armed Bandit(iMAB)模型；
+- 对于slot denpendent场景，会设计一个改进版的personlized Markov DNN(pMDNN)模型。
+
+第3.1节和3.2节会分别引入两个模型。对于第二个step，会使用一个DSSM模型来在每个slot上分配合适类型的feeds。第3.3节会详细介绍，pMDNN可以与DSSM一起训练来构成一个end-to-end模型。
 
 ## 3.1 independent Multi-Armed Bandit
 
-在iMAB模型中，异构feed ranking的评估指标是在ipv和pv间的ratio $$\theta$$。更高的$$\theta$$意味着，当一个用户浏览在CSE中的一个feed时，用户更可能会点击该feed。因此，$$\theta$$可以根据用户的实际需要来用于评估heterogeneous feed ranking的匹配度（fitness）。因此，对于每个independent slot，我们会为每个feed type估计一个先验ratio $$\theta$$分布，并倾向于选择能够生成最高$$\theta$$值的feed type。
+在iMAB模型中，**异构feed ranking的评估指标是：在ipv和pv间的ratio $$\theta$$**。更高的$$\theta$$意味着：当一个用户浏览在CSE中的一个feed时，用户更可能会点击该feed。因此，$$\theta$$可以根据用户的实际需要来用于评估heterogeneous feed ranking的匹配度（fitness）。因此，**对于每个independent slot，我们会为每个feed type估计一个先验ratio $$\theta$$分布，并倾向于选择能够生成最高$$\theta$$值的feed type**。
 
-理论上，由于Beta分布可以天然地表示由两个参数$$\alpha$$和$$\beta$$控制的任意类型的分布，它会假设每个type的ratio $$\theta$$具有一个先验分布遵循$$\theta_i \sim B(\alpha_i^0, \beta_i^0)$$，其中：$$i \in \mu = \lbrace post, list, video \rbrace$$。$$\alpha_i^0$$是type i的历史ipv数，$$\beta_i^0$$是type i历史pv数和ipv数间的差。由于$$B(\alpha_i^0, \beta_i^0)$$的期望是$$\frac{\alpha_i^0}{\alpha_i^0 + \beta_i^0}$$，它是ipv和pv间的历史ratio。因此，后验ratio分布可以通过在线实时流数据进行每天更新，表示成$$\theta_i \mid D_i \sim B(\alpha_i^0 + \lambda D^{ipv}, \beta_i^0 + \lambda (D^{pv} - D^{ipv})) $$，其中：$$D_i$$指的是每天到来的feed type i，$$\lambda$$是时间影响因子，因为新数据会对更新ratio分布有影响。
+理论上，由于Beta分布可以天然地表示成：由两个参数$$\alpha$$和$$\beta$$控制的任意类型的分布，它会假设每个type的ratio $$\theta$$具有一个先验分布遵循：$$\theta_i \sim B(\alpha_i^0, \beta_i^0)$$，
 
-最终，我们会使用一个two step sampling策略来选择每个slot的type。首先，对于每个feed type i，一个value $$\theta_i$$会被随机生成，因为在pv和ipv间的ratio的估计遵循以下的概率分布：
+其中：
+
+- $$i \in \mu = \lbrace post, list, video \rbrace$$。
+- $$\alpha_i^0$$是type i的历史ipv数，
+- $$\beta_i^0$$是type i历史pv数和ipv数间的差。
+
+由于$$B(\alpha_i^0, \beta_i^0)$$的期望是：$$\frac{\alpha_i^0}{\alpha_i^0 + \beta_i^0}$$，它是ipv和pv间的历史ratio。因此，后验ratio分布可以通过在线实时流数据进行每天更新，表示成：
 
 $$
-p(\theta_i | D_i) = \frac{(\theta_i)^{\alpha_i,-1}(1-\theta_i)^{\beta_i,-1}}{B(\alpha_i, \beta_i,}
+\theta_i \mid D_i \sim B(\alpha_i^0 + \lambda D^{ipv}, \beta_i^0 + \lambda (D^{pv} - D^{ipv})) 
+$$
+
+其中：
+
+- $$D_i$$指的是每天到来的feed type i
+- $$\lambda$$是时间影响因子，因为新数据会对更新ratio分布有影响。
+
+最终，我们会使用一个two step sampling策略来选择每个slot的type。首先，对于每个feed type i，会被随机生成一个value $$\theta_i$$，因为在pv和ipv间的ratio的估计遵循以下的概率分布：
+
+$$
+p(\theta_i | D_i) = \frac{(\theta_i)^{\alpha_i,-1}(1-\theta_i)^{\beta_i,-1}}{B(\alpha_i, \beta_i,)}
 $$
 
 ...(1)
