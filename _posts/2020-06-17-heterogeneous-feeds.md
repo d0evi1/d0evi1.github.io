@@ -12,7 +12,7 @@ ali在多年前提的一个《An End-to-end Model of Predicting Diverse Ranking 
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/5f3dccb61a3ff96dfff597173299b5ef2ec271b3127e3551d88a7ea533c5304290b12acececf119a8c1a4b85bbc0c553?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
 
-图1
+图1 Item Search Engine和Content Search Engine间的关系
 
 
 # 2.基本概念
@@ -21,23 +21,33 @@ ali在多年前提的一个《An End-to-end Model of Predicting Diverse Ranking 
 
 alibaba自己拥有CSE(Content Search Engine)和ISE（Item Search engine），它会相互交互来为用户创建在线购物环境。在ISE中的所有items与CSE中的一群feed相关。用户可以自由地travel和search在两个搜索引擎。
 
-阿里巴巴ISE和CSE的混合使用，有益于用户在线购物。总之，用户会在阿里巴巴上日志化，他们与搜索引擎的交互总是有意图的。然而，如果他们只搜索在ISE中的items，当面对大量items时，他们可能会迷茫。例如，阿里的官网，像服装这样的热门品类可能包含上万的items。每个items会使用数十个keywords进行打标记（比如：风格、slim cut、韩版等）。如果没有任意指导，用户们从一个item候选的大集合中区分合适的items是面临挑战的。
+阿里巴巴ISE和CSE的混合使用，对用户在线购物有收益。总之，用户会在阿里巴巴上日志化，他们与搜索引擎的交互总是有意图的。然而，当面对大量items时，如果他们只搜索在ISE中的items，他们可能会迷茫。例如，阿里的官网，像服装这样的热门品类可能包含上万的items。每个items会使用数十个keywords进行打标记（比如：风格、slim cut、韩版等）。如果没有任意指导，用户们从一个item候选的大集合中区分合适的items是面临挑战的。
 
-因此，为了帮助用户避免疑惑，并提供它们可靠的购物建议，CSE会成为用户的购物指导。给定来自用户的queries，CSE会组织一个合适的feed ranking list作为一个返回结果，替代item ranking list。feeds可以被表示成post(article)、list(item list)以及video的形式。他们由电商领域（clothing、travelling、化妆品）专家的"淘宝达人（Daren）"生产。在它们的feeds流量，“达人”会介绍特定items的优点和缺点，并对特定subjects基于它们的领域知识提出个人建议。一个post feed是一篇文章，它会介绍特定items的属性；一个list feed是一个推荐items的集合；一个video feed是一个short video用来演示建议items。通过达人的建议，用户可以做出更好的购物选择。
+因此，**为了帮助用户避免疑惑，并提供它们可靠的购物建议，CSE会成为用户的购物指导**。给定来自用户的queries，CSE会组织一个合适的feed ranking list作为一个返回结果，替代item ranking list。**feeds可以被表示成post(article)、list(item list)以及video的形式**。他们由电商领域（clothing、travelling、化妆品）专家的"淘宝达人（Daren）"生产。在它们的feeds流量，“达人”会介绍特定items的优点和缺点，并对特定subjects基于它们的领域知识提出个人建议。
 
-每天在生产环境中的数据会经验性地展示在两个搜索引擎间的user travel rate是否频繁。在用户跳到CSE中前，他们通常已经在ISE中搜索过记录。这表明用户实际上希望购买来自“达人”的建议。提供更好的CSE搜索结果可以帮助用户更方便的定向到合适的items，从而做出之后的购买，这是电商的主要目标。然而，仍然有挑战。首先，feed types是异构的，不同类型的feeds的适当性（fitness）会与一个给定的query是不可比的。例如，一个list feed是否比一个post feed更好依赖于用户体验。第二，大量用户进入阿里CSE会携带着来自ISE的用户行为。如何处理跨域信息并构建user profiles来形成一个在CSE上的个性化feed ranking需要进一步探索。
+- 一个post feed是一篇文章，它会介绍特定items的属性；
+- 一个list feed是一个推荐items的集合；
+- 一个video feed是一个用来演示建议items的short video。
+
+通过达人的建议，用户可以做出更好的购物选择。
+
+每天在生产环境中的数据会经验性地展示在两个搜索引擎间的user travel rate是否频繁。在用户跳到CSE中前，他们通常已经在ISE中搜索过记录。这表明用户实际上希望购买来自“达人”的建议。提供更好的CSE搜索结果可以帮助用户更方便的定向到合适的items，从而做出之后的购买，这是电商的主要目标。然而，仍然有挑战。首先，feed types是异构的，不同类型的feeds的匹配度（fitness）与一个给定的query是不可比的。例如，一个list feed是否比一个post feed更好依赖于用户体验。第二，大量用户进入阿里CSE会携带着来自ISE的用户行为。如何处理跨域信息并构建user profiles来形成一个在CSE上的个性化feed ranking需要进一步探索。
 
 ## 2.2 数据准备
 
-在我们的方法中，我们的目标是：给定一个user u发起的一个query q，返回一个异构feed ranking list $$R_1(feed) \mid u, q$$。在Top K个ranked feed中的每个item会被安置（locate），并在CSE中的一个"slot"中从上到下展示。为了学习independent Multi-armed Bandit（iMAB）模型以及personalized Markov DNN(pMDNN)模型，需要获取slot相关的统计数据（全局信息）以及用户点击流数据（个性化信息）这两者。
+在我们的方法中，我们的目标是：**给定一个user u发起的一个query q，返回一个异构feed ranking list $$R_1(feed) \mid u, q$$**。
+
+在Top K个ranked feed中的每个item都会被安置（locate），并在CSE中从上到下分别在一个"slot"中展示。为了学习independent Multi-armed Bandit（iMAB）模型以及personalized Markov DNN(pMDNN)模型，需要获取**slot相关的统计数据（全局信息）**以及**用户点击流数据（个性化信息）**这两者。
 
 ### 2.2.1 slot相关的统计数据
 
-用户偏好的一个候设是：在每个slot中的feed type相互独立。对于每个slot，三个候选feed types的概率（post、list、video）会遵循它们自己的Beta分布。因此，给定在一个slot s上的候选类型T，为了估计一个feed type $$\theta$$的先验分布$$p(\theta \mid \alpha, \beta, T, s)$$，必须知道每个slot的所有slot相关统计信息，以便估计$$\alpha$$和$$beta$$。slot相关的统计数据包含了两部分：在线实时数据和离线历史数据。在线实时数据指的是流数据：每天由用户生成的对于一个特定slot type的点击数(click)、曝光数(display)。离线历史数据指的是：过去N天page view（pv）、以及item page view（ipv）的总数。在线天数据是streaming data，可以只在实时观察到。而离线历史数据可以被追踪、并能从仓库中获取。我们会在表1中计算和展示top 5 slots的统计数据。
+用户偏好的一个假设是：**在每个slot中的feed type相互独立**。
+
+对于每个slot，三个候选feed types的概率（post、list、video）会**遵循它们自己的Beta分布**。因此，给定在一个slot s上的候选类型T，为了估计一个feed type $$\theta$$的先验分布$$p(\theta \mid \alpha, \beta, T, s)$$，必须知道每个slot的所有slot相关统计信息，以便估计$$\alpha$$和$$\beta$$。slot相关的统计数据包含了两部分：在线实时数据和离线历史数据。在线实时数据指的是流数据：每天由用户生成的对于一个特定slot type的点击数(click)、曝光数(display)。离线历史数据指的是：过去n天page view（pv）、以及item page view（ipv）的总数。在线天数据是streaming data，只能在实时中观察到。而离线历史数据可以被追踪、并能从仓库中获取。我们会在表1中计算和展示top 5 slots的统计数据。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/306effdbd7e89591e270a7b1460e62b2d579da9b671c6d2a64a2ce82623dbf44522f0e1fdada9806b207e2cd831c1faf?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=t1.jpg&amp;size=750">
 
-表1
+表1 在CSE的top 5 slots上的feed历史数据
 
 从表1中看到，在每个相关slots的pv和ipv的总数会有不同，video feeds在CSE中的top 5 slots很难出现。这表示：从全局上看，用户在不同feed types会偏向不同的feed types。
 
@@ -47,7 +57,7 @@ alibaba自己拥有CSE(Content Search Engine)和ISE（Item Search engine），�
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/0689a49c79b288b56e8ab2f953d3da07dbef6426e4fcf74909e6f0cdb999bfc42ee1b08d8a8d37876054fbf161a41cc1?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=t2.jpg&amp;size=750">
 
-表2
+表2 对于每个slot的用户个性化数据的示例
 
 # 3.方法
 
