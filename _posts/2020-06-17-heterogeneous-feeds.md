@@ -104,7 +104,11 @@ $$
 
 ...(1)
 
-其中，给定$$\alpha_i$$和$$\beta_i,$$，$$B(\alpha_i, \beta_i,)$$是一个常数，$$ai,=a_0+\lambda D_i^{ipv}$$以及$$\beta_i,=\beta_0 + \lambda(D_i^{pv} - D_i^{ipv})$$
+其中，给定$$\alpha_i$$和$$\beta_i,$$，
+
+- $$B(\alpha_i, \beta_i,)$$是一个常数
+- $$\alpha_i,=\alpha_0+\lambda D_i^{ipv}$$
+- $$\beta_i,=\beta_0 + \lambda(D_i^{pv} - D_i^{ipv})$$
 
 第二，对于每个feed type，会应用一个softmax函数到所有feed types上来生成一个归一化的selection概率：
 
@@ -114,7 +118,10 @@ $$
 
 ...(2)
 
-其中，i指的是三种feed types的其中之一，$$\theta_i$$是公式1展示了根据后验概率分布$$D(\theta)$$生成的随机值。
+其中：
+
+- i指的是三种feed types的其中之一
+- $$\theta_i$$是公式1展示了根据后验概率分布$$D(\theta)$$生成的随机值
 
 这种方式中，在所有slots中的feed types会独立选中。整个过程的伪代码如算法1所示。
 
