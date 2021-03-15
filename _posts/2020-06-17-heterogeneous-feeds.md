@@ -6,7 +6,7 @@ modified: 2020-06-15
 tags: 
 ---
 
-ali在多年前提的一个《An End-to-end Model of Predicting Diverse Ranking On Heterogeneous Feeds》，我们来看下它的实现。
+ali在2018年前提的一个《An End-to-end Model of Predicting Diverse Ranking On Heterogeneous Feeds》，我们来看下它的实现。
 
 # 介绍
 
@@ -206,7 +206,35 @@ $$
 
 最后，给定一个query，所有candidate feeds可以通过由该模型计算的generative probability进行排序。它可以使用pMDNN进行训练来公式化成一个end-to-end模型，如图2所示。而它仍需要从iMAB模型进行训练得到。
 
+# 4.实验
+
+我们会在ISE和CSE上进行实验，数据集划分：80%训练集，20%测试集。用户行为序列会收集N=90天的数据，来构建一个behaviors graph，它可以将users和queries表示成dimensional embeddings。
+
+## 4.1 模型setup
+
+对于iMAB模型，在online部分，我们实现了一个real-time Flink job，它会解析用户行为日志，并抽取一系列status表示：用户在不同slots上是否点击或浏览展示的feeds。接着用户行为被同步到online reward到iMAB模型中。由于阿里的用户行为日志非常大，为了确保Flink job时延低，我们分配了256个workers做parsing和joining，接着使用64个workers做aggregating。正如我们所预期的，online rewards会在3s内被传给iMAB模型，这使得它可以基于最新的用户行为来选择arm来表示一个概率分布。而在离线部分，超过1亿的ipv和pv记录会被聚合来估计Beta分布。基于经验表明，我们会在iMAB模型中设置$$\lambda=10$$来作为一个time impact factor。
+
+另外，pMDNN模型需要一个训练过程，相应的设置如下：
+
+- User和Query表示：128维的graph embedding
+- Feed type表示：one-hot vector
+- Activation function：ReLu和softmax
+- Loss function：cross entropy
+- optimizer：GD opitmizer
+- learning rate: 0.0001
+- epochs: 100000
+
+我们会训练pMDNN模型，并导出saved_model格式来在CSE中进行serving，它会接收实时在线请求，包含：user、query、以及preceding feed type，接着使用转化后的embedding vectors按顺序预测下一个slot type。在原始DSSM中的缺省设置会应用到我们的模型中。
+
+## 4.2 A/B test
+
+我们在三个分桶上部署提出的模型。每个分桶会通过一个hash partition function来等价处理用户请求。我们会选择5个major indices来对比在iMAB和pMDNN间的效果。pv表示展示items的数目，而pv click表示有多少displayed items被点击；相似的，uv是不同用户进入到CSE的总数，uv点击表示用户点击feeds的数目；至于uv CTR，它是用户点或不点的ratio。
+
+表3展示了实验结果。对比原始的离线ranking方法，pMDNN总体上要胜过iMAB。特别是uv click和uv ctr，他们对于我们的场景是必要的，因为uv click的增加表明：更多用户超向于CSE，以便它能改进它的购物体验，同时，uv ctr的增强表明：用户进入CSE实验上在模型的ranking结果中更感兴趣。至于pv click，它也表明我们的模型工作良好，因为更多用户在发起queries后愿意点击feeds。
+
+基于pv click和uv CTR，我们可以下结论：pMDNN要优于iMAB，它通过应用cross-domain知识并优化在whole page上的ranking results。另外，结合上用户体验信息可以增加用户点击的概率（uv click指标）。
+
 # 参考
 
 
-- 1.[]()
+- 1.[https://sigir-ecom.github.io/ecom2018/ecom18Papers/paper13.pdf](https://sigir-ecom.github.io/ecom2018/ecom18Papers/paper13.pdf)
