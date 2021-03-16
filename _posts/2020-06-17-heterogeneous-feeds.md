@@ -173,7 +173,13 @@ $$
 
 ...(4)
 
-其中，$$X_i$$是对于第i个slot的input feature vectors，它与user $$u_i$$、queries $$q_i$$以及previous slot feed types $$f_i$$相关。$$\Phi$$是input feature vectors到output feed type的转换函数。c是当前slot的true feed type。我们的目标是最大化成功预测slot feed types的joint probability。
+其中：
+
+- $$X_i$$是对于第i个slot的input feature vectors，它与user $$u_i$$、queries $$q_i$$以及previous slot feed types $$f_i$$相关。
+- $$\Phi$$是input feature vectors到output feed type的转换函数。
+- c是当前slot的true feed type。
+
+我们的目标是最大化成功预测slot feed types的joint probability。
 
 为了简化我们的pMDNN模型，并加速运行速度，只有slot feed type的一阶Markov过程会被应用到该模型上。它意味着预测第i个slot feed type，只有第(i-1)个slot feed type会对它有latent影响。而这对于一个user u的第一个slot feed type来说会带来一个问题。因为它没有previous slot feed type信息。对于一个user u，为了给第一个slot生成一个伪信息，user u喜欢的item i会在ISE中根据观看次数和停留时长被检测到。接着，我们会在ISE中将item i映射到在CSE中与它相关的feed f中，并使用f的type作为一个替代。
 
