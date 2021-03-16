@@ -146,12 +146,18 @@ Dependent heterogneous feed type selection会由三个因素决定：user、quer
 基于统计数据，在CSE中有80%的用户来自于ISE。因此，通过使用它们的用户行为序列数据，我们可以构建一个graph来描述users、queries、items间的关系。之后，node2vec会在最后使用一个skip gram模型来学习users和queries的embeddings。详细的pipeline如图2所示，目标函数如下：
 
 $$
-O(\overset{\rightarrow}{f_v}) = log \sigma(\bar{f_t} \cdot \bar{f_v})) + k E_{u \in P_{noise}} [-log \sigma(\bar{f_u} \cdot \bar{f_v}))]
+O(\overset{\rightarrow}{f_v}) = log \sigma(\overset{\rightarrow}{f_t} \cdot \overset{\rightarrow}{f_v}) + k E_{u \in P_{noise}} [-log \sigma(\overset{\rightarrow}{f_u} \cdot \overset{\rightarrow}{f_v})]
 $$
 
 ...(3)
 
-$$\bar{f_v}$$是当前node v的embedding。t是node v的一个positive neighbour node；u是v的一个negative sampled node。这意味着，给定一个node v，我们需要学习一个node embedding表示，它可以最大化概率来生成它的positive neighbor node u，并最小化概率来生成它的negative node node sets$$P_{noise}$$。
+其中：
+
+- $$\overset{\rightarrow}{f_v}$$是当前node v的embedding。
+- t是node v的一个positive neighbour node；
+- u是v的一个negative sampled node。
+
+这意味着：给定一个node v，我们需要学习一个node embedding表示，它可以最大化概率来生成它的positive neighbor node u，并最小化概率来生成它的negative node node sets$$P_{noise}$$。
 
 图2的中间部分表明，如何训练node embedding表示。input layer是node的one-hot encoding。weight matrix W是所有nodes的embedding，它可以帮助将input one-hot encoding node投影到一个$$\mid D \mid$$维的latent space上。接着，最大化概率来生成node u的neighour nodes。
 
