@@ -131,18 +131,22 @@ $$
 
 ## 3.2 peronalized Markov DNN
 
-Dependent heterogneous feed type selection会由三个因素决定：user、query、以及在相同page页上之前的slot feed types。**第一，不同users会在相同queries下对于items具有不同的偏好**。例如，当一个用户搜索"dress"时，她可能会愿意看到关于dress描述的文章post。而对于其它user，他们可能更喜欢lists，因为他们想看到更多item选项而非单个item介绍。**第二，在当前slot上的feed types的用户偏好可能会受之前feed types的潜在影响，它可以被看成是一个Markov process**。例如，没有用户愿意看到在所有slots上看到相同类型，他们或多或少希望看到不同types的feeds。**第三，不同queries在所有slots上应产生不同的feed type allocation**。为了一起集成用户偏好、query、以及推荐的previous feed types，对于第i个slot，我们提出了一个pMDNN模型来生成推荐的feed type $$t_i \mid (user, query, t_1, \cdots, t_{i-1})$$。整个模型可以解耦成两个子任务（sub tasks）：包括一个user&query表示学习任务、以及一个personlized slot type的预测任务，如图2所示。
+Dependent heterogneous feed type selection会由三个因素决定：user、query、以及在相同page页上之前的slot feed types。
+
+- **第一，不同users会在相同queries下对于items具有不同的偏好**。例如，当一个用户搜索"dress"时，她可能会愿意看到关于dress描述的文章post。而对于其它user，他们可能更喜欢lists，因为他们想看到更多item选项而非单个item介绍。
+- **第二，在当前slot上的feed types的用户偏好可能会受之前feed types的潜在影响，它可以被看成是一个Markov process**。例如，没有用户愿意看到在所有slots上看到相同类型，他们或多或少希望看到不同types的feeds。
+- **第三，不同queries在所有slots上应产生不同的feed type allocation**。为了将用户偏好、query、以及推荐的previous feed types一起集成，对于第i个slot，我们提出了一个pMDNN模型来生成推荐的feed type $$t_i \mid (user, query, t_1, \cdots, t_{i-1})$$。整个模型可以解耦成两个子任务（sub tasks）：包括一个user&query表示学习任务、以及一个personlized slot type的预测任务，如图2所示。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/52fbd3f901e0935336d3662d7377d21877360bbb618b2deb2b8adc5e5c9dd3558b3554b4edafc2db9a044a3da98423e6?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 使用pMDNN的end-to-end模型，从cross-domain knowledge和user preference中进行学习
 
 ### 3.2.1 User和Query的表示
 
 基于统计数据，在CSE中有80%的用户来自于ISE。因此，通过使用它们的用户行为序列数据，我们可以构建一个graph来描述users、queries、items间的关系。之后，node2vec会在最后使用一个skip gram模型来学习users和queries的embeddings。详细的pipeline如图2所示，目标函数如下：
 
 $$
-O(\upperset{\rightarrow}{f_v}) = log \sigma(\bar{f_t} \cdot \bar{f_v})) + k E_{u \in P_{noise}} [-log \sigma(\bar{f_u} \cdot \bar{f_v}))]
+O(\overset{\rightarrow}{f_v}) = log \sigma(\bar{f_t} \cdot \bar{f_v})) + k E_{u \in P_{noise}} [-log \sigma(\bar{f_u} \cdot \bar{f_v}))]
 $$
 
 ...(3)
