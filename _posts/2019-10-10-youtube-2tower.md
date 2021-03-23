@@ -25,22 +25,22 @@ youtube在2019发布了它的双塔模型《Sampling-Bias-Corrected Neural Model
 
 **这会造成模型预测对于长尾内容（long-tail content）具有很大variance**。对于这种cold-start问题，真实世界系统需要适应数据分布的变化来更好面对**新鲜内容（fresh content）**。
 
-受Netflix prize的启发，MF-based modeling被广泛用在构建retrieval systems中学习query和item的latent factors。在MF框架下，大量推荐研究在学习大规模corpus上解决了许多挑战。常见的思路是，利用query和item的content features。在item id外，content features很难被定义成大量用于描述items的features。例如，一个video的content features可以是从video frames中抽取的视觉features或音频features。MF-based模型通常只能捕获features的二阶交叉，因而，在表示具有许多格式的features collection时具有有限阶（power）。
+受Netflix prize的启发，MF-based modeling被广泛用在构建retrieval systems中学习query和item的latent factors。在MF框架下，大量推荐研究在学习大规模corpus上解决了许多挑战。**常见的思路是，利用query和item的content features**。在item id外，content features很难被定义成大量用于描述items的features。例如，一个video的content features可以是从video frames中抽取的视觉features或音频features。MF-based模型通常只能捕获features的二阶交叉，因而，在表示具有许多格式的features collection时具有有限阶（power）。
 
-在最近几年，受deep learning的影响，大量工作采用DNNs来推荐。Deep representations很适合编码在低维embedding space上的复杂的user states和item content features。在本paper中，采用two-tower DNNs来构建retrieval模型。**图1提供了two-tower模型构建的图示，左和右分别表示{user, context}和{item}**。two-tower DNN从multi-class classification NN（一个MLP模型）泛化而来[19]，其中，图1的right tower被简化成一个具有item embeddings的single layer。因而，**two-tower模型结构可以建模当labels具有structures或content features的情形**。MLP模型通常使用许多来自一个fixed的item语料表中sampled negatives进行训练。相反的，使用了deep item tower后，由于item content features以及共享的网络参数，对于计算所有item embeddings来说，在许多negatives上抽样和训练通常是无效的。
+在最近几年，受deep learning的影响，大量工作采用DNNs来推荐。Deep representations很适合编码在低维embedding space上的复杂的user states和item content features。在本paper中，采用two-tower DNNs来构建retrieval模型。**图1提供了two-tower模型构建的图示，左和右分别表示{user, context}和{item}**。two-tower DNN从multi-class classification NN（一个MLP模型）泛化而来[19]，其中，图1的right tower被简化成一个具有item embeddings的single layer。因而，**two-tower模型结构可以建模当labels具有structures或content features的情形**。MLP模型通常使用许多来自一个fixed的item语料表中sampled negatives进行训练。作为对比，在使用了deep item tower后，对于计算所有item embeddings来说，由于item content features以及共享的网络参数，在许多negatives上进行抽样并训练通常是无效的。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/727bab11fbdbc3698fb29496fd211f65663b710033b639c3e514edf43885bf90be605e072ef20ed3c277c5d73aa4f912?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750" width="300">
 
 图1
 
-我们考虑batch softmax optimization，其中item probability会在一个random batch上所有items上计算得到。然而，在我们的实验中所示，batch softmax具有sampling bias倾向，在没有任何纠正的情况下，可能会严重限制模型效果。importance sampling和相应的bias reduction在MLP模型[4,5]中有研究。受这些工作的启发，我们提出了使用estimated item frequency的batch softmax来纠正sampling bias。对比于MLP模型，其中output item vocabulary是固定的（stationary），我们会根据vocabualary和分布随着时间变化来target streaming data。我们提出了一种新算法通过gradient descent来概述（sketch）和估计（estimate） item freqency。另外，我们使用bias-corrected modeling，并将它扩展到在youtube推荐上构建个性化retrieval system。我们也引入了一个sequential training trategy，用来吸收streaming data，与indexing和serving组件一起工作。
+我们考虑batch softmax optimization：其中item probability会通过在一个random batch上的所有items上计算得到。然而，在我们的实验中所示：**batch softmax具有sampling bias倾向，在没有任何纠正的情况下，可能会严重限制模型效果**。importance sampling和相应的bias reduction在MLP模型[4,5]中有研究。受这些工作的启发，我们提出了使用estimated item frequency的batch softmax来纠正sampling bias。对比于MLP模型，其中output item vocabulary是固定的（stationary），我们会根据vocabualary和分布随着时间变化来target streaming data。我们提出了一种新算法通过gradient descent来概述（sketch）和估计（estimate） item freqency。另外，我们使用bias-corrected modeling，并将它扩展到在youtube推荐上构建个性化retrieval system。我们也引入了一个sequential training strategy，用来吸收streaming data，与indexing和serving组件一起工作。
 
 主要4个contributions：
 
-- Streaming Frequency Estimation。
-- Model Framework
-- Youtube recommendation
-- offline和Live实现
+- Streaming Frequency Estimation：我们提出了一个新算法，根据vocabulary和分布偏移（distribution shifts）来估计来自data stream的item frequency。我们提供了分析结果来展示该estimation的variance和bias。我们也提供了仿真来演示我们的方法在捕捉数据动态性上的效率
+- Modeling Framework：我们提供了一个通用的建模框架来构建大规模检索系统。特别的，我们针对batch softmax会在cross entropy loss中引入estimated item frequency来减小在in-batch items上的sampling bias
+- Youtube recommendation：我们描述了如何使用modeling framework来为youtube 推荐构建一个大规模的检索系统。我们引入了end-to-end 系统，包括：training、indexing、serving组件
+- offline和Live实现：我们在两个真实数据集上执行offline实验，并演示了samping bias correction的效果。我们也展示了为youtube构建的索引系统，并在真实流量实验上提升了engagement指标。
 
 # 2.相关工作
 
