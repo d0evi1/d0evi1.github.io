@@ -101,7 +101,7 @@ $$
 
 ...(2)
 
-当M非常大时，在计算partition function时很难包括所有的candidate examples，例如：等式(1)中的分母。我们主要关注处理streaming data。因此，与负样本(negatives)从一个固定corpus中抽样得到的case训练MLP模型不同，对于从相同batch中的所有queries来说，我们只考虑使用in-batch items[22]作为负样本（negatives）。更确切地说，给定一个关于B pairs $$\lbrace (x_i, y_I, r_i) \rbrace_{i=1}^B$$的mini-batch，对于每个$$i \in [B]$$，该batch softmax是：
+当M非常大时，在计算partition function时很难包括所有的candidate examples，例如：等式(1)中的分母。我们主要关注处理streaming data。因此，与从一个固定corpus中抽样得到负样本(negatives)的case进行训练MLP模型不同，**对于从相同batch中的所有queries来说，我们只考虑使用in-batch items[22]作为负样本（negatives）**。更确切地说，给定一个关于B pairs $$\lbrace (x_i, y_I, r_i) \rbrace_{i=1}^B$$的mini-batch，对于每个$$i \in [B]$$，该batch softmax是：
 
 $$
 P_B (y_i | x_i; \theta) = \frac{e^{s(x_i,y_i)}}{ \sum\limits_{i \in [B]} e^{s(x_i, y_i)}}
@@ -123,7 +123,7 @@ $$
 P_B^c (y_i | x_i; \theta) = \frac{e^{s^c(x_i,y_i)}}{e^{s^c(x_i,y_i)} + \sum_{j \in [B],j \neq i} e^{s^c(x_i,y_i)}}
 $$
 
-接着将上述term插入到等式(2)，产生：
+接着将上述term代入到等式(2)，产生：
 
 $$
 L_B(\theta) := -\frac{1}{B} \sum\limits_{i \in [B]} r_i \cdot log(P_B^c(y_i | x_i; \theta)) 
@@ -152,13 +152,17 @@ $$
 
 另外，我们的模型框架提供了选项，可以在inference时选择任意items。不再计算在所有items上的dot product，低时耗retrieval通常基于一个基于hashing技术高效相似度搜索系统，特别的，高维embeddings的compact representations通过quantization、以及end-to-end learning和coarse和PQ来构建。
 
-归一化（Normalization）和温度（Temperature）。经验上，我们发现，添加embedding normalization，比如：$$u(x,\theta) \leftarrow u(x,\theta) / \|\| u(x,\theta) \|\|_2, u(y,\theta) \leftarrow v(y,\theta) / \|\| v(y,\theta) \|\|_2$$，可以提升模型的trainability，从而产生更好的retrieval quanlity。另外，一个tempreature $$\tau$$被添加到每个logit上来对predictions进行削尖(sharpen)：
+**归一化（Normalization）和温度（Temperature）**
+
+经验上，我们发现，添加embedding normalization，比如：$$u(x,\theta) \leftarrow frac{u(x,\theta)}{ \| u(x,\theta) \|_2}, u(y,\theta) \leftarrow \frac{v(y,\theta)} / {\| v(y,\theta) \|_2}$$，**可以提升模型的trainability，从而产生更好的retrieval quality**。
+
+另外，一个Temperature $$\tau$$被添加到每个logit上来对predictions进行削尖(sharpen)：
 
 $$
-s(x,y) = <u(x,\theta), v(y,\theta)> / \tau>
+s(x,y) = \frac{<u(x,\theta), v(y,\theta)>} {\tau}
 $$
 
-实际上，$$\tau$$是一个超参数，用于调节最大化检索指标（比如：recall或precision）。
+实际上，**$$\tau$$是一个超参数，用于调节最大化检索指标**（比如：recall或precision）。
 
 # 4.Streaming Frequancy估计
 
