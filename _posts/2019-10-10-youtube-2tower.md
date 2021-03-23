@@ -31,7 +31,7 @@ youtube在2019发布了它的双塔模型《Sampling-Bias-Corrected Neural Model
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/727bab11fbdbc3698fb29496fd211f65663b710033b639c3e514edf43885bf90be605e072ef20ed3c277c5d73aa4f912?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750" width="300">
 
-图1
+图1 一个2-tower DNN模型，它会学习query和candidate表示
 
 我们考虑batch softmax optimization：其中item probability会通过在一个random batch上的所有items上计算得到。然而，在我们的实验中所示：**batch softmax具有sampling bias倾向，在没有任何纠正的情况下，可能会严重限制模型效果**。importance sampling和相应的bias reduction在MLP模型[4,5]中有研究。受这些工作的启发，我们提出了使用estimated item frequency的batch softmax来纠正sampling bias。对比于MLP模型，其中output item vocabulary是固定的（stationary），我们会根据vocabualary和分布随着时间变化来target streaming data。我们提出了一种新算法通过gradient descent来概述（sketch）和估计（estimate） item freqency。另外，我们使用bias-corrected modeling，并将它扩展到在youtube推荐上构建个性化retrieval system。我们也引入了一个sequential training strategy，用来吸收streaming data，与indexing和serving组件一起工作。
 
@@ -96,7 +96,7 @@ $$
 接着进一步加入rewards $$r_i$$，我们考虑上下面的weighted log-likelihood作为loss function：
 
 $$
-L_T(\theta) := - \frac{1}{T} \sum\limits_{i \in [T]} r_i \cdot log(P(y_i | x_i; \theta) 
+L_T(\theta) := - \frac{1}{T} \sum\limits_{i \in [T]} r_i \cdot log(P(y_i | x_i; \theta)) 
 $$
 
 ...(2)
@@ -126,7 +126,7 @@ $$
 接着将上述term插入到等式(2)，产生：
 
 $$
-L_B(\theta) := -\frac{1}{B} \sum\limits_{i \in [B]} r_i \cdot log(P_B^c(y_i \| x_i; \theta)) 
+L_B(\theta) := -\frac{1}{B} \sum\limits_{i \in [B]} r_i \cdot log(P_B^c(y_i | x_i; \theta)) 
 $$
 
 ...(4)
