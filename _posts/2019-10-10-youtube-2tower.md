@@ -154,7 +154,7 @@ $$
 
 **归一化（Normalization）和温度（Temperature）**
 
-经验上，我们发现，添加embedding normalization，比如：$$u(x,\theta) \leftarrow frac{u(x,\theta)}{ \| u(x,\theta) \|_2}, u(y,\theta) \leftarrow \frac{v(y,\theta)} / {\| v(y,\theta) \|_2}$$，**可以提升模型的trainability，从而产生更好的retrieval quality**。
+经验上，我们发现，添加embedding normalization，比如：$$u(x,\theta) \leftarrow \frac{u(x,\theta)}{ \| u(x,\theta) \|_2}, u(y,\theta) \leftarrow \frac{v(y,\theta)}{\| v(y,\theta) \|_2}$$，**可以提升模型的trainability，从而产生更好的retrieval quality**。
 
 另外，一个Temperature $$\tau$$被添加到每个logit上来对predictions进行削尖(sharpen)：
 
