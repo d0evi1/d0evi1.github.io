@@ -58,19 +58,25 @@ $$
 
 假设我们有一个单标签问题（single-label）。每个训练样本$$(x_i, \lbrace t_i \rbrace)$$包含了一个context以及一个target class。我们将**$$P(y \mid x)$$作为：给定context x下，一个target class y的概率**。
 
-我们可以训练一个函数F(x,y)来生成softmax logits——也就是说，该class在给定context上的相对log概率（relative log probabilities）：
+我们可以训练一个函数F(x,y)来生成softmax logits（比如：双塔模型的内积、dnn的logit等）——也就是说，该class在给定context上的相对log概率（relative log probabilities）：
 
 $$
 F(x,y) \leftarrow log(P(y|x)) + K(x)
 $$
 
-其中，K(x)是一个不依赖于y的任意函数(arbitrary function)。
+其中：K(x)是一个不依赖于y的任意函数(arbitrary function)。
 
-在full softmax训练中，对于每个训练样本$$(x_i,\lbrace t_i \rbrace)$$，我们会为在$$y \in L$$中的所有类计算logits $$F(x_i,y)$$。**如果类L总数很大，计算很会昂贵**。
+在full softmax训练中，对于每个训练样本$$(x_i,\lbrace t_i \rbrace)$$，我们会为所有class $$y \in L$$计算logits $$F(x_i,y)$$。**如果L总数很大(class很多)，计算很会昂贵**。
 
 ## 抽样函数：$$Q(y \mid x)$$
 
-在"Sampled Softmax"中，对于每个训练样本$$(x_i, \lbrace t_i \rbrace)$$，**我们会根据一个选择抽样函数：$$Q(y \mid x)$$来选择一个关于“sampled” classese的小集合$$S_i \subset L$$**。每个被包含在$$S_i$$中的类，它与概率$$Q(y \mid x_i)$$完全独立。
+在"Sampled Softmax"中，对于每个训练样本$$(x_i, \lbrace t_i \rbrace)$$，我们会根据一个选择抽样函数：
+
+$$
+Q(y \mid x)
+$$
+
+**用它来选择一个“抽样后（sampled）” classes的小集合$$S_i \subset L$$**。每个被包含在$$S_i$$中的class，它与概率$$Q(y \mid x_i)$$完全独立。
 
 $$
 P(S_i = S|x_i) = \prod_{y \in S} Q(y|x_i) \prod_{y \in (L-S)} (1-Q(y|x_i))
@@ -82,9 +88,9 @@ $$
 C_i = S_i \cup \lbrace t_i \rbrace
 $$
 
-我们的训练任务是为了指出：**在给定集合$$C_i$$上，在$$C_i$$中哪个类是target class**。
+我们的训练任务是为了指出：**在给定集合$$C_i$$上，在$$C_i$$中哪个class是target class**。
 
-对于每个类$$y \in C_i$$，给定我们的先验$$x_i$$和$$C_i$$，我们希望计算target class y的后验概率。
+对于每个class $$y \in C_i$$，给定我们的先验$$x_i$$和$$C_i$$，我们希望计算target class y的后验概率。
 
 使用Bayes' rule：[bayes](https://math.stackexchange.com/questions/549887/bayes-theorem-with-multiple-random-variables)
 
