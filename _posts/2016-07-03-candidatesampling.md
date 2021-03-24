@@ -108,7 +108,7 @@ P(t_i=y|x_i,C_i) = P(t_i=y,C_i|x_i) / P(C_i|x_i) \\
 =P(y|x_i)P(C_i|t_i=y,x_i) / P(C_i|x_i)
 $$
 
-接着，为了计算$$P(C_i \mid t_i=y,x_i)$$，我们注意到为了让它发生，$$S_i$$可以包含y或也可以不包含y，但必须包含$$C_i$$所有其它元素，并且必须不包含在$$C_i$$任意classes。因此：
+接着，为了计算$$P(C_i \mid t_i=y,x_i)$$，我们注意到为了让它发生，$$S_i$$可以包含y或也可以不包含y，但必须包含$$C_i$$所有其它元素，并且必须不能包含不在$$C_i$$的任意classes。因此：
 
 $$
 \begin{align}
@@ -132,10 +132,10 @@ $$
 training \ softmax \ input = F(x,y) - log(Q(y|x))
 $$
 
-从该classifer对梯度进行BP，可以训练任何我们想到的F。
+我们对来自该classifer的梯度进行BP，可以训练任何我们想到的F。
 
 
-# 
+# 补充：tensorflow实现
 
 以tensorflow中的tf.random.log_uniform_candidate_sampler为例。
 
@@ -296,6 +296,14 @@ $$
 **当target classes近似遵循这样的一个分布时，该sampler很有用——例如，如果该classes表示字典中的词以词频降序排列时。如果你的classes不以词频降序排列，无需使用该op**。
 
 另外，该操作会返回true_expected_count和sampled_expected_count的tensors，它们分别对应于表示每个target classes(true_classes)以及sampled classes（sampled_candidates）在sampled classes的一个平均tensor中期望出现的次数。这些值对应于在上面的$$Q(y \mid x)$$。如果unique=True，那么它是一个post-rejection概率，我们会近似计算它。
+
+即：
+
+	对一个labels tensor进行candidate sampling抽样，抽取num_sampled个负样本。
+	返回：
+	    相应的负样本label: sampled_candidates     => 个数与num_sampled相同
+	    相应的正样本的概率：true_expected_count    => 个数与labels相同
+	    相应的负样本的概率：sampled_expected_count => 个数与num_sampled相同
 
 # paper2
 
