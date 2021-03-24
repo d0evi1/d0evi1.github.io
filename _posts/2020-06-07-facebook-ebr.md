@@ -139,9 +139,9 @@ encoders的inputs可以从常规的text embedding模型区分unified embedding�
 我们也会使用不同方式的mining positives进行实验，并发现以下的有意思的现象：
 
 - **点击（clicks）**：它使用点击结果作为正样本，因为clicks表示用户对于结果的反馈，它很可能与用户的搜索意图相匹配
-- **曝光（impressions）**：我们将retrieval看成是一个ranker的近似，但它执行的很快。因此，我们希望设计retrieval模型来学习那些可以被ranker排得更高的相同集合的结果。从这个意义上说，对于retrieval model learning来说，展示或曝光给用户的所有结果是相同的。
+- **曝光（impressions）**：我们将retrieval看成是一个ranker的近似，但它执行的很快。因此，我们希望设计retrieval模型来学习那些可以被ranker排得更高的相同集合的结果。从这个意义上说，对于retrieval model learning来说，展示（show）或曝光（impressed）给用户的所有结果都等价为正例（positive）。
 
-我们的实验结果表明，两种定义效果相当；模型使用click vs. impressions进行训练，给定相同的data volume，会导致相似的recalls。另外，我们会对click-based训练数据与impression-based数据达成一致，然而我们没有观察到在click-based模型上有额外的收益。这表明增加impression data不会提供额外的值，模型也不会从增加的训练数据量上获得收益。
+我们的实验结果表明，两种定义效果相当；模型使用click vs. impressions进行训练，给定相同的data volume，会导致相似的recalls。另外，**我们会对click-based训练数据与impression-based数据达成一致，然而我们没有观察到在click-based模型上有额外的收益**。这表明增加impression data不会提供额外的值，模型也不会从增加的训练数据量上获得收益。
 
 我们以上的研究表明，**使用点击（click）作为正样本（positive）以及随机抽样（random）作为负样本（negative）可以提供一个合理的模型表现**。在它之上，我们进一步探索hard mining策略来提升模型区分相似结果间不同之处的能力。我们将在6.1节讨论。
 
