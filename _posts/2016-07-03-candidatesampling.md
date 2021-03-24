@@ -90,17 +90,17 @@ $$
 
 我们的训练任务是为了指出：**在给定集合$$C_i$$上，在$$C_i$$中哪个class是target class**。
 
-对于每个class $$y \in C_i$$，给定我们的先验$$x_i$$和$$C_i$$，我们希望计算target class y的后验概率。
+**对于每个class $$y \in C_i$$，给定我们的先验$$x_i$$和$$C_i$$，我们希望计算target class y的后验概率**。我们称它为$$P(t_i=y \mid x_i,C_i)$$。
 
-使用Bayes' rule：[bayes](https://math.stackexchange.com/questions/549887/bayes-theorem-with-multiple-random-variables)
+注：Bayes' rule：[bayes](https://math.stackexchange.com/questions/549887/bayes-theorem-with-multiple-random-variables)
 
 $$
-P(Z|X,Y) = P(Y,Z|X) P(X) / P(X,Y) = P(Y,Z|X) P(Y|X)
+P(Z|X,Y) = P(Y,Z|X) P(X) / P(X,Y) = P(Y,Z|X) / P(Y|X)
 $$
 
 ...(b)
 
-得到：
+应用Bayes' rule得到：
 
 $$
 P(t_i=y|x_i,C_i) = P(t_i=y,C_i|x_i) / P(C_i|x_i) \\
