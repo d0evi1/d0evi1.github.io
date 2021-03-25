@@ -239,7 +239,7 @@ EBR需要大量研究来继续提升效果。我们研究了两个重要的embed
 
 我们也观察到：**最优的setting是每个positive最多有两个hard negatives**。使用超过两个hard negatives会使model quality退化。
 
-online HNM的一个限制是：**随机抽样（random samples）中存在任意的hard negative的概念可能很低，因此不能产生hard enough negatives**。接着，我们会基于整个result pool来生成harder negatives，也就是：offline Hard Negative Mining。
+online HNM的一个限制是：**来自随机抽样（random samples）中任意的hard negative的概率可能很低，因此不能产生足够hard的 negatives**。接着，我们会基于整个result pool来生成harder negatives，也就是：offline Hard Negative Mining。
 
 **Offline hard negative mining**
 
