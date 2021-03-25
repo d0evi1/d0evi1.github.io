@@ -229,9 +229,9 @@ EBR需要大量研究来继续提升效果。我们研究了两个重要的embed
 
 以people search为例，当分析我们的embedding模型时，我们发现：给定一个query，从embeddings返回的topK个结果通常具有相同的名字。尽管引入了social features，该模型不会总是将target results排得比其它要高。这使我们认为：模型不能合理利用social features，这很可能是因为：负样本（negative training data）太容易(easy)，因为是随机样本，通常具有不同的名字。**为了使得模型能更好地区分相似结果，我们可以使用在embedding space中与正样本（positive）更接近的样本作为hard negatives**。
 
-**online hard negative mining**
+**Online hard negative mining**
 
-由于模型训练是基于mini-batch更新的，hard negatives会在每个动态的batch中被高效选中。每个batch由n个positive pairs组成：（$$\lbrace q^{(i)}, d_{+}^{(i)} \rbrace_{i=1}^{n}$$）。**接着对于每个query $$q^{(i)}$$，我们会它使用所有其它positive documents $$\lbrace d_{+}^{(1)}, \cdots, d_{+}^{(j)}, \cdots,  d_{+}^{(n)} \mid j \neq i \rbrace$$来构建一个小的document pool，并选择具有最高相似度得分的documents作为hardest negatives来创建training triplets**。允许online hard negative mining是我们模型提升的一个主要contributor。它可以极大提升跨所有verticals的embedding模型质量：
+由于模型训练是基于mini-batch更新的，hard negatives会以一种动态且高效的方式在每个batch中被选中。每个batch由n个positive pairs组成：（$$\lbrace q^{(i)}, d_{+}^{(i)} \rbrace_{i=1}^{n}$$）。**接着对于每个query $$q^{(i)}$$，我们会它使用所有其它positive documents $$\lbrace d_{+}^{(1)}, \cdots, d_{+}^{(j)}, \cdots,  d_{+}^{(n)} \mid j \neq i \rbrace$$来构建一个小的document pool，并选择具有最高相似度得分的documents作为hardest negatives来创建training triplets**。允许online hard negative mining是我们模型提升的一个主要contributor。它可以极大提升跨所有verticals的embedding模型质量：
 
 - 对于people search的recall具有+8.38%的recall
 - 对于groups search具有+7%的recall
