@@ -256,7 +256,7 @@ offline hard negative mining由以下的过程生成：
 
 第二个insight是retrieval task optimization。我们的hypothesis是：**训练数据中的easy negatives的出现仍然是必要的**，因为检索模型是在一个input space上操作的，它混合了不同levels的hardness数据组成。因此，我们探索一些方式来与hard negatives一起集成random negatives，包括：从一个easy model中的transfer learning。从经验上看，**以下两种技术具有最好的效果**：
 
-- **Mix easy/hard training**：在训练中混合random和hard negatives是有益的。在easy:hard=100:1时，可以增加easy/hard negatives的ratio可以提升model recall和饱和度。
+- **Mix easy/hard training**：在训练中混合random和hard negatives是有益的。增加easy/hard negatives的ratio可以持续提升model recall，当在easy:hard=100:1时达到饱和。
 - **从“hard”模型到"easy"模型的transfer learning**：从easy到hard模型的transfer learning不会生成一个更好的模型，从hard到easy的transfer learning可以达到一个更好的model recall的提升
 
 最后，在training data中为每个data point计算穷举KNN是非常time-consuming的，由于计算资源限制，总的模型训练时间会变得不切实际。对于offline hard negative mining算法来说，具有一个高效地top K generation很重要。ANN search是实际的解法，它可以极大减小总的计算时间。更进一步，在一个random shard上运行ANN search是足够生成有效的hard negatives的，因为我们在训练期间只依赖semi-hard negatives。
