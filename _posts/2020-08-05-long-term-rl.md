@@ -53,11 +53,25 @@ Feed流机制在推荐系统中广泛被采用，特别是移动Apps。Feed stre
 
 ## 3.1 Feed Streaming推荐
 
-在feed流推荐中，推荐系统会在离散的time steps上与一个user $$u \in U$$进行交互。在每个time step t上，agent会feeds一个item $$i_t$$，并从该user上接收一个feedback $$f_t$$，其中$$i_t \in I$$会来自推荐的item set，$$f_t \in F$$是用户在$$i_t$$上的feedback/behavior，包括：点击、购买、跳过、离开等。交互过程形成一个序列：$$X_t = \lbrace u, (i_1, f_1, d_1), \cdots, (i_t, f_t, d_t) \rbrace$$，其中：$$d_t$$是在推荐上的dwell time，它表示用户在推荐上的体验偏好。给定$$X_t$$，agent需要为下一个item step生成$$i_{i+1}$$，它的目标是：最大化long term user engagement，例如：总点击数（total clicks） 或 浏览深度（browsing depth）。在本工作中，我们关注于在feed streaming场景如何提升所有items的期望质量（expected quality）。
+在feed流推荐中，推荐系统会在离散的time steps上与一个user $$u \in U$$进行交互：
+
+在每个time step t上，agent会feeds一个item $$i_t$$，并从该user上接收一个feedback $$f_t$$，其中$$i_t \in I$$会来自推荐的item set，$$f_t \in F$$是用户在$$i_t$$上的feedback/behavior，包括：点击、购买、跳过、离开等。交互过程形成一个序列：$$X_t = \lbrace u, (i_1, f_1, d_1), \cdots, (i_t, f_t, d_t) \rbrace$$，其中：$$d_t$$是在推荐上的dwell time，它表示用户在推荐上的体验偏好。
+
+给定$$X_t$$，agent需要为下一个item step生成$$i_{i+1}$$，它的目标是：**最大化long term user engagement**，例如：总点击数（total clicks） 或 浏览深度（browsing depth）。在本工作中，我们关注于在feed streaming场景如何提升所有items的期望质量（expected quality）。
 
 ## 3.2 Feed Streams的MDP公式
 
-一个MDP可以通过$$M=<S, A, P, R, \gamma>$$进行定义，其中，S是state space，A是action space，$$P: S \times A \times S \rightarrow R$$是转移函数（transition function），$$R: S \times A \rightarrow R$$是mean reward function ，其中：r(s, a)是immediate goodness，$$\gamma \in [0,1]$$是discount factor。一个(stationary) policy $$\pi: S \times A \rightarrow [0, 1]$$会在actions上分配每个state $$s \in S$$一个distribution，其中$$a \in A$$具有概率$$\pi (a \mid s)$$。在feed流推荐中，$$<S, A, P>$$设置如下：
+一个MDP可以通过$$M=<S, A, P, R, \gamma>$$进行定义，其中：
+
+- S是state space
+- A是action space
+- $$P: S \times A \times S \rightarrow R$$是转移函数（transition function）
+- $$R: S \times A \rightarrow R$$是mean reward function ，其中：r(s, a)是immediate goodness
+- $$\gamma \in [0,1]$$是discount factor。
+
+一个(stationary) policy $$\pi: S \times A \rightarrow [0, 1]$$会在actions上分配每个state $$s \in S$$一个distribution，其中：$$a \in A$$具有概率$$\pi (a \mid s)$$。
+
+在feed流推荐中，$$<S, A, P>$$设置如下：
 
 - State S：是一个states的集合。我们会在time step t上的 state设计成浏览序列$$s_t = X_{t-1}$$。在开始时，$$s_1 = \lbrace u \rbrace$$只会包含用户信息。在time step t上，$$s_t = s_{t-1} \oplus \lbrace (i_{t-1}, f_{t-1}, d_{t-1})\rbrace$$会使用old state $$s_{t-1}$$进行更新，
 - Action A：是一个关于actions的有限集合。可提供的actions依赖于state s，表示为A(s)。$$A(s_1)$$会使用所有recalled items进行初始化。$$A(s_t)$$会通过从$$A(s_{t-1})$$中移除推荐items进行更新，action $$a_t$$是正在推荐的item $$i_t$$
@@ -84,27 +98,27 @@ $$
 
 ### Instant metrics
 
-在instant user engagement中，我们会具有clicks、purchase（商业上）等。instant metrics的公共特性是：这些metrics由current action即时触发。此处我们以click为例，第t次feedback的click数可以定义成：
+在instant user engagement中，我们会具有clicks、purchase（商业上）等。instant metrics的公共特性是：**这些metrics由current action即时触发**。此处我们以click为例，第t次feedback的click数可以定义成：
 
 $$
-m_t^c = #clicks(f_t)
+m_t^c = \#clicks(f_t)
 $$
 
 ### Delayed metrics
 
-delayed metrics包括：browsing depth、dwell time、user revisit等。这些metrics通常会被用于衡量long-term user engagement。delayed metrics会由之前的行为触发，其中一些会具有long-term dependency。这里提供会提供delayed metrics的两个示例reward functions：
+delayed metrics包括：browsing depth、dwell time、user revisit等。这些metrics通常会被用于衡量long-term user engagement。**delayed metrics会由之前的行为触发，其中一些会具有long-term dependency**。这里提供会提供delayed metrics的两个示例reward functions：
 
- **深度指标（Depth metrics）**
+ **1.深度指标（Depth metrics）**
  
  由于无限下刷机制，浏览的深度是在feed流场景下的一个特殊指标器（special indicator），它会与其它类型的推荐相区别。在观看了第t个feed之后，如果用户仍然在系统中并且继续下刷，系统会对该feed进行reward。直觉上，depth $$m_t^d$$的metric可以被定义成：
  
  $$
- m_t^d = #scans(f_t)
+ m_t^d = \#scans(f_t)
  $$
  
- 其中，$$#scans(f_t)$$是第t个feedback的scans的数目。
+ 其中，$$\#scans(f_t)$$是第t个feedback的scans的数目。
  
- **返回时间指标（Return time metric）**
+ **2.返回时间指标（Return time metric）**
 
 当用户对推荐items很满意时，通常他会更经常性地使用该系统。因此，在两个visits间的间隔时间（interval time）可以影响系统的用户满意度。return time $$m_t^r$$可以被设计成时间的倒数（reciprocal of time）:
 
