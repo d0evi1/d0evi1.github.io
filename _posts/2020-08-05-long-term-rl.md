@@ -96,7 +96,7 @@ $$
 
 接着，我们根据instant metrics和delayed metrics给出一些reward function的实例。
 
-### Instant metrics
+### 3.3.1 Instant metrics
 
 在instant user engagement中，我们会具有clicks、purchase（商业上）等。instant metrics的公共特性是：**这些metrics由current action即时触发**。此处我们以click为例，第t次feedback的click数可以定义成：
 
@@ -104,13 +104,13 @@ $$
 m_t^c = \#clicks(f_t)
 $$
 
-### Delayed metrics
+### 3.3.2 Delayed metrics
 
 delayed metrics包括：browsing depth、dwell time、user revisit等。这些metrics通常会被用于衡量long-term user engagement。**delayed metrics会由之前的行为触发，其中一些会具有long-term dependency**。这里提供会提供delayed metrics的两个示例reward functions：
 
  **1.深度指标（Depth metrics）**
  
- 由于无限下刷机制，浏览的深度是在feed流场景下的一个特殊指标器（special indicator），它会与其它类型的推荐相区别。在观看了第t个feed之后，如果用户仍然在系统中并且继续下刷，系统会对该feed进行reward。直觉上，depth $$m_t^d$$的metric可以被定义成：
+ 由于无限下刷机制，浏览的深度是在feed流场景下的一个特殊指标器（special indicator），它会与其它类型的推荐相区别。**在观看了第t个feed之后，如果用户仍然在系统中并且继续下刷，系统会对该feed进行reward**。直觉上，depth $$m_t^d$$的metric可以被定义成：
  
  $$
  m_t^d = \#scans(f_t)
@@ -120,7 +120,7 @@ delayed metrics包括：browsing depth、dwell time、user revisit等。这些me
  
  **2.返回时间指标（Return time metric）**
 
-当用户对推荐items很满意时，通常他会更经常性地使用该系统。因此，在两个visits间的间隔时间（interval time）可以影响系统的用户满意度。return time $$m_t^r$$可以被设计成时间的倒数（reciprocal of time）:
+当用户对推荐items很满意时，通常他会更经常性地使用该系统。因此，**在两个visits间的间隔时间（interval time）可以影响系统的用户满意度**。return time $$m_t^r$$可以被设计成时间的倒数（reciprocal of time）:
 
 $$
 m_t^r = \frac{\beta}{v^r}
@@ -134,6 +134,8 @@ $$
 从以上示例（click metric、depth metric以及return time metrics），我们可以清楚看到：$$m_t = [m_t^c, m_t^d, m_t^r]^T$$。注意，在MDP setting中，累积收益（cumulative rewards）是可以被最大化的，也就是说，我们实际上对总浏览深度（total browsing depth）、未来访问频次进行最优化，它们通常是long term user engagement。
 
 # 4. 推荐系统的Policy learning
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/26369f739ff807a8b118354b1e416df460252278187c9c65805de5c09d65d8c7f62c64f320d81704a0cafbb212b05088?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
 
 为了估计future reward（例如：未来用户粘性），对于推荐项$$I_T$$的expected long-term user engagement会使用Q-value进行表示：
 
@@ -208,6 +210,10 @@ $$
 
 为了捕获我变的用户行为信息，所有rough behaviors会顺序feed到raw Behavior Embedding layer中。在实际中，特定user actions的数目是极其不均的（例如：点击数要少于skips数）。因此，直接利用raw Behavior Embedding Layer的output会造成Q-Network从sparse user behaviors中丢失信息，例如：购买信息会被skips信息会淹没。另外，每种类型的用户行为具有它自己的特性：在一个item上的点击，通常能表示用户当前的偏好，在一个item上的购买会暗示着用户兴趣的转移（shifting），而skip的因果关系更复杂，可能是：随意浏览（casual browsing）、中立（neutral）、或者觉得不喜欢（annoyed）等。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/d88691f81fb7871366edec32deea98281167847102621f70f9ce81c9342072e6d7175ac5b363754b93bc4d2eefc19331?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
+
+图1
+
 为了更好表示user state，如图1所示，我们提供一种hierarchical behavior layer来加到raw beahiors embedding layers中，主要的用户行为，比如：click、skip、purchase会使用不同的LSTM pipelines进行独立跟踪：
 
 $$
@@ -236,7 +242,13 @@ $$\theta_q$$的值会通过SGD进行更新，梯度计算如等式(5)所示。
 
 有了Q-learning based framework，在学习一个稳定的推荐policy之前，我们在模型中通过trial&error search来训练参数。然而，由于部署不满意policies的开销以及风险，对于在线训练policy几乎是不可能的。一个可选的方式是，在部署前使用logged data D训练一个合适的policy，它通过一个logging policy $$\pi_b$$收集到。不幸的是，等式(4)的Q-Learning framework会到到Deadly Trial问题，当对函数近似（function approximation）、bootstrapping以及offline training进行组合时，会出现这种不稳定和差异问题。
 
-为了避免在offline Q-Learning中的不稳定和差异问题，我们进一步引入一个user simulator（指的是S-Network），它会对environment进行仿真，并帮助policy learning。特别的，在每轮推荐中，会使用真实user feedback进行对齐（aligning），S-Network需要生成用户的响应$$f_t$$、dwell time $$d_t$$、revisited time $$v^r$$，以及一个二元变量$$L_T$$，它表示用户是否会离开平台。如图2所示，simulated user feedback的生成使用S-Network $$S(\theta_s)$$，它是一个multi-head neural network。State-action embedding被设计在与Q-Network中相同的结构中，但具有独立的参数。layer $$(s_t, i_t)$$会跨所有任务进行共享，其它layer （图2中的$$(s_t, i_t)$$）是task-specific的。因为dwell time和用户的feedback是inner-session的行为，$$\hat{f}_t$$和$$\hat{d}_t$$的计算如下：
+为了避免在offline Q-Learning中的不稳定和差异问题，我们进一步引入一个user simulator（指的是S-Network），它会对environment进行仿真，并帮助policy learning。特别的，在每轮推荐中，会使用真实user feedback进行对齐（aligning），S-Network需要生成用户的响应$$f_t$$、dwell time $$d_t$$、revisited time $$v^r$$，以及一个二元变量$$L_T$$，它表示用户是否会离开平台。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c96a7a2308732a16a3b6fb62e716c7815dcf4d978b10cf5ee1bb4808fb32f88a07e8b2dcca1f1fb36973bce7066b8fad?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
+
+图2
+
+如图2所示，simulated user feedback的生成使用S-Network $$S(\theta_s)$$，它是一个multi-head neural network。State-action embedding被设计在与Q-Network中相同的结构中，但具有独立的参数。layer $$(s_t, i_t)$$会跨所有任务进行共享，其它layer （图2中的$$(s_t, i_t)$$）是task-specific的。因为dwell time和用户的feedback是inner-session的行为，$$\hat{f}_t$$和$$\hat{d}_t$$的计算如下：
 
 $$
 \hat{f}_t = softmax(W_f x_f + b_f) \\
