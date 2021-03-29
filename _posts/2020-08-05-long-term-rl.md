@@ -11,7 +11,10 @@ Engagement in Recommender Systems》对long-term engagement做了建模。
 
 # 摘要
 
-Feed streaming机制在推荐系统中广泛被采用，特别是移动Apps。Feed streaming seting提供用户无限feeds的交互形式。这种形式下，一个好的推荐系统会更关注用户的粘性，这与经典的instant metrics相差较远，通常以long-term user engagement的方式进行measure。直接对long-term engagement直行优化是一个non-trivial问题，因为learning target通常不能由传统的supervised learning方法提供。尽管RL天然适配最大化long term rewards的问题，应用RL来最优化long-term user engagement仍然面临着以下挑战：用户行为是多变的，它通常包含两者：instant feedback（比如：clicks）以及delayed feedback（比如：停留时长（dwell time）,再次访问（ revisit））；另外，执行有效的off-policy learning仍然不成熟，特别是当结合上bootstrapping和function approximation时。
+Feed流机制在推荐系统中广泛被采用，特别是移动Apps。Feed streaming setting提供用户无限feeds的交互形式。这种形式下，**一个好的推荐系统会更关注用户的粘性，通常以long-term user engagement的方式进行measure**。这与经典的instant metrics相差较大。直接对long-term engagement直行优化是一个non-trivial问题，因为learning target通常不能由传统的supervised learning方法提供。尽管RL天然适合于对long term rewards最大化的最优化问题，应用RL来最优化long-term user engagement仍然面临着以下挑战：
+
+- 用户行为是多变的，它通常包含两者：**instant feedback（比如：clicks）**以及**delayed feedback（比如：停留时长（dwell time）,再次访问（revisit））**；
+- 另外，执行有效的off-policy learning仍然不成熟，特别是当结合上bootstrapping和function approximation时。
 
 为了解决该问题，在该工作中，我们引入了一个RL framework——FeedRec来最优化long-term user engagement。FeedRec引入了两个部分：
 
@@ -22,12 +25,12 @@ Feed streaming机制在推荐系统中广泛被采用，特别是移动Apps。Fe
 
 # 介绍
 
-推荐系统通过建议最匹配用户需求和喜好的商品，在信息搜索任务中帮助用户进行发现。最近，用户可以浏览由无限刷的feeds流生成的items，比如：Yahoo News的新闻流，Facebook的social流，Amazon的商品流。特别的，当与商品流交一旨，用户会点击items，并浏览items的详情。同时，用户可能也会跳过不够吸引人的items，并继续下刷，也有可能由于过多冗余的、不感兴趣的items的出现而离开系统。在这样的环境下，优化点击（clicks）不再是黄金法则。最大化用户的交互满意度，有两部分：
+推荐系统通过建议最匹配用户需求和喜好的商品，在信息搜索任务中帮助用户进行发现。最近，用户可以浏览由无限刷的feeds流生成的items，比如：Yahoo News的新闻流，Facebook的social流，Amazon的商品流。特别的，**当与商品流交互时，用户会点击items并浏览items的详情。同时，用户可能也会跳过不够吸引人的items，并继续下刷，并有可能由于过多冗余的、不感兴趣的items的出现而离开系统**。在这样的环境下，优化点击（clicks）不再是黄金法则。最大化用户的交互满意度，有两部分：
 
 - instant engagement（比如：click）
 - long-term engagement（比如：粘性 stickiness）：通常表示用户会继续更长时间停留在streams上，并在后续重复打开streams
 
-然而，大多数传统的推荐系统只关注于优化instant metrics（比如：CTR：点击率、CVR：转化率 conversion rate）。随着更深的交互，一个商品feed流推荐系统应不仅带来更高的CTR，同时也能保持用户与系统的活跃度。Delayed metrics通常更复杂，包括：在Apps上的dwell time，page-view的深度，在两个visits间的internal time等。不幸的是，由于建模delayed metrics的难度，直接优化delayed metrics非常具有挑战性。而一些前置工作[28]开始研究一些long-term/delayed metrics的最优化，希望找到一种系统解决方案来最优化overall engagement metrics。
+然而，大多数传统的推荐系统只关注于优化instant metrics（比如：CTR：点击率、CVR：转化率 conversion rate）。随着更深的交互，一个商品feed流推荐系统应不仅带来更高的CTR，同时也能保持用户与系统的活跃度。**Delayed metrics通常更复杂，包括：在Apps上的dwell time，page-view的深度，在两个visits间的internal time等**。不幸的是，由于建模delayed metrics的难度，直接优化delayed metrics非常具有挑战性。而一些前置工作[28]开始研究一些long-term/delayed metrics的最优化，希望找到一种系统解决方案来最优化overall engagement metrics。
 
 直觉上，RL天生是最大化long-term rewards的，可以是一个unified framework来最优化instant和long-term user engagement。使用RL来最优化long-term user engagement本身并不是一个non-trivial问题。正如提到的，long-term user engagement是非常复杂的（例如：在多变行为上的measure，比如：dwell time, revisit），需要大量的enviroment interactions来建模这样的long term行为，并有效构建一个推荐agent。作为结果，通过在线系统从头构建一个recommender agent的代价很高，因为许多与不成熟的推荐agent的交互会伤害用户体验，甚至惹恼用户。另一种可选的方法是利用logged data构建一个离线的recommender agent，其中，off-policy learning方法会缓和trial-and-error search的开销。不幸的是，在实际推荐系统中，包括Monte Carlo(MC)和temporal difference(TD)在内的当前方法，对于offline policy learning具有缺陷：MC-based方法会有high variance的问题，尤其是在实际应用中当面对大量action space（例如：数十亿candidate items）；TD-based方法可以通过使用bootstrapping技术在估计时提升效率，然而，会遇到另一个大问题：Deadly Triad（致命的三）：例如：当将function approximation、bootstrapping、offline training给合在一起时，会引起不稳定（instability）和分歧（divergence）问题。不幸的是，推荐系统中的SOTA方法，使用neural结构设计，在offline policy learning中会不可避免地遇到Deadly Triad问题。
 
