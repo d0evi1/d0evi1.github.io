@@ -184,13 +184,13 @@ Q-network的设计对于性能很重要。在long-term user engagement最优化�
 该layer的目的是，采用所有raw behavior信息，它们与long term engagement有关，来distill用户的state以便进一步最优化。给定observation $$s_t= \lbrace u, (i_1, f_1, d_1) \cdots, (i_{t-1}, f_{t-1}, d_{t-1}) \rbrace$$，我们让$$f_t$$是在$$i_t$$上所有用户行为的可能类型，包括：点击、购买、跳过、离开等，其中$$d_t$$是该行为的dwell time。$$\lbrace i_t \rbrace$$的整个集合首先被转成embedding vectors $$\lbrace i_t \rbrace$$。为了表示将信息feedback给item embedding，我们将$$\lbrace i_t \rbrace$$投影到一个feedback-dependent空间中，通过使用一个projection matrix来对embedding进行乘积，如下：
 
 $$
-i_t^' = F_{f_t} i_t
+i_t^{'} = F_{f_t} i_t
 $$
 
 其中，$$F_{f_t} \in R^{H \times H}$$是对于一个特定feedback $$f_t$$的投影矩阵，为了进一步建模时间信息，会使用一个time-LSTM来跟踪user state随时间的变化：
 
 $$
-h_{r, t} = Time-LSTM(i_t^', d_t)
+h_{r, t} = Time-LSTM(i_t^{'}, d_t)
 $$
 
 ...(6)
@@ -198,9 +198,9 @@ $$
 其中，Time-LSTM会建模dwell time，通过引入一个由$$d_t$$控制的time gate：
 
 $$
-g_t = \sigma(i_t^', W_{ig} + \sigma(d_t W_{gg}) + b_g) \\
-c_t = p_t \odot c_{t-1} + e_t \odot g_t \odot \sigma(i_t^' W_{ic} + h_{t-1} W_{hc} + b_c) \\
-o_t = \sigma(i_t^' W_{io} + h_{t-1} W_{ho} + w_{co} \odot c_t + b_o)
+g_t = \sigma(i_t^{'}, W_{ig} + \sigma(d_t W_{gg}) + b_g) \\
+c_t = p_t \odot c_{t-1} + e_t \odot g_t \odot \sigma(i_t^{'} W_{ic} + h_{t-1} W_{hc} + b_c) \\
+o_t = \sigma(i_t^{'} W_{io} + h_{t-1} W_{ho} + w_{co} \odot c_t + b_o)
 $$
 
 其中，$$c_t$$是memory cell。
