@@ -6,17 +6,17 @@ modified: 2019-11-23
 tags: 
 ---
 
-在《Modeling and Simultaneously Removing Bias via Adversarial Neural Networks》paper中：
+microsoft在《Modeling and Simultaneously Removing Bias via Adversarial Neural Networks》paper中提出了一种使用adversarial network解决position bias的方法：
 
 # 介绍
 
-在online广告系统中，需要对给定一个query估计一个ad的ctr，或PClick。使用该PClick估计以及一个广告主的bid，我们可以运行一个auction来决定在一个页面上的什么位置放置ads。这些ad的曝光(impressions)以及他们相应的features被用来训练新的PClick模型。这里，在线广告会存在feedback loop问题，其中：之前看到过的ads会占据着traing set，在页面上越高位置的ads会由大部分正样本(clicks)组成。**该bias使得在所有ads、queries以及positions（或D）上估计一个good PClick很难，因为features的比例过高（overrepresentation）与高CTR占据feature space有关**。
+在online广告系统中，需要对给定一个query估计一个ad的ctr，或PClick。通过结合该PClick估计以及一个广告主的bid，我们可以运行一个auction来决定在一个页面上的哪个位置放置ads。这些ad的曝光(impressions)以及他们相应的features被用来训练新的PClick模型。这里，**在线广告会存在feedback loop问题**，其中：之前看到过的ads会占据着training set，在页面上越高位置的ads会由大部分正样本(clicks)组成。**该bias使得在所有ads、queries以及positions（或D）上估计一个好的PClick很难，因为features的比例过高（overrepresentation）与高CTR占据feature space有关**。
 
-我们假设：在一个page上的position（例如：mainline、sidebar或bottom）可以概括PClick bias的一大部分。实际上，我们的目标是学习一个PClick表示，它对于一个ad展示的position是不变的（invariant），也就是说，所有potential ads对于给定页面上的一个位置，仍然会是单一的相对排序。尽管我们可以很容易地使用一个linear function来强制在position features，但其它features的intrinsic bias相对于position来说更难被移除。
+我们假设：在一个page上的position（例如：mainline、sidebar或bottom）可以概括PClick bias的一大部分。实际上，我们的目标是学习这样的一个PClick表示：它对于一个ad展示的position是不变的（invariant），也就是说，**所有potential ads对于给定页面上的一个位置，仍然会是单一的相对排序**。尽管我们可以很容易地使用一个linear function来强制在position features，但其它features的intrinsic bias相对于position来说更难被移除。
 
-为了学习这种position invariant feature的PClick模型，我们使用ANNs（adversarial neural networks）。ANNs会使用competing loss functions来进行建模，它在tandem（[6]）下进行最优化，最近的工作[1,9]有使用它们进隐藏或加密数据。我们的ANN representation包括了4个networks：Base、Prediction、Bias、以及Bypass Networks（图1）。最终在线使用的PClick prediction是来自Bypass和Prediction networks的outputs的一个线性组合的结果，它用来预测$$\hat{y}$$。然而，在训练这些predictors期间，会使用Bias network adversary(对手)进行竞争。该Bias network只使用由Base network生成的low rank vector $$Z_A$$，尝试对position做出预测。相应的，Prediction、Bypass和Base networks会最优化一个augmented loss function，它会对Bias network进行惩罚。结果是，在传给Prediction network之前，vector $$Z_A$$与position无关。
+为了学习这种位置不变特性（position invariant feature）的PClick模型，我们使用ANNs（adversarial neural networks）。ANNs会使用competing loss functions来进行建模，它在tandem（[6]）下进行最优化，最近的工作[1,9]有使用它们进隐藏或加密数据。我们的ANN representation包括了4个networks：Base、Prediction、Bias、以及Bypass Networks（图1）。最终在线使用的PClick prediction是来自Bypass和Prediction networks的outputs的一个线性组合的结果，它用来预测$$\hat{y}$$。然而，在训练这些predictors期间，会使用Bias network adversary(对手)进行竞争。该Bias network只使用由Base network生成的low rank vector $$Z_A$$，尝试对position做出预测。相应的，Prediction、Bypass和Base networks会最优化一个augmented loss function，它会对Bias network进行惩罚。结果是，在传给Prediction network之前，vector $$Z_A$$与position无关。
 
-克服position/display biases的另一个方法是，使用multi-armed bandit方法来帮助生成更少的无偏训练数据以及covariate shift。然而，两都都需要来自一个exploration set中的大量样本来生成更好的估计。实际上，很难获得足够量的exploration data，因为它通常会极大影响收益。我们的ANN方法无需exploration，可以应用于已存在的dataset。
+**克服position/display biases的另一个方法是：使用multi-armed bandit方法来帮助生成更少的无偏训练数据以及covariate shift**。然而，两者都需要来自一个exploration set中的大量样本来生成更好的估计。实际上，很难获得足够量的exploration data，因为它通常会极大影响收益。我们的ANN方法无需exploration，可以应用于已存在的dataset。
 
 为了测试模型的有效性，我们会在真实数据集和伪造实验上进行评估。我们会生成两个伪造数据集集合，并模拟online ads系统的feedback loop，并展示systematic和user position biases可以通过ANN进行处理，并生成更精准的估计。
 
@@ -31,42 +31,49 @@ tags:
 
 # 2.在付费搜索中的position bias
 
-ML应用中的feedback问题是常见的。为了演示它，我们主要关注付费广告搜索中的CTR或PClick问题。一个标准的Ad selection stack包括了一个选择系统（selection system），一个模型阶段（model phase），一个竞价阶段（auction phase）[7]。selection system会决定ads的一个子集来传给model。model会尝试估计在分布D上的完全概率密度函数，它是整个Ads、Queries、Positions space。特别的，我们会估计$$P(Click \mid Ad, Queries, Positions\ space)$$ 。在auction阶段，广告主会对关键词竞价（bid）并对queries进行匹配。Ads和他们的positions会最终由PClicks和广告主bids所选择。我们主要关注model phase或PClick model。
+ML应用中的feedback问题是常见的。为了演示它，我们主要关注付费广告搜索中的CTR或PClick问题。一个标准的Ad selection stack包括了：
 
-出于许多原因，很难估计D。首先，一个在线Ads系统会从D中抽样一个小量的有偏部分。机器学习模型会使用许多features跨Ad和Query上进行估计PClick。许多丰富的features是counting features，它会会跨Ad和QUERY的过往进行统计信息（比如：该Ad/Query组合在过去的点击百分比）。Query Ad pairs经常出现在Ad stack中，它们具有丰富的informative feature信息：然而，从未见过或者很少见过的Query Ad pairs并没有这些丰富的信息。因而，对于一个模型来说，保证一个Query Ad pair的ranking在online之前没有展示过很难，这会导致feedback loop。
+- 选择系统（selection system）：selection system会决定ads的一个子集来传给model
+- 模型阶段（model phase）：model会尝试估计在分布D上的完全概率密度函数，它是整个Ads、Queries、Positions space。特别的，我们会估计$$P(Click \mid Ad, Queries, Positions\ space)$$ 。
+- 竞价阶段（auction phase）[7]：在auction阶段，广告主会对关键词竞价（bid）并对queries进行匹配。Ads和他们的positions会最终由PClicks和广告主bids所选择。我们主要关注model phase或PClick model。
+
+出于许多原因，很难估计D。首先，一个在线Ads系统会从D中抽样一个小量的有偏部分。机器学习模型会使用许多features跨<Ad,Query>上进行估计PClick。许多丰富的features是counting features，它会会跨<Ad,QUERY>的过往进行统计信息（比如：该Ad/Query组合在过去的点击百分比）。Query Ad pairs经常出现在Ad stack中，它们具有丰富的informative feature信息：然而，**从未见过或者很少见过的Query Ad pairs并没有这些丰富的信息。因而，对于一个模型来说，保证一个Query Ad pair在online之前没有展示过很难进行ranking，这会导致feedback loop**。
 
 第二，一个feedback loop会在training data和PClick model间形成。新的training data或ads会由之前的model的ranking顺序展示，一个新的PClick model会从之前的training data中生成。因而，**产生的Feedback Loop(FL)会偏向于过往的模型和训练数据**。
 
-Position CTR，$$P(y \mid Position = p)$$是一个ad在一个页面上给定某个位置的点击概率。这会通过对在给定位置中展示的ads的CTRs做平均计算得到。具有越高ranked positions的Ads一般也会生成更高的CTRs。之前的工作尝试建模或解释为什么存在position bias【5】。在我们的setting中，我们假设：过往ads的$$P(y \mid Position = p)$$会总结在一个在线广告系统中存在的这些issues，因为具有越高Position CTR的ads，也越可能具有一个高比例与high PClicks相关的features。
+Position CTR，$$P(y \mid Position = p)$$是一个ad在一个页面上的给定位置p的点击概率。**这可以通过对在给定位置中展示的ads的CTRs做平均计算得到。具有越高ranked positions的Ads一般也会生成更高的CTRs**。之前的工作尝试建模或解释为什么存在position bias【5】。在我们的setting中，我们假设：过往ads的$$P(y \mid Position = p)$$会总结在一个在线广告系统中存在的这些issues，因为具有越高Position CTR的ads，也越可能具有与high PClicks更强相关的特性。
 
-在理想的情况下，一个PClick模型只会使用来自D中的一个大量的RUS数据（randomly and uniformly sampled data）。一个在线Ads stack的核心目标是：广告收入（ad revenue）。实际上，不可能获得一个大的随机抽样数据集，因为online展示许多随机的Ads和queries pair在代价太高。
+在理想情况下，一个PClick模型只会使用来自D中的一个大量的**随机且均匀抽样数据（RUS数据：randomly and uniformly sampled data）**。一个在线Ads stack的核心目标是：广告收入（ad revenue）。实际上，不可能获得一个大的随机抽样数据集，因为online展示许多随机的Ads和queries pair在代价太高。
 
 # 3.背景
 
 ## 3.1 在线广告
 
-biased FL的训练数据问题，可以通过multi-armed bandits来缓解。multi-armed bandits问题的核心是：寻找一个合理的Exploration & Exploitation的trade off。
+biased FL的训练数据问题，可以通过multi-armed bandits来缓解。multi-armed bandits问题的核心是：**寻找一个合理的Exploration & Exploitation的trade off**。
 
-在付费搜索广告的context中，会拉取一个arm，它对应的会选择一个ad进行展示。Exploration实际上意味着具有较低点击概率估计的ads，会导致在short-term revenue上的一个潜在损失（potential loss）。Exploitation偏向于那些具有最高概率估计的ads，会产生一个立即的广告收入的增益。
+在付费搜索广告的context中，会拉取一个arm，它对应的会选择一个ad进行展示。
+
+- Exploration实际上意味着**具有较低点击概率估计的ads**，会导致在short-term revenue上的一个潜在损失（potential loss）。
+- Exploitation偏向于那些**具有最高概率估计的ads**，会产生一个立即的广告收入的增益。
 
 Bandit算法已经成功出现在展示广告文献、以及其它新闻推荐等领域。由于简洁、表现好，Thompson sampling是一个流行的方法，它对应的会根据最优的概率抽取一个arm。
 
-这些方法在该假设下工作良好，可以探索足够的广告。在在线机器学习系统中，medium-term和short-term revenue的损失是不可接受的。我们可以获取exploration data的一个小抽样，但通常获得足够多的exploration data开销很大，它们受训练数据极大影响。因此，大量biased FL data仍然会被用于训练一个模型，这个问题仍存在。
+这些方法在该假设下工作良好，可以探索足够的广告。在在线机器学习系统中，medium-term和short-term revenue的损失是不可接受的。**我们可以获取exploration data的一个小抽样，但通常获得足够多的exploration data开销很大，它们受训练数据极大影响**。因此，大量biased FL data仍然会被用于训练一个模型，这个问题仍存在。
 
-另一种解决该问题的方法是：回答一个反事实的问题（answering the conterfactual question）[2]。Bottou et al.展示了如何使用反事实方法。该方法不会直接尝试最优化从D上的抽样数据的效果，而是估计PCLick models在过往表现有何不同。作者开发了importance sampling技术来估计具有置信区间的关于兴趣的conterfactual expcectations。
+另一种解决该问题的方法是：回答一个反事实的问题（answering the conterfactual question）[2]。Bottou et al.展示了如何使用反事实方法。该方法不会直接尝试最优化从D上的抽样数据的效果，而是估计PCLick models在过往表现有何不同。作者开发了importance sampling技术来估计具有置信区间的关于兴趣的conterfactual expectations。
 
 Covariate shift是另一个相关问题，假设：$$P(Y \mid X)$$对于训练和测试分布是相同的，其中：Y是labels，X是features。然而，p(X)会随着training到testing分布发生shifts或者changes。与counterfactual文献相似，它会对loss function进行rebalance，通过在每个实例上乘以$$w(x)=\frac{p_{test}(x)}{p_{train}(x)}$$，以便影响在test set上的变化。然而，决定w(x)何时test set上不会具有足够样本变得非常困难。在我们的setting中RUS dataset不足够大来表示整个分布D。
 
 ## 3.2 Adversarial Networks
 
-对抗网络（Adversarial networks）在最近变得流行，特别是在GANs中作为generative models的一部分。在GANs中，目标是构建一个generative model，它可以通过并行最优化在一个generator和discriminator network间的两个loss functions，从一些domain中创建真实示例。
+对抗网络（Adversarial networks）在最近变得流行，特别是在GANs中作为generative models的一部分。在GANs中，目标是构建一个generative model，它可以通过同时对在一个generator和discriminator network间的两个loss functions进行最优化，从一些domain中可以创建真实示例。
 
-Adversarial networks也会用于其它目的。[1]提出使用Adversarial networks来生成某些级别的加密数据。目标是隐藏来自一个adversary的信息，
+Adversarial networks也会用于其它目的。[1]提出使用Adversarial networks来生成某些级别的加密数据。目标是隐藏来自一个adversary的信息，。。。略
 
 
 # 4.方法描述
 
-给定一个biased Feedback Loop的training set我们描述了一种ANN结构来生成精准的PClick预测 $$\hat{y}$$。我们假设一个连续值特征b，它会对该bias进行归纳。我们将b定义成在Ads context中的position CTR或$$P(y \mid Position=p)$$。一个input features集合X通常与b弱相关。
+给定一个biased Feedback Loop的training set我们描述了一种ANN结构来生成精准的PClick预测 $$\hat{y}$$。我们假设一个连续值特征b，它会对该bias进行归纳。**我们将b定义成在Ads context中的position CTR或$$P(y \mid Position=p)$$。一个input features集合X通常与b弱相关**。
 
 ## 4.1 网络结构
 
@@ -74,9 +81,14 @@ Adversarial networks也会用于其它目的。[1]提出使用Adversarial networ
 
 图1
 
-ANN表示包括了如图1所示的4部分：Base network、Predction network、Bias network、以及一个Bypass Network，该networks的每一部分具有参数：$$\theta_A, \theta_Y, \theta_B, \theta_{BY}$$。第一个组件，Base和Prediction networks，会独立地对b进行最优化；第二个组件，Bypass network，只依赖于b。通过以这种方式解耦模型，ANN可以从bias存在时的data进行学习。
+ANN表示包括了如图1所示的4部分：Base network、Predction network、Bias network、以及一个Bypass Network，该networks的每一部分具有参数：$$\theta_A, \theta_Y, \theta_B, \theta_{BY}$$。
 
-Bypass结构会直接使用B，它通过包含它的最后的hidden state $$Z_{BY}$$作为在等式1的最后sigmoid prediction函数中的一个linear term。最终的hidden states的集合用于预测$$\hat{y}$$将包含一个来自Prediction和Bypass Network的线性组合。假设：
+- 第一个组件，Base和Prediction networks，会独立地对b进行最优化；
+- 第二个组件，Bypass network，只依赖于b。
+
+通过以这种方式解耦模型，ANN可以从bias存在时的data进行学习。
+
+Bypass结构会直接使用b，它通过包含它的最后的hidden state $$Z_{BY}$$作为在等式1的最后sigmoid prediction函数中的一个linear term。最终的hidden states的集合用于预测$$\hat{y}$$将包含一个来自Prediction和Bypass Network的线性组合。假设：
 
 $$
 \hat{y} = sigmoid(W_Y Z_Y + W_{BY} Z_{BY} + c)
@@ -93,17 +105,26 @@ $$
 
 在b上的linear bypass strategy，当直接包含b时，允许ANN独立建模b，并保留在b上相对排序（relative ranking）
 
-给定X，Base Network会输出一个hidden activations的集合，$$Z_A$$会将输入feed给Prediction和Bias networks，如图1所示。$$Z_A$$用于预测y效果很好，而预测b很差。
+给定X，Base Network会输出一个hidden activations的集合，$$Z_A$$会将输入feed给Prediction和Bias networks，如图1所示。**$$Z_A$$用于预测y效果很好，而预测b很差**。
 
 ## 4.2 Loss functions
 
-为了完成hidden activations的期望集合，我们会最小化两个competing loss函数：bias loss: $$Loss_B$$、noisy loss：$$Loss_N$$
+为了完成hidden activations的期望集合，我们会最小化两个competing loss函数：
+
+- bias loss: $$Loss_B$$
+- noisy loss：$$Loss_N$$
+
+其定义分别如下：
+
+bias loss:
 
 $$
 Loss_B(b, \hat{b}; \theta_B) = \sum\limits_{i=0}^n (b_i - \hat{b}_i)^2
 $$
 
 ...(2)
+
+noisy loss:
 
 $$
 Loss_N(y, \hat{y}, b, \hat{b}; \theta_A, \theta_{BY}, \theta_Y) = (1-\lambda) Loss_Y(y, \hat{y}) + \lambda \cdot Cov_B(b, \hat{b})^2
@@ -139,16 +160,21 @@ $$Cov_B(b, \hat{b})^2$$表示来自预测噪声的距离$$\hat{b}$$。squared co
 
 ## 4.4 在线inference
 
-为了在一个online setting上预测，我们会忽略Bias network，并使用其它三个networks来生成predictions： $$\hat{y}$$ . 在在线广告系统中，对于在过去在线没有看到过的数据，我们将b设置为Position 1 CTR，接着它们会feed到Bypass network中。
+为了在一个online setting上预测，我们会忽略Bias network，并使用其它三个networks来生成predictions： $$\hat{y}$$ . **在在线广告系统中，对于在过去在线没有看到过的数据，我们将b设置为Position 1 CTR，接着它们会feed到Bypass Network中**。
 
 # 5.系统级bias的人工评估
-
 
 我们会生成人造数据来展示自然的feedback loop或者在在线广告stack中出现的system level bias。我们首先根据一个bernoulli（概率为：$$P(Y=1)=0.1$$）生成click labels，其中Y=1表示一个点击的ad。接着，feature vectors $$x_j$$会从两个不同但重合的正态分布上生成，根据：
 
 $$
-...
+x_j = 
+\begin{cases}
+N(0, \sigma), & \text{if $Y=0$} \\
+N(1, \sigma), & \text{if $Y=1$}
+\end{cases}
 $$
+
+其中，我们设置$$\sigma=3$$。
 
 这会构成一个完全分布D，会采用10w样本来构建一个大的Reservoir dataset。我们接着表示通过仿真一个迭代过程来表示feedback loop，其中之前的top ranked $$x_j$$（或ads）被用于训练数据来对下一个ads进行排序。图2和3展示了这个feedback loop过程，算法2演示了该仿真。
 
