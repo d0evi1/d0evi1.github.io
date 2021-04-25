@@ -17,7 +17,15 @@ CTR预测是为了估计一个用户在特定context上、在某个推荐item上
 然而，每件事都有两面。为了达到良好的性能，Deep CTR模型具有复杂的结构，需要在大量训练数据上进行训练许多epochs，因此它们都会具有较低的训练效率。当模型不能及时生成时，这样低效的训练（很长训练时间）会导致效果下降。我们在Hauwei AppGallery上进行app推荐时观察到，当模型停止更新时，这样的效果如图1所示。实例，如果模型停止更新5天，模型效果在AUC上会下降0.66%，这会导致收益和用户体验的极大损失。因此，如何提升Deep CTR模型的训练效率并且不伤害它的效果是在推荐系统中的一个必要问题。**分布式学习(Distributed learning)和增量学习( incremental
 learning )**是两种常见范式来解决该问题。分布式学习需要额外的计算资源，需要将训练数据和模型分布到多个节点上来加速训练。在另一方面，增量学习会更改训练过程：从batch mode到increment mode，它会利用最近的数据来更新当前模型。然而，工业界推荐系统的大多数deep models是以batch模式进行训练的，它会使用一个fixed-size window的训练数据来迭代训练模型。在本工作中，我们主要关注incremental方法来训练deep CTR模型，它的目标是极大提升训练效率，并且不降低模型表现。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/cf052a3b652df34d8123ce0331fdea684616ee472b6b4bf87137726196ad63f444ffce41fb1f2ad96cb5e6636e0ea177?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
+
+图1
+
 然而，大多数incremental learning方法主要关注于图片识别领域，其中：新的任务或clesses会随时间被学习。而incremental learning方法在图片识别上面临着不同的状况，比如：刚来的new features等，因此，没有必要研究该话题。在本paper中，我们提出一个实用的incremental方法：IncCTR。如图2所示，三种解耦的模块被集成到我们的模型中：Data Module、Feature Module以及Model Module。Data Module会模拟一个水库（reservoir）的功能，从历史数据和incoming数据中构建训练数据。Feature module被设计成处理来自incoming data的新features，并初始化已经存在的features和new features。Model模块会部署知识蒸馏（knowledge distillation）来对模型参数进行fine-tune，并对来自之前模型的知识与来自incoming data的知识的学习进行balance。更特别的，对于teacher model我们会观察两种不同的选择。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/3c13de63c66efd6087f8bcedd94a460a6c0bdab1213dd599e6c2d9ee58264660435da5fc0abf20a5f672f3734324e2e5?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
+
+图2
 
 主要贡献如下：
 
@@ -43,6 +51,10 @@ paper的其余部分组织如下。在第2节，我们引入先决条件来更�
 
 在batch mode下进行训练的模型会基于一个fixed-size time window的数据进行迭代式学习。当新数据到来时，time window会向前滑动。如图3所示，“model 0”会基于day 1到day 10的数据进行训练。接着，当新数据（"day 11"）到来时，一个新模型（称为“model 1”）会基于day 2到day 11的数据进行训练。相似的，“model 2”会基于day 3到day 12.
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b174caaee9dc06a94414bd7f8a827ef0098bd2a867712df169902443943971d4c3b5f6bd258e61a0c04c33ff399e54a3?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
+
+图3
+
 ### 2.2.2 使用Incremental Mode进行训练
 
 在incremental模式下，会基于**已经存在的模型**和**新数据**进行训练。如图3所示，“Model 1”会基于已经存在的模型“Model 0”（它会基于在day 1到day 10上的数据进行训练），以及day 11的数据进行训练。接着，"Model 1"转向已经存在的模型。接着，当day 12的数据到来时，"Model 2"会基于"Model 1"和第day 12的数据进行训练。
@@ -61,9 +73,17 @@ paper的其余部分组织如下。在第2节，我们引入先决条件来更�
 
 然而，使用incremental模式训练会带来额外问题，因为当新数据进来时，新features会出现。如图4所示，new data的每个块都会带来一个特定比例的new features。例如，从criteo数据集上观察到，对比起在该块前存在的features集合，new data的第一块会带来12%的new features，而第14个块仍会带来4%的new features。因此，当新数据进来时，policy F需要自增更新。可能的是，一个feature x，它之前被认为是Others，在new data进来后，如果它的出现次数S[x]大于THR阈值，会被认为是一个唯一的feature。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/088c2627849fe7110a6e86ee2868a832e470ae7b40def4dcc8c350a06af2df9dee131d4b16cfabbc8c19e953e3ad58d0?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=4.jpg&amp;size=750">
+
+图4
+
 在分配合适的ids给所有features后，IncCTR中的feature module会对已存在featurs和new features进行初始化。当我们以batch模式训练时，feature embedding $$\epsilon$$的所有值都会被随机初始化。然而，在incremental模式下，我们会对已存在的features $$\Epsilon_{exist}$$的embedding和new features $$\Epsilon_{new}$$的embeddings独立进行初始化。
 
 feature模块（称为：new feature分配和feature embedding初始化）的功能如算法1所示。当new data进来时，我们首先更新每个feature（第3行）的出现次数，并继承已存在的feature分配策略（第4行）。如果来自new data的一个feature是新的大于该阈值（第6行），它会被添加到该policy中，id会自增1（第7行）。feature embeddings会独立初始化，依赖于一个feature是否为新。对于一个已经存在的feature，它会继承来自已存在模型的embedding作为它的初始化（行11）。这样的继承会将历史数据的知识转移到将自增训练的模型上。对于一个new feature，它的embedding会随机初始化，因为没有先验知识提供（行12）。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/964db874dec99d2f217aec5cf76c16a1dd71ec848cb4973949d6f1ad5ffafa5390c97745863bd46d72b61bbc4d5b1d8e?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=alg1.jpg&amp;size=750">
+
+算法1
 
 ## 3.2 Model模块
 
@@ -73,7 +93,9 @@ feature模块（称为：new feature分配和feature embedding初始化）的功
 
 除了已存在features的embedding外，network参数也从已存在模型继承，作为warm-start。为了使用incremental模式对模型参数进行fine-tune，我们会使用一些auxiliary tricks来达到较好表现。例如，对于$$\Epsilon_{exist}$$我们会使用一个比$$\Epsilon_{new}$$更低的learning rate。fine-tune的训练细节在算法2的第19-第25行进行表示。该模型会通过在prediction和groundtruth间进行最小化cross entropy来进行最优化。我们会对该模型训练一定数目的epochs，其中：经验上我们设置数目epoch为1（第25行）。
 
-算法1
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/fabd8d00538c331ecd49de9455c74756da2b2a50ee125f186b61ef2318236099ca9b4f66d5d990b58c4da3d8d8e8df15?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=alg2.jpg&amp;size=750">
+
+算法2
 
 **知识蒸馏（Knowledge distillation）**
 
