@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 增量训练介绍
+title: 增量训练IncCTR介绍
 description: 
 modified: 2020-08-30
 tags: 
@@ -21,11 +21,15 @@ learning )**是两种常见范式来解决该问题。分布式学习需要额�
 
 图1  当模型停止更新不同天时，模型效果下降的表现。x轴表示training set和test set间的不同gaps
 
-然而，大多数incremental learning方法主要关注于图片识别领域，其中：新的任务或clesses会随时间被学习。而incremental learning方法在图片识别上面临着不同的状况，比如：刚来的new features等，因此，没有必要研究该话题。在本paper中，我们提出一个实用的incremental方法：IncCTR。如图2所示，三种解耦的模块被集成到我们的模型中：Data Module、Feature Module以及Model Module。Data Module会模拟一个水库（reservoir）的功能，从历史数据和incoming数据中构建训练数据。Feature module被设计成处理来自incoming data的新features，并初始化已经存在的features和new features。Model模块会部署知识蒸馏（knowledge distillation）来对模型参数进行fine-tune，并对来自之前模型的知识与来自incoming data的知识的学习进行balance。更特别的，对于teacher model我们会观察两种不同的选择。
+然而，大多数incremental learning方法主要关注于图片识别领域，其中：新的任务或classes会随时间被学习。而incremental learning方法在图片识别上面临着不同的状况，比如：刚来的new features等，因此，没有必要研究该话题。**在本paper中，我们提出一个实用的incremental方法：IncCTR**。如图2所示，三种解耦的模块被集成到我们的模型中：Data Module、Feature Module以及Model Module。
+
+- Data Module：会模拟一个水库（reservoir）的功能，从历史数据和incoming数据中构建训练数据。
+- Feature module：被设计成处理来自incoming data的新features，并初始化已经存在的features和new features。
+- Model模块：会部署知识蒸馏（knowledge distillation）来对模型参数进行fine-tune，并对来自之前模型的知识与来自incoming data的知识的学习进行balance。更特别的，对于teacher model我们会观察两种不同的选择。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/3c13de63c66efd6087f8bcedd94a460a6c0bdab1213dd599e6c2d9ee58264660435da5fc0abf20a5f672f3734324e2e5?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 IncCTR架构总览，其中t表示incremental step
 
 主要贡献如下：
 
@@ -49,11 +53,11 @@ paper的其余部分组织如下。在第2节，我们引入先决条件来更�
 
 ### 2.2.1 使用Batch Mode进行训练
 
-在batch mode下进行训练的模型会基于一个fixed-size time window的数据进行迭代式学习。当新数据到来时，time window会向前滑动。如图3所示，“model 0”会基于day 1到day 10的数据进行训练。接着，当新数据（"day 11"）到来时，一个新模型（称为“model 1”）会基于day 2到day 11的数据进行训练。相似的，“model 2”会基于day 3到day 12.
+在batch mode下进行训练的模型会基于一个fixed-size time window的数据进行迭代式学习。当新数据到来时，time window会向前滑动。如图3所示，“model 0”会基于day 1到day 10的数据进行训练。接着，当新数据（"day 11"）到来时，一个新模型（称为“model 1”）会基于day 2到day 11的数据进行训练。相似的，“model 2”会基于day 3到day 12进行训练。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b174caaee9dc06a94414bd7f8a827ef0098bd2a867712df169902443943971d4c3b5f6bd258e61a0c04c33ff399e54a3?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
 
-图3
+图3 使用Batch Mode进行训练 vs. 使用Incremental Mode进行训练。每个block表示一天的训练数据
 
 ### 2.2.2 使用Incremental Mode进行训练
 
