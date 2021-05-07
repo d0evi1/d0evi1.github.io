@@ -14,12 +14,12 @@ tags:
 
 CTR预测是为了估计一个用户在特定context上、在某个推荐item上的概率。它在个性化推荐系统中扮演着重要角色，特别是在app store的商业化以及在线广告上。现在deep learning方法获得了越来越多的吸引力，因为它在预测性能和自动化特征探索上的优越性。因此，许多工业界公司都会在它们的推荐系统上部署deep ctr模型，比如：google play的Wide&Deep、Huawei AppGallery的DeepFM/PIN，Taobao的DIN和DIEN等。
 
-然而，每件事都有两面。为了达到良好的性能，Deep CTR模型具有复杂的结构，需要在大量训练数据上进行训练许多epochs，因此它们都会具有较低的训练效率。当模型不能及时生成时，这样低效的训练（很长训练时间）会导致效果下降。我们在Hauwei AppGallery上进行app推荐时观察到，当模型停止更新时，这样的效果如图1所示。实例，如果模型停止更新5天，模型效果在AUC上会下降0.66%，这会导致收益和用户体验的极大损失。因此，如何提升Deep CTR模型的训练效率并且不伤害它的效果是在推荐系统中的一个必要问题。**分布式学习(Distributed learning)和增量学习( incremental
+然而，每件事都有两面。为了达到良好的性能，Deep CTR模型具有复杂的结构，需要在大量训练数据上进行训练许多epochs，因此它们都会具有较低的训练效率。当模型不能及时生成时，这样低效的训练（很长训练时间）会导致效果下降。我们在Huawei AppGallery上进行app推荐时观察到，当模型停止更新时，这样的效果如图1所示。**举个例子：如果模型停止更新5天，模型效果在AUC上会下降0.66%，这会导致收益和用户体验的极大损失**。因此，如何提升Deep CTR模型的训练效率并且不伤害它的效果是在推荐系统中的一个必要问题。**分布式学习(Distributed learning)和增量学习( incremental
 learning )**是两种常见范式来解决该问题。分布式学习需要额外的计算资源，需要将训练数据和模型分布到多个节点上来加速训练。在另一方面，增量学习会更改训练过程：从batch mode到increment mode，它会利用最近的数据来更新当前模型。然而，工业界推荐系统的大多数deep models是以batch模式进行训练的，它会使用一个fixed-size window的训练数据来迭代训练模型。在本工作中，我们主要关注incremental方法来训练deep CTR模型，它的目标是极大提升训练效率，并且不降低模型表现。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/cf052a3b652df34d8123ce0331fdea684616ee472b6b4bf87137726196ad63f444ffce41fb1f2ad96cb5e6636e0ea177?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
 
-图1
+图1  当模型停止更新不同天时，模型效果下降的表现。x轴表示training set和test set间的不同gaps
 
 然而，大多数incremental learning方法主要关注于图片识别领域，其中：新的任务或clesses会随时间被学习。而incremental learning方法在图片识别上面临着不同的状况，比如：刚来的new features等，因此，没有必要研究该话题。在本paper中，我们提出一个实用的incremental方法：IncCTR。如图2所示，三种解耦的模块被集成到我们的模型中：Data Module、Feature Module以及Model Module。Data Module会模拟一个水库（reservoir）的功能，从历史数据和incoming数据中构建训练数据。Feature module被设计成处理来自incoming data的新features，并初始化已经存在的features和new features。Model模块会部署知识蒸馏（knowledge distillation）来对模型参数进行fine-tune，并对来自之前模型的知识与来自incoming data的知识的学习进行balance。更特别的，对于teacher model我们会观察两种不同的选择。
 
