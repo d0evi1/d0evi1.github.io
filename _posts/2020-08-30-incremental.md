@@ -136,7 +136,7 @@ KD-batch和KD-self的训练细节在算法2中的第3行到第5行，第11行到
 
 ## 3.3 Data模块
 
-从数据的角色，对于灾难性忘却问题（catastrophic forgetting）一种简单的解决方法是，不只基于new data来训练incremental模型，同时也基于一些选中的historical data。我们计划实现一个data reservoir来提供合适的训练数据给incremental training。在已存在reservoir中的一些比例的数据，和new data会互相交错构成new reservoir。在该模型中，一些问题需要进行确认，比如：在已存在的reservoir中需要保留多少比例的数据。data模块的实验不是为现在完成的，它是要完成框架的将来工作的一部分。
+从数据的视角看，**对于灾难性忘却问题（catastrophic forgetting）一种简单的解决方法是：不只基于new data来训练incremental模型，同时也基于一些选中的historical data**。我们计划实现一个data reservoir来提供合适的训练数据给incremental training。**在existing reservoir中的一些比例的数据，和new data会互相交错构成new reservoir**。在该模型中，一些问题需要进行确认，比如：在已存在的reservoir中需要保留多少比例的数据。data模块的实现目前还没完成，它是要完成框架的将来工作的一部分。
 
 # 4.实验
 
