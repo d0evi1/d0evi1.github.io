@@ -38,6 +38,10 @@ $$
 
 # 3.taobao推荐中的Priviledged features
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b22fed1cbf60e8ea388c3b0acdb93a2b6d3f7dfe5dd29fcea3a6ed612aa3b61ae9163987a84df0346f820d8bf90a0751?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
+
+图2
+
 为了更好地理解priviledged features，我们首先如图2所示给出taobao推荐的一个总览。在工作推荐中通常这么做，我们采用cascaded 学习框架。在呈现给用户给，有3个stages来select/rank items：candidate generation、coarse-grained ranking、fine-grained ranking。为了在效率和accuracy间做出一个好的trade-off，越往前的cascaded stage，会采用复杂和高效的模型，对items进行scoring会具有更高的时延。在candidate generation stage，我们会选择$$10^5$$个用户可能会点击或购买的items。总之，candidate genreation会从多个sources进行混合而来，比如：协同过滤、DNN模型等。在candidate generation之后，我们会采用两个stage进行ranking，其中PFD会在这时使用。
 
 在coarse-grained ranking stage中，我们主要会通过candidate generation stage来估计所有items的CTRs，它们接着被用来选择top-k个最高的ranked items进入到下一stage。预测模型的input主要包含了三个部分。第一部分包括：用户行为，它会记录用户点击/购买items的历史。由于用户行为是有序的，RNNs或self-attention会通常被用来建模用户的long short-term interests。第二部分由user features组成，例如：user id、age、gender等。第三部分由item features组成，例如：item id、category、brand等。通过该工作，所有features都会被转换成categorical type，我们可以为每个feature学习一个embedding。
@@ -55,6 +59,10 @@ $$
 如图2所示，粗排不会使用任何交叉特征，例如：用户在item category上在过去24小时内的点击等。通过实验验证，添加这样的features可能大大提高预测效果。然而，这在serving时会极大地加时延，因为交叉特征依赖user和指定的item。换句话说，features会随着不同的items或users而不同。如果将它们放到等式(3)中的item或user侧。mappings $$\phi_w(\cdot)$$的inference需要执行和候选数一样多的次数，例如：$$10^5$$次。总之，non-linear mapping $$\phi_W(\cdot)$$的计算开销要比简单的inner product大许多阶。在serving期间使用交叉特征是不实际的。**这里，我们将这些交叉特征看成是：在粗排CTR预测的priviledged features**。
 
 在精排阶段，除了估计在粗排中做的CTR外，我们也会估计所有候选的CVR，例如：如果用户点击它，那么会购买该item的概率。在电商推荐中，主要目标是最大化GMV（商品交易总量），它可以被解耦成CTR X CVR X Price。一旦为所有items估计CTR和CVR，我们可以通过expected GMVs来对它们进行排序来最大化。在CVR的定义中，很明显，用户在点击item详情页上的行为（例如：停留时长、是否观看评论、是否与卖者进行交流等），对于预测来说相当有用。然而，在任何future click发生前，CVR必须要对ranking进行估计。描述在详情页上用户行为的features在inference期间并没有提供。这里，我们可以将这些features表示成priviledged features来进行CVR预测。为了更好地理解它们，我们给出图3进行演示。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b58ad836c2911bf16a9f57df68559ef1cb103de2ae1da749a2f2392bdac6be55b7cd7dc2ca863017977999572df45433?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
+
+图3
 
 # 4.Priviledged Feature Distillation
 
@@ -84,15 +92,21 @@ $$
 
 如图1所示，PFD会从priviledged features中distill知识。作为对比，MD会从更复杂的teacher model中distill知识。两个distillation技术是互补的。一个天然扩展是，将它们进行组合来构成一个更复杂的accurate teacher来指导student。
 
-
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/f9fb4b5ff2b9ac858cd7373af569666da70667037fee34aceeb50e633be1a2d29a8f4e657638cebca091349594d2be62?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
 
 图1
 
 在粗排的CTR prediction中，如等式(3)所示，我们使用inner product模型来在serving上增加效率。事实上，inner product模型会被认为是泛化的MF（gnerelized matrix factorization）。尽管我们正使用非线性映射$$\Phi_W(\cdot)$$来转移user和item inputs，该模型能力天然受限于内积操作的bi-linear结构。DNNs，它可以逼近任意函数，被认为是对于在teacher中的inner product模型的一个替代。事实上，如【22】中的定义1所示，乘积操作可以通过一个two-layers的NN（在hidden layer上只有4个neurons）来逼近任意小。因此，使用DNN的表现被认为是inner-product模型的下界（lower-bounded）。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/e19f36cbaacb2ff2b91195b8272b671412ff8d0dcbf2c43110c2fba49932c422cea5bd3b2a9532e14a8ada10d36674c8?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=4.jpg&amp;size=750">
+
 图4
 
 在PFD+MD中，我们也采用DNN模型作为teacher network。事实上，这里的teacher model与我们在精排CTR预测使用的模型相同。本任务中的PFD+MD可以被认为是从精排中distill知识，来提升粗排。为了更好地演示，我们在图4中给出了整个框架。在serving期间，我们会只抽取student部分，它依赖于priviledged features。由于所有items的mappings $$\phi_{W^i} (X^i) $$是与users相互独立的，我们会事先对它们进行离线计算。当一个请求过来时，user mapping $$\phi_{W^u}(X^u)$$会首先计算。这之后，我们会使用所有items的mappings（它们从candidate generation阶段生成）来计算inner-product。top-k得分最高的items接着被选中并被feed给精排。基本上，我们只要执行一个forward pass来获得user mapping，并在user和所有candidates间执行高效地inner product操作，它在计算方面相当友好。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/69034a0bc169479900de0b05e88ff69b9f403f949dde46d24e65a38fcee28547ad58d8b3d9c92e6a506c7d99638fbeed?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=5.jpg&amp;size=750">
+
+图5
 
 # 5.实验
 
