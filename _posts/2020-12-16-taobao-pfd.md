@@ -12,9 +12,17 @@ tags:
 
 **为了确保offline training与online serving的一致性，我们通常在真实应用的两个enviorments中我们使用相同的features**。然而，有一些有区分性的特征（discriminative features）会被忽略（它们只在训练时提供）。以电商环境中的CVR预测（conversion rate）为例，这里我们的目标是：**估计当用户点击了该item后购买该item概率**。在点击详情页（clicked detail page）上描述用户行为的features（例如：在整个页面上的dwell time）相当有用。**然而，这些features不能被用于推荐中的online CVR预测，因为在任意点击发生之前预测过程已经完成**。尽管这样的**post-event features**确实会在offline training记录。为了与使用privildeged information的学习相一致，**这里我们将对于预测任务具有区分性（discriminative）、但只在训练时提供的features，称为priviledged features**。
 
-使用priviledged features的一种简单方法是：multi-task learning，例如：使用一个额外的任务来预测每个feature。然而，在multi-task learning中，每个任务不会满足一个无害保障（no-harm guarantee）（例如：priviledged features可能会伤害原始模型的学习）。更重要的，no-harm guarantee非常可能违反，因为估计priviledged features比起原始问题[20]相当具有挑战性。从实际看，当一次只使用几十个priviledged features，对于所有任务进行调参是个大挑战。
+使用priviledged features的一种简单方法是：multi-task learning，例如：使用一个额外的任务来预测每个feature。然而，在multi-task learning中，每个任务不必满足无害保障原则（no-harm guarantee）（例如：priviledged features可能会伤害原始模型的学习）。更重要的是，由于估计priviledged features比起原始问题[20]更具挑战性，很可能会与no-harm guarantee原则相冲突。从实际角度看，当一次使用数十个priviledged features，对于调整所有任务来说是个大挑战。
 
-受LUPI（learning using priviledged information）【24】的启发，这里我们提出priviledged features distillation(PFD)来使用这些features。我们会训练两个模型：例如：一个student和一个teacher模型。student模型与original模型相同，它会处理offline training和online serving的features。teacher model会处理所有features，它包括：priviledged features。知识会从teacher中distill出来（例如：在本工作中的soft labels），接着被用于监督student的训练，而original hard labels（例如：{0, 1}）它会额外用来提升它的效果。在online serving期间，只有student部分会被抽出，它不依赖priviledged features作为输入，并能保证训练的一致性。对比起MTL，PFD主要有两个优点。一方面，对于预测任务，priviledged features会以一个更合适的方式来进行组合。通常，添加更多的priviledged features会产生更精准的预测。另一方面，PFD只会引入一个额外的distillation loss，不管priviledged features的数目是多少，很更容易进行平衡。
+受LUPI（learning using priviledged information）【24】的启发，这里我们提出**priviledged features distillation(PFD)来使用这些features**。我们会训练两个模型：一个student和一个teacher模型。
+
+- student模型：与original模型相同，它会处理offline training和online serving的features。
+- teacher模型：会处理所有features，它包括：priviledged features。
+
+知识会从teacher中distill出来（例如：在本工作中的soft labels），接着被用于监督student的训练，而original hard labels（例如：{0, 1}）它会额外用来提升它的效果。在online serving期间，只有student部分会被抽出，它不依赖priviledged features作为输入，并能保证训练的一致性。对比起MTL，PFD主要有两个优点：
+
+- 一方面，对于预测任务，priviledged features会以一个更合适的方式来进行组合。通常，添加更多的priviledged features会产生更精准的预测
+- 另一方面，PFD只会引入一个额外的distillation loss，不管priviledged features的数目是多少，很更容易进行平衡
 
 PFD不同于常用的模型萃取（model distillation：MD）[3,13]。在MD中，teacher和student会处理相同的inputs。teacher会使用比student更强的模型。例如，teachers可以使用更深的network来指导更浅的students。在PFD中，teacher和student会使用相同的模型，但会在inputs上不同。PFD与原始的LUPI【24】也不同，在PFD中的teacher network会额外处理regular features。图1给出了区别。
 
