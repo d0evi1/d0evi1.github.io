@@ -10,7 +10,7 @@ tags:
 
 最近几年，DNNs已经在推荐任务预测上达到了非常好的效果。然而，大多数这些工作集中在模型本身。只有有限的工作把注意力放到输入的特征方面，而它可以决定模型表现的上界（upper-bound）。在本工作中，我们主要关注于特征方面，特别是在电商推荐中的features。
 
-为了确保offline training与online serving的一致性，我们通常在真实应用的两个enviorments中我们使用相同的features。然而，有一些有区分性的特征（discriminative features）会被忽略（它们只在训练时提供）。以电商环境中的CVR预测（conversion rate）为例，这里我们的目标是：估计当用户点击了该item后购买该item概率。在点击详情页（clicked detail page）上描述用户行为的features（例如：在整个页面上的dwell time）相当有用。然而，这些features不能被用于推荐中的online CVR预测，因它在任意点击发生之前它已经被完成。尽管这样的post-event features确实会对于offline training被记录。为了与使用privildeged information的学习相一致，这里我们将对于预测任务具有区分性（discriminative）、但只在训练时提供的features，称为priviledged features。
+**为了确保offline training与online serving的一致性，我们通常在真实应用的两个enviorments中我们使用相同的features**。然而，有一些有区分性的特征（discriminative features）会被忽略（它们只在训练时提供）。以电商环境中的CVR预测（conversion rate）为例，这里我们的目标是：**估计当用户点击了该item后购买该item概率**。在点击详情页（clicked detail page）上描述用户行为的features（例如：在整个页面上的dwell time）相当有用。**然而，这些features不能被用于推荐中的online CVR预测，因为在任意点击发生之前预测过程已经完成**。尽管这样的**post-event features**确实会在offline training记录。为了与使用privildeged information的学习相一致，**这里我们将对于预测任务具有区分性（discriminative）、但只在训练时提供的features，称为priviledged features**。
 
 使用priviledged features的一种简单方法是：multi-task learning，例如：使用一个额外的任务来预测每个feature。然而，在multi-task learning中，每个任务不会满足一个无害保障（no-harm guarantee）（例如：priviledged features可能会伤害原始模型的学习）。更重要的，no-harm guarantee非常可能违反，因为估计priviledged features比起原始问题[20]相当具有挑战性。从实际看，当一次只使用几十个priviledged features，对于所有任务进行调参是个大挑战。
 
