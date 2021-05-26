@@ -77,9 +77,15 @@ $$
 
 图2 taobao推荐总览。我们采用一个cascaded learning框架来select/rank items。在粗排中， interacted features(通常也是discriminattive)会被禁止，因为他们会在serving时极大增加时耗。一些有表征性的features会在下面部分演示
 
-为了更好地理解priviledged features，我们首先如图2所示给出taobao推荐的一个总览。在工作推荐中通常这么做，我们采用cascaded 学习框架。在呈现给用户给，有3个stages来select/rank items：candidate generation、coarse-grained ranking、fine-grained ranking。为了在效率和accuracy间做出一个好的trade-off，越往前的cascaded stage，会采用复杂和高效的模型，对items进行scoring会具有更高的时延。在candidate generation stage，我们会选择$$10^5$$个用户可能会点击或购买的items。总之，candidate genreation会从多个sources进行混合而来，比如：协同过滤、DNN模型等。在candidate generation之后，我们会采用两个stage进行ranking，其中PFD会在这时使用。
+为了更好地理解priviledged features，我们首先如图2所示给出taobao推荐的一个总览。在工作推荐中通常这么做，我们采用cascaded 学习框架。在items呈现给用户前，有3个stages来select/rank items：candidate generation、coarse-grained ranking、fine-grained ranking。为了在效率和accuracy间做出一个好的trade-off，**越往前的cascaded stage，会采用复杂和高效的模型，对items进行scoring会具有更高的时延**。在candidate generation stage，我们会选择$$10^5$$个用户可能会点击或购买的items。总之，candidate genreation会从多个sources进行混合而来，比如：协同过滤、DNN模型等。在candidate generation之后，我们会采用两个stage进行ranking，**其中PFD会在这时使用**。
 
-在coarse-grained ranking stage中，我们主要会通过candidate generation stage来估计所有items的CTRs，它们接着被用来选择top-k个最高的ranked items进入到下一stage。预测模型的input主要包含了三个部分。第一部分包括：用户行为，它会记录用户点击/购买items的历史。由于用户行为是有序的，RNNs或self-attention会通常被用来建模用户的long short-term interests。第二部分由user features组成，例如：user id、age、gender等。第三部分由item features组成，例如：item id、category、brand等。通过该工作，所有features都会被转换成categorical type，我们可以为每个feature学习一个embedding。
+在coarse-grained ranking stage中，我们主要会通过candidate generation stage来估计所有items的CTRs，它们接着被用来选择top-k个最高的ranked items进入到下一stage。预测模型的input主要包含了三个部分。
+
+- 第一部分：用户行为，它会记录用户点击/购买items的历史。由于用户行为是有序的，RNNs或self-attention会通常被用来建模用户的long short-term interests。
+- 第二部分：user features，例如：user id、age、gender等。
+- 第三部分：item features，例如：item id、category、brand等。
+
+通过该工作，所有features都会被转换成categorical type，我们可以为每个feature学习一个embedding。
 
 在粗排阶段，prediction model的复杂度会被严格限制，以便让上万候选在ms内完成。这里，我们使用inner product模型来对item scores进行measure：
 
