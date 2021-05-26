@@ -43,7 +43,7 @@ PFD不同于常用的模型萃取（model distillation：MD）[3,13]。
 在给出我们的PFD的详细描述前，首先介绍下distillation技术。总体上，该技术的目标是，帮助non-convex的student models来更好地训练。对于model distillation，我们通常会按如下方式写出objective function：
 
 $$
-\underset{min}{W_s} (1-\lambda) * L_s(y, f_s(X; W_s)) + \lambda * L_d (f_t(X; W_t), f_s(X; W_s))
+\underset{W_s}{min} (1-\lambda) * L_s(y, f_s(X; W_s)) + \lambda * L_d (f_t(X; W_t), f_s(X; W_s))
 $$
 
 ...(1)
@@ -59,7 +59,7 @@ $$
 除了从更复杂模型中对knowledge进行distill外，[24]提出从previledged information $$X^*$$上进行distill，它被认为是使用priviledged information(LUPI)进行学习。loss function接着变为：
 
 $$
-\underset{1-\lambda}{W_s} * L_s (y, f(X; W_s)) + \lambda * L_d (f(X^*; W_t); f(X; W_s))
+\underset{W_s}{min} {1-\lambda} * L_s (y, f(X; W_s)) + \lambda * L_d (f(X^*; W_t); f(X; W_s))
 $$
 
 ...(2)
