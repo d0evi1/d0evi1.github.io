@@ -75,7 +75,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b22fed1cbf60e8ea388c3b0acdb93a2b6d3f7dfe5dd29fcea3a6ed612aa3b61ae9163987a84df0346f820d8bf90a0751?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 taobao推荐总览。我们采用一个cascaded learning框架来select/rank items。在粗排中， interacted features(通常也是discriminattive)会被禁止，因为他们会在serving时极大增加时耗。一些有表征性的features会在下面部分演示
 
 为了更好地理解priviledged features，我们首先如图2所示给出taobao推荐的一个总览。在工作推荐中通常这么做，我们采用cascaded 学习框架。在呈现给用户给，有3个stages来select/rank items：candidate generation、coarse-grained ranking、fine-grained ranking。为了在效率和accuracy间做出一个好的trade-off，越往前的cascaded stage，会采用复杂和高效的模型，对items进行scoring会具有更高的时延。在candidate generation stage，我们会选择$$10^5$$个用户可能会点击或购买的items。总之，candidate genreation会从多个sources进行混合而来，比如：协同过滤、DNN模型等。在candidate generation之后，我们会采用两个stage进行ranking，其中PFD会在这时使用。
 
