@@ -55,7 +55,7 @@ $$
 - $$L_d$$表示使用soft labels的loss，它由teacher产生
 - $$\lambda \in [0, 1]$$是超参数，用于对两个loss进行balance
 
-对比起单独最小化$$L_s$$的original function，我们会期待在等式(1)中的additional loss $$L_d$$会帮助更好地训练$$W_s$$，通过从teacher中对knowledge进行distilling得到。在[29]中，Pereyra et.将distillation loss看成是在student model上进行regularization。当单独以最小化$$L_s$$的方式训练$$f_s$$时，它被证明是获得overconfident preditions（过拟合的预测），会对training set过拟合。通过添加distillation loss，$$f_s$$也会近似来自$$f_t$$的soft predictions。通过对outputs进行softening，$$f_s$$更可能会达到更好的泛化效果。
+对比起单独最小化$$L_s$$的original function，我们会期待在等式(1)中的additional loss $$L_d$$会帮助更好地训练$$W_s$$，通过从teacher中对knowledge进行distilling得到。在[29]中，Pereyra et.将distillation loss看成是在student model上进行regularization。当单独以最小化$$L_s$$的方式训练$$f_s$$时，它被证明是获得overconfident preditions（过拟合的预测），会对training set过拟合。通过添加distillation loss，$$f_s$$也会逼近来自$$f_t$$的soft predictions。通过对outputs进行softening，$$f_s$$更可能会达到更好的泛化效果。
 
 通常，teacher model会比student model更强大。teachers可以是一些models的ensembles，或者具有比student更多neurons、更多layers、或更广数值精度的DNNs。但也有些异外，比如，在[1]中，两个模型都会使用相同的结构，它们会相互学习，不同之处在于initialization以及处理训练数据的orders。
 
