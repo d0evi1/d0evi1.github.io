@@ -55,18 +55,16 @@ $$
 - $$L_d$$表示使用soft labels的loss，它由teacher产生
 - $$\lambda \in [0, 1]$$是超参数，用于对两个loss进行balance
 
-对比起单独最小化$$L_s$$的original function，我们会期待在等式(1)中的additional loss $$L_d$$会帮助更好地训练$$W_s$$，通过从teacher中对knowledge进行distilling得到。在[29]中，Pereyra et.将distillation loss看成是在student model上进行regularization。当单独以最小化$$L_s$$的方式训练$$f_s$$时，它被证明是获得overconfident preditions（过拟合的预测），会对training set过拟合。通过添加distillation loss，$$f_s$$也会逼近来自$$f_t$$的soft predictions。通过对outputs进行softening，$$f_s$$更可能会达到更好的泛化效果。
+对比起单独最小化$$L_s$$的original function，我们会期待在等式(1)中的additional loss $$L_d$$会帮助更好地训练$$W_s$$，通过从teacher中对knowledge进行distilling得到。**在[29]中，Pereyra et.将distillation loss看成是在student model上进行regularization**。当单独以最小化$$L_s$$的方式训练$$f_s$$时，它被证明是获得overconfident preditions（过拟合的预测），会对training set过拟合。通过添加distillation loss，$$f_s$$也会逼近来自$$f_t$$的soft predictions。通过对outputs进行softening，$$f_s$$更可能会达到更好的泛化效果。
 
-通常，teacher model会比student model更强大。teachers可以是一些models的ensembles，或者具有比student更多neurons、更多layers、或更广数值精度的DNNs。但也有些异外，比如，在[1]中，两个模型都会使用相同的结构，它们会相互学习，不同之处在于initialization以及处理训练数据的orders。
+通常，teacher model会比student model更强大。teachers可以是一些models的ensembles，或者具有比student更多neurons、更多layers、或更广数值精度的DNNs。但也有些例外，比如，在[1]中，两个模型都会使用相同的结构，它们会相互学习，不同之处在于initialization以及处理训练数据的orders。
 
-如等式(1)所示，teacher的参数$$W_t$$会在最小化期间fix住。我们可以将distillation技术划分成两个steps：
+**如等式(1)所示，teacher的参数$$W_t$$会在最小化期间fix住**。我们可以将distillation技术划分成两个steps：**首先使用已知的labels y训练teacher，接着通过最小化等式(1)来训练student**。在一些应用中，模型会花费相当长的时间才收敛，等待teacher像等式(1)一样准备好是不实际的。作为替代，**一些工作会尝试同步训练teacher和student【1,38,39】**。除了像等式(1)那样从final output进行distilling之外，也可以**从middle layer上进行disitll**，例如：[30]尝试从intermediate feature maps进行distill，可以帮助训练一个deeper和thinner network。
 
-首先使用已知的labels y训练teacher，接着通过最小化等式(1)来训练student。在一些应用中，模型会花费相当长的时间才收敛，等待teacher像等式(1)一样准备好是不实际的。作为替代，一些工作会尝试同步训练teacher和student【1,38,39】。除了像等式(1)那样从final output进行distilling之外，也可以从middle layer上进行disitll，例如：[30]尝试从intermediate feature maps进行distill，可以帮助训练一个deeper和thinner network。
-
-除了从更复杂模型中对knowledge进行distill外，[24]提出从previledged information $$X^*$$上进行distill，它被认为是使用priviledged information(LUPI)进行学习。loss function接着变为：
+除了从更复杂模型中对knowledge进行distill外，[24]提出从**previledged information $$X^*$$上进行distill**，它被认为是使用priviledged information(LUPI)进行学习。loss function接着变为：
 
 $$
-\underset{W_s}{min} {1-\lambda} * L_s (y, f(X; W_s)) + \lambda * L_d (f(X^*; W_t); f(X; W_s))
+\underset{W_s}{min} (1-\lambda) * L_s (y, f(X; W_s)) + \lambda * L_d (f(X^*; W_t); f(X; W_s))
 $$
 
 ...(2)
