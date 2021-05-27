@@ -121,11 +121,12 @@ $$
 
 ...(4)
 
-通常，添加更多信息（例如：更多features），会得到更精准的predictions。teacher $$f(X, X^*; W_t)$$这里期望会比sutdent $$f(X; W_s)$$、或者LUPI $$f(X^*; W_t)$$的teahcer更强。在上述场景上，通过考虑上priviledged features和regular features，可以使用停留时长（dwell time）来区分在不同昂贵items上的偏好程度。teacher会有更多的知识来指导student，而非误导它。通过以下实验进行验证，添加regular features到teacher中是non-trivial的，它可以极大提升LUPI的效果。从那以后，我们将该技术表示成PFD来区别LUPI。
+通常，添加更多信息（例如：更多features），会得到更精准的predictions。teacher $$f(X, X^*; W_t)$$这里期望会比sutdent $$f(X; W_s)$$、或者LUPI $$f(X^*; W_t)$$的teahcer更强。在上述场景上，**通过考虑上priviledged features和regular features，可以使用停留时长（dwell time）来区分在不同昂贵items上的偏好程度**。teacher会有更多的知识来指导student，而非误导它。通过以下实验进行验证，添加regular features到teacher中是non-trivial的，它可以极大提升LUPI的效果。从那以后，我们将该技术表示成PFD来区别LUPI。
 
-如等式(4)所示，teacher $$f(X, X^*; W_t)$$会优先训练。然而，在我们的应用中，单独训练teacher model会花费一个较长时间。使用像等式(4)这样的distillation是相当不实际的。更可信的方式是，像[1,38,39]的方式同步地训练teacher和student。objective function接着被修改如下：
+如等式(4)所示，teacher $$f(X, X^*; W_t)$$会优先训练。然而，在我们的应用中，单独训练teacher model会花费一个较长时间。使用像等式(4)这样的distillation是相当不实际的。**更可行的方式是，像[1,38,39]的方式同步地训练teacher和student**。objective function接着被修改如下：
 
 $$
+\underset{W_s, W_t}{min} (1-\lambda) * L_s(y, f(X;W_s)) + \lambda * L_d(f(X,X^*;W_t), f(X;W_s)) + L_t(y, f(X, X^*; W_t))
 
 $$
 
