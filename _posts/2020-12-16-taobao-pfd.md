@@ -105,11 +105,11 @@ $$
 
 如图2所示，粗排不会使用任何交叉特征，例如：用户在item category上在过去24小时内的点击等。通过实验验证，添加这样的features可能大大提高预测效果。然而，这在serving时会极大地增加时延，因为交叉特征依赖user和指定的item。**换句话说，features会随着items或users的不同而不同**。如果将它们放到等式(3)中的item或user侧。mappings $$\phi_w(\cdot)$$的inference需要执行和候选数一样多的次数，例如：$$10^5$$次。总之，non-linear mapping $$\phi_W(\cdot)$$的计算开销要比简单的inner product大许多阶。在serving期间使用交叉特征是不实际的。**这里，我们将这些交叉特征看成是：在粗排CTR预测的priviledged features**。
 
-在精排阶段，除了在粗排中也会做的CTR预估外，我们也为所有候选预估CVR，例如：如果用户点击某个item后会购买该item的概率。**在电商推荐中，主要目标是最大化GMV（商品交易总量），它可以被解耦成CTR X CVR X Price**。一旦为所有items估计CTR和CVR，我们可以通过expected GMVs来对它们进行排序来最大化。在CVR的定义中，很明显，**用户在点击item详情页上的行为（例如：停留时长、是否观看评论、是否与卖者进行交流等），对于预测来说相当有用**。然而，在任何future click发生前，CVR必须要对ranking进行估计。描述在详情页上用户行为的features在inference期间并没有提供。这里，我们可以将这些features表示成priviledged features来进行CVR预测。为了更好地理解它们，我们给出图3进行演示。
+在精排阶段，除了在粗排中也会做的CTR预估外，我们也为所有候选预估CVR，例如：如果用户点击某个item后会购买该item的概率。**在电商推荐中，主要目标是最大化GMV（商品交易总量），它可以被解耦成CTR x CVR x Price**。一旦为所有items估计CTR和CVR，我们可以通过expected GMVs来对它们进行排序来最大化。在CVR的定义中，很明显，**用户在点击item详情页上的行为（例如：停留时长、是否观看评论、是否与卖者进行交流等），对于预测来说相当有用**。然而，在任何future click发生前，CVR必须要对ranking进行估计。描述在详情页上用户行为的features在inference期间并没有提供。这里，我们可以将这些features表示成priviledged features来进行CVR预测。为了更好地理解它们，我们给出图3进行演示。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b58ad836c2911bf16a9f57df68559ef1cb103de2ae1da749a2f2392bdac6be55b7cd7dc2ca863017977999572df45433?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
 
-图3
+图3 描述了clicked item的详情页上的用户行为。包括没有展示的dwell time，这些features对于CVR预测来说是相当有信息量的（informative）。然而，在serving时，如左子图所示，在任意item被点击之前，我们不必使用CVR来对所有candidate items进行rank。对于CVR预测，我们将这些features表示成priviledged features
 
 # 4.Priviledged Feature Distillation
 
