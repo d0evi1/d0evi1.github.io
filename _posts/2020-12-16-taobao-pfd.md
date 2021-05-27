@@ -121,7 +121,7 @@ $$
 
 ...(4)
 
-通常，添加更多信息（例如：更多features），会得到更精准的predictions。teacher $$f(X, X^*; W_t)$$这里期望会比sutdent $$f(X; W_s)$$、或者LUPI $$f(X^*; W_t)$$的teahcer更强。在上述场景上，**通过考虑上priviledged features和regular features，可以使用停留时长（dwell time）来区分在不同昂贵items上的偏好程度**。teacher会有更多的知识来指导student，而非误导它。通过以下实验进行验证，添加regular features到teacher中是non-trivial的，它可以极大提升LUPI的效果。从那以后，我们将该技术表示成PFD来区别LUPI。
+通常，添加更多信息（例如：更多features），会得到更精准的predictions。teacher $$f(X, X^*; W_t)$$这里期望会比sutdent $$f(X; W_s)$$、或者LUPI $$f(X^*; W_t)$$的teacher更强。在上述场景上，**通过考虑上priviledged features和regular features，可以使用停留时长（dwell time）来区分在不同昂贵items上的偏好程度**。teacher会有更多的知识来指导student，而非误导它。通过以下实验进行验证，添加regular features到teacher中是non-trivial的，它可以极大提升LUPI的效果。从那以后，我们将该技术表示成PFD来区别LUPI。
 
 如等式(4)所示，teacher $$f(X, X^*; W_t)$$会优先训练。然而，在我们的应用中，单独训练teacher model会花费一个较长时间。使用像等式(4)这样的distillation是相当不实际的。**更可行的方式是，像[1,38,39]的方式同步地训练teacher和student**。objective function接着被修改如下：
 
@@ -132,9 +132,9 @@ $$
 
 ...（5）
 
-尽管会节省时间，同步训练可能不稳定（un-stable）。在early stage时，teacher模型没有被well-trained，distillation loss $$L_d$$可能会使student分心（distract），并减慢训练。这里我们通过一个warm up scheme来缓和它。在early stage时，我们将等式(5)的$$\lambda$$设置为0，从那以后将它固定到一个pre-defined value，其中swapping step可以是个超参数。在我们的大规模数据集上，我们发现，这种简单的scheme可以良好地运转。不同于相互学习（mutual learning），我们只允许student来从teacher那进行学习。否则，**teacher会与student相互适应，这会降低效果**。当根据teacher参数$$W_t$$分别计算gradient时，我们会触发distillation loss $$L_d$$。算法1使用SGD更新如下。
+尽管会节省时间，同步训练可能不稳定（un-stable）。**在early stage时，teacher模型没有被well-trained，distillation loss $$L_d$$可能会使student分心（distract），并减慢训练**。这里我们通过一个warm up scheme来缓和它。**在early stage时我们将等式(5)的$$\lambda$$设置为0，从那以后将它固定到一个pre-defined value，其中swapping step可以是个超参数**。在我们的大规模数据集上，我们发现，这种简单的scheme可以良好地运转。不同于相互学习（mutual learning），我们只允许student来从teacher那进行学习。否则，**teacher会与student相互适应，这会降低效果**。当根据teacher参数$$W_t$$分别计算gradient时，我们会触发distillation loss $$L_d$$。算法1使用SGD更新如下。
 
-根据该工作，所有模型都会在parameter server系统上进行训练，其中，所有参数都会存储在servers上，大多数计算会在workers上执行。训练速度主要决取于在人orkers上的计算负载以及在workers和servers间的通信量。如等式(5)所示，我们会一起训练teacher和student。参数数目和计算会加倍。使用PFD进行训练可能会比在student上单独训练更慢，这在工业界是不实际的。特别是对于在线学习，会要求实时计算，采用distillation会增加预算。这里我们会通过共享在teacher和student的所有公共输入部分来缓和该问题。由于所有features的embeddings会占据在servers上的大多数存储，通过共享通信量可以减小一半。该计算可以通过共享用户点击/购买行为的处理部分来减小，它的开销较大。正如以下实验所验证的，我们可以通过sharing来达到更好的表现。另外，对比起单独训练student，我们只会增加一些额外的时间，对于online learning来说这会使得PFD更适应些（adoptable）。
+根据该工作，所有模型都会在parameter server系统上进行训练，其中，所有参数都会存储在servers上，大多数计算会在workers上执行。训练速度主要决取于在workers上的计算负载以及在workers和servers间的通信量。如等式(5)所示，我们会一起训练teacher和student。参数数目和计算会加倍。使用PFD进行训练可能会比在student上单独训练更慢，这在工业界是不实际的。特别是对于在线学习，会要求实时计算，采用distillation会增加预算。这里我们会通过共享在teacher和student的所有公共输入部分来缓和该问题。由于所有features的embeddings会占据在servers上的大多数存储，通过共享通信量可以减小一半。该计算可以通过共享用户点击/购买行为的处理部分来减小，它的开销较大。正如以下实验所验证的，我们可以通过sharing来达到更好的表现。另外，对比起单独训练student，我们只会增加一些额外的时间，对于online learning来说这会使得PFD更适应些（adoptable）。
 
 **扩展：PFD+MD**
 
