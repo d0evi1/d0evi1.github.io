@@ -134,7 +134,7 @@ $$
 
 尽管会节省时间，同步训练可能不稳定（un-stable）。**在early stage时，teacher模型没有被well-trained，distillation loss $$L_d$$可能会使student分心（distract），并减慢训练**。这里我们通过一个warm up scheme来缓和它。**在early stage时我们将等式(5)的$$\lambda$$设置为0，从那以后将它固定到一个pre-defined value，其中swapping step可以是个超参数**。在我们的大规模数据集上，我们发现，这种简单的scheme可以良好地运转。不同于相互学习（mutual learning），我们只允许student来从teacher那进行学习。否则，**teacher会与student相互适应，这会降低效果**。当根据teacher参数$$W_t$$分别计算gradient时，我们会触发distillation loss $$L_d$$。算法1使用SGD更新如下。
 
-根据该工作，所有模型都会在parameter server系统上进行训练，其中，所有参数都会存储在servers上，大多数计算会在workers上执行。训练速度主要决取于在workers上的计算负载以及在workers和servers间的通信量。如等式(5)所示，我们会一起训练teacher和student。参数数目和计算会加倍。使用PFD进行训练可能会比在student上单独训练更慢，这在工业界是不实际的。特别是对于在线学习，会要求实时计算，采用distillation会增加预算。这里我们会通过共享在teacher和student的所有公共输入部分来缓和该问题。由于所有features的embeddings会占据在servers上的大多数存储，通过共享通信量可以减小一半。该计算可以通过共享用户点击/购买行为的处理部分来减小，它的开销较大。正如以下实验所验证的，我们可以通过sharing来达到更好的表现。另外，对比起单独训练student，我们只会增加一些额外的时间，对于online learning来说这会使得PFD更适应些（adoptable）。
+根据该工作，所有模型都会在parameter server系统上进行训练，其中，所有参数都会存储在servers上，大多数计算会在workers上执行。训练速度主要决取于在workers上的计算负载以及在workers和servers间的通信量。**如等式(5)所示，我们会一起训练teacher和student。参数数目和计算会加倍。使用PFD进行训练可能会比在student上单独训练更慢，这在工业界是不实际的。**特别是对于在线学习，会要求实时计算，采用distillation会增加预算。这里我们会通过**共享在teacher和student的所有公共输入部分**来缓和该问题。由于所有features的embeddings会占据在servers上的大多数存储，通过共享通信量可以减小一半。该计算可以通过共享用户点击/购买行为的处理部分来减小，它的开销较大。正如以下实验所验证的，我们可以通过sharing来达到更好的表现。另外，对比起单独训练student，我们只会增加一些额外的时间，对于online learning来说这会使得PFD更适应些（adoptable）。
 
 **扩展：PFD+MD**
 
@@ -142,7 +142,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/f9fb4b5ff2b9ac858cd7373af569666da70667037fee34aceeb50e633be1a2d29a8f4e657638cebca091349594d2be62?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
 
-图1
+图1 MD与PFD。在MD中，knowledge会从更复杂的模型中distill出来。在PFD中，knowledge会同时从previledged和regular features中进行distill。PFD也会与使用priviledged information(LUPI)的original learning有所不同，其中teacher只处理priviledged features
 
 在粗排的CTR prediction中，如等式(3)所示，我们使用inner product模型来在serving上增加效率。事实上，inner product模型会被认为是泛化的MF（gnerelized matrix factorization）。尽管我们正使用非线性映射$$\Phi_W(\cdot)$$来转移user和item inputs，该模型能力天然受限于内积操作的bi-linear结构。DNNs，它可以逼近任意函数，被认为是对于在teacher中的inner product模型的一个替代。事实上，如【22】中的定义1所示，乘积操作可以通过一个two-layers的NN（在hidden layer上只有4个neurons）来逼近任意小。因此，使用DNN的表现被认为是inner-product模型的下界（lower-bounded）。
 
