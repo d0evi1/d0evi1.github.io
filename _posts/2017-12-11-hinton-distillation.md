@@ -66,7 +66,39 @@ $$
 
 因此，在高temperature限制下，distilliation等价于最小化$$1/2(z_i - v_i)^2$$，提供的logits对于每个transfer case都是独立零均值的。在更低的temperatures上时，distilliation会花费更少的attention来matching logits，以便比平均有更多的negative。这有潜在优势，因为这些logits对于用于训练cumbersome modelcost function几乎完整无限制，因此他们可能非常有noisy。另一方面，非常负的logits可能会传达关于由cumbersome model获取knowledge的有用信息。这些效果占据着哪些是一个经验性问题。我们展示了当distilled model太小，而不能获取cumbersome model中的所有知识，intermediate temperatures会运行最好，会强烈建议忽略掉大的negative logits，这样会有用。
 
-。。。
+# 3.在MNIST上的初步实验
+
+...
+
+# 4.在语音识别上的实验
+
+...
+
+# 5.在非常大数据集上训练ensembles
+
+...
+
+# 6.Soft targets作为Regularizers
+
+使用soft targets来替代hard targets的主要目的之一是，在soft targets中携带的一大堆有用的信息，不能使用单个hard target进行编码。在本节中，我们展示了，通过使用相当少的数据来满足baseline语音模型中85M参数，有非常大的影响。表5展示了只有3%的数据（大概20M样本），使用hard targets的baseline model进行训练，会导致严重的overfitting（我们做了early stopping，但在accuracy达到44.5%迅速下降），其中使用soft targets的相同模型可以恢复几乎在完整训练集上的所有信息（大概2%）.这十分深刻，注意我们不必做early-stopping：使用soft targets的系统会简单“收敛”到57%。这展示了soft targets是一个非常有效的方式，一个模型在所有数据上训练发现的regularities会与另一个模型相交流（communicating）。
+
+## 6.1 使用soft targets来阻止specialist避免overfitting
+
+在JFT dataset上，我们在实验上使用的specialists会将所有其它非专家类（non-specialist classes）收缩到单个垃圾类上（dustbin class）。如果我们允许specialists具有一个在所有classes上的full softmax，比起early stopping有一种更好的方式来阻止overfitting。一个specialist会在它的special classes上高度增强的数据上进行训练。这意味着，训练集的有效大小（effective size）会更小，它具有一个很强的趋势来overfit它的special classes。该问题不能通过将specialist变得更小来解决，因为我们会丢掉非常有用来自对所有non-specialist classes建模得到的transfer effects。
+
+我们的实验会使用3%的语音数据，它强烈建议如果一个specialist会使用genrealist的weights进行初始化，我们可以让它保持几乎所有关于non-special classes的知识，通过为non-special classes使用soft targets来训练，另外使用hard targets来训练它。soft targets可以由generalist来提供。我们现在会探索该方法。
+
+# 7.与MoE（Mixtures of Experts）的关系
+
+使用specialists可以在数据的子集上进行训练，它与MoE（mixtures of experts）具有相似性，它使用一个gating network来计算分配每个样本到每个expert的概率。同时，由于experts会学习来处理分配给它们的样本，gating network会学习选择哪个experts来分配每个样本，基于experts对该样本的相对判别表现（relative discriminative performance）。使用该关于该experts的discriminative performance来判断该学到的分配，会比简单将input vectors进行聚类并为每个cluster分配一个expert的方式要好的多，但它使得训练很难并行化：首先，每个expert的加权训练集（weighted training set）会以依赖于所有其它experts的方式保持变更；第二，gating network需要对比在相同样本上不同experts的表现来知道如何修正它的分配概率。这些难点意味着：MoE（Mixture of experts）很少被用于那些最有收益的地方：具有海量数据集并且包括着不同的子集的任务。
+
+对多个specialists的训练并行化更容易。我们首先训练一个gneralist model，接着使用confusion matrix来定义用于训练specialists的subsets。一旦这些subsets已经被定义，specialists可以完全独立进行训练。在test time时，我们可以使用genralist model的预测来决定，哪个specialists是相关的，并且只有这些specialists需要被运行。
+
+# 8.讨论
+
+我们已经展示了，distilling可以式作良好，将一个ensemble、或者从一个大的高度复杂的模型的知识进行transfer到一个更小的distilled model上。在MNIST上，当transfer set被用于训练distilled model时，即使缺少一或多个classes，distillation的效果也很好。对于一个更深的语音模型，用于android voice search，我们展示了，几乎所有的提升都通过训练一个dnn的ensemble并将它distilled到相同size的单个neural net上（它更容易部署）来达到。
+
+对于实际的大神经网络（big neural networks），训练一个full ensemble是可行的，但我们发现，单个大网络要训练很久，可以通过学习大量specialist nets来极大提升效果，每个specialist可以学习判断在一个高度confusable cluster中的classes。到目前为上，我们并没有展示，我们可以在specialists中的知识distill到单个大的net上。
 
 
 # 参考
