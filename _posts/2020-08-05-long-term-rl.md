@@ -140,7 +140,7 @@ $$
 为了估计future reward（例如：未来用户粘性），对于推荐项$$I_T$$的expected long-term user engagement会使用Q-value进行表示：
 
 $$
-Q^{\pi} (s_t, i_t) = E_{i_k \sim \pi} [r_t + \sum\limits_{k=1}^{T_t} \gamma^k r_{t+k}]
+Q^{\pi} (s_t, i_t) = E_{i_k \sim \pi} [\underbrace{r_t}_{\text{current rewards}} + \underbrace{\sum\limits_{k=1}^{T_t} \gamma^k r_{t+k}}_{\text{future rewards}}]
 $$
 
 ...(2)

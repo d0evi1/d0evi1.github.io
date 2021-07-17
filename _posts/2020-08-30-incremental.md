@@ -150,10 +150,10 @@ KD-batch和KD-self的训练细节在算法2中的第3行到第5行，第11行到
 
 为了评估在IncCTR框加中提出的效果和效率，我们在公开benchmark和私有数据集上做了实验。
 
-- Criteo。该数据集用于CTR预估的benchmark算法。它包含了24天的连续流量日志，包括26个类别型features以及13个numerical features，第一行作为label，表示是否该ad被点击或未被点击
+- Criteo。该数据集用于CTR预估的benchmark算法。它包含了24天的连续流量日志，包括26个类别型features以及13个numerical features，第一行作为label，表示该ad是否被点击
 - HuaweiAPP。为了演示提出方法的效果，我们在商业数据集上做了离线实验。HuaweiAPP包含60个连续天的点击日志，包含了app features、匿名的user features和context features。
 
-为了减小复制实验结果的目的，我们在criteo数据集上做了数据处理的细节。根据kaggle比赛，涉及datasampling、discretization以及feature filtering。出于商业原因，我们没有细出处理huaweiAPP的处理细节，但过程基本相似。
+为了减小复制实验结果的目的，我们在criteo数据集上做了数据处理的细节。根据kaggle比赛，涉及datasampling、discretization以及feature filtering。出于商业原因，我们没有给出huaweiAPP的处理细节，但过程基本相似。
 
 - Data sampling：考虑数据的imbalance（只有3%的样本是正），与[12]相似，我们将负样本做down sampling，将正样本比例接近50%
 - 离散化：类别型和数值形features都存在在Criteo数据集中。然而，两种类型的features的分布本质是相当不同的[11]。在大多数推荐模型中，numerical features通过buckeing或logarithm被转换成categorical features。根据上述方式，我们使用logarithm作为离散方法：

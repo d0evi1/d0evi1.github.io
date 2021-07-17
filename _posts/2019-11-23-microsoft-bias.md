@@ -186,9 +186,10 @@ $$
 
 图3
 
-根据第i-1天的Reserviir数据集中的10000个实例的$$\frac{K}{2}$$候选集会使用无放回抽样随机抽取，其中K=500.模型$$M_{i-1}$$会在第i-1天上训练，并在每个候选集合上对top 2 ads进行排序，在第i天展示给用户。labels会在第i天展示，它随后会形成对可提供的$$topk_i$$训练数据的下一次迭代。
+根据第i-1天的Reservoir数据集中的10000个实例的$$\frac{K}{2}$$候选集合使用无放回抽样随机抽取，其中K=500.模型$$M_{i-1}$$会在第i-1天上训练，并在每个候选集合上对top 2 ads进行排序，在第i天展示给用户。labels会在第i天展示，它随后会形成对可提供的$$topk_i$$训练数据供下一次迭代。
 
-我们会重复该过程，直到迭代了T=100轮. 每次迭代中，我们会记录对于每个top 2 positions的平均position CTR $$P(y \mid Position=p)$$。p=1表示top ranked ads，p=2表示2nd top ranked ads。我们会将position CTRs看成是连续bias term b。为了启动该过程，我们会从Reservoir中抽取K个实例来构成$$topk_0$$。在一个在线Ads系统中，多天的训练数据通常被用来减小systermatic bias。以后续评估中，我们会利用最近两天的训练数据（例如：$$M_i$$只在$$topk_i$$和$$topk_{i-1}$$上训练）。每个模型$$M_i$$是一个logistic regression classifier，它具有l2正则。我们在第法2的13行上设置参数r=0，来展示一个系统级的feedback loop bias。我们构成了testing data，从该feedback loop过程中独立，或从D中抽取10w样本来进行HeldOut RUS评估。
+
+我们会重复该过程，直到迭代了T=100轮. 每次迭代中，我们会记录对于每个top 2 positions的平均position CTR $$P(y \mid Position=p)$$。**p=1表示top ranked ads，p=2表示2nd top ranked ads。我们会将position CTRs看成是连续bias term b**。为了启动该过程，我们会从Reservoir中抽取K个实例来构成$$topk_0$$。在一个在线Ads系统中，多天的训练数据通常被用来减小systermatic bias。后续评估中，我们会利用最近两天的训练数据（例如：$$M_i$$只在$$topk_i$$和$$topk_{i-1}$$上训练）。每个模型$$M_i$$是一个logistic regression classifier，它具有l2正则。我们在算法2的13行上设置参数r=0，来展示一个系统级的feedback loop bias。我们构成了testing data，从该feedback loop过程中独立，或从D中抽取10w样本来进行HeldOut RUS评估。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/7b132bbc738e8e4fb5bf3df05e40d4bb203148b1b5b180a775d7a38cda74c797e4eaac027d2a41781b537b353620964a?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=t1.jpg&amp;size=750">
 
