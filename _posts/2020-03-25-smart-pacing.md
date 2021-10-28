@@ -130,11 +130,39 @@ $$
 - 1) 对应于高响应ad request groups的layers应具有高优先级
 - 2) 高优先级layer的pacing rate应会比一个低优先级layer要更小
 
-对于每个campaign，当DSP接收到一个合格的ad request时，它会首先决定：该ad request 会落在哪个ad request group上，指的是相应的layer来获得该pacing rate。DSP接着会代表campaign来竞价，它的概率会等于由一个preceding bid 最优化模块给出的retrieved pacing rate。
+对于每个campaign，当DSP接收到一个合格的ad request时，它会首先决定：**该ad request 会落在哪个ad request group上，指的是相应的layer来获得该pacing rate**。DSP接着会代表campaign来竞价，它的概率会等于由一个preceding bid 最优化模块给出的retrieved pacing rate。
 
 ## 5.2 Online Pacing Rate调节
 
-我们基于实时反馈，来采用一个control-based方法来调节每层的pacing rate。假设我们具有L个layers，对于每个layer，由response prediction model给出的response rate预估是：$$p=(p_1, \cdots, p_L)$$，这里，如果期望的response是click，那么预估的每层的eCPC是$$e(e_1, \cdots, e_L)$$，其中：$$e_i = \frac{CPM}{ 1000 \times p_i}$$。假设每层的pacing rate在第t-1个time slot上是$$r^{(t-1)} = (r_1^{(t-1), \cdots, r_L^{(t-1)}}$$，那么，每个layer的spending为$$c^{(t-1)} = (c_1^{(t-1), \cdots, c_L^{(t-1)}}$$，对于将要到来的第t个 time slot会基于campaign目标，control-based的方法会预估$$r^{(t)} = (r_1^{(t)}, , \cdots, r_L^{(t)}$$。
+我们基于实时反馈，来采用一个control-based方法来调节每层的pacing rate。假设我们具有L个layers。对于每个layer，由response prediction model给出的response rate预估是：
+
+$$
+p=(p_1, \cdots, p_L)
+$$
+
+这里，如果期望的response是click，那么预估的每层的eCPC是:
+
+$$
+e(e_1, \cdots, e_L)
+$$，
+
+其中：$$e_i = \frac{CPM}{ 1000 \times p_i}$$。假设每层的pacing rate在第t-1个time slot上是：
+
+$$
+r^{(t-1)} = (r_1^{(t-1)}, \cdots, r_L^{(t-1)}
+$$
+
+那么，每个layer的spending为：
+
+$$
+c^{(t-1)} = (c_1^{(t-1)}, \cdots, c_L^{(t-1)}
+$$
+
+对于将要到来的第t个 time slot会基于campaign目标，control-based的方法会预估：
+
+$$
+r^{(t)} = (r_1^{(t)}, , \cdots, r_L^{(t)})
+$$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/59cd41d4eda859c9e377fb9e7493b93a206d22864c9128127a47f5d07850f2b3759de543baf7f51e2f3985c71a676811?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
 
