@@ -110,15 +110,22 @@ $$
 
 # 4.response预测
 
-我们的解法依赖于一个准确的response prediction模型来预估$$p_i$$。如第2节，有许多文献解决该问题。这里我们简单描述了如何执行该预估。我们会使用在(2,11)中的方法，并基于它做出一些改进。在这种方法中，我们首先利用在数据中的层次结构来收集具有不同间隔的response feedback features。例如，在ad侧，从root开始，接着一层接一层是：advertiser category，advertiser，campaign，最后是ad。在层次结构的不同levels上的历史响应率（historical response rates）可以当作features来使用机器学习模型（LR、gbdt等）来给出一个$$p_i$$的原始预估（raw estimation），称为$$\hat{p}_i$$。接着我们使用属性（比如：用户的age、gender）来构建一个shallow tree。树的每个叶子节点标识一个关于ad requests的不相交集合，它可以进一步划分成具有不同平均响应率的子集。最后，我们会在叶子节点$$Req_i$$内对$$\hat{p}_i$$进行微调，使用一个picewise linear regression来估计最终的$$p_i$$。该scheme会生成一个公平的accurate response prediction。
+我们的解法依赖于一个准确的response prediction模型来预估$$p_i$$。如第2节，有许多文献解决该问题。这里我们简单描述了如何执行该预估。我们会使用在(2,11)中的方法，并基于它做出一些改进。在这种方法中，我们首先利用在数据中的层次结构来收集具有不同间隔的response feedback features。例如，在ad侧，从root开始，接着一层接一层是：advertiser category，advertiser，campaign，最后是ad。在层次结构的不同levels上的历史响应率（historical response rates）可以当作features来使用机器学习模型（LR、gbdt等）来给出一个$$p_i$$的原始预估（raw estimation），称为$$\hat{p}_i$$。接着我们使用属性（比如：用户的age、gender）来构建一个shallow tree。树的每个叶子节点标识一个关于ad requests的不相交集合，它可以进一步划分成具有不同平均响应率的子集。最后，我们会在叶子节点$$Req_i$$内对$$\hat{p}_i$$进行微调，使用一个piecewise linear regression来估计最终的$$p_i$$。该scheme会生成一个公平的accurate response prediction。
 
 # 5.control-based的解法
 
-在一个在线环境中，很难达到完全最优解来解决等式（2）和等式（3）的问题。我们采用启发法来减小原始问题的解空间。更特别的，使用第4节中描述的response prediction模型，相似的，responding ad requests会分组到一起，他们会共享相同的group pacing rate。不同分组会具有不同的group pacing rates来影响在高responding ad request groups上的偏好。原始问题（求解每个$$r_i$$的point pacing rate）会简化成求解一个group pacing rates的集合。我们会采用control-based的方法来调节group pacing rates以便online feedback data可以立即用于campaign最优化。换句话说，group pacing rates会通过campaign的生命周期动态调节。出于简洁性，在本文其它地方，pacing rate和group pacing rate会相通，我们会在第l个group的group pacing rate表示为$$r_l$$。
+在一个在线环境中，很难达到完全最优解来解决等式（2）和等式（3）的问题。我们采用启发法来减小原始问题的解空间。更特别的，使用第4节中描述的response prediction模型，**相似的，responding ad requests会分组到一起，他们会共享相同的group pacing rate**。不同分组会具有不同的group pacing rates来影响在高responding ad request groups上的偏好。原始问题（求解每个$$r_i$$的point pacing rate）会简化成求解一个group pacing rates的集合。我们会采用control-based的方法来调节group pacing rates以便online feedback data可以立即用于campaign最优化。**换句话说，group pacing rates会通过campaign的生命周期动态调节。**出于简洁性，在本文其它地方，pacing rate和group pacing rate会相通，我们会在第l个group的group pacing rate表示为$$r_l$$。
 
-## 5.1 一个Layered Presentation
+## 5.1 层级表示（Layered Presentation）
 
-对于每个ad campaign，我们会维护一个layered数据结构，其中每层对应于一个ad request group。我们会以layerd数据结构来保存每个ad request group的以下信息：平均响应率（通常是：CTR、AR等，它来自response prediction模型）、ad request group的优先级、pacing rate（例如：在ad request group中对一个ad request的竞价概率）、campaign在该ad request group中在最新time slot上的花费。这里的原则是：
+对于每个ad campaign，我们会维护一个层级数据结构，其中每层对应于一个ad request group。我们会以层级数据结构来保存每个ad request group的以下信息：
+
+- 平均响应率（通常是：CTR、AR等，它来自response prediction模型）
+- ad request group的优先级
+- pacing rate（例如：在ad request group中对一个ad request的竞价概率）
+- campaign在该ad request group中在最新time slot上的花费
+
+**这里的原则是**：
 
 - 1) 对应于高响应ad request groups的layers应具有高优先级
 - 2) 高优先级layer的pacing rate应会比一个低优先级layer要更小
