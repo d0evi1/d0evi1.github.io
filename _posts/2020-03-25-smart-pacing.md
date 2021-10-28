@@ -86,17 +86,23 @@ $$
 
 其中，$$\epsilon$$定义了没有花光所有预算的容忍度。由于市场的动态性，对于两个单目标最优化问题很难解决。在工业界已存在被广泛使用的方法，只会捕获效果目标，或者只会捕获预算花完目标。达到效果目标的一个示例是：对retargeting beacon触发ad requests，总是竞价。不幸的是，避免过度消费（overspending）或者欠消费（underspending）是无保障的。对于平滑步调控制（smooth pacing control）的另一个示例是，引入一个全局pacing rate，以便ad requests具有相同的概率被一个campaign竞价。然而，这些已经存在的方法没有一个可以解决我们公式化的smart pacing问题。为了解决该问题，我们研究了流行的campaign setups，并做出一些关键观察（可以启发我们的解法）：
 
-- CPM campaigns：广告主对于每个曝光会会付定固定数目的钱。对于品牌广告主（branding advertisers），campaign最优化的定义如公式2所示。只要预算可以被花费，并且spending pattern会随plan安排，高响应广告请求会比低响应的具有一个更高的point pacing rate，以便效果可以被最优化。对于效果广告主（performance advertisers，例如：eCPC、eCPA为目标），campaign最优化的定义如公式3所示。很明显，高响应的ad requerest应具有更高的point pacing rate来达到performance目标。
+- CPM campaigns：**广告主对于每个曝光会会付定固定数目的钱**。对于品牌广告主（branding advertisers），campaign最优化的定义如公式2所示。只要预算可以被花费，并且spending pattern会随plan安排，高响应广告请求会比低响应的具有一个更高的point pacing rate，以便效果可以被最优化。对于效果广告主（performance advertisers，例如：eCPC、eCPA为目标），campaign最优化的定义如公式3所示。很明显，高响应的ad requerest应具有更高的point pacing rate来达到performance目标。
 
-- CPC/CPA campaigns：广告主会基于clicks/actions的绝对数目进行付费。显式效果目标是，保证当代表广告主进行竞价时，DSP不会丢掉钱。因此，这种optimzation的定义为等式(3)。授于高responding ad request以高point pacing rates，从广告主和DSP的视角来说会更有效：广告主会在creative serving cost上花费更少，而DSP可以节省更多ad机会来服务其它campaigns。
+- CPC/CPA campaigns：**广告主会基于clicks/actions的绝对数目进行付费**。显式效果目标是，保证当代表广告主进行竞价时，DSP不会损失钱。因此，这种optimzation的定义为等式(3)。授于高responding ad request以高point pacing rates，从广告主和DSP的视角来说会更有效：广告主会在creative serving cost上花费更少，而DSP可以节省更多ad机会来服务其它campaigns。
 
-- 动态CPM campaigns：DSP会为每个曝光花费一个动态数目的钱，而非固定。这些campaigns通常具有指定效目的目标，以便最优化问题会落在等式(3)
+- 动态CPM campaigns：**DSP会为每个曝光花费一个动态数目的钱，而非固定**。这些campaigns通常具有指定效目的目标，以便最优化问题会落在等式(3)
 中。与CPC/CPA campaigns相似，高responding ad requests会更受偏爱，以便减少creative serving cost以及节约ad机会。
 
 
 # 3.4 解法汇总
 
-受这些观察的启发，我们开发了新的heuristics来求解smart pacing问题。该heuristics尝试找到一个可行解，它会满足如等式2或3定义的所有constraints，接着进一步通过feedback control来最优化目标。我们首先从离线服务日志中构建一个response prediction模型来估计$$p_i = Pr(respond \mid Req_i, Ad)$$，它会帮助我们区分高响应广告请求 和 低响应广告请求。第二，我们会通过将相似的响应请求group在一起来减小solution space，并且在相同group中的请求会共享相同的group pacing rate。使用高responding rates的groups会具有高的pacing rates（比如图2(a)中的蓝色箭头）。第三，我们会开发一个新的control-based的方法来从在线feedback data中学习，并能动态调整group pacing rates来逼近最优解。不失一般性，我们假设campaign setup是具有/没有一个eCPC目标的CPM计费。我们的方法可以应用到其它计费（billing）方法上 ，效果广告或者其它grouping策略，比如：基于$$p_i/c_i$$的grouping。（期望的response per cost）
+受这些观察的启发，我们开发了新的heuristics来求解smart pacing问题。该heuristics尝试找到一个可行解，它会满足如等式2或3定义的所有constraints，接着进一步通过feedback control来最优化目标。
+
+- 首先从离线服务日志中构建一个response prediction模型来估计$$p_i = Pr(respond \mid Req_i, Ad)$$，它会帮助我们区分高响应广告请求 和 低响应广告请求。
+- 第二，我们会通过将相似的响应请求group在一起来减小solution space，并且在相同group中的请求会共享相同的group pacing rate。使用高responding rates的groups会具有高的pacing rates（比如图2(a)中的蓝色箭头）。
+- 第三，我们会开发一个新的control-based的方法来从在线feedback data中学习，并能动态调整group pacing rates来逼近最优解。
+
+不失一般性，我们假设campaign setup是具有/没有一个eCPC目标的CPM计费。我们的方法可以应用到其它计费（billing）方法上 ，效果广告或者其它grouping策略，比如：基于$$p_i/c_i$$的grouping。（期望的response per cost）
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ade9127e6a1766a7afcf3c2193044b8661dcd83e128caef301a95b58169624f0e6e290c8afb3816940604de00b27b292?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
