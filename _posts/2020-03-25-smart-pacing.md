@@ -172,10 +172,10 @@ $$
 
 我们首先描述对于没有指定效果目标的ad campaigns的微调算法。对于这种campaign类型，首要目标是花费预算，并根据budget spending plan进行安排。因而，在每个time slot的end，算法需要决定在下一个time slot中的预算量，并调整layered pacing rates来花费该量。
 
-在下一time slot中的待花费预算，由当前预算花费状态来决定。给定一个ad campaign，假设它的总预算是B，budget spending plan是$$B = (B^{(1)}, \cdots, B^{(K)})$$，在运行m个time slots后，剩余预算变为$$B_m$$。我们需要决定在每个剩余time slots中的花费，表示为$$\hat{C}^{m+1}, \cdots, \hat{C}^{(K)}$$，以便总预算可以花完，penalty最小。
+**在下一time slot中的待花费预算，由当前预算花费状态来决定**。给定一个ad campaign，假设它的总预算是B，budget spending plan是$$B = (B^{(1)}, \cdots, B^{(K)})$$，在运行m个time slots后，剩余预算变为$$B_m$$。我们需要决定在每个剩余time slots中的花费，表示为$$\hat{C}^{m+1}, \cdots, \hat{C}^{(K)}$$，以便总预算可以花完，penalty最小。
 
 $$
-\underset{arg min \Omega}{\hat{C}^{(m+1)}, \cdots, \hat{C}^{(K)}} \\
+\underset{\hat{C}^{(m+1)}, \cdots, \hat{C}^{(K)}}{arg min \Omega} \\
 s.t. \sum\limits_{t=m+1}^k \hat{C}^{(t)} = B_m
 $$
 
