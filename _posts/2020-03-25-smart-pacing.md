@@ -66,7 +66,7 @@ $$
 
 ## 3.2 在线广告campaign最优化的Smart Pacing问题
 
-广告主会花费预算，执行spending plan，并同时最优化campaign效果。然而，这样的一个抽象的多目标最优化问题，会有多个**帕累托最优解（Pareto optimal solutions）**。**在真实场景中，广告主通常会为不同campaigns对这些目标定制优化级**。对于品牌广告（branding campaigns），广告主通常会将花费预算放在最高优化级，接着是spending plan，而对效果并不很关注。在serving time时（例如：ad request time），由于我们使用概率节流（probabilistic throttling），**我们完全可以控制的唯一东西是$$r_i$$**。因而，对于没有指定效果目标的ad campaigns的smart pacing问题定义为：决定$$r_i$$的值，以便以下的测算是最优的：
+广告主会花费预算，执行spending plan，并同时最优化campaign效果。然而，这样的一个抽象的多目标最优化问题，会有多个**帕累托最优解（Pareto optimal solutions）**。**在真实场景中，广告主通常会为不同campaigns对这些目标定制优化级**。对于品牌广告（branding campaigns），广告主通常会将花费预算放在最高优化级，接着是spending plan，而对效果并不很关注。在serving time时（例如：ad request time），由于我们使用概率节流（probabilistic throttling），**我们完全可以控制的唯一东西是$$r_i$$**。因而，对于没有指定效果目标的ad campaigns的smart pacing问题(smart pacing for ad campaigns without specific performance goals)定义为：决定$$r_i$$的值，以便以下的测算是最优的：
 
 $$
 \underset{r_i}{min} P \\
@@ -75,24 +75,24 @@ $$
 
 ...(2)
 
-其中，$$\epsilon$$定义了违背spending plan的容忍度。相反的，对于效果广告活动（performance campaigns）具有指定的效果目标，达成效果目标是top优先级。此时坚持spending plan通常是低优先的。我们将**smart pacing for ad campaigns with specific performance goals**的问题定义为：决定$$r_i$$的值，以便以下测算是最优的：
+其中，$$\epsilon$$定义了违背spending plan的容忍度。相反的，对于效果广告（performance campaigns）具有指定的效果目标，达成效果目标是top优先级。此时坚持spending plan通常是低优先的。我们将**smart pacing for ad campaigns with specific performance goals**的问题定义为：决定$$r_i$$的值，以便以下测算是最优的：
 
 $$
-\underset{min}{r_i} \Omega(C, B)  \\
-s.t. P <= G, B - C <= \epsilon
+\underset{r_i}{min} \Omega(C, B)  \\
+s.t. P <= G, B - C \leq \epsilon
 $$
 
 ...(3)
 
-其中，$$\epsilon$$定义了没有花光所有预算的容忍度。由于市场的动态性，单目标最优化问题很难解决。在工业界已存在被广泛使用的方法，只会捕获效果目标，或者只会捕获预算花完目标。达到效果目标的一个示例是：对retargeting beacon触发ad requests，总是竞价。不幸的是，避免过度消费（overspending）或者欠消费（underspending）是无保障的。对于平滑步调控制（smooth pacing control）的另一个示例是，引入一个全局pacing rate，以便ad requests具有相同的概率被一个campaign竞价。然而，这些已经存在的方法没有一个可以解决我们公式化的smart pacing问题。为了解决该问题，我们研究了流行的campain setups，并做出一些关键观察（可以触发我们的解）：
+其中，$$\epsilon$$定义了没有花光所有预算的容忍度。由于市场的动态性，对于两个单目标最优化问题很难解决。在工业界已存在被广泛使用的方法，只会捕获效果目标，或者只会捕获预算花完目标。达到效果目标的一个示例是：对retargeting beacon触发ad requests，总是竞价。不幸的是，避免过度消费（overspending）或者欠消费（underspending）是无保障的。对于平滑步调控制（smooth pacing control）的另一个示例是，引入一个全局pacing rate，以便ad requests具有相同的概率被一个campaign竞价。然而，这些已经存在的方法没有一个可以解决我们公式化的smart pacing问题。为了解决该问题，我们研究了流行的campaign setups，并做出一些关键观察（可以启发我们的解法）：
 
 - CPM campaigns：广告主对于每个曝光会会付定固定数目的钱。对于品牌广告主（branding advertisers），campaign最优化的定义如公式2所示。只要预算可以被花费，并且spending pattern会随plan安排，高响应广告请求会比低响应的具有一个更高的point pacing rate，以便效果可以被最优化。对于效果广告主（performance advertisers，例如：eCPC、eCPA为目标），campaign最优化的定义如公式3所示。很明显，高响应的ad requerest应具有更高的point pacing rate来达到performance目标。
 
-- CPC/CPA campaigns：广告主会基于clicks/actions的绝对数目进行付费。显式效果目标是，保证当代表广告主进行竞价时，DSP不会丢掉钱。因此，这种optimzation的定义为等式(3)。
+- CPC/CPA campaigns：广告主会基于clicks/actions的绝对数目进行付费。显式效果目标是，保证当代表广告主进行竞价时，DSP不会丢掉钱。因此，这种optimzation的定义为等式(3)。授于高responding ad request以高point pacing rates，从广告主和DSP的视角来说会更有效：广告主会在creative serving cost上花费更少，而DSP可以节省更多ad机会来服务其它campaigns。
 
-- CPC/CPA campaigns：。。。
+- 动态CPM campaigns：DSP会为每个曝光花费一个动态数目的钱，而非固定。这些campaigns通常具有指定效目的目标，以便最优化问题会落在等式(3)
+中。与CPC/CPA campaigns相似，高responding ad requests会更受偏爱，以便减少creative serving cost以及节约ad机会。
 
-#
 
 # 3.4 解法汇总
 
