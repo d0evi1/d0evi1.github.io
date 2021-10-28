@@ -166,7 +166,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/59cd41d4eda859c9e377fb9e7493b93a206d22864c9128127a47f5d07850f2b3759de543baf7f51e2f3985c71a676811?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
 
-图3 减少budget spending的一个示例
+图3 加速budget spending的一个示例
 
 ## 5.2.1 没有performance目标的Campaigns
 
@@ -191,19 +191,24 @@ $$
 
 其中，$$t=m+1, \cdots, K$$。我们会触发该细节：由于页面限制，如何估计$$\hat{C}^{(t)}$$。在在线环境中，假设在最新的time slot中的实际花费是$$C^{(t-1)}$$，我们定义$$R=\hat{C}^{(t)} - C^{(t-1)}$$是residual，它可以帮助我们来做出调整决策。
 
-算法1给出了adujstment是如何完成的。假设index L表示最高优先级，index 1表示最低优先级，假设$$l'$$是具有非零pacing rate的最后一层。如果R=0, 则不需要做adjustment。如果R>0，这意味着需要加速分发，pacing rates会以一种自上而下的方式进行调整。从第L层开始，每一层的pacing rate会随层数一层层增加，直到第$$l'$$层。第5行会计算当前层的期望pacing rate，为了offset R。当第$$l' \neq 1$$时并且它的updated pacing rate $$r_{l'}^{(t)} > trial \ rate$$时，我们给第$$l' - 1$$层一个trial rate来准备进一步加速，如果R< 0，这意味着分发会变慢，每一层的pacing rate会以自底向上的方式减小，直接R是offset。第11行会生成当前layer到offset R的期望的pacing rate。假设l是最后要调的layer，$$l \neq 1$$和它的新的pacing rate $$r_l^{(t)} > trial \ rate$$，我们会给出第$$l-1$$层的trail rate来准备进一步加速。图4是一个分发如何变慢 的示例。
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/e4a22c94acba05bee6f4e62b9328f8d927dcce839c5a77b9178158200530a01be14acc31030f849f35d4ea8ae939a7cd?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=a1.jpg&amp;size=750">
+
+算法1
+
+算法1给出了adujstment是如何完成的。**假设：index L表示最高优先级，index 1表示最低优先级，假设$$l'$$是具有非零pacing rate的最后一层**。
+
+- 如果R=0, 则不需要做adjustment。
+- 如果R>0，这意味着需要加速分发，pacing rates会以一种自上而下的方式进行调整。
+
+从第L层开始，每一层的pacing rate会随层数一层层增加，直到第$$l'$$层。第5行会计算当前层的期望pacing rate，为了offset R。当第$$l' \neq 1$$时并且它的updated pacing rate $$r_{l'}^{(t)} > trial \ rate$$时，我们给第$$l' - 1$$层一个trial rate来准备进一步加速，如果R< 0，这意味着分发会变慢，每一层的pacing rate会以自底向上的方式减小，直接R是offset。第11行会生成当前layer到offset R的期望的pacing rate。假设l是最后要调的layer，$$l \neq 1$$和它的新的pacing rate $$r_l^{(t)} > trial \ rate$$，我们会给出第$$l-1$$层的trail rate来准备进一步加速。图4是一个分发如何变慢 的示例。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/1cc5b3643f8e08d6ee79275e0da8df9bf7ee94de3d364e82d919215976cd38d5adba3c146d427c8d8913403f0ce4a1e9?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=4.jpg&amp;size=750">
 
-图4
+图4 一个减少budget spending的示例
 
 我们注意到，在在线环境中，该greedy策略会尝试达到等式（2）的最优解。在每个time slot内，它会努力投资inventories，并在总预算和speding plan约束下具有最好的效果。
 
 ### 5.2.2 具有效果目标的Campaigns
-
-<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/e4a22c94acba05bee6f4e62b9328f8d927dcce839c5a77b9178158200530a01be14acc31030f849f35d4ea8ae939a7cd?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=a1.jpg&amp;size=750">
-
-算法1
 
 对于指定效果目标的campaigns（例如：eCPC <=2美元），pacing rate adjustment是有点复杂。很难预见在所有未来time slots内的ad request traffic，并且response rate分布可以随时间变化。因此，给定预算花费目标，利用在当前time slot中的所有ad requests，它们满足效果目标，不是等式（3）的最优解。算法2描述了对于这种类型的campaigns如何来完成adjustment。我们采用heuristic来进一步基于效果目标进行adjustment，它会添加到算法1中。
 
