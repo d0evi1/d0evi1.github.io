@@ -106,7 +106,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ade9127e6a1766a7afcf3c2193044b8661dcd83e128caef301a95b58169624f0e6e290c8afb3816940604de00b27b292?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 概率节流（Probabilistic Throttling） vs. 竞价修改（Bid Modification）的因子依赖图。灰色的因子涉及到budget pacing control。**在pacing rate和response rate间添加依赖是其中一个关键点.**
 
 # 4.response预测
 
