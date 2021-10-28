@@ -66,11 +66,11 @@ $$
 
 ## 3.2 在线广告campaign最优化的Smart Pacing问题
 
-广告主会花费预算，执行spending plan，并同时最优化campaign效果。然而，这样的一个抽象多目标最优化问题，会有多个**帕累托最优解（Pareto optimal solutions）**。在真实场景中，广告主通常会为不同campaigns对这些目标定制优化级。对于branding campaigns，广告主通常会将花费预算放在最高优化级，接着是spending plan，而效果并不很关注。在serving time时（例如：ad request time），由于我们使用概率节流（probabilistic throttling），我们完全可以控制的唯一东西是$$r_i$$。因而，对于没有指定效果目标的ad campaigns的smart pacing问题定义为：决定$$r_i$$的值，以便以下的测算是最优的：
+广告主会花费预算，执行spending plan，并同时最优化campaign效果。然而，这样的一个抽象的多目标最优化问题，会有多个**帕累托最优解（Pareto optimal solutions）**。**在真实场景中，广告主通常会为不同campaigns对这些目标定制优化级**。对于品牌广告（branding campaigns），广告主通常会将花费预算放在最高优化级，接着是spending plan，而对效果并不很关注。在serving time时（例如：ad request time），由于我们使用概率节流（probabilistic throttling），**我们完全可以控制的唯一东西是$$r_i$$**。因而，对于没有指定效果目标的ad campaigns的smart pacing问题定义为：决定$$r_i$$的值，以便以下的测算是最优的：
 
 $$
-\underset{min}{r_i} P \\
-s.t. C = B, \Omega (C,B) <= \epsilon
+\underset{r_i}{min} P \\
+s.t. C = B, \Omega (C,B) \leq \epsilon
 $$
 
 ...(2)
