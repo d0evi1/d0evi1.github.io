@@ -11,26 +11,26 @@ Optimization》提出了一种smart pacing的策略。
 
 # 0.摘要
 
-在定向广告中，广告主会在预算范围内在分发约束的情况下最大化竞价效果。大多数广告主通常喜欢引入delivery constraint来随时间平滑地花费预算，以便触达更广范围的受众，并具有持续性的影响。对于在线广告，由于许多曝光会通过公开竞拍(public auctions)来进行交易，流动性（liquidity）使得价格更具弹性，在需求方和供给方间的投标景观（bid landscape）会动态变化。因此，对于同时执行平滑步调控制（smooth pacing control）并且最大化竞价效果很具挑战。本文中提出了一种smart pacing方法，它会同时从离线和在线数据中学习每个campaign的分发步调（delivery pace），来达到平滑分发和最优化效果目标。我们也在真实DSP系统中实现了该方法。实验表明，在线广告活动（online ad campaign）和离线模拟都表明我们的方法可以有效提升campaign效果，并能达到分布目标。
+在定向广告中，广告主会在预算范围内在分发约束的情况下最大化竞价效果。**大多数广告主通常喜欢引入分发约束（delivery constraint）来随时间平滑地花费预算，以便触达更广范围的受众，并具有持续性的影响**。对于在线广告，由于许多曝光会通过公开竞拍(public auctions)来进行交易，流动性（liquidity）使得价格更具弹性，在需求方和供给方间的投标景观（bid landscape）会动态变化。因此，对于同时执行平滑步调控制（smooth pacing control）并且最大化竞价效果很具挑战。本文中提出了一种smart pacing方法，它会同时从离线和在线数据中学习每个campaign的分发步调（delivery pace），来达到平滑分发和最优化效果目标。我们也在真实DSP系统中实现了该方法。实验表明，在线广告活动（online ad campaign）和离线模拟都表明我们的方法可以有效提升campaign效果，并能达到分布目标。
 
 # 1.介绍
 
 在线广告是一个数十亿美金的产业，并且在最近几年持续两位数增长。市场见证了搜索广告（search
-advertising）、上下文广告（ contextual advertising）、保证展示广告(guaranteed display advertising)、以及最近的基于竞价的广告的出现。我们主要关注基于竞价的广告（auction-based），它具有最高的流动性，例如：每次ad曝光可以通过一个公开竞价使用一个不同的价格来交易。在市场中，DSPs（Demand-Side Platforms ）是个关键角色，它扮演着大量广告主的代理，并通过许多direct ad-network 或者RTB（实时竞价）广告交换来获得不同的广告曝光，来管理ad campaigns的整个welfare。一个广告主在一个DSP上的目标可以归为：
+advertising）、上下文广告（ contextual advertising）、保证展示广告(guaranteed display advertising)、以及最近的基于竞价的广告的出现。**我们主要关注基于竞价的广告（auction-based），它具有最高的流动性，例如：每次ad曝光可以通过一个公开竞价使用一个不同的价格来交易**。在市场中，DSPs（Demand-Side Platforms ）是个关键角色，它扮演着大量广告主的代理，并通过许多direct ad-network 或者RTB（实时竞价）广告交换来获得不同的广告曝光，来管理ad campaigns的整个welfare。一个广告主在一个DSP上的目标可以归为：
 
-- 达到分发和效果目标：对于品牌活动（branding campaigns），目标通常是花费预算来达到一个广泛受众、同时使得活动效果尽可能好；对于效果活动（performance campaigns），目标通常是达到一个performance目标（比如：eCPC <= 2美元），并同时尽可能花费越多预算。其它campaigns的目标通常在这两个极端之内。
+- **达到分发和效果目标**：对于品牌活动（branding campaigns），目标通常是花费预算来达到一个广泛受众、同时使得活动效果尽可能好；对于效果活动（performance campaigns），目标通常是达到一个performance目标（比如：eCPC <= 2美元），并同时尽可能花费越多预算。其它campaigns的目标通常在这两个极端之内。
 
-- 执行预算花费计划：广告主通常期望它们的广告会在购买周期内平滑展示，以便达到一个更广的受众，可以有持续性影响，并在其它媒介上（TV和杂志）增加活动。因此，广告主可以定制自己的预算花费计划（budget spending plans）。图1给出了budget spending plan的两个示例：平均步调（even pacing）和基于流量的步调（traffic based pacing）。
+- **执行预算花费计划(budget spending plan)**：广告主通常期望它们的广告会在购买周期内平滑展示，以便达到一个更广的受众，可以有持续性影响，并在其它媒介上（TV和杂志）增加活动。因此，广告主可以定制自己的预算花费计划（budget spending plans）。图1给出了budget spending plan的两个示例：平均步调（even pacing）和基于流量的步调（traffic based pacing）。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/d47a9752d0621f63d31144653004e88291a21b5a70dd7c9922f243fe7929d6188623087c4ddabd22979d8e26ef557797?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
 
-图1
+图1 不同的预算花费计划
 
-- 减少创意服务开销（creative serving cost）：除了通过由DSPs负责的开销外，也存在由第3方创意服务提供商负责的creative serving cost。现在，越来越多的广告活动会以视频或富媒体的形式出现。这种类型的曝光的creative serving cost可以与优质存货开销（premium inventory cost）一样多，因此，广告主总是愿意减少这样的开销，并且来高效和有效地分发曝光给合适的用户。
+- **减少创意服务开销（creative serving cost）**：除了通过由DSPs负责的开销外，也存在由第3方创意服务提供商负责的creative serving cost。现在，越来越多的广告活动会以视频或富媒体的形式出现。这种类型的曝光的creative serving cost可以与优质存货开销（premium inventory cost）一样多，因此，广告主总是愿意减少这样的开销，并且来高效和有效地分发曝光给合适的用户。
 
 # 3.问题公式化
 
-我们关注两个campaign类型： 1) branding campaigns 2) performance campaigns。其它campaign类型位于两个之间。这些类型的campaign可以具有它自己唯一的budget spending plan。我们首先将该问题公式化来解决，接着给出我们的解法。
+我们关注两个campaign类型： 1) 品牌广告（branding campaigns） 2) 效果广告（performance campaigns）。其它campaign类型位于两个之间。这些类型的campaign可以具有它自己唯一的budget spending plan。我们首先将该问题公式化来解决，接着给出我们的解法。
 
 ## 3.1 前提
 
@@ -42,24 +42,24 @@ $$
 
 其中，$$B^{(t)} >= 0$$并且 $$\sum_{t=1,\cdots,K} B^{(k)} = B$$。假设$$Req_i$$是由一个DSP接受到的第i个ad request。如第2节所述，我们使用概率节流（probabilistic throttling）来进行budget pacing control。我们表示为：
 
-- $$s_i \sim Bern(r_i)$$：该变量表示：对于$$Req_i$$，Ad是否参与竞价，$$r_i$$是在$$Req_i$$上的point pacing rate。$$r_i \in [0, 1]$$表示Ad参与$$Req_i$$上竞价的概率。
+- $$s_i \sim Bern(r_i)$$：该变量表示：在$$Req_i$$上Ad是否参与竞价。其中：$$r_i$$是在$$Req_i$$上的point pacing rate。$$r_i \in [0, 1]$$表示Ad参与$$Req_i$$上竞价的概率。
 
-- $$w_i$$：该变量表示Ad 参与该次竞价时是否赢得$$Req_i$$，它会依赖于通过竞价最优化模块（bid optimization module）给出的竞价$$bid_i$$
+- $$w_i$$：该变量表示在$$Req_i$$上参与该次竞价时是否赢得该Ad。它会依赖于通过竞价最优化模块（bid optimization module）给出的竞价$$bid_i$$
 
-- $$c_i$$：当Ad被服务于ad请求$$Req_i$$时的广告主开销。注意：开销包括inventory cost和creative serving cost。
+- $$c_i$$：当Ad服务于$$Req_i$$时的广告主开销。注意：开销包括inventory cost和creative serving cost。
 
-- $$q_i \sim Bern(p_i)$$：该变量表示当Ad服务于$$Req_i$$时，用户是否会执行一些期望的响应（例如：click），其中$$p_i = Pr(respond \mid Req_i, Ad)$$是这些响应的概率。
+- $$q_i \sim Bern(p_i)$$：该变量表示当Ad服务于$$Req_i$$时，用户是否会执行一些期望的响应（例如：click）。其中$$p_i = Pr(respond \mid Req_i, Ad)$$是这些响应的概率。
 
 - $$C = \sum_i s_i \times w_i \times c_i $$是ad campaign Ad的总开销。
 
-- $$P=C/sum_i s_i \times w_i \times q_i$$：ad campaign Ad的performance（例如：当期望响应是点击时的eCPC）
+- $$P=C/\sum_i s_i \times w_i \times q_i$$：ad campaign Ad的效果（performance）（例如：当期望响应是点击时的eCPC）
 
 - $$C = (C^{(1)}, \cdots, C^{(k)})$$：在K个time slots上的spending pattern，其中$$C^{(t)}$$是第t个time slot的开销，$$C^{(t)} >= 0$$并且$$\sum_{t=1,\cdots,K} C^{(k)} = C$$
 
-给定一个广告活动Ad，我们定义：$$\Omiga$$是penalty(error) function，它会捕获spending pattern C是如何偏离spending plan B。值越小表示排列（alignment）越好。作为示例，我们会将penalty定义如下：
+给定一个广告活动Ad，**我们定义：$$\Omega$$是penalty(error) function，它会捕获spending pattern C是如何偏离spending plan B。值越小表示对齐（alignment）越好**。作为示例，我们会将penalty定义如下：
 
 $$
-\Omiga (C, B) = \sqrt frac{1}{K} \sum\limits_{t=1}^K (C^{(t)} - B^{(t)})^2
+\Omega (C, B) = \sqrt \frac{1}{K} \sum\limits_{t=1}^K (C^{(t)} - B^{(t)})^2
 $$
 
 ...(1)
