@@ -144,18 +144,18 @@ $$
 
 $$
 e(e_1, \cdots, e_L)
-$$，
+$$
 
 其中：$$e_i = \frac{CPM}{ 1000 \times p_i}$$。假设每层的pacing rate在第t-1个time slot上是：
 
 $$
-r^{(t-1)} = (r_1^{(t-1)}, \cdots, r_L^{(t-1)}
+r^{(t-1)} = (r_1^{(t-1)}, \cdots, r_L^{(t-1)})
 $$
 
 那么，每个layer的spending为：
 
 $$
-c^{(t-1)} = (c_1^{(t-1)}, \cdots, c_L^{(t-1)}
+c^{(t-1)} = (c_1^{(t-1)}, \cdots, c_L^{(t-1)})
 $$
 
 对于将要到来的第t个 time slot会基于campaign目标，control-based的方法会预估：
@@ -166,7 +166,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/59cd41d4eda859c9e377fb9e7493b93a206d22864c9128127a47f5d07850f2b3759de543baf7f51e2f3985c71a676811?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
 
-图3
+图3 减少budget spending的一个示例
 
 ## 5.2.1 没有performance目标的Campaigns
 
