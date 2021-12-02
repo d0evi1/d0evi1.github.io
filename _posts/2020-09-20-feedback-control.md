@@ -79,10 +79,10 @@ $$
 
 数学上，假设对于一个给定的ad campaign，存在n个交易平台（可以是其它channels），比如：1, 2, ..., n，它们对于一个target rule具有ad volume。在我们的公式里，我们关注最优化点击，而转化率公式可以相似被获取到。假设：
 
-- $$\epsilon_i$$：是在交易平台i上的eCPC，
-- $$c_i(\epsilon_i)$$是campaign在交易平台i上调整竞价使得eCPC为$$\epsilon_i$$，所对应的在campaign的lifetime中获得的点击数
+- $$\epsilon_i$$：是在交易平台i上的eCPC
+- $$c_i(\epsilon_i)$$：是campaign在交易平台i上调整竞价后使得eCPC为$$\epsilon_i$$，所对应的**在该campaign的lifetime中获得的点击数**
 
-对于广告主，他们希望在给定campaign预算B下，最大化campaign-level的点击数：
+对于广告主，他们希望在给定campaign预算B下，最大化campaign-level的点击数（会使得成本$$\epsilon_i$$越小）：
 
 $$
 max_{\epsilon_1,\epsilon_2,\cdots,\epsilon_n} \sum_i c_i(\epsilon_i) \\
@@ -102,8 +102,8 @@ $$
 其中，$$\alpha$$是Lagrangian乘子。接着我们采用它在$$\epsilon_i$$上的梯度，并假设它为0
 
 $$
-\frac{\partial L(\epsilon_1,\epsilon_2,\cdots,\epsilon_n, \alpha)}{\partial \epsilon_i} = c_i^'(\epsilon_i) - \alpha(c_i^' (\epsilon_i) \epsilon_i + c_i(\epsilon_i)) = 0 \\
-\frac{1}{\alpha} = \frac{c_i^' (\epsilon_i) \epsilon_i + c_i(\epsilon_i)}{c_i^'(\epsilon_i)} = \epsilon_i + \frac{c_i(\epsilon_i)}{c_i^'(\epsilon_i)}
+\frac{\partial L(\epsilon_1,\epsilon_2,\cdots,\epsilon_n, \alpha)}{\partial \epsilon_i} = c_i'(\epsilon_i) - \alpha(c_i' (\epsilon_i) \epsilon_i + c_i(\epsilon_i)) = 0 \\
+\frac{1}{\alpha} = \frac{c_i' (\epsilon_i) \epsilon_i + c_i(\epsilon_i)}{c_i'(\epsilon_i)} = \epsilon_i + \frac{c_i(\epsilon_i)}{c_i'(\epsilon_i)}
 $$
 
 ...(9) (10)
