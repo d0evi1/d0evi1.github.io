@@ -111,7 +111,7 @@ $$
 其中，对于每个交易平台i都适用于该等式。这样，我们可以使用$$\alpha$$来桥接任意两个平台i和j的等式：
 
 $$
-\frac{1}{\alpha} = \epsilon_i + \frac{c_i(\epsilon_i)}{c_i^'(\epsilon_i)} = \epsilon_j + \frac{c_j(\epsilon_j)}{c_j^'(\epsilon_j)}
+\frac{1}{\alpha} = \epsilon_i + \frac{c_i(\epsilon_i)}{c_i'(\epsilon_i)} = \epsilon_j + \frac{c_j(\epsilon_j)}{c_j'(\epsilon_j)}
 $$
 
 ...(11)
@@ -119,7 +119,7 @@ $$
 因此，最优解条件给定如下：
 
 $$
-\frac{1}{\alpha} = \epsilon_1 + \frac{c_i(\epsilon_1)}{c_1^'(\epsilon_1)} = \epsilon_2 + \frac{c_2(\epsilon_2)}{c_2^'(\epsilon_2)} = ... = \epsilon_n + \frac{c_n(\epsilon_n)}{c_n^'(\epsilon_n)} \\
+\frac{1}{\alpha} = \epsilon_1 + \frac{c_i(\epsilon_1)}{c_1'(\epsilon_1)} = \epsilon_2 + \frac{c_2(\epsilon_2)}{c_2'(\epsilon_2)} = ... = \epsilon_n + \frac{c_n(\epsilon_n)}{c_n'(\epsilon_n)} \\
 \sum_i c_i(\epsilon_i) \epsilon_i = B
 $$
 
