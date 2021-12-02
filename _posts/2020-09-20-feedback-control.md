@@ -119,13 +119,13 @@ $$
 因此，最优解条件给定如下：
 
 $$
-\frac{1}{\alpha} = \epsilon_1 + \frac{c_i(\epsilon_1)}{c_1'(\epsilon_1)} = \epsilon_2 + \frac{c_2(\epsilon_2)}{c_2'(\epsilon_2)} = ... = \epsilon_n + \frac{c_n(\epsilon_n)}{c_n'(\epsilon_n)} \\
+\frac{1}{\alpha} = \epsilon_1 + \frac{c_1(\epsilon_1)}{c_1'(\epsilon_1)} = \epsilon_2 + \frac{c_2(\epsilon_2)}{c_2'(\epsilon_2)} = ... = \epsilon_n + \frac{c_n(\epsilon_n)}{c_n'(\epsilon_n)} \\
 \sum_i c_i(\epsilon_i) \epsilon_i = B
 $$
 
 ...(12)(13)
 
-有了足够的数据样本，我们可以发现，$$c_i(\epsilon_i)$$通常是一个concave和smooth函数。一些示例如图4所示。
+有了足够的数据样本，我们可以发现，$$c_i(\epsilon_i)$$通常是一个凹函数（concave）和平滑（smooth）函数。一些示例如图4所示。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/730cef0bd8b1fd91dd48f9c9a7860097afa302603bfbc8bb946de038ed5afa11a8b6709f723128f26855bb37715d57fd?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=4.jpg&amp;size=750">
 
@@ -149,7 +149,7 @@ $$
 等式(14)转成(12)：
 
 $$
-\frac{1}{\alpha} = \epsilon_i + \frac{c_i(\epsilon_i)}{c_i^'(\epsilon_i)} = \epsilon_i +  ... = (1+\frac{1}{b_i} \epsilon_i
+\frac{1}{\alpha} = \epsilon_i + \frac{c_i(\epsilon_i)}{c_i'(\epsilon_i)} = \epsilon_i +  ... = (1+\frac{1}{b_i} \epsilon_i
 $$
 
 ...(15)
