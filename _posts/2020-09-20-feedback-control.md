@@ -1,6 +1,6 @@
 ---
 layout: post
-title: ali COLD介绍
+title: PID广告控制介绍
 description: 
 modified: 2020-09-10
 tags: 
@@ -8,11 +8,19 @@ tags:
 
 《Feedback Control of Real-Time Display Advertising》在PID中引入了feedback control。
 
+## 3.2 PID controller 
+
+在t时刻的bid request，执行者会考虑当前控制信号$$\phi(t)$$，并将$$b(t)$$调整bid price$$$$
+
+## 3.3 Waterlevel-based Controller
+
+
+
 ## 3.4 点击最大化
 
 假设：feedback controller是一个有效工作，用来分发广告主的KPI目标，在该节中，我们会演示feedback control机制可以被当成一个model-free的click maximisation framework，它可以嵌入到任意bidding策略，并执行在不同channels上，通过设置smart reference values来进行竞价预算分配。
 
-当一个广告主指定目标受众时（通常会组合上广告曝光上下文分类）来进行它指定的campaign，来自独立channels（比如：不同的广告交易平台(ad exchanges)、不同的用户regions、不同的用户PC/model设备等）的满足目标规则（target rules）的曝光（impressions）。通常，DSP会集合许多ad exchanges，并分发来自所有这些广告交易平台(ad exchanges)的所需ad曝光（只要曝光能满足target rule），尽管市场价格会大有不同。图3展示了这些，对于相同的campaign，不同的广告交易平台(ad exchanges)会有不同的eCPC。如【34】中所说，在其它channels上（比如：user regions和devices上）也会有所不同。
+当一个广告主在指定目标受众时（通常会组合上广告曝光上下文分类）来进行它指定的campaign，来自独立channels（比如：不同的广告交易平台(ad exchanges)、不同的用户regions、不同的用户PC/model设备等）的满足目标规则（target rules）的曝光（impressions）。通常，DSP会集合许多ad exchanges，并分发来自所有这些广告交易平台(ad exchanges)的所需ad曝光（只要曝光能满足target rule），尽管市场价格会大有不同。图3展示了这些，对于相同的campaign，不同的广告交易平台(ad exchanges)会有不同的eCPC。如【34】中所说，在其它channels上（比如：user regions和devices上）也会有所不同。
 
 开销差异提供给广告主一个机会，可以基于eCPC来最优化它的campaign效果。为了证实这点，假设一个DSP被集在到两个广告交易平台A和B。对于在该DSP中的一个campaign，如果来自A的eCPC要比B的高，这意味着来自平台B的库存要比平台A的费用更高效，接着会重新分配一些预算给A和B，这将潜在减小该campaign的整体eCPC。实际上，预算重分配（budget reallocation）可以通过对平台A减小竞价、并增加平台B的竞价来完成。这里，我们正式提出一个用于计算每个交易平台的均衡eCPC模型，它可以被用作最优化reference eCPC来进行feedback control，并在给定预算约束下生成一个最大数目的点击。
 
