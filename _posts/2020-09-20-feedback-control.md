@@ -22,7 +22,7 @@ tags:
 
 # 3.1 Actuator
 
-对于在时刻的bid request，auctuator会考虑当前控制信息$$\phi(t)$$来将bid价格从$$b(t)$$调整到一个新的值$$b_a(t)$$。在我们的模型中，控制信号，它会在下一节中以数学形式定义，这在bid price上的一个增益。总之，当控制信号$$\phi(t)$$为0时，不会进行bid调整。这是不同的actuator模型，在我们的工作中，我会选择使用：
+对于在t时刻的bid request，auctuator会考虑当前控制信息$$\phi(t)$$来将bid价格从$$b(t)$$调整到一个新的值$$b_a(t)$$。在我们的模型中，控制信号，它会在下一节中以数学形式定义，这在bid price上的一个增益。总之，当控制信号$$\phi(t)$$为0时，不会进行bid调整。这是不同的actuator模型，在我们的工作中，我会选择使用：
 
 $$
 b_a(t) = b(t) exp(\lbrace \phi(t) \rbrace)
@@ -30,7 +30,7 @@ $$
 
 ...(2)
 
-其中，当$$\phi(t) = 0$$时，该模型会满足$$b_a(t)$$。其它比如线性模型$$b_a(t) = b(t) (1+\phi(t))$$的模型也会在我们的研究中，但当一个大的负向控制信号被发到actuator时执行效果很差，其中linear actuator通常会响应一个负或零的bid，这在我们场景中是无意义的。相反的，指数模型是合适的，可以解决上述缺点，因为它天然会避免一个负的竞价。在之后的研究中，我们会基于指数形式的actuator model上报分析。
+其中，当$$\phi(t) = 0$$时，该模型会满足$$b_a(t)$$。其它比如线性模型$$b_a(t) = b(t) (1+\phi(t))$$的模型也会在我们的研究中，但当一个大的负向控制信号被发到actuator时执行效果很差，其中linear actuator通常会响应一个负或零的bid，这在我们场景中是无意义的。相反的，指数模型是合适的，因为它天然会避免一个负的竞价，从而解决上述缺点。在之后的研究中，我们会基于指数形式的actuator model上报分析。
 
 ## 3.2 PID controller 
 
@@ -40,9 +40,15 @@ $$
 e(t_k) = x_r - x(t_k), \\
 \phi(t_{k+1}) \rightarrow \lambda_P e(t_k) + \lambda_I \sum\limits_{j=1}^k e(t_j) \Delta t_j + \lambda_D \frac{\Delta e(t_k)}{\Delta t_k}
 $$
+
 ...(3)(4)
 
-其中，error factor $$e(t_k)$$是$$x_r$$减去当前控制变量值$$x(t_k)$$的reference value，更新时间间隔给定如下$$\Delta t_j = t_j - t_{j-1} $$,error factors的变化是$$\Delta e(t_k) = e(t_k) - e(t_{k-1})$$，其中: $$\lambda_P, \lambda_I, \lambda_D$$是每个control factor的weight参数。注意，这里的control factors都是在离散时间$$(t_1, t_2, \cdots) $$上的，因为bidding事件是离散的，它实际上会周期性更新control factors。所有的control factors $$(\phi(t), e(t_k), \lambda_P, \lambda_I, \lambda_D)$$仍会在两个updates间保持相同，在等式(2)中的控制信号$$\phi(t)$$等于$$\phi(t_k)$$。我们看到P factor会趋向于将当前变量值push到reference value；I factor会减小从当前时间开始的累计error；D factor会控制该变量的波动。
+其中：
+
+- error factor $$e(t_k)$$是$$x_r$$减去当前控制变量值$$x(t_k)$$的reference value
+- 更新时间间隔给定如下$$\Delta t_j = t_j - t_{j-1} $$,error factors的变化是$$\Delta e(t_k) = e(t_k) - e(t_{k-1})$$，其中: $$\lambda_P, \lambda_I, \lambda_D$$是每个control factor的weight参数。
+
+注意，这里的control factors都是在离散时间$$(t_1, t_2, \cdots) $$上的，因为bidding事件是离散的，它实际上会周期性更新control factors。所有的control factors $$(\phi(t), e(t_k), \lambda_P, \lambda_I, \lambda_D)$$仍会在两个updates间保持相同，在等式(2)中的控制信号$$\phi(t)$$等于$$\phi(t_k)$$。我们看到P factor会趋向于将当前变量值push到reference value；I factor会减小从当前时间开始的累计error；D factor会控制该变量的波动。
 
 ## 3.3 Waterlevel-based Controller
 
