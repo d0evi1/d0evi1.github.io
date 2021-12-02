@@ -10,7 +10,13 @@ tags:
 
 # 3.RTB feedback control系统
 
+
+
 图2展示了RTB feedback control系统的图示。传统的bidding strategy可以表示为在DSP bidding agent中的bid calculator module。controller会扮演着根据bid calculator调整bid价格的角色。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ecfce45fcc3f2e22ec815c4fe656c7e6d087370ea7874a0b6f46c724bb19e2b4a4459d50a2f5a5bf2da85b98fc6fafca?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
+
+图2
 
 特别的，monitor会接收到来自ad exchange的auction win通知和来自ad tracking系统的用户点击反馈，它整体上会看成是dynamic system。接着，当前的KPI值（比如：AWR和eCPC）会被计算。如果该任务会使用reference value来控制eCPC，在reference eCPC和measured eCPC间的error因子会被计算，并接着会发送到control function中。输出控制信号会被发送到actuator中，它会使用control signal来调整来自bid calculator的原始bid price。调整后的bid price会将合理的ad（qualified ad）打包成bid response，并发送回ad exchange进行auction。
 
@@ -59,6 +65,7 @@ $$
 
 当一个广告主在指定目标受众时（通常会组合上广告曝光上下文分类）来进行它指定的campaign，来自独立channels（比如：不同的广告交易平台(ad exchanges)、不同的用户regions、不同的用户PC/model设备等）的满足目标规则（target rules）的曝光（impressions）。通常，DSP会集合许多ad exchanges，并分发来自所有这些广告交易平台(ad exchanges)的所需ad曝光（只要曝光能满足target rule），尽管市场价格会大有不同。图3展示了这些，对于相同的campaign，不同的广告交易平台(ad exchanges)会有不同的eCPC。如【34】中所说，在其它channels上（比如：user regions和devices上）也会有所不同。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/20fe6d05772ce1e0acc3bfc82846acde16b666b530416a4ad4157c4c4f0e95b2b4348dbe1451e050d611220b0cea0057?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
 
 图3
 
@@ -112,7 +119,13 @@ $$
 
 ...(12)(13)
 
-有了足够的数据样本，我们可以发现，$$c_i(\epsilon_i)$$通常是一个concave和smooth函数。一些示例如图4所示。基于该观察，可以将$$c_i(\epsilon_i)$$定义成一个通用多项式：
+有了足够的数据样本，我们可以发现，$$c_i(\epsilon_i)$$通常是一个concave和smooth函数。一些示例如图4所示。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/730cef0bd8b1fd91dd48f9c9a7860097afa302603bfbc8bb946de038ed5afa11a8b6709f723128f26855bb37715d57fd?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=4.jpg&amp;size=750">
+
+图4
+
+基于该观察，可以将$$c_i(\epsilon_i)$$定义成一个通用多项式：
 
 $$
 c_i(\epsilon_i) = c_i^* a_i  (\frac{\epsilon_i}{\epsilon_i^*})^{b_i}
@@ -203,6 +216,10 @@ $$
 
 对于每个campaign，我们会检查在两个KPIs上的两个controllers。我们首先调整在训练数据上的控制参数来最小化settling time。接着我们采用在test data上的controllers并观察效果。在每个campaign上的详细控制效果如表1所示。图5展示了controlled KPI vs. timesteps（例如：轮）曲线。曲水平线意味着reference。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/4ea198e84181652260c3274c5616844eeca81c48879f02336ef82afbb028381316b48240f9bdc464f542c7b13de50bb1?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=5.jpg&amp;size=750">
+
+图5
+
 我们从结果看到：
 
 - (i) 所有PID controllers可以设置在error band内的KIPs（小于40轮的settling time），它意味着PID control可以在给定reference value上设置两个KPIs。
@@ -219,7 +236,15 @@ $$
 
 在达成settling time、RMSE-SS和SD-SS的分布，以及三个refrence levels的setting，如图6(a)(b)所示，使用PID来控制eCPC和AWR。我们观察到，平均setting time、RMSE-SS、SD-SS，会随着refrence values变高而减小。这表明：具有更高reference的eCPC和AWR的控制任务，会更容易达成，因为可以竞价更高来获胜更多、并且花费更多。随着reference越高，越接近初始performance value，控制信号不会带来更严重的bias或易变性（volatility），这会导致更低的RMSE-SS和SD-SS。对于page limit，使用WL的control效果不会在这里呈述。结果与PID相近。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/0f5d7ec0ea575c1ff3d003cabe8c1ed01521a044bf91c9c7358565ec1dcee6f5f998153cd493197915bf4703679a4f59?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=6.jpg&amp;size=750">
+
+图6
+
 图7给出了具有三个reference levels两个controllers的特定控制曲线，它在一个样本campaign 3386。我们发现reference value会远离控制变量的初始值，会在eCPC和AWR上为settling带来更大的难度。这建议广告主在设置一个模糊控制目标会引入unsettling或更大易变性的风险。广告主应尝试找出在target value和practical control performance间的一个最好trade-off。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/7e9508b02ebd33c62760d652742000a692b8edbb720c28f27ffb74407025f8669015fe618a07828c271807a26cadd970?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=7.jpg&amp;size=750">
+
+图7
 
 ## 4.4 PID setting：静态 vs. 动态references
 
@@ -253,10 +278,18 @@ $$
 
 图8展示了具有基于等式(20)计算的动态reference PID control的效果。campaign效果会在当预算耗尽时停止。从该图看到，对于eCPC和AWR control，动态reference会采用一个激进模式，将eCPC或AWR沿着原始的reference value（虚线）进行推进。这实际上会模拟一些广告主的策略：当performance低于reference时，更高的dynamic reference会将总效果更快地推向intial reference。另外，对于AWR control，我们可以看到，当预算即将耗尽时，dynamic reference会起伏不定。这是因为当所剩预算不够时，reference value会通过等式(20)设置得过高或过低，以便将效果push到初始目标。很显然这是一个低效的解决方案。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/44da0a625cd1446841e5705272e99b6993df7b0b0dc0195cd6238db7f8382a8be90d796418cfa4a3c8db4fbe8d398b06?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=8.jpg&amp;size=750">
+
+图8
+
 另外，我们直接对比了PID在dynamic-reference controllers（dyn）和标准静态reference（st）上的数量控制效果。除了settling time外，我们也对比了settling cost，它表示在settling前的花费预算。在所有campaigns上整体效果，eCPC control如图9(a)所示；AWR control如图9(b)所示。结果表明：
 
 - (i) 对于eCPC control，dynamic reference controllers不会比static-reference controller效果更好 
 - (ii) 对于AWR control，dynamic-reference controllers可以减小settling time和cost，但accuracy（RMSE-SS）和stability（SD-SS）会比static-reference controllers更糟。这是因为dynamic reference本身会带来易变性（如图8）。这些结果表明，PID controller提供了一个够好的方式来朝着预先指定的reference来设置变量，无需动态调整reference来加速使用我们的方法。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/251d37508fa3e292405759ed38d3ba719e2754a4a84606731e64fdaada73d93153a1b434032d4cc032e1bd0c806d8323?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=9.jpg&amp;size=750">
+
+图9
 
 ## 4.5 click maximisation的reference setting
 
@@ -270,7 +303,15 @@ $$
 - (ii) 通过重分配预算，在不同广告交易平台上设置不同reference eCPCs，multiple会进一步胜过uniform
 - (iii) 在impression相关的指标上，feedback-control-enabled bidding策略会比non-controlled bidding stategy获得更多曝光，通过减少它们的bids（CPM）以及AWR，但达成更多的bid volumes。这建议我们：通过分配更多预算到具有更低值的impressions上，可以潜在生成更多点击。作为一个副产品，它会证实【33】的理论。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/570b8e6e48ff1cfb8b099f0e0384aabfab50b958b161d5bfe55637fa245dc772d6392d09e7b9ace6886a298c3f3442a0?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=10.jpg&amp;size=750">
+
+图10
+
 作为示例，图11会绘制在campaign 1458上的三个方法的settling效果。三条曲线是在三个交易平台上的reference eCPCs。我们可以看到：在三个广告交易平台上的eCPCs。我们可以看到，在三个交易平台上的eCPs成功设置在reference eCPCs。同时，campaign-level eCPC (multiple)会比uniform和none设置在一个更低值。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/14836f47b8553605dce2bbdf9694a11ae633ac26632e5fb6111be31712780e74e758fe99245df32b0b6c5f2529c8b0db?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=11.jpg&amp;size=750">
+
+图11
 
 ## 4.6 PID参数调整
 
@@ -287,6 +328,10 @@ $$
 **在线参数更新**
 
 由于DSP会在feedback control下运行，收集的数据会被立即使用来训练一个新的PID controller并更新老的。我们研究了PID参数使用最近数据进行在线更新的可能性。特别的，在使用训练数据初始化PID参数后，我们会在每10轮上对controller进行重训练（例如：在round 10, 20, 30），在test stage使用所有之前的数据并使用与training stage相同的参数搜索方法。在re-training中的参数搜索会在每个controller上花费10分钟，它比round周期（2小时）要更短。图12展示了分别使用在线和郭线PID参数的control效果。可以看到，在每10轮后，在线调参的PID在管理控制围绕reference value的eCPC上会比离线更有效，产生更短的settling time以及更低的overshoot。另外，当切换参数时，没有明显的干扰或不稳定发生。有了在线参数更新，我们可以开始基于several-hour的training data来训练controllers并采用新数据来自适应更新参数来提升control效果。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b64be8f332eb6b3f86b6696ae835486471918c88c1810a563b82b79eef8a8734e30cba0918550fd77192da715e6fc1c3?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=12.jpg&amp;size=750">
+
+图12
 
 # 5.在线部署与测试
 
