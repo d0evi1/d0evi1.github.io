@@ -48,11 +48,11 @@ $$
 - error factor $$e(t_k)$$是$$x_r$$减去当前控制变量值$$x(t_k)$$的reference value
 - 更新时间间隔给定如下$$\Delta t_j = t_j - t_{j-1} $$,error factors的变化是$$\Delta e(t_k) = e(t_k) - e(t_{k-1})$$，其中: $$\lambda_P, \lambda_I, \lambda_D$$是每个control factor的weight参数。
 
-注意，这里的control factors都是在离散时间$$(t_1, t_2, \cdots) $$上的，因为bidding事件是离散的，它实际上会周期性更新control factors。所有的control factors $$(\phi(t), e(t_k), \lambda_P, \lambda_I, \lambda_D)$$仍会在两个updates间保持相同，在等式(2)中的控制信号$$\phi(t)$$等于$$\phi(t_k)$$。我们看到P factor会趋向于将当前变量值push到reference value；I factor会减小从当前时间开始的累计error；D factor会控制该变量的波动。
+注意，这里的control factors都是在离散时间$$(t_1, t_2, \cdots) $$上的，因为bidding事件是离散的，它实际上会周期性更新control factors。**所有的control factors $$(\phi(t), e(t_k), \lambda_P, \lambda_I, \lambda_D)$$仍会在两个updates间保持相同**，在等式(2)中的控制信号$$\phi(t)$$等于$$\phi(t_k)$$。我们看到P factor会趋向于将当前变量值push到reference value；I factor会减小从当前时间开始的累计error；D factor会控制该变量的波动。
 
 ## 3.3 Waterlevel-based Controller
 
-Waterlevel-based（WL） Controller是另一种feedback model，它会通过water level来用来切换设备控制：
+Waterlevel-based（WL） Controller是另一种feedback model，它会通过water level来切换设备控制：
 
 $$
 \phi(t_{k+1}) \rightarrow \phi(t_k) + \gamma(x_r - x(t_k))
@@ -67,7 +67,7 @@ $$
 
 ## 3.4 为点击最大化设置References
 
-假设：feedback controller是用来分发广告主的KPI目标的一个有效工具。在该节中，我们会演示feedback control机制可以被当成一个model-free的click maximisation framework，它可以嵌入到任意bidding策略，并执行在不同channels上，通过设置smart reference values来进行竞价预算分配。
+假设：feedback controller是用来分发广告主的KPI目标的一个有效工具。在该节中，我们会演示feedback control机制可以被当成一个**模型无关（model-free）的点击最大化框架（click maximisation framework）**，它可以嵌入到任意bidding策略，并执行：在不同channels上，通过设置smart reference values来进行竞价预算分配。
 
 当一个广告主在指定目标受众时（通常会组合上广告曝光上下文分类）来进行它指定的campaign，来自独立channels（比如：不同的广告交易平台(ad exchanges)、不同的用户regions、不同的用户PC/model设备等）的满足目标规则（target rules）的曝光（impressions）。通常，DSP会集合许多ad exchanges，并分发来自所有这些广告交易平台(ad exchanges)的所需ad曝光（只要曝光能满足target rule），尽管市场价格会大有不同。图3展示了这些，对于相同的campaign，不同的广告交易平台(ad exchanges)会有不同的eCPC。如【34】中所说，在其它channels上（比如：user regions和devices上）也会有所不同。
 
