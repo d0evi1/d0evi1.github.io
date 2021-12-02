@@ -8,19 +8,59 @@ tags:
 
 《Feedback Control of Real-Time Display Advertising》在PID中引入了feedback control。
 
+# 3.RTB feedback control系统
+
+图2展示了RTB feedback control系统的图示。传统的bidding strategy可以表示为在DSP bidding agent中的bid calculator module。controller会扮演着根据bid calculator调整bid价格的角色。
+
+特别的，monitor会接收到来自ad exchange的auction win通知和来自ad tracking系统的用户点击反馈，它整体上会看成是dynamic system。接着，当前的KPI值（比如：AWR和eCPC）会被计算。如果该任务会使用reference value来控制eCPC，在reference eCPC和measured eCPC间的error因子会被计算，并接着会发送到control function中。输出控制信号会被发送到actuator中，它会使用control signal来调整来自bid calculator的原始bid price。调整后的bid price会将合理的ad（qualified ad）打包成bid response，并发送回ad exchange进行auction。
+
+# 3.1 Actuator
+
+对于在时刻的bid request，auctuator会考虑当前控制信息$$\phi(t)$$来将bid价格从$$b(t)$$调整到一个新的值$$b_a(t)$$。在我们的模型中，控制信号，它会在下一节中以数学形式定义，这在bid price上的一个增益。总之，当控制信号$$\phi(t)$$为0时，不会进行bid调整。这是不同的actuator模型，在我们的工作中，我会选择使用：
+
+$$
+b_a(t) = b(t) exp(\lbrace \phi(t) \rbrace)
+$$ 
+
+...(2)
+
+其中，当$$\phi(t) = 0$$时，该模型会满足$$b_a(t)$$。其它比如线性模型$$b_a(t) = b(t) (1+\phi(t))$$的模型也会在我们的研究中，但当一个大的负向控制信号被发到actuator时执行效果很差，其中linear actuator通常会响应一个负或零的bid，这在我们场景中是无意义的。相反的，指数模型是合适的，可以解决上述缺点，因为它天然会避免一个负的竞价。在之后的研究中，我们会基于指数形式的actuator model上报分析。
+
 ## 3.2 PID controller 
 
-在t时刻的bid request，执行者会考虑当前控制信号$$\phi(t)$$，并将$$b(t)$$调整bid price$$$$
+我们考虑的第一个controller是经典的PID controller。如名字所示，一个PID controller会从基于error因子的比例因子、积分因子和微分因子的一个线性组合上生成控制信号：
+
+$$
+e(t_k) = x_r - x(t_k), \\
+\phi(t_{k+1}) \rightarrow \lambda_P e(t_k) + \lambda_I \sum\limits_{j=1}^k e(t_j) \Delta t_j + \lambda_D \frac{\Delta e(t_k)}{\Delta t_k}
+$$
+...(3)(4)
+
+其中，error factor $$e(t_k)$$是$$x_r$$减去当前控制变量值$$x(t_k)$$的reference value，更新时间间隔给定如下$$\Delta t_j = t_j - t_{j-1} $$,error factors的变化是$$\Delta e(t_k) = e(t_k) - e(t_{k-1})$$，其中: $$\lambda_P, \lambda_I, \lambda_D$$是每个control factor的weight参数。注意，这里的control factors都是在离散时间$$(t_1, t_2, \cdots) $$上的，因为bidding事件是离散的，它实际上会周期性更新control factors。所有的control factors $$(\phi(t), e(t_k), \lambda_P, \lambda_I, \lambda_D)$$仍会在两个updates间保持相同，在等式(2)中的控制信号$$\phi(t)$$等于$$\phi(t_k)$$。我们看到P factor会趋向于将当前变量值push到reference value；I factor会减小从当前时间开始的累计error；D factor会控制该变量的波动。
 
 ## 3.3 Waterlevel-based Controller
 
+Waterlevel-based（WL） Controller是另一种feedback model，它会通过water level来用来切换设备控制：
+
+$$
+\phi(t_{k+1}) \rightarrow \phi(t_k) + \gamma(x_r - x(t_k))
+$$
+
+...(5)
+
+其中，$$\gamma$$是对于在指数scale下的$$\phi(t_k)$$次更新的step size参数。
+
+对比起PID， WL controller只会使用变量与reference value间的差异。另外，它会提供一个顺序控制信号。也就是说，下个control信号会基于前者进行调整。
 
 
-## 3.4 点击最大化
+## 3.4 为点击最大化设置References
 
-假设：feedback controller是一个有效工作，用来分发广告主的KPI目标，在该节中，我们会演示feedback control机制可以被当成一个model-free的click maximisation framework，它可以嵌入到任意bidding策略，并执行在不同channels上，通过设置smart reference values来进行竞价预算分配。
+假设：feedback controller是用来分发广告主的KPI目标的一个有效工具。在该节中，我们会演示feedback control机制可以被当成一个model-free的click maximisation framework，它可以嵌入到任意bidding策略，并执行在不同channels上，通过设置smart reference values来进行竞价预算分配。
 
 当一个广告主在指定目标受众时（通常会组合上广告曝光上下文分类）来进行它指定的campaign，来自独立channels（比如：不同的广告交易平台(ad exchanges)、不同的用户regions、不同的用户PC/model设备等）的满足目标规则（target rules）的曝光（impressions）。通常，DSP会集合许多ad exchanges，并分发来自所有这些广告交易平台(ad exchanges)的所需ad曝光（只要曝光能满足target rule），尽管市场价格会大有不同。图3展示了这些，对于相同的campaign，不同的广告交易平台(ad exchanges)会有不同的eCPC。如【34】中所说，在其它channels上（比如：user regions和devices上）也会有所不同。
+
+
+图3
 
 开销差异提供给广告主一个机会，可以基于eCPC来最优化它的campaign效果。为了证实这点，假设一个DSP被集在到两个广告交易平台A和B。对于在该DSP中的一个campaign，如果来自A的eCPC要比B的高，这意味着来自平台B的库存要比平台A的费用更高效，接着会重新分配一些预算给A和B，这将潜在减小该campaign的整体eCPC。实际上，预算重分配（budget reallocation）可以通过对平台A减小竞价、并增加平台B的竞价来完成。这里，我们正式提出一个用于计算每个交易平台的均衡eCPC模型，它可以被用作最优化reference eCPC来进行feedback control，并在给定预算约束下生成一个最大数目的点击。
 
