@@ -16,7 +16,7 @@ tags:
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ecfce45fcc3f2e22ec815c4fe656c7e6d087370ea7874a0b6f46c724bb19e2b4a4459d50a2f5a5bf2da85b98fc6fafca?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 集成在RTB系统中的feedback controller
 
 特别的，monitor会接收到来自ad exchange的auction win通知和来自ad tracking系统的用户点击反馈，它整体上会看成是dynamic system。接着，当前的KPI值（比如：AWR和eCPC）会被计算。如果该任务会使用reference value来控制eCPC，在reference eCPC和measured eCPC间的error因子会被计算，并接着会发送到control function中。输出控制信号会被发送到actuator中，它会使用control signal来调整来自bid calculator的原始bid price。调整后的bid price会将合理的ad（qualified ad）打包成bid response，并发送回ad exchange进行auction。
 
@@ -67,7 +67,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/20fe6d05772ce1e0acc3bfc82846acde16b666b530416a4ad4157c4c4f0e95b2b4348dbe1451e050d611220b0cea0057?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
 
-图3
+图3 跨不同ad exchanges的不同eCPCs。Dataset: iPinYou
 
 开销差异提供给广告主一个机会，可以基于eCPC来最优化它的campaign效果。为了证实这点，假设一个DSP被集在到两个广告交易平台A和B。对于在该DSP中的一个campaign，如果来自A的eCPC要比B的高，这意味着来自平台B的库存要比平台A的费用更高效，接着会重新分配一些预算给A和B，这将潜在减小该campaign的整体eCPC。实际上，预算重分配（budget reallocation）可以通过对平台A减小竞价、并增加平台B的竞价来完成。这里，我们正式提出一个用于计算每个交易平台的均衡eCPC模型，它可以被用作最优化reference eCPC来进行feedback control，并在给定预算约束下生成一个最大数目的点击。
 
@@ -123,7 +123,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/730cef0bd8b1fd91dd48f9c9a7860097afa302603bfbc8bb946de038ed5afa11a8b6709f723128f26855bb37715d57fd?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=4.jpg&amp;size=750">
 
-图4
+图4 与eCPC相反的clicks数目。clicks和eCPC会跨整个iPinYou 每campaign的training dataset计算，通过对等式(1)中的$$b_0$$进行调参进行计算
 
 基于该观察，可以将$$c_i(\epsilon_i)$$定义成一个通用多项式：
 
@@ -218,7 +218,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/4ea198e84181652260c3274c5616844eeca81c48879f02336ef82afbb028381316b48240f9bdc464f542c7b13de50bb1?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=5.jpg&amp;size=750">
 
-图5
+图5 eCPC和AWR上的控制效果
 
 我们从结果看到：
 
@@ -238,13 +238,13 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/0f5d7ec0ea575c1ff3d003cabe8c1ed01521a044bf91c9c7358565ec1dcee6f5f998153cd493197915bf4703679a4f59?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=6.jpg&amp;size=750">
 
-图6
+图6 使用PID的控制难度对比
 
 图7给出了具有三个reference levels两个controllers的特定控制曲线，它在一个样本campaign 3386。我们发现reference value会远离控制变量的初始值，会在eCPC和AWR上为settling带来更大的难度。这建议广告主在设置一个模糊控制目标会引入unsettling或更大易变性的风险。广告主应尝试找出在target value和practical control performance间的一个最好trade-off。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/7e9508b02ebd33c62760d652742000a692b8edbb720c28f27ffb74407025f8669015fe618a07828c271807a26cadd970?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=7.jpg&amp;size=750">
 
-图7
+图7 campaign 3386在eCPC和AWR上使用不同reference values的控制效果
 
 ## 4.4 PID setting：静态 vs. 动态references
 
@@ -280,7 +280,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/44da0a625cd1446841e5705272e99b6993df7b0b0dc0195cd6238db7f8382a8be90d796418cfa4a3c8db4fbe8d398b06?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=8.jpg&amp;size=750">
 
-图8
+图8 使用PID的动态reference control
 
 另外，我们直接对比了PID在dynamic-reference controllers（dyn）和标准静态reference（st）上的数量控制效果。除了settling time外，我们也对比了settling cost，它表示在settling前的花费预算。在所有campaigns上整体效果，eCPC control如图9(a)所示；AWR control如图9(b)所示。结果表明：
 
@@ -289,7 +289,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/251d37508fa3e292405759ed38d3ba719e2754a4a84606731e64fdaada73d93153a1b434032d4cc032e1bd0c806d8323?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=9.jpg&amp;size=750">
 
-图9
+图9 使用PID的Dynamic vs. static reference 
 
 ## 4.5 click maximisation的reference setting
 
@@ -305,13 +305,13 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/570b8e6e48ff1cfb8b099f0e0384aabfab50b958b161d5bfe55637fa245dc772d6392d09e7b9ace6886a298c3f3442a0?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=10.jpg&amp;size=750">
 
-图10
+图10 Bid最优化效果
 
 作为示例，图11会绘制在campaign 1458上的三个方法的settling效果。三条曲线是在三个交易平台上的reference eCPCs。我们可以看到：在三个广告交易平台上的eCPCs。我们可以看到，在三个交易平台上的eCPs成功设置在reference eCPCs。同时，campaign-level eCPC (multiple)会比uniform和none设置在一个更低值。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/14836f47b8553605dce2bbdf9694a11ae633ac26632e5fb6111be31712780e74e758fe99245df32b0b6c5f2529c8b0db?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=11.jpg&amp;size=750">
 
-图11
+图11 多交易平台的feedback control的settlement
 
 ## 4.6 PID参数调整
 
@@ -331,7 +331,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b64be8f332eb6b3f86b6696ae835486471918c88c1810a563b82b79eef8a8734e30cba0918550fd77192da715e6fc1c3?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=12.jpg&amp;size=750">
 
-图12
+图12 在线/离线参数更新的控制
 
 # 5.在线部署与测试
 
