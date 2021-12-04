@@ -18,7 +18,7 @@ tags:
 
 图2 集成在RTB系统中的feedback controller
 
-特别的，monitor会接收到来自ad exchange的auction win通知和来自ad tracking系统的用户点击反馈，它整体上会看成是dynamic system。接着，当前的KPI值（比如：AWR和eCPC）会被计算。如果该任务会使用reference value来控制eCPC，在reference eCPC和measured eCPC间的error因子会被计算，并接着会发送到control function中。输出控制信号会被发送到actuator中，它会使用control signal来调整来自bid calculator的原始bid price。调整后的bid price会将合理的ad（qualified ad）打包成bid response，并发送回ad exchange进行auction。
+特别的，**monitor**会接收到来自ad exchange的**auction win通知**和来自ad tracking系统的**用户点击反馈**，它整体上会看成是dynamic system。接着，当前的KPI值（比如：AWR和eCPC）会被计算。如果该任务会使用reference value来控制eCPC，在reference eCPC和measured eCPC间的error因子会被计算，并接着会发送到control function中。输出控制信号会被发送到actuator中，它会使用control signal来调整来自bid calculator的原始bid price。调整后的bid price会将合理的ad（qualified ad）打包成bid response，并发送回ad exchange进行auction。
 
 # 3.1 Actuator
 
@@ -85,7 +85,7 @@ $$
 对于广告主，他们希望在给定campaign预算B下，最大化campaign-level的点击数（会使得成本$$\epsilon_i$$越小）：
 
 $$
-max_{\epsilon_1,\epsilon_2,\cdots,\epsilon_n} \sum_i c_i(\epsilon_i) \\
+\underset{\epsilon_1,\epsilon_2,\cdots,\epsilon_n}{max} \sum_i c_i(\epsilon_i) \\
 s.t. \sum_i c_i(\epsilon_i) \epsilon_i = B
 $$
 
@@ -94,12 +94,12 @@ $$
 它的拉格朗日项为：
 
 $$
-L(\epsilon_1,\epsilon_2,\cdots,\epsilon_n, \alpha) = \sum_i  c_i(\epsilon_i)  - \alpha ( c_i(\epsilon_i) \epsilon_i - B)
+L(\epsilon_1,\epsilon_2,\cdots,\epsilon_n, \alpha) = \sum_i  c_i(\epsilon_i)  - \alpha ( \sum\limits_i c_i(\epsilon_i) \epsilon_i - B)
 $$
 
 ...(8)
 
-其中，$$\alpha$$是Lagrangian乘子。接着我们采用它在$$\epsilon_i$$上的梯度，并假设它为0
+其中，$$\alpha$$是Lagrangian乘子。接着我们采用它在$$\epsilon_i$$上的梯度为0，进行求解：
 
 $$
 \frac{\partial L(\epsilon_1,\epsilon_2,\cdots,\epsilon_n, \alpha)}{\partial \epsilon_i} = c_i'(\epsilon_i) - \alpha(c_i' (\epsilon_i) \epsilon_i + c_i(\epsilon_i)) = 0 \\
@@ -149,7 +149,7 @@ $$
 等式(14)转成(12)：
 
 $$
-\frac{1}{\alpha} = \epsilon_i + \frac{c_i(\epsilon_i)}{c_i'(\epsilon_i)} = \epsilon_i +  ... = (1+\frac{1}{b_i} \epsilon_i
+\frac{1}{\alpha} = \epsilon_i + \frac{c_i(\epsilon_i)}{c_i'(\epsilon_i)} = \epsilon_i +  ... = (1+\frac{1}{b_i}) \epsilon_i
 $$
 
 ...(15)
@@ -163,7 +163,7 @@ $$
 
 ...(16) (17)
 
-有意思的是，等式(17)中的equilibrium不在相同交易平台的eCPCs的state中。作为替代，当在平台间重新分配任意预算量时，不会做出更多的总点击；例如，在一个双平台的情况下，当来自一个平台的点击增加等于另一个的下降时，会达到平衡。更特别的，对于广告交易平台i，我们从等式(17)观察到，如果它的点击函数$$c_i(\epsilon_i)$$相当平，例如：在特定区域，点击数会随着eCPC的增加而缓慢增加，接着学到的$$b_i$$会很小。这意味着因子$$\frac{b_i}{b_i + 1}$$也会很小；接着等式(17)中，我们可以看到在广告交易平台i中最优的eCPC应相当小。
+有意思的是，等式(17)中的equilibrium不在相同交易平台的eCPCs的state中。作为替代，当在平台间重新分配任意预算量时，不会做出更多的总点击；**例如，在一个双平台的情况下，当来自一个平台的点击增加等于另一个的下降时，会达到平衡**。更特别的，对于广告交易平台i，我们从等式(17)观察到，如果它的点击函数$$c_i(\epsilon_i)$$相当平，例如：在特定区域，点击数会随着eCPC的增加而缓慢增加，接着学到的$$b_i$$会很小。这意味着因子$$\frac{b_i}{b_i + 1}$$也会很小；接着等式(17)中，我们可以看到在广告交易平台i中最优的eCPC应相当小。
 
 将等式(14)和等式(17)代入等式(7)中：
 
