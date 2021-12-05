@@ -205,7 +205,7 @@ $$
 
 **评估协议（evaluation protocol）**
 
-我们遵循之有在bid optimisation上的研究的evaluation protocol。特别的，对于每条数据记录，我们会将feature信息传递到我们的bidding agent中。我们的bidding agent会基于CTR预估以及等式（1）中的参数生成一个新的bid。我们接着会对生成的bid 与 记录的实际auction winning price进行对比。如果该bid比auction winning price要更高，我们可以知道bidding agent会在该次auction上胜出，并且获得该次ad impression。如果该次ad impression record会带来一次click，那么该placement会生成一个正向结果（一次click），开销等于winning price。如果没有发生click行为，该placement会产生一次负向结果，并浪费钱。control参数会每2小时更新（作为一轮）。
+我们遵循过去在bid optimisation上的研究的evaluation protocol。特别的，对于每条数据记录，我们会将feature信息传递到我们的bidding agent中。我们的bidding agent会基于CTR预估以及等式（1）中的参数生成一个新的bid。我们接着会对生成的bid 与 记录的实际auction winning price进行对比。如果该bid比auction winning price要更高，我们可以知道bidding agent会在该次auction上胜出，并且获得该次ad impression。如果该次ad impression record会带来一次click，那么该placement会生成一个正向结果（一次click），开销等于winning price。如果没有发生click行为，该placement会产生一次负向结果，并浪费钱。control参数会每2小时更新（作为一轮）。
 
 值得一提的是，历史的用户反馈会被广泛用来评估信息检索系统和推荐系统。他们所有都会使用历史点击作为一个proxy来关联训练prediction model，也会形成ground truth。相似的，我们的evaluation protocol会保留user contexts、displayed ads（creatives 等）、bid requests
 、以及auction environment不变。我们希望回答：在相同的context下，如果广告主给出一个不同或更好的竞价策略或采用一个feedback loop，他们是否能获得在有限预算下的更好点击。对于用户来说只要没有任何变化，点击仍会相同。该方法对于评估bid optimisation来说很好，并且在展示广告工业界被广泛采用。
