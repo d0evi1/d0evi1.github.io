@@ -228,11 +228,11 @@ $$
 我们遵循过去在bid optimisation上的研究的evaluation protocol。特别的，对于每条数据记录，我们会将feature信息传递到我们的bidding agent中。**我们的bidding agent会基于CTR预估以及等式（1）中的参数生成一个新的bid**。我们接着会对生成的bid 与 记录的实际auction winning price进行对比。**如果该bid比auction winning price要更高，我们可以知道bidding agent会在该次auction上胜出，并且获得该次ad impression。如果该次ad impression record会带来一次click，那么该placement会生成一个正向结果（一次click），开销等于winning price**。如果没有发生click行为，该placement会产生一次负向结果，并浪费钱。control参数会每2小时更新（作为一轮）。
 
 值得一提的是，历史的用户反馈会被广泛用来评估信息检索系统和推荐系统。他们所有都会使用历史点击作为一个proxy来关联训练prediction model，也会形成ground truth。相似的，我们的evaluation protocol会保留user contexts、displayed ads（creatives 等）、bid requests
-、以及auction environment不变。我们希望回答：在相同的context下，如果广告主给出一个不同或更好的竞价策略或采用一个feedback loop，他们是否能获得在有限预算下的更好点击。对于用户来说只要没有任何变化，点击仍会相同。该方法对于评估bid optimisation来说很好，并且在展示广告工业界被广泛采用。
+、以及auction environment不变。我们希望回答：**在相同的context下，如果广告主给出一个不同或更好的竞价策略或采用一个feedback loop，他们是否能获得在有限预算下的更好点击**。对于用户来说只要没有任何变化，点击仍会相同。**该方法对于评估bid optimisation来说很好，并且在展示广告工业界被广泛采用**。
 
 **Evaluation Measures**
 
-我们在feedback control系统中采用一些常用的measures。我们将errorband定义为在reference value上$$\pm 10%$$的区间。如果在该区域内控制变量settles，我们认为该变量被成功控制。convergence的speed（）也同样重要。特别的，我们会评估rise time来确认该控制变量进入到error band中有多快。我们也会使用settling time来评估受控变量成功限制在error band内有多快。然而，快收敛（fast convergence）会带来控制不准（inaccurate control）问题。在settling（称为稳态：）之后，我们使用RMSE-SS来评估在controlled variable value与reference value间的RMSE。最后，我们会通过计算在该settling后该变量值的标准差，来measure该control stability，称为“SD-SS”。
+我们在feedback control系统中采用一些常用的measures。我们**将errorband定义为在reference value上$$\pm 10%$$的区间**。如果在该区域内控制变量settles，我们认为该变量被成功控制。convergence的speed（）也同样重要。特别的，我们会评估rise time来确认该控制变量进入到error band中有多快。我们也会使用settling time来评估受控变量成功限制在error band内有多快。然而，快收敛（fast convergence）会带来控制不准（inaccurate control）问题。在settling（称为稳态：）之后，我们使用RMSE-SS来评估在controlled variable value与reference value间的RMSE。最后，我们会通过计算在该settling后该变量值的标准差，来measure该control stability，称为“SD-SS”。
 
 对于bid optimisation的效果，我们会使用campaign的总达成点击数（total achieved click number）和eCPC来作为主要评估measures。我们也会监控与效果相关的曝光（比如：曝光数、AWR和CPM）。
 
