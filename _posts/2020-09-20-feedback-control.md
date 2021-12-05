@@ -333,11 +333,11 @@ $$
 - 当$$x_r(t_k) = x_r$$, $$x_r(t_{k+1})$$会设置成与$$x_r$$相同；
 - 当$$x_r(t_k) > x_r$$时，$$x_r(t_{k+1})$$会设置得比$$x_r$$更低，反之
 
-出于可读性，我们会在附录详细介绍微分项。使用等式(20)我们可以计算新的reference eCPC/AWR $$x_r(t_{k+1})$$，并使用它来替换等式(3)中的$$x_r$$来计算error factor，以便做出动态reference control。
+出于可读性，我们会在附录详细介绍微分项。**使用等式(20)我们可以计算新的reference $$\frac{eCPC}{AWR}$$ $$x_r(t_{k+1})$$**，并使用它来替换等式(3)中的$$x_r$$来计算error factor，以便做出动态reference control。
 
 **结果与讨论**
 
-图8展示了具有基于等式(20)计算的动态reference PID control的效果。campaign效果会在当预算耗尽时停止。从该图看到，对于eCPC和AWR control，动态reference会采用一个激进模式，将eCPC或AWR沿着原始的reference value（虚线）进行推进。这实际上会模拟一些广告主的策略：当performance低于reference时，更高的dynamic reference会将总效果更快地推向intial reference。另外，对于AWR control，我们可以看到，当预算即将耗尽时，dynamic reference会起伏不定。这是因为当所剩预算不够时，reference value会通过等式(20)设置得过高或过低，以便将效果push到初始目标。很显然这是一个低效的解决方案。
+图8展示了具有基于等式(20)计算的动态reference PID control的效果。campaign效果会在当预算耗尽时停止。从该图看到，对于eCPC和AWR control，**动态reference会采用一个激进模式，将eCPC或AWR沿着原始的reference value（虚线）进行推进**。这实际上会模拟一些广告主的策略：当performance低于reference时，更高的dynamic reference会将总效果更快地推向intial reference。另外，对于AWR control，我们可以看到，当预算即将耗尽时，dynamic reference会起伏不定。这是因为当所剩预算不够时，reference value会通过等式(20)设置得过高或过低，以便将效果push到初始目标。很显然这是一个低效的解决方案。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/44da0a625cd1446841e5705272e99b6993df7b0b0dc0195cd6238db7f8382a8be90d796418cfa4a3c8db4fbe8d398b06?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=8.jpg&amp;size=750">
 
@@ -356,19 +356,23 @@ $$
 
 我们已经研究了feedback control如何用于点击最大化的目标。如第3.4节所示，bid requests通常来自不同的广告交易平台，其中，市场支配力和CPM价格是不同的。给定一个预算限制，控制eCPC在每个交易平台上的点击数最大化，可以通过各自在每个平台上设置最优的eCPC reference来达到。
 
-在该实验中，我们为每个广告平台构建了一个PID feedback controller，其中，reference eCPCs通过等式(17)和等式(19)进行计算。我们会基于每个campaign的训练数据来训练PID参数，接着在test data上测试bidding的效果。如表3所示，在所有广告交易平台上的eCPC，对于所有测试campaigns都会设置在reference value上（settling time少于40）。我们将多个平台eCPC feedback control方法称为multiple。除了multiple外，我们也测试了一个baseline方法，它会在所有ad交易平台上分配一个单一最优均匀eCPC reference，表示为“uniform”。我们也会使用没有feedback control的线性bidding策略作为baseline，表示为“none”。
+在该实验中，**我们为每个广告平台构建了一个PID feedback controller**，其中，reference eCPCs通过等式(17)和等式(19)进行计算。**我们会基于每个campaign的训练数据来训练PID参数，接着在test data上测试bidding的效果**。如表3所示，在所有广告交易平台上的eCPC，对于所有测试campaigns都会设置在reference value上（settling time少于40）。
+
+- **multiple**：我们将多个平台eCPC feedback control方法称为multiple。
+- **uniform**：除了multiple外，我们也测试了一个baseline方法，它会在所有ad交易平台上分配一个单一最优均匀eCPC reference，表示为“uniform”。
+- **none**：我们也会使用没有feedback control的线性bidding策略作为baseline，表示为“none”。
 
 在多个evaluation measures上的对比如图10所示。我们观察到：
 
-- (i) 在achieved clicks数目和eCPC上，feedback-control-enabled bidding策略（uniform和multiple）要极大胜过non-controlled bidding策略（none）。这表明，合理的controlling eCPCs会导致在最大化clicks上的一个最优解 
-- (ii) 通过重分配预算，在不同广告交易平台上设置不同reference eCPCs，multiple会进一步胜过uniform
-- (iii) 在impression相关的指标上，feedback-control-enabled bidding策略会比non-controlled bidding stategy获得更多曝光，通过减少它们的bids（CPM）以及AWR，但达成更多的bid volumes。这建议我们：通过分配更多预算到具有更低值的impressions上，可以潜在生成更多点击。作为一个副产品，它会证实【33】的理论。
+- (i) 在achieved clicks数目和eCPC上，feedback-control-enabled bidding策略（uniform和multiple）要**极大胜过non-controlled bidding策略（none）**。这表明，合理的controlling eCPCs会导致在最大化clicks上的一个最优解 
+- (ii) 通过重分配预算，在不同广告交易平台上设置不同reference eCPCs，**multiple会进一步胜过uniform**
+- (iii) 在impression相关的指标上，feedback-control-enabled bidding策略会比non-controlled bidding stategy获得更多曝光，通过减少它们的bids（CPM）以及AWR，但达成更多的bid volumes。**这建议我们：通过分配更多预算到具有更低值的impressions上，可以潜在生成更多点击**。作为一个副产品，它会证实【33】的理论。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/570b8e6e48ff1cfb8b099f0e0384aabfab50b958b161d5bfe55637fa245dc772d6392d09e7b9ace6886a298c3f3442a0?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=10.jpg&amp;size=750">
 
 图10 Bid最优化效果
 
-作为示例，图11会绘制在campaign 1458上的三个方法的settling效果。三条曲线是在三个交易平台上的reference eCPCs。我们可以看到：在三个广告交易平台上的eCPCs。我们可以看到，在三个交易平台上的eCPs成功设置在reference eCPCs。同时，campaign-level eCPC (multiple)会比uniform和none设置在一个更低值。
+作为示例，图11会绘制在campaign 1458上的三个方法的settling效果。三条曲线是在三个交易平台上的reference eCPCs。我们可以看到：在三个广告交易平台上的eCPCs。我们可以看到，在三个交易平台上的eCPCs成功设置在reference eCPCs。同时，campaign-level eCPC (multiple)会比uniform和none设置在一个更低值。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/14836f47b8553605dce2bbdf9694a11ae633ac26632e5fb6111be31712780e74e758fe99245df32b0b6c5f2529c8b0db?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=11.jpg&amp;size=750">
 
@@ -380,15 +384,15 @@ $$
 
 **参数搜索**
 
-经验上，$$\lambda_D$$不会极大地改变control效果。$$\lambda_D$$只需要一个很小值，比如：$$1 \times 10^{-5}$$，会减小overshoot并能轻微缩短settling time。这样，参数搜索的焦点是$$\lambda_P$$和$$\lambda_I$$。我们不会使用开销很大的grid search，我们会执行一个adaptive coordinate search。对于每个update，我们会fix住一个参数，更改另一个来寻找能产生更短settling time的最优值，对于每次shooting，这种line searching step length会指数收缩。通常在3或4次迭代后，会达到局部最优解（local optima），我们会发现这样的解与grid search是高度可比的。
+经验上，**$$\lambda_D$$不会极大地改变control效果。$$\lambda_D$$只需要一个很小值**，比如：$$1 \times 10^{-5}$$，会减小overshoot并能轻微缩短settling time。这样，参数搜索的焦点是$$\lambda_P$$和$$\lambda_I$$。我们不会使用开销很大的grid search，我们会执行一个adaptive coordinate search。**对于每个update，我们会fix住一个参数，更改另一个来寻找能产生更短settling time的最优值**，对于每次shooting，这种line searching step length会指数收缩。通常在3或4次迭代后，会达到局部最优解（local optima），我们会发现这样的解与grid search是高度可比的。
 
 **设置$$\phi(t)$$的bounds**
 
-我们也发现：设置控制信号$$\phi(t)$$的上下界对于KIPs可控来说很重要。由于在RTB中的动态性，用户CTR在一个周期内下降是正常的，这会使得eCPC更高。相应的feedback可能产生在bids上一个大的负向增益（nagative gain），这会导致极低的bid price，并且在剩余rounds上没有win、click以及没有额外开销。在这种情况下，一个合理的低下限(-2)的目标可以消除上述极端影响，可以阻止严重的负向控制信号。另外，一个上限(5)为了避免在远超reference value的变量增长。
+我们也发现：**设置控制信号$$\phi(t)$$的上下界对于KPIs可控来说很重要**。由于在RTB中的动态性，用户CTR在一个周期内下降是正常的，这会使得eCPC更高。相应的feedback可能产生在bids上一个大的负向增益（nagative gain），这会导致极低的bid price，并且在剩余rounds上没有win、click以及没有额外开销。在这种情况下，一个合理的低下限(-2)的目标可以消除上述极端影响，可以阻止严重的负向控制信号。另外，一个上限(5)为了避免在远超reference value的变量增长。
 
 **在线参数更新**
 
-由于DSP会在feedback control下运行，收集的数据会被立即使用来训练一个新的PID controller并更新老的。我们研究了PID参数使用最近数据进行在线更新的可能性。特别的，在使用训练数据初始化PID参数后，我们会在每10轮上对controller进行重训练（例如：在round 10, 20, 30），在test stage使用所有之前的数据并使用与training stage相同的参数搜索方法。在re-training中的参数搜索会在每个controller上花费10分钟，它比round周期（2小时）要更短。图12展示了分别使用在线和郭线PID参数的control效果。可以看到，在每10轮后，在线调参的PID在管理控制围绕reference value的eCPC上会比离线更有效，产生更短的settling time以及更低的overshoot。另外，当切换参数时，没有明显的干扰或不稳定发生。有了在线参数更新，我们可以开始基于several-hour的training data来训练controllers并采用新数据来自适应更新参数来提升control效果。
+由于DSP会在feedback control下运行，收集的数据会被立即使用来训练一个新的PID controller并更新老的。我们研究了PID参数使用最近数据进行在线更新的可能性。特别的，在使用训练数据初始化PID参数后，**我们会在每10轮上对controller进行重训练（例如：在round 10, 20, 30），在test stage使用所有之前的数据并使用与training stage相同的参数搜索方法**。在re-training中的参数搜索会在每个controller上花费10分钟，它比round周期（2小时）要更短。图12展示了分别使用在线和郭线PID参数的control效果。可以看到，在每10轮后，在线调参的PID在管理控制围绕reference value的eCPC上会比离线更有效，产生更短的settling time以及更低的overshoot。另外，当切换参数时，没有明显的干扰或不稳定发生。有了**在线参数更新**，我们可以开始基于several-hour的training data来训练controllers并采用新数据来自适应更新参数来提升control效果。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b64be8f332eb6b3f86b6696ae835486471918c88c1810a563b82b79eef8a8734e30cba0918550fd77192da715e6fc1c3?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=12.jpg&amp;size=750">
 
