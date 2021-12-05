@@ -256,19 +256,19 @@ $$
 
 我们从结果看到：
 
-- (i) 所有PID controllers可以设置在error band内的KPIs（小于40轮的settling time），它意味着PID control可以在给定reference value上设置两个KPIs。
-- (ii) 在eCPC上的WL controller，在test data上不会work，即使我们可以找出在训练数据上的好参数。这是因为当面对RTB的巨大动态性时，WL controller会尝试通过短时效果反馈（transient performance feedbacks）影响平均系统行为。
+- (i) 所有PID controllers可以设置在KPIs的error band内（小于40轮的settling time），它意味着PID control可以在给定reference value上设置两个KPIs。
+- (ii) 在eCPC上的WL controller，在test data上不会work，即使我们可以找出在训练数据上的好参数。**这是因为当面对RTB的巨大动态性时，WL controller会尝试通过短时效果反馈（transient performance feedbacks）影响平均系统行为**。
 -  (iii)对于在AWR上的WL，大多数campaigns是可控的，但仍有两个campaigns会在设置 reference value时失败。
 -  (iv) 对比在AWR上的PID，WL总是产生更高的RMSE-SS和SD-SS，但比overshot百分比要更低。这种control settings会具有一个相当短的rise time，通常会面对一个更高的overshot。
 -  (v) 另外，我们观察到，具有更高CTR estimator AUC效果的campaigns，通常会获得更短的settling time。
 
-根据上述结果，PID controller在test RTB cases上完胜WL controller。我们相信，这是因为在PID controller中的integral factor可以帮助减小累积误差（例如：RMSE-SS），derivative factor可以帮助减小变量波动（variable fluctuation，例如：SD-SS）。设置AWR比eCPC要更容易。这主要是因为AWR只依赖于市场价格分布，而eCPC会额外涉及user feedback，例如：CTR，而prediction会具有很大不确定性。
+根据上述结果，**PID controller在test RTB cases上完胜WL controller**。我们相信，这是因为在PID controller中的integral factor可以帮助**减小累积误差**（例如：RMSE-SS），derivative factor可以帮助**减小变量波动**（variable fluctuation，例如：SD-SS）。**设置AWR比eCPC要更容易。这主要是因为AWR只依赖于市场价格分布，而eCPC会额外涉及user feedback，例如：CTR，而prediction会具有很大不确定性**。
 
 ## 4.3 控制难度（control difficulty）
 
-在本节中，我们会通过添加更高或更低的reference values来进一步扩展control capability实验进行对比。我们的目标是，研究不同levels的reference values在control difficulty上的影响。我们遵循相同的模式来训练和测试controllers。然而，替代展示准确的performance value效果，我们这里只关注不同refrence settings上的效果对比。
+在本节中，我们会通过添加更高或更低的reference values来进一步扩展control capability实验进行对比。我们的目标是：**研究不同levels的reference values在control difficulty上的影响**。我们遵循相同的模式来训练和测试controllers。然而，替代展示准确的performance value效果，我们这里只关注不同reference settings上的效果对比。
 
-在达成settling time、RMSE-SS和SD-SS的分布，以及三个refrence levels的setting，如图6(a)(b)所示，使用PID来控制eCPC和AWR。我们观察到，平均setting time、RMSE-SS、SD-SS，会随着refrence values变高而减小。这表明：具有更高reference的eCPC和AWR的控制任务，会更容易达成，因为可以竞价更高来获胜更多、并且花费更多。随着reference越高，越接近初始performance value，控制信号不会带来更严重的bias或易变性（volatility），这会导致更低的RMSE-SS和SD-SS。对于page limit，使用WL的control效果不会在这里呈述。结果与PID相近。
+在达成settling time、RMSE-SS和SD-SS的分布，以及三个refrence levels的setting，如图6(a)(b)所示，使用PID来控制eCPC和AWR。我们观察到，平均setting time、RMSE-SS、SD-SS，会随着refrence values变高而减小。这表明：**具有更高reference的eCPC和AWR的控制任务会更容易达成，因为可以更高的竞价来赢得更多获胜、并且花费更多**。随着reference越高，越接近初始performance value，控制信号不会带来更严重的bias或易变性（volatility），这会导致更低的RMSE-SS和SD-SS。对于page limit，使用WL的control效果不会在这里呈述。结果与PID相近。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/0f5d7ec0ea575c1ff3d003cabe8c1ed01521a044bf91c9c7358565ec1dcee6f5f998153cd493197915bf4703679a4f59?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=6.jpg&amp;size=750">
 
