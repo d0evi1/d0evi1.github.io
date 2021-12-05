@@ -181,9 +181,9 @@ $$
 
 ...(19)
 
-等式(19)对于$$\alpha$$没有封闭解（closed form slove）。**然而，由于$$b_i$$非负，$$\sum_i \delta_i (\frac{1}{\alpha})^{b_i + 1} $$随着$$\frac{1}{\alpha}$$单调增，你可以通过使用一个数值求解法（比如：SGD或Newton法来轻易获得$$\alpha$$的解**。最终，基于求得的$$\alpha$$，我们可以发现对于每个ad交易平台i的最优的eCPC $$\epsilon_i$$。
+等式(19)对于$$\alpha$$没有封闭解（closed form slove）。**然而，由于$$b_i$$非负，$$\sum_i \delta_i (\frac{1}{\alpha})^{b_i + 1} $$随着$$\frac{1}{\alpha}$$单调增，你可以通过使用一个数值求解法（比如：SGD或Newton法）来轻易获得$$\alpha$$的解**。最终，基于求解得的$$\alpha$$，我们可以使用等式(17)来发现每个ad交易平台i的最优的eCPC $$\epsilon_i$$。
 
-实际上，**这些eCPCs是我们希望该campaign在相应的交易平台达到的reference value**。我们可以使用PID controllers来达到这样的reference eCPCs，（对于每个广告交易平台i，通过设转走在等式(3)中的$$x_r$$作为$$\epsilon_i$$），以例达到在campaign level上的点击最大数。
+实际上，**这些eCPCs是我们希望该campaign在相应的交易平台达到的reference value**。我们可以**使用PID controllers来达到这样的reference eCPCs**，（对于每个广告交易平台i，通过设置在等式(3)中的$$x_r$$作为$$\epsilon_i$$），**以达到在campaign level上的点击最大数**。
 
 作为特例，如果我们将campaign的整体容量看成一个channel，该方法可以被直接用于一个通用的bid optimisation tool。它会使用campaign的历史数据来决定最优化的eCPC，接着通过控制eCPC来执行click optimisation来将最优的eCPC设置为reference。注意，该multi-channel click最大化框架可以灵活地合并到任意竞价策略中。
 
