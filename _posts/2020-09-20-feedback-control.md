@@ -125,11 +125,11 @@ $$
 
 ...(12)(13)
 
-有了足够的数据样本，我们可以发现，$$c_i(\epsilon_i)$$通常是一个凹函数（concave）和平滑（smooth）函数。一些示例如图4所示。
+通过足够的数据样本，我们可以发现，$$c_i(\epsilon_i)$$通常是一个凹函数（concave）和平滑（smooth）函数。一些示例如图4所示。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/730cef0bd8b1fd91dd48f9c9a7860097afa302603bfbc8bb946de038ed5afa11a8b6709f723128f26855bb37715d57fd?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=4.jpg&amp;size=750">
 
-图4 与eCPC相反的clicks数目。clicks和eCPC会跨整个iPinYou 每campaign的training dataset计算，通过对等式(1)中的$$b_0$$进行调参进行计算
+图4 eCPC vs. clicks数目。clicks和eCPC会通过整个iPinYou的每个campaign的training dataset计算，通过对等式(1)中的$$b_0$$进行调参进行计算
 
 基于该观察，可以将$$c_i(\epsilon_i)$$定义成一个通用多项式：
 
