@@ -232,7 +232,7 @@ $$
 
 **Evaluation Measures**
 
-我们在feedback control系统中采用一些常用的measures。我们**将errorband定义为在reference value上$$\pm 10%$$的区间**。如果在该区域内控制变量settles，我们认为该变量被成功控制。convergence的speed（）也同样重要。特别的，我们会评估rise time来确认该控制变量进入到error band中有多快。我们也会使用settling time来评估受控变量成功限制在error band内有多快。然而，快收敛（fast convergence）会带来控制不准（inaccurate control）问题。在settling（称为稳态：）之后，我们使用RMSE-SS来评估在controlled variable value与reference value间的RMSE。最后，我们会通过计算在该settling后该变量值的标准差，来measure该control stability，称为“SD-SS”。
+我们在feedback control系统中采用一些常用的measures。我们**将errorband定义为在reference value上$$\pm 10%$$的区间**。如果在该区域内控制变量settles，我们认为该变量被成功控制。convergence的speed（）也同样重要。特别的，**我们会评估rise time来确认该控制变量进入到error band中有多快**。我们也会使用settling time来评估受控变量成功限制在error band内有多快。然而，**快收敛（fast convergence）会带来控制不准（inaccurate control）问题。在settling（称为稳态：）之后，我们使用RMSE-SS来评估在controlled variable value与reference value间的RMSE**。最后，我们会通过计算在该settling后该变量值的**标准差**，来measure该control stability，称为“SD-SS”。
 
 对于bid optimisation的效果，我们会使用campaign的总达成点击数（total achieved click number）和eCPC来作为主要评估measures。我们也会监控与效果相关的曝光（比如：曝光数、AWR和CPM）。
 
