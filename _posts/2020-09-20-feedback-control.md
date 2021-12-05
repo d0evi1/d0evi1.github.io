@@ -301,7 +301,7 @@ $$
 
 图6 使用PID的控制难度对比
 
-图7给出了具有三个reference levels两个controllers的特定控制曲线，它在一个样本campaign 3386。我们发现reference value会远离控制变量的初始值，会在eCPC和AWR上为settling带来更大的难度。这建议广告主在设置一个模糊控制目标会引入unsettling或更大易变性的风险。广告主应尝试找出在target value和practical control performance间的一个最好trade-off。
+图7给出了具有三个reference levels两个controllers的特定控制曲线，它在一个样本campaign 3386。我们发现：**当reference value会远离控制变量的初始值时，会在eCPC和AWR上为settling带来更大的难度**。这建议广告主在设置一个模糊控制目标会引入unsettling或更大易变性的风险。广告主应尝试找出在target value和practical control performance间的一个最好trade-off。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/7e9508b02ebd33c62760d652742000a692b8edbb720c28f27ffb74407025f8669015fe618a07828c271807a26cadd970?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=7.jpg&amp;size=750">
 
