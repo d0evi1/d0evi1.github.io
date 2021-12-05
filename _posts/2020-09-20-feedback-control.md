@@ -197,11 +197,11 @@ $$
 - 以及19.5M的**曝光数据**
 - 14.79K的**点击**以及16K条人民币的**消费数据**。
 
-根据数据发布者，每个campaign最近3天的数据会被split成test data，剩余作为training data。dataset的磁盘大小为35GB。关于dataset的更多统计和分析提供在[34]。该dataset是以record-per-row的格式存在，其中，每行包含了三个部分：
+根据数据发布者，**每个campaign最近3天的数据会被split成test data，剩余作为training data**。dataset的磁盘大小为35GB。关于dataset的更多统计和分析提供在[34]。该dataset是以record-per-row的格式存在，其中，每行包含了三个部分：
 
-- i) 该次拍卖（auction）的features，比如：time、location、IP地址、URL/发布者的domain、ad slot size、用户兴趣分段等。每条记录的features会被indexed成0.7M维度的稀疏二元vector，它会feed到一个关于竞价策略的logistic regression CTR estimator中
-- ii) 拍卖获胜价格，它是该bid赢得该次auction的和hreshold
-- iii) 用户在ad impression上的feedback，比如：点击 或 未点击
+- i) **该次拍卖（auction）的features**，比如：time、location、IP地址、URL/发布者的domain、ad slot size、用户兴趣分段等。每条记录的features会被indexed成0.7M维度的稀疏二元vector，它会**feed到一个关于竞价策略的logistic regression CTR estimator中**
+- ii) **拍卖获胜价格**，它是该bid赢得该次auction的和threshold
+- iii) **用户在ad impression上的feedback**，比如：点击 或 未点击
 
 **评估协议（evaluation protocol）**
 
