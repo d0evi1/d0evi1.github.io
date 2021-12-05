@@ -8,6 +8,26 @@ tags:
 
 《Feedback Control of Real-Time Display Advertising》在PID中引入了feedback control。
 
+# 1.介绍
+
+从2009年，RTB（real-time bidding）在展示广告中变成一个新范式。不同于常规的人工谈判（human negotiation）或者预设置一个固定的曝光价格，RTB会创建一个曝光级别的竞拍（impression-level auction），使得广告主可以通过服务于DSPs的计算机算法为单次曝光进行竞价（bid）。竞价道理依赖于每个ad曝光的实用（utility：例如：对于生成点击或转化的一次曝光的likelihood和经济值）以及开销（cost：例如：实际支付价格）。更重要的，实时信息（比如：特定的用户人口统计学、兴趣分段以及许多上下文信息）可以被用来帮助竞价算法评估每个广告曝光。有了实时决策机制，RTB可以比其它在线广告形式生成更高的ROI（投资回报率）。
+
+RTB除了分发效果驱动的广告外，不幸的是，会导致高度可变性（volatilities），它们通过主要的KPIs进行measure，比如：CPM（每千人成本：cost per mile）、AWR（竞拍获胜率：auction winning ratio）、eCPC（每击点击有效开销：effective cost per click）、CTR（点击率）。所有这四个KPIs会随时间在广泛使用的bidding strategy上剧烈波动。这样的不稳定性造成了广告主在最优化和控制KPIs vs. 开销上很困难。
+
+本paper中，提出使用feecback control理论来解决RTB中的不稳定问题。Feedback controllers被广泛用于多个应用中，主要维持在预定义的reference values上进行对变量进行动态更改。应用场景有：飞机方向控制、机器人工智能。在我们的RTB场景中，指定的KPI value，依赖于广告主的需求，可以被看成是我们希望使用一个预定义的reference value进行控制的变量。我们的研究主要有两个用例：
+
+- 1) 对于效果驱动的广告，我们关注于获得一个点击所需的平均开销的feedback control，通过eCPC进行measure
+- 2) 对于品牌广告，为了确保一个campaign的指定高曝光，我们关注于控制对于目标曝光的竞拍获胜率，通过AWR进行measure
+
+更特别的，对于到来的广告展示机会请求（bid request），我们会采用它们中的每个作为control input信号，并考虑竞价的gain（调整值）作为control output信号。我们会开发两个controllers进行测试：
+
+- PID controller
+- WL controller
+
+我们在大规模实验上测试了feedback control的效果，它们使用erference value、以及reference dynamics的不同setting。通过经验研究，我们发现PID和WL controllers可以控制eCPC和AWR，而PID则比WL提供一个更好的control accuracy和健壮性。
+
+。。。
+
 # 3.RTB feedback control系统
 
 
