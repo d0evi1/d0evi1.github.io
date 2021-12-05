@@ -238,7 +238,7 @@ $$
 
 **实证研究的组织**
 
-包含了在控制两个KIPs（eCPC和AWR）的以下5个部分。
+包含了在控制两个KPIs（eCPC和AWR）的以下5个部分。
 
 - i) 4.2节，我们会回答提出的feedback control系统是否实际上能控制这些KPIs
 - iii) 4.3节，会集中在PID controller，并研究它在设置target variable上的特性
@@ -256,7 +256,7 @@ $$
 
 我们从结果看到：
 
-- (i) 所有PID controllers可以设置在error band内的KIPs（小于40轮的settling time），它意味着PID control可以在给定reference value上设置两个KPIs。
+- (i) 所有PID controllers可以设置在error band内的KPIs（小于40轮的settling time），它意味着PID control可以在给定reference value上设置两个KPIs。
 - (ii) 在eCPC上的WL controller，在test data上不会work，即使我们可以找出在训练数据上的好参数。这是因为当面对RTB的巨大动态性时，WL controller会尝试通过短时效果反馈（transient performance feedbacks）影响平均系统行为。
 -  (iii)对于在AWR上的WL，大多数campaigns是可控的，但仍有两个campaigns会在设置 reference value时失败。
 -  (iv) 对比在AWR上的PID，WL总是产生更高的RMSE-SS和SD-SS，但比overshot百分比要更低。这种control settings会具有一个相当短的rise time，通常会面对一个更高的overshot。
