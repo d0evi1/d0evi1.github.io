@@ -41,7 +41,7 @@ RTB除了分发效果驱动的广告外，不幸的是，会导致高度可变�
 
 ## 2.2 Bidding Strategies
 
-对于DSP bidding agents的一个基本问题是，找到对于一个即将到来的bid request采用多少开销进行竞价（bid）。对于每个ad曝光，bid决策依赖于：utility（例如：CTR，期望回报）以及开销cost（例如：期望支付的价格）。在广泛采用的bidding strategy中，utility会通过CTR estimation进行评估，而base price则基于bid landscape进行调节来进行开销评估。生成的竞价策略如下：
+对于DSP bidding agents的一个基本问题是，**找到对于一个即将到来的bid request采用多少开销进行竞价（bid）**。对于每个ad曝光，bid决策依赖于：utility（例如：CTR，期望回报）以及开销cost（例如：期望支付的价格）。在广泛采用的bidding strategy中，**utility会通过CTR estimation进行评估，而base price则基于bid landscape进行调节来进行开销评估**。生成的竞价策略如下：
 
 $$
 b(t) = b_0 \frac{\theta_t}{\theta_0}
@@ -76,7 +76,7 @@ $$
 
 # 3.1 Actuator
 
-对于在t时刻的bid request，auctuator会考虑当前控制信息$$\phi(t)$$来将bid价格从$$b(t)$$调整到一个新的值$$b_a(t)$$。在我们的模型中，控制信号，它会在下一节中以数学形式定义，这在bid price上的一个增益。总之，当控制信号$$\phi(t)$$为0时，不会进行bid调整。这是不同的actuator模型，在我们的工作中，我会选择使用：
+**对于在t时刻的bid request，auctuator会考虑当前控制信息$$\phi(t)$$来将bid价格从$$b(t)$$调整到一个新的值$$b_a(t)$$**。在我们的模型中，控制信号，它会在下一节中以数学形式定义，这在bid price上的一个增益。总之，当控制信号$$\phi(t)$$为0时，不会进行bid调整。这是不同的actuator模型，在我们的工作中，我会选择使用：
 
 $$
 b_a(t) = b(t) exp(\lbrace \phi(t) \rbrace)
