@@ -39,9 +39,16 @@ RTB除了分发效果驱动的广告外，不幸的是，会导致高度可变�
 
 ## 2.1 RTB Flow steps
 
+RTB eco-system的主要components间的交互过程归结为以下几步：
+
+- (0) 当一个用户访问一个支持广告的网站（例如：web pages、流视频以及移动apps），每个ad placement将会向广告交易平台（ad exchange）触发一个广告请求
+- (1) 对于该次特定ad曝光，广告交易平台会发送bid requests给每个广告主的DSP bidding agent，同时带上相关的信息：user和context信息
+- (2) 有了bid request和每个满足要求的ads的信息，bidding agent会计算一个bid price，接着bid response( ad, bid price)会发送回exchange
+- (3) ...
+
 ## 2.2 Bidding Strategies
 
-对于DSP bidding agents的一个基本问题是，**找到对于一个即将到来的bid request采用多少开销进行竞价（bid）**。对于每个ad曝光，bid决策依赖于：utility（例如：CTR，期望回报）以及开销cost（例如：期望支付的价格）。在广泛采用的bidding strategy中，**utility会通过CTR estimation进行评估，而base price则基于bid landscape进行调节来进行开销评估**。生成的竞价策略如下：
+对于DSP bidding agents的一个基本问题是，**找到对于一个即将到来的bid request采用多少开销进行竞价（bid）**。对于每个ad曝光，bid决策依赖于：utility（例如：CTR，期望回报）以及开销cost（例如：期望支付的价格）。在广泛采用的bidding strategy中，**utility会通过CTR estimation进行评估，而base price则基于bid landscape进行调节来进行开销评估**。paper[25]生成的竞价策略如下：
 
 $$
 b(t) = b_0 \frac{\theta_t}{\theta_0}
