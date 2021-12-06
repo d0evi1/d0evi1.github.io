@@ -12,7 +12,14 @@ tags:
 
 从2009年，RTB（real-time bidding）在展示广告中变成一个新范式。不同于常规的人工谈判（human negotiation）或者预设置一个固定的曝光价格，**RTB会创建一个曝光级别的竞拍（impression-level auction），使得广告主可以通过服务于DSPs的计算机算法为单次曝光进行竞价（bid）**。竞价决策依赖于每个ad曝光的utility（实用：例如：对于生成点击或转化的一次曝光的likelihood和经济值）以及cost（开销：例如：实际支付价格）。更重要的，实时信息（比如：特定的用户人口统计学、兴趣分段以及许多上下文信息）可以被用来帮助竞价算法评估每个广告曝光。**有了实时决策机制，RTB可以比其它在线广告形式生成更高的ROI（投资回报率）**。
 
-RTB除了分发效果驱动的广告外，不幸的是，会导致高度可变性（volatilities），它们通过主要的KPIs进行measure，比如：CPM（每千人成本：cost per mile）、AWR（竞拍获胜率：auction winning ratio）、eCPC（每击点击有效开销：effective cost per click）、CTR（点击率）。所有这四个KPIs会随时间在广泛使用的bidding strategy上剧烈波动。这样的不稳定性造成了广告主在最优化和控制KPIs vs. 开销上很困难。
+RTB除了分发效果驱动的广告外，不幸的是，会导致高度可变性（volatilities），它们通过主要的KPIs进行measure，比如：
+
+- CPM（每千人成本：cost per mile）
+- AWR（竞拍获胜率：auction winning ratio）
+- eCPC（每击点击有效开销：effective cost per click）
+- CTR（点击率）
+
+所有这四个KPIs会随时间在广泛使用的bidding strategy上剧烈波动。这样的不稳定性造成了广告主在最优化和控制KPIs vs. 开销上很困难。
 
 本paper中，提出使用feecback control理论来解决RTB中的不稳定问题。Feedback controllers被广泛用于多个应用中，主要维持在预定义的reference values上进行对变量进行动态更改。应用场景有：飞机方向控制、机器人工智能。在我们的RTB场景中，指定的KPI value，依赖于广告主的需求，可以被看成是我们希望使用一个预定义的reference value进行控制的变量。我们的研究主要有两个用例：
 
