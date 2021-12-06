@@ -59,7 +59,7 @@ $$
 其中：
 
 - $$\theta_t$$是对于在时刻t的bid request的预估CTR（estimated CTR）；
-- $$\theta_0$$是在target条件下的平均CTR（average CTR）
+- $$\theta_0$$是在target condition（例如：一个用户兴趣片段：user interest segment）下的平均CTR（average CTR）
 - $$b_0$$是对于target condition的可调节基础竞价（tuned base bid price）
 
 在本文中，我们采用该方法，并采用一个logistic CTR estimator.
