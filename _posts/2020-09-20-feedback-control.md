@@ -23,15 +23,15 @@ RTB除了分发效果驱动的广告外，不幸的是，会导致高度可变�
 
 本paper中，提出使用feecback control理论来解决RTB中的不稳定问题。Feedback controllers被广泛用于多个应用中，主要维持在预定义的reference values上进行对变量进行动态更改。应用场景有：飞机方向控制、机器人工智能。在我们的RTB场景中，指定的KPI value，依赖于广告主的需求，可以被看成是我们希望使用一个预定义的reference value进行控制的变量。我们的研究主要有两个用例：
 
-- 1) 对于效果驱动的广告，我们关注于获得一个点击所需的平均开销的feedback control，通过eCPC进行measure
-- 2) 对于品牌广告，为了确保一个campaign的指定高曝光，我们关注于控制对于目标曝光的竞拍获胜率，通过AWR进行measure
+- 1) 对于效果驱动的广告：我们**关注于获得一个点击所需的平均开销的feedback control，通过eCPC进行measure**
+- 2) 对于品牌广告：为了确保一个campaign的指定高曝光，我们关注于**控制对于目标曝光的竞拍获胜率，通过AWR进行measure**
 
 更特别的，对于到来的广告展示机会请求（bid request），我们会采用它们中的每个作为control input信号，并考虑竞价的gain（调整值）作为control output信号。我们会开发两个controllers进行测试：
 
 - PID controller
 - WL controller
 
-我们在大规模实验上测试了feedback control的效果，它们使用erference value、以及reference dynamics的不同setting。通过经验研究，我们发现PID和WL controllers可以控制eCPC和AWR，而PID则比WL提供一个更好的control accuracy和健壮性。
+我们在大规模实验上测试了feedback control的效果，它们使用reference value、以及reference dynamics的不同setting。通过经验研究，我们发现PID和WL controllers可以控制eCPC和AWR，而PID则比WL提供一个更好的control accuracy和健壮性。
 
 。。。
 
