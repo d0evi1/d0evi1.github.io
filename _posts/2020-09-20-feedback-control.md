@@ -102,7 +102,11 @@ $$
 - error factor $$e(t_k)$$是$$x_r$$减去当前控制变量值$$x(t_k)$$的reference value
 - 更新时间间隔给定如下$$\Delta t_j = t_j - t_{j-1} $$,error factors的变化是$$\Delta e(t_k) = e(t_k) - e(t_{k-1})$$，其中: $$\lambda_P, \lambda_I, \lambda_D$$是每个control factor的weight参数。
 
-注意，这里的control factors都是在离散时间$$(t_1, t_2, \cdots) $$上的，因为bidding事件是离散的，它实际上会周期性更新control factors。**所有的control factors $$(\phi(t), e(t_k), \lambda_P, \lambda_I, \lambda_D)$$仍会在两个updates间保持相同**，在等式(2)中的控制信号$$\phi(t)$$等于$$\phi(t_k)$$。我们看到P factor会趋向于将当前变量值push到reference value；I factor会减小从当前时间开始的累计error；D factor会控制该变量的波动。
+注意，这里的control factors都是在离散时间$$(t_1, t_2, \cdots) $$上的，因为bidding事件是离散的，它实际上会周期性更新control factors。**所有的control factors $$(\phi(t), e(t_k), \lambda_P, \lambda_I, \lambda_D)$$仍会在两个updates间保持相同**，在等式(2)中的控制信号$$\phi(t)$$等于$$\phi(t_k)$$。我们看到：
+
+- P factor会趋向于将当前变量值push到reference value
+- I factor会减小从当前时间开始的累计error
+- D factor会控制该变量的波动
 
 ## 3.3 Waterlevel-based Controller
 
