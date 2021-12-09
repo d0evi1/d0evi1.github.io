@@ -329,7 +329,7 @@ $$
 
 比例因子、微分因子、积分因子的组合，可以使PID feedback自动高效调整在control lifetime期间的settling过程。可选的，你可以经验性地调整reference value，以便达到期望的reference value。对于eCPC control的示例，**如果刚好在耗尽首个一半预算之后，campaign的达成eCPC（achived eCPC）要比intial reference value要更高，那么广告主会希望降低reference以便加快下调，最终在耗尽完预算之前达到它初始的eCPC目标**。PID feedback controller会通过它的积分项来隐式地处理这样的问题。在本节中，我们研究了RTB feedback control机制，对于广告主是否必要仍必要，来根据campaign的实时效果来有目的地调整reference value。
 
-**Dynamic Freference Adjustment Model**
+**Dynamic reference Adjustment Model**
 
 为了模拟广告主的策略，在预算限制下来动态变更eCPC和AWR的reference value，我们提出一种**dynamic reference adjustment model**来计算**在$$t_k$$后的新reference $$x_r(t_{k+1})$$**：
 
