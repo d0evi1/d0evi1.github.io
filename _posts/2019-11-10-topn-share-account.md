@@ -60,12 +60,12 @@ tags:
 
 我们给定：一个相关的推荐系统$$R_{ref}$$会产生在给定T下的期望推荐。因此，我们会说：通过相关推荐系统$$R_{ref}(T)$$在**用户评分矩阵（user-rating-matrix）**T上计算，如果i在u的top-N推荐中，则一个item i与一个user u相关。
 
-不幸的是，在我们的问题设定中，T是未知的。因此，我们会给出**账号评分评阵（account-rating-matrix）** $$R \in \lbrace 0, 1 \rbrace^{||A|| \times ||I||}$$。其中：
+不幸的是，在我们的问题设定中，T是未知的。因此，我们会给出**账号评分评阵（account-rating-matrix）** $$R \in \lbrace 0, 1 \rbrace^{\|A\| \times \|I\|}$$。其中：
 
 - $$R_{ai}=1$$表示账号$$a \in A$$对于$$i \in I$$是存在一个已知偏好的
 - $$R_{ai}=0$$表示不存在这样的信息
 
-现在，缺失上下文信息的共享账号的top-N推荐，会设计一个共享账号推荐系统$$R_{sa}(R)$$，它基于账号评分评阵（account-rating-matrix）R，计算每个账号a的top $$N_a$$的推荐，如下：
+现在，**缺失上下文信息的共享账号的top-N推荐，会设计一个共享账号推荐系统$$R_{sa}(R)$$，它基于账号评分评阵（account-rating-matrix）R，计算每个账号a的top $$N_a$$的推荐**，如下：
 
 - top $$N_a$$包含了在账号a的用户集合下每个用户的top-N items，有：$$N = \frac{N_a}{\|U(a)\|}$$。实际上，目标是，通过最大化具有至少一个item的用户数来避免dominance问题和generality问题。
 - 账户a的用户集合中的某一用户，在top-$$Na$$中的哪个items是对他有意义的，这是很清楚的，例如：presentation problem会得到解决
