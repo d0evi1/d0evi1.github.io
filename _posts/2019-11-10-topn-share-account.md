@@ -60,7 +60,7 @@ tags:
 
 我们给定：一个相关的推荐系统$$R_{ref}$$会产生在给定T下的期望推荐。因此，我们会说：通过相关推荐系统$$R_{ref}(T)$$在**用户评分矩阵（user-rating-matrix）**T上计算，如果i在u的top-N推荐中，则一个item i与一个user u相关。
 
-不幸的是，在我们的问题设定中，T是未知的。因此，我们会给出**账号评分评阵（account-rating-matrix）** $$R \in \lbrace 0, 1 \rbrace^{|A| \times |I|}$$。其中：
+不幸的是，在我们的问题设定中，T是未知的。因此，我们会给出**账号评分评阵（account-rating-matrix）** $$R \in \lbrace 0, 1 \rbrace^{||A|| \times ||I||}$$。其中：
 
 - $$R_{ai}=1$$表示账号$$a \in A$$对于$$i \in I$$是存在一个已知偏好的
 - $$R_{ai}=0$$表示不存在这样的信息
