@@ -178,19 +178,23 @@ $$
 
 这样，我们会避免容易出错的（error prone）任务：估计在共享账号上的用户数目、并基于一个通用的聚类准则，显式地将账号a划分成它的个体用户。
 
-更进一步，由于子集可以是潜在重合，DAMIB推荐系统不会关注在共享账号上的用户的已知偏好是否强烈、轻微、或者根本不重合。
+更进一步，由于子集可以是潜在重合，**DAMIB推荐系统不会关注在共享账号上的用户的已知偏好是否强重合、微重合、或者根本不重合**。
 
 最终，注意，对于p=0来说，它总是有：$$s_{DAMIB} = s_{LIB} = s_{IB}$$。因此，item-based推荐系统是DAMIB推荐系统的一个特例。
 
 # 6.高效计算
 
-可以发现，在等式(3)中的最大化，需要以指数时间复杂度来直接计算$$S_{LIB}$$，称为$$2^{\I I(a) \|}$$。相应的，直接计算$$s_{DAMIB}$$是很难的。
+可以发现，在等式(3)中的最大化，需要以指数时间复杂度来直接计算$$S_{LIB}$$，称为$$2^{\mid I(a) \mid}$$。相应的，直接计算$$s_{DAMIB}$$是很难的。
 
-幸运的是，我们表明：$$S_{LIB}$$会允许我们来以O(nlogn)来计算$$s_{DAMIB}$$，其中：$$n = \| I(a) \|$$。该特性由定理6.1给出。
+幸运的是，我们表明：**$$S_{LIB}$$会允许我们来以O(nlogn)来计算$$s_{DAMIB}$$**，其中：$$n = \mid I(a) \mid$$。该特性由定理6.1给出。
 
 定理6.1 ： 假设a是一个账号，它喜欢items I(a)的集合。i是一个候选推荐。如果我们将所有items $$j,l \in I(a)$$进行排序，$$rank(j) < rank(l) \Leftrightarrow sim(j,i) > sim(l,i)$$，这样，子集$$S_i^* \subseteq I(a)$$会在所有$$S \in 2^{I(a)}$$上最大化$$S_{LIB}(S, i)$$，它是ranking的一个prefix。
 
-证明：略。。。
+证明：给定任意的$$S \subseteq I(a)$$。初始化P=S。当P不是一个prefix时，从P中移除最差的ranked item r，并添加最好的ranked item a到P中（它不在P中）。只要P还不是一个prefix，它会持有: $$sim(a, i) \geq sim(r, i)$$。因此，每个这样的item安排会增加$$s_{LIB}(P, i)$$（或至少等于），因为因子$$\frac{1}{\mid I(a) \mid^P}$$不会变化，在求和项$$\sum_{j \in I(a)} sim(j,i) \cdot \mid KNN(j) \cap \lbrace i \rbrace \mid$$中的一个较小项会被更一个更大的项所替代。因而，对于每个$$S \subseteq I(a)$$，它不是ranking的一个prefix，我们也可以总是找到一个prefix $$P \subseteq I(a) $$，满足：$$s_{LIB}(P,i) \geq s_{LIB}(S, i)$$。因此，子集$$S_i^*$$会最大化在所有$$S \in 2^{I(a)}$$上的$$s_{LIB}(S, i)$$，必须总是ranking的一个prefix。
+
+由于最优的subset是一个prefix，我们可以发现，它在ranked items I(a)上的一次遍历是线性时间的。时间复杂度上的log因子会来自于对$$\mid I(a) \mid$$上进行排序。
+
+该理论是我们方法的核心，因为它允许我们在O(nlogn)上计算$$s_{DAMIB}$$。
 
 # 7.解决Dominance问题
 
