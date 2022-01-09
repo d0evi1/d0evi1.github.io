@@ -125,7 +125,7 @@ $$
 
 # 5.解决genreality问题
 
-前面章节表明，由于item-based RRS不会区分：**一个得分是少量大相似得分的求和，还是许多小相似分得分的求程。因此会出现generality问题**。因而，我们的第一步是采用item-based的推荐得分（等式1）到length-adjusted item-based推荐得分上：
+前面章节表明，由于item-based RRS不会区分：**一个得分是少量大相似得分的求和，还是许多小相似分得分的求程。因此会出现generality问题**。因而，我们的第一步是采用item-based的推荐得分（等式1）到**length-adjusted item-based（LIB）**推荐得分上：
 
 $$
 S_{LIB}(u, i) = S_{LIB}(I(u), i) = \frac{1}{|I(u)|^p} \cdot S_{IB}(I(u), i)
@@ -135,15 +135,15 @@ $$
 
 其中，超参数$$p \in [0,1]$$。**尽管这种adjustment不会立即解决genreality问题，它会提供一种方式，来区分是：在少量大相似得分的求和，还是许多小得分求和的问题**。通过**选择p > 0，我们可以创建一个bias，它偏向于少量大相似得分的求程。p值越大，该bias就越大**。
 
-由于因子$$\frac{1}{\| I(u) \|^P}$$对于所有候选推荐i来说是相同的，对于用户u根据$$S_{LIB}$$和$$S_{IB}$$的top N items是相同的。然而，当我们计算两个不同用户间的得分时，$$S_{LIB}$$也会解释用户喜欢的items总量。
+由于因子$$\frac{1}{\mid| I(u) \mid^P}$$对于所有候选推荐i来说是相同的，对于用户u根据$$S_{LIB}$$和$$S_{IB}$$的top N items是相同的。然而，当我们计算两个不同用户间的得分时，$$S_{LIB}$$也会解释用户喜欢的items总量。
 
-为了避免generality问题，我们理想地希望推荐这么一个item，如果一个item i与共享账号a中的某个用户高度相关。因此，我们会计算item i与每个个体用户$$u \in U(a)$$的推荐得分。正式的，我们希望根据它的推荐得分对所有item i进行排序：
+为了避免generality问题，我们理想地希望：**为共享账号a中的某个用户推荐与他高度相关的推荐项i**。因此，我们会计算item i与每个个体用户$$u \in U(a)$$的推荐得分。正式的，我们希望根据它的推荐得分对所有item i进行排序：
 
 $$
-max_{u \in U(a)} S_{LIB} (I(u), i)
+\underset{max}{u \in U(a)} S_{LIB} (I(u), i)
 $$
 
-不幸的是，我们不能计算理想推荐得分，因为$$U(a)$$和I(u)是未知的。相似的，我们只知道$$I(a) = \lbrace j \in I \I R_{aj} = 1 \rbrace$$, 它表示账号a喜欢的items集合。
+不幸的是，我们不能计算理想的推荐得分，因为$$U(a)$$和I(u)是未知的。相似的，我们只知道$$I(a) = \lbrace j \in I \mid R_{aj} = 1 \rbrace$$, 它表示账号a喜欢的items集合。
 
 然而，我们可以使用它的上界对理想的推荐得分进行近似：
 
