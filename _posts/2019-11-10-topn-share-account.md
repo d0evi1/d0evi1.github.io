@@ -67,10 +67,10 @@ tags:
 
 现在，**缺失上下文信息的共享账号的top-N推荐，会设计一个共享账号推荐系统$$R_{sa}(R)$$，它基于账号评分评阵（account-rating-matrix）R，计算每个账号a的top $$N_a$$的推荐**，如下：
 
-- top $$N_a$$包含了在账号a的用户集合下每个用户的top-N items，有：$$N = \frac{N_a}{\|U(a)\|}$$。实际上，目标是，通过最大化具有至少一个item的用户数来避免dominance问题和generality问题。
-- 账户a的用户集合中的某一用户，在top-$$Na$$中的哪个items是对他有意义的，这是很清楚的，例如：presentation problem会得到解决
+- top $$N_a$$包含了在账号a的用户集合下每个用户的top-N items，有：$$N = \frac{N_a}{\|U(a)\|}$$。实际上，这里目标是，**通过最大化在topN中具有至少一个item的用户的数目**，来避免dominance问题和generality问题。
+- 账户a的用户集合中的某一用户，在top-Na中的哪个items是对他有意义的，这是很清楚的，presentation problem会得到解决
 
-注意：在上面的定义中，共享账号的推荐系统不会获得共享每个账号的用户数目作为输入。更进一步，关于共享一个账号的用户的共享兴趣，不会做出任何假设。他们可以具有完全不同的兴趣，或者部分重叠的兴趣，或者完全重合的兴趣。
+注意：在上面的定义中，**共享账号的推荐系统不会获得共享每个账号的用户数目作为输入**。更进一步，关于共享一个账号的用户的共享兴趣，不会做出任何假设。他们可以具有完全不同的兴趣，或者部分重叠的兴趣，或者完全重合的兴趣。
 
 最后，注意该问题定义与一个典型的group推荐问题【10】正交。
 
@@ -79,15 +79,15 @@ tags:
 
 # 3.相关推荐系统
 
-通常，推荐系统会发现，一个用户u的top-N推荐，通过首次为每个候选推荐i计算推荐得分 s(u,i)，接着选择最高分排序的top-N推荐来获得。
+通常，对于一个用户u的top-N推荐，推荐系统会先为每个候选推荐项i计算推荐得分 s(u,i)，接着从中选择按最高分排序的top-N推荐项。
 
-对于binary、postive-only feedback，大多数流行的推荐系统的其中之一是，item-based CF推荐系统【2】。这些item-based推荐系统根源于这样的意图：好的推荐会与target user偏好的目标items相似，其中在两个items间的相似性会通过使用在用户喜欢的items的各自集合间的任意相似度measure进行衡量。因此，对于一个target user u，这种推荐系统：
+对于binary、postive-only feedback，大多数流行的推荐系统的其中之一是，item-based CF推荐系统【2】。这些item-based推荐系统根源于这样的意图：**好的推荐会与target user偏好的目标items相似，其中在两个items间的相似性会通过使用在用户喜欢的items的各自集合间的任意相似度measure进行衡量**。因此，对于一个target user u，这种推荐系统：
 
-- 首先会发现：KNN(j)，这是对j的k个最相似items，其中：每个喜欢的item j（T_{uj}=1）通过使用一个相似measure sim(j,i)进行衡量。
+- 首先会发现KNN(j)：这是对j的k个最相似items，其中：每个喜欢的item j（$$T_{uj}=1$$）通过使用一个相似measure $$sim(j,i)$$进行衡量。
 - 接着，用户u对于一个候选推荐i的item-based推荐得分给定如下：
 
 $$
-S_{IB}(u, i) = s_{IB}(I(u), i) = \sum_{j \in I(u)} sim(j, i) \dot | KNN(j) \cap \lbrace i \rbrace  
+S_{IB}(u, i) = s_{IB}(I(u), i) = \sum_{j \in I(u)} sim(j, i) \cdot | KNN(j) \cap \lbrace i \rbrace  |
 $$ 
 
 ...(1)
