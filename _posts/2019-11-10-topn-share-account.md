@@ -107,11 +107,11 @@ $$
 简单将相关推荐系统（reference recommender system）应用到account-rating-matrix R上会导致次优结果，因为RRS会有三个共享账号问题。我们使用两个示例进行说明。在两个示例中，我们考虑：
 
 - 两个用户$$u_a$$和$$u_b$$会共享账号s。
-- 用户$$u_a$$对于items $$a_1$$和$$a_2$$具有一个已知偏好
-- 用户$$u_b$$对于items $$b_1$$, $$b_2$$, $$b_3$$具有一个已知偏好
+- 用户$$u_a$$对于items $$a_1$$和$$a_2$$具有一个已知偏好（相当于推荐里面的trigger item list）
+- 用户$$u_b$$对于items $$b_1$$, $$b_2$$, $$b_3$$具有一个已知偏好（相当于推荐里面的trigger item list）
 - 存在5个候候选推荐：$$r_a^1, r_a^2, r_b^1, r_b^2, r_g$$，其中$$r_a^1$$和$$r_a^2$$是对于$$u_a$$来说的好推荐；$$r_b^1$$和$$r_b^2$$是对于$$u_b$$来说的好推荐。$$r_g$$是一个完全通用的推荐，两个用户都是中性
 
-表1和2总结了一些立即计算。
+表1和2给出了一些立即计算。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c721e0975bccb75c678cc3af461820fb7dcca75e3b5c811a434bb459dce07e7530f4f182d17d71c0a70680519bd00b31?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=t1.jpg&amp;size=750">
 
