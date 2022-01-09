@@ -200,15 +200,15 @@ $$
 
 DAMIB推荐系统允许我们检测：**什么时候(when)发生domainance问题**。这是因为：由DAMIB提供的每个推荐项i会伴随着一个清晰的解释，形式为：最优子集$$S_i^*  \subseteq  I(a)$$。因此，如果union $$U_{i \in top-N_a} S_i^*$$只是I(a)的一个小子集时，我们知道：**这个小子集会在账号a的top $$N_a$$推荐中占统治地位**。
 
-求解dominance问题，可以选择在算法1中的ALG=DAMIB，我们称为COVER。例如，我们为共享账号推荐的最终算法是DAMIB-COVER，其中DAMIB-COVER(a) = COVER(a, DAMIB)。
+可以通过选择在算法1中的**ALG=DAMIB**（我们称为COVER）来解决dominance问题。例如，我们为共享账号推荐的最终算法是DAMIB-COVER，其中：**DAMIB-COVER(a) = COVER(a, DAMIB)**。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/fbff1c6b76540f381340a2adee71ca09f635f71605045ba48aac5a36457ba23cd096028c1ae54dc3491dfa9877436295?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=a1.jpg&amp;size=750">
 
 算法1
 
-该DAMIB-COVAER算法会使用DAMIB得分来找出$$N_a$$的最高得分候选推荐，如果它的解释$$S_c^*$$与更高排序的候选的解释不够有区分性，我们就从top $$N_a$$中移除一个候选推荐c。$$D(S_c^*, C(a)) \geq \theta_D$$的解释区分性条件，会衡量一个候选($$S_c^*$$)以及更高排序候选(C(a))是否足够不同。
+该DAMIB-COVAER算法会使用DAMIB得分来**找出$$N_a$$的最高得分候选推荐**，如果它的**解释(explanation)$$S_c^*$$**与更高排序的候选的解释不容易区分，我们就从top $$N_a$$中移除该候选推荐项c。$$D(S_c^*, C(a)) \geq \theta_D$$的解释区分性条件，**会衡量一个候选($$S_c^*$$)以及更高排序候选（ranked candidates）C(a)的explanations的union是否足够不同**。
 
-关于explanation-diffference条件的可能的启发定义是：$$S_c^* \ C(a) | \geq 0.5 \cdot | S_c^* | $$。。。
+关于explanation-diffference条件的可能的启发定义是：$$S_c^* \ C(a) | \geq 0.5 \cdot | S_c^* | $$，并且$$\mid S_c^* \ C(a) \mid = \mid S_c^* \mid$$。然而，我们的实验表明：$$\mid S_c^* \ C(a) \mid \geq 1$$会比其它两种都好。因此，使用后一种启发法。
 
 
 # 8.求解presentation问题
