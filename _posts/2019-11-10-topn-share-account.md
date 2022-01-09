@@ -151,12 +151,12 @@ $$
 \underset{S \in 2^{I(a)}}{max} S_{LIB} (S, i) \geq \underset{u \in U(a)}{max} S_{LIB}(I(u), i)
 $$
 
-其中，$$2^{I(a)}$$是$$I(a)$$的幂（power），例如，该集合包含了所在I(a)的可能子集。提出的近似是一个理想得分的上界，因为I(u)的每个集合对于$$u \in U(a)$$来说是$$2^{I(a)}$$的一个元素。该近似是基于假设：所有I(a)的子集，它们对应于用户更可能生成最高的推荐得分，而非将它们随机地放在一起。
+其中，$$2^{I(a)}$$是$$I(a)$$的幂（power）（**该集合包含了所在I(a)的可能子集**）。提出的近似是一个理想得分的上界，因为I(u)的每个集合对于$$u \in U(a)$$来说是$$2^{I(a)}$$的一个元素。该近似是基于假设：**所有I(a)的子集，它们对应于用户更可能生成最高的推荐得分，而非将它们随机地放在一起**。
 
-相应的，我们提出使用disambiguating item-based(DAMIB)推荐系统，关于账号a对于item i的推荐得分如下：
+相应的，我们提出**使用disambiguating item-based(DAMIB)推荐系统**，关于账号a对于item i的推荐得分如下：
 
 $$
-s_{DAMIB}(a, i) = max_{S \in 2^{I(a)}} S_{LIB}(S, i)
+s_{DAMIB}(a, i) = \underset{S \in 2^{I(a)}}{max} S_{LIB}(S, i)
 $$
 
 ...(3)
@@ -164,7 +164,7 @@ $$
 每个得分$$s_{DAMIB}(a, i)$$对应于一个最优的子集$$S_i^* \subseteq I(a)$$：
 
 $$
-S_i^* = argmax_{S \in 2^{I(a)}} S_{LIB}(S, i)
+S_i^* = \underset{S \in 2^{I(a)}}{argmax} S_{LIB}(S, i)
 $$
 
 ...(4)
