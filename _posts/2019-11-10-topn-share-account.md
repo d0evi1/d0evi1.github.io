@@ -198,7 +198,7 @@ $$
 
 # 7.解决Dominance问题
 
-DAMIB推荐系统允许我们检测，当domainance问题发现时。这是因为，由DAMIB提供的每个推荐项i会伴随着一个清晰的解释，形式为：最优子集$$S_i^*  \subseteq  I(a)$$。因此，如果union $$U_{i \in top\-N{a}} S_i^*$$只是I(a)的一个小子集时，我们知道，这个小子集会在账号a的top $$N_a$$推荐中占统治地位。
+DAMIB推荐系统允许我们检测：**什么时候(when)发生domainance问题**。这是因为：由DAMIB提供的每个推荐项i会伴随着一个清晰的解释，形式为：最优子集$$S_i^*  \subseteq  I(a)$$。因此，如果union $$U_{i \in top-N_a} S_i^*$$只是I(a)的一个小子集时，我们知道：**这个小子集会在账号a的top $$N_a$$推荐中占统治地位**。
 
 求解dominance问题，可以选择在算法1中的ALG=DAMIB，我们称为COVER。例如，我们为共享账号推荐的最终算法是DAMIB-COVER，其中DAMIB-COVER(a) = COVER(a, DAMIB)。
 
