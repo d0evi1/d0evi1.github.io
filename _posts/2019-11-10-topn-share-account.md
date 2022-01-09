@@ -208,14 +208,14 @@ DAMIB推荐系统允许我们检测：**什么时候(when)发生domainance问题
 
 该DAMIB-COVAER算法会使用DAMIB得分来**找出$$N_a$$的最高得分候选推荐**，如果它的**解释(explanation)$$S_c^*$$**与更高排序的候选的解释不容易区分，我们就从top $$N_a$$中移除该候选推荐项c。$$D(S_c^*, C(a)) \geq \theta_D$$的解释区分性条件，**会衡量一个候选($$S_c^*$$)以及更高排序候选（ranked candidates）C(a)的explanations的union是否足够不同**。
 
-关于explanation-diffference条件的可能的启发定义是：$$S_c^* \ C(a) | \geq 0.5 \cdot | S_c^* | $$，并且$$\mid S_c^* \ C(a) \mid = \mid S_c^* \mid$$。然而，我们的实验表明：$$\mid S_c^* \ C(a) \mid \geq 1$$会比其它两种都好。因此，使用后一种启发法。
+关于explanation-diffference条件的可能的启发定义是：$$S_c^* \backslash C(a) | \geq 0.5 \cdot | S_c^* | $$，并且$$\mid S_c^* \backslash C(a) \mid = \mid S_c^* \mid$$。然而，我们的实验表明：$$\mid S_c^* \backslash C(a) \mid \geq 1$$会比其它两种都好。因此，使用后一种启发法。
 
 
 # 8.求解presentation问题
 
 对于一个共享账号a，使用DAMIB-COVEAR生成top-Na推荐项是不够的，因为共享账号的用户不知道哪个推荐项属于哪个用户。这被称为presentation问题。
 
-我们的解决方案是，将每个推荐项 $$i \in top-N_a$$、与它的解释(explanation)$$S_i^*$$表示在一起。我们期望：对于在top-Na中的items i的绝大多数，explanation $$S_i^*$$是u（共享账号a的某一用户）的偏好I(u)的一个子集。我们会在第9节进行验证该假设。
+我们的解决方案是，**将每个推荐项 $$i \in top-N_a$$、与它的解释(explanation)$$S_i^*$$表示在一起**。我们期望：对于在top-Na中的items i的绝大多数，explanation $$S_i^*$$是u（共享账号a的某一用户）的偏好I(u)的一个子集。我们会在第9节进行验证该假设。
 
 因此，我们将该推荐表示为item r推荐给喜欢s1, s2, s3的用户。接着，一个会用户认为s1, s2, s3是他的偏好，并知道r是推荐给他的。
 
