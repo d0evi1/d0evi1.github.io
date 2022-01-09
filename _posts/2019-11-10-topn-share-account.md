@@ -113,11 +113,9 @@ $$
 
 表1和2总结了一些立即计算。
 
-。。。
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c721e0975bccb75c678cc3af461820fb7dcca75e3b5c811a434bb459dce07e7530f4f182d17d71c0a70680519bd00b31?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=t1.jpg&amp;size=750">
 
-表1 
-
-表2
+表1、2
 
 两个示例都适合说明RRS存在的presentation问题。例如，考虑表1的第一行。推荐得分$$s(s, r_a^1) = 11$$是以下三项$$sim(a_1, r_a^)=5, sim(a_2, r_a^1) = 5, s(b_1, r_a^1) = 1$$的总和。因此，它可以通过$$a_1, a_2, b_1$$来进行解释。然而这是一个坏的解释，因为由于$$b_1$$的缺失，$$u_a$$会难于区分解释，$$u_b$$会错误下结论成这对他是有意义的。
 
@@ -192,6 +190,10 @@ $$
 DAMIB推荐系统允许我们检测，当domainance问题发现时。这是因为，由DAMIB提供的每个推荐项i会伴随着一个清晰的解释，形式为：最优子集$$S_i^*  \subseteq  I(a)$$。因此，如果union $$U_{i \in top\-N{a}} S_i^*$$只是I(a)的一个小子集时，我们知道，这个小子集会在账号a的top $$N_a$$推荐中占统治地位。
 
 求解dominance问题，可以选择在算法1中的ALG=DAMIB，我们称为COVER。例如，我们为共享账号推荐的最终算法是DAMIB-COVER，其中DAMIB-COVER(a) = COVER(a, DAMIB)。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/fbff1c6b76540f381340a2adee71ca09f635f71605045ba48aac5a36457ba23cd096028c1ae54dc3491dfa9877436295?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=a1.jpg&amp;size=750">
+
+算法1
 
 该DAMIB-COVAER算法会使用DAMIB得分来找出$$N_a$$的最高得分候选推荐，如果它的解释$$S_c^*$$与更高排序的候选的解释不够有区分性，我们就从top $$N_a$$中移除一个候选推荐c。$$D(S_c^*, C(a)) \geq \theta_D$$的解释区分性条件，会衡量一个候选($$S_c^*$$)以及更高排序候选(C(a))是否足够不同。
 
