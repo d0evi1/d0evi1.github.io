@@ -16,9 +16,9 @@ tags:
 
 当多个用户共享账号时会引出三个问题。
 
-首先，**dominance problem**。当所有推荐项（recommendations）只与共享账号的部分用户有关，至少一个用户不会获得任何相关推荐项，此时会引起“主导问题（dominance problem）”。我们会说：只有少量用户会主宰该账号。另外，考虑一个经常购物的家庭。他们通常会在购买家庭用品时偶尔也会为孩子购买玩具。现在，很有可能所有推荐项会基于更多的家庭用品来生成，该推荐系统对孩子来说是基本没啥用。
+首先，**dominance problem**。当所有推荐项（recommendations）只与共享账号的部分用户有关，至少一个用户不会获得任何相关推荐项，此时会引起“主导问题（dominance problem）”。我们会说：**只有少量用户的兴趣会主宰该账号的推荐**。另外，考虑一个经常购物的家庭。他们通常会在购买家庭用品时偶尔也会为孩子购买玩具。现在，很有可能所有推荐项会基于更多的家庭用品来生成，该推荐系统对孩子来说是基本没啥用。
 
-第二，**generality problem**。当推荐项不仅与共享账号下所有用户都有些相关时，并且不会与任一个用户相关时，会引发“generality problem”。当多个用户的不同品味兴趣被合到同一个账户上时，推荐系统更可能会推荐被大多数人喜欢的**通用items（general items）**，忽略掉私人的品味。
+第二，**generality problem**。当推荐项不仅与共享账号下所有用户兴趣都有些相关，并且又不仅仅与任一个用户相关时，会引发“generality problem”。当多个用户的不同品味兴趣被合到同一个账户上时，推荐系统更可能会推荐被大多数人喜欢的**通用items（general items）**，忽略掉私人的品味。
 
 第三，如果推荐系统可以为共享账号上的每个用户生成相关的推荐项，每个用户如何知道哪个推荐项是为你推荐的呢？我们称这为**“presentation problem”**。
 
@@ -53,7 +53,7 @@ tags:
 
 注意：在该问题设定中，每个用户会属于一个账号。
 
-首先，考虑用户评分矩阵（user-rating-matrix）$$T \in \lbrace 0, 1 \rbrace^{\|U\| \times \|I\|}$$。其中：
+首先，考虑用户评分矩阵（user-rating-matrix）$$T \in \lbrace 0, 1 \rbrace^{\mid U \mid \times \mid I \mid}$$。其中：
 
 - $$T_{ui}=1$$表示存在用户$$u \in U$$对于item $$i \in I$$的偏好
 - $$T_{ui}=0$$表示没有这样的偏好
@@ -67,7 +67,7 @@ tags:
 
 现在，**缺失上下文信息的共享账号的top-N推荐，会设计一个共享账号推荐系统$$R_{sa}(R)$$，它基于账号评分评阵（account-rating-matrix）R，计算每个账号a的top $$N_a$$的推荐**，如下：
 
-- top $$N_a$$包含了在账号a的用户集合下每个用户的top-N items，有：$$N = \frac{N_a}{\|U(a)\|}$$。实际上，这里目标是，**通过最大化在topN中具有至少一个item的用户的数目**，来避免dominance问题和generality问题。
+- top $$N_a$$包含了在账号a的用户集合下每个用户的top-N items，有：$$N = \frac{N_a}{\mid U(a) \mid}$$。实际上，这里目标是：**通过最大化在topN中具有至少一个item的用户的数目**（用户多，兴趣也多），来避免dominance问题和generality问题。
 - 账户a的用户集合中的某一用户，在top-Na中的哪个items是对他有意义的，这是很清楚的，presentation problem会得到解决
 
 注意：在上面的定义中，**共享账号的推荐系统不会获得共享每个账号的用户数目作为输入**。更进一步，关于共享一个账号的用户的共享兴趣，不会做出任何假设。他们可以具有完全不同的兴趣，或者部分重叠的兴趣，或者完全重合的兴趣。
@@ -84,7 +84,7 @@ tags:
 对于binary、postive-only feedback，大多数流行的推荐系统的其中之一是，item-based CF推荐系统【2】。这些item-based推荐系统根源于这样的意图：**好的推荐会与target user偏好的目标items相似，其中在两个items间的相似性会通过使用在用户喜欢的items的各自集合间的任意相似度measure进行衡量**。因此，对于一个target user u，这种推荐系统：
 
 - 首先会发现KNN(j)：这是对j的k个最相似items，其中：每个喜欢的item j（$$T_{uj}=1$$）通过使用一个相似measure $$sim(j,i)$$进行衡量。
-- 接着，用户u对于一个候选推荐i的item-based推荐得分给定如下：
+- 接着，用户u对候选推荐项i的item-based推荐得分给定如下：
 
 $$
 S_{IB}(u, i) = s_{IB}(I(u), i) = \sum_{j \in I(u)} sim(j, i) \cdot | KNN(j) \cap \lbrace i \rbrace  |
@@ -92,12 +92,14 @@ $$
 
 ...(1)
 
-其中，$$I(u) = \lbrace j \in I  \| T_{uj} = 1 \rbrace$$，这是u喜欢的items集合。
+其中：
 
-sim(j,i)的一个常见选择中，cosine相似度。更进一步，归一化相似度得分可以提升表现【2】。sim(j,i)的定义如下：
+- $$I(u) = \lbrace j \in I  \mid T_{uj} = 1 \rbrace$$，这是u喜欢的items集合。
+
+sim(j,i)的一个常见选择是cosine相似度。更进一步，归一化相似度得分可以提升表现【2】。sim(j,i)的定义如下：
 
 $$
-sim(j,i) = \frac{cos(j,i)}{ \sum_{l \in KNN(j)} cos(j, l)}
+sim(j,i) = \frac{cos(j,i)}{ \sum\limits_{l \in KNN(j)} cos(j, l)}
 $$
 
 我们可以使用这种推荐系统作为相关推荐系统$$R_{ref}$$。
