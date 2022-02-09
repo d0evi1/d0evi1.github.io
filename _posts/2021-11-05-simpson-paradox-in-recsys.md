@@ -10,6 +10,35 @@ tags:
 JADIDINEJAD在《The Simpson’s Paradox in the Offline Evaluation of
 Recommendation Systems》中提出推荐系统中的Simpson’s Paradox：
 
+
+# 1.介绍
+
+推荐系统通常会以online（A/B testing或interleaving）或offline方式进行评估。然而，推荐系统的离线评估仍然是大范围使用的evaluation，归因于online evaluation[6,14]部署研究系统的难度。实际上，很难以一个离线方式，通过使用历史用户交互日志可靠地评估一个推荐模型的效果【7，16，43】。该问题是存在混淆因子（confounders），例如：那些可以影响items的曝光（exposure）以及结果（outcomes）（比如：ratings）的变量。**confounding问题会在当一个平台尝试建模用户行为时，如果没有解释在曝光的推荐items的选择偏差（selection bias）时会出现，从而导致不可预料的结果**。在这种情况下，很难区别用户交互是来自于用户的真实偏好、还是受部署推荐系统的影响。
+
+通常，推荐系统的离线评估会具有两个阶段：
+
+- 1) 收集来自一个deployed system的用户反馈集合
+- 2) 使用这样的feedback来经验性评估和比较不同的推荐模型
+
+第一阶段可以遵循不同类型的donfounders，即可以是：由用户的item选择行为来初始化，或者通过受deployed推荐系统的动作影响。例如，除了其它交互机制（比如：搜索）之外，用户很可能会与这些被曝光的items交互。在这种方式下，在一个新推荐模型的离线评估中，使用历史交互，这样的交互已经从deployed推荐系统中获取得到，形成一个closed loop feedback，例如：deployed recommender system具有一个对收集到的feedback的直接影响，它可以被用来进行对其它推荐模型的离线评估。因而，新的推荐模型会根据它趋向于模拟由deployed model收集到的交互有多像来进行评估，而非有多满足用户的真实偏好。另一方面，在一个open loop（随机化）场景中，deployed model是一个随机推荐模型，例如：为users曝光随机的items。因此，在deployed model与新的推荐model间的feedback loop会打破，deployed model不会对收集到的feedback dataset具有影响，相应的，它对于在基于收集到的feedback dataset上对任意新模型的离线评估都没有影响。然而，为users曝光随机items是天然不实际的，用户体验会降级。因此，基于closed loop feedback对推荐系统进行训练和评估会是一个严重问题。
+
+Simpson’s paradox是统计学中的一个现象，当多个不同分组的观察数据中出现的一个显著趋势，会在这些分组组合在一起时消失或者逆转【29】。**在推荐场景中，当曝光（例如：推荐items）和结果（例如：用户的隐式和显式反馈）相关联时，并且曝光和结果会受一个第三方变量强烈影响时，会发生Simpson’s paradox**。在统计学上，如果观察到的feedback是Simpson’s paradox的一个产物，根据confounding variable对feedback进行分层，会造成悖论的消失。我们会争论在推荐系统的情况下，该confounding variable是：交互数据被收集的deployed model（或系统），a.k.a：closed loop feedback【17】。在本paper中，我们的核心目标是，对于closed loop feedback在推荐系统离线评估上提供一个in-depth研究，并提供了一个健壮的解来解决该问题。特别的，我们会讨论：从一个deployed model收集到的feedback datasets会偏向于deployed model的特性，并导致证实Simpson’s paradox的结论。我们通过研究在推荐系统离线评估上condounding variable（例如：deployed model's的特性），可以观察到显著趋势；当从经典离线setting上报observations时，该趋势接着会消失或逆转。另外，我们提出了一种新的评估方法，它可以解决Simpson’s paradox，以便产生一种更合理的推荐系统离线评估方法。
+
+为了更好地理解该问题的微妙之处，考虑一个deployed推荐模型，它会提升一个指定分组的items（例如：流行的items）——对比起只有少量交互的长尾items，存在一些少量的头部items，它们会被广泛曝光给用户并获得大量交互。当我们基于从前面deployed model收集到的feedback来评估一个新的推荐模型时，如果没有解释不同的items曝光的有多频繁，评估过程会由deployed model的特性所混淆，例如：任意模型的效果会具有一个趋势，展示相似的属性给已经存在的deployed model，很可能会过估计（over-estimated）。在这种情况下，我们会选择部署一个新的模型，它会匹配已经demployed model的特性，而它则比来自实际用户角度另一个模型会更低效。在本paper中，我们通过研究该问题在标准离线评估中做出结论的结果，并提出一种新的方法来解决该问题。特别的，本paper的贡献有两块：
+
+- 我们提出了一种in-depth分析
+- 为了解决该问题，提出了一个新的propensity-based stratified evaluation方法
+
+# 2.相关工作
+
+我们的工作主要受三块相关工作的启发：
+
+- 在l2r中解决bias（2.1节）
+- 算法混淆（algorithmic confounding）或closed loop feedback（2.2节）
+- 在counterfactual learning和evaluation中的工作（2.3）
+
+... 
+
 # 4.介绍
 
 辛普森悖论（Simpson’s paradox）是统计学中的一种观察现象，它会出现在观察数据集的许多不同groups中的一个显著趋势，当这些groups组合在一起时会消失甚至反转。该topic在许多文献上被广泛讨论。在该现象中会出现一个明显的悖论，当聚合数据时会支持这么一个结论：它与在数据聚合前的相同的分层数据的结论相反。当两个变量间的关系被研究时，如果这些变量会被一个协变量（confounding variable）所强烈影响时，就会发生辛普森悖论。当该数据根据混杂变量（confounding variable）进行分层时，该悖论会展示出相悖的结论。在这种情况下，使用一个显著性检验（significance test）可以识别出在一个指定层做出的错误结论，如第7节所示，显著性检验不可能区分出这样的统计趋势（trends）。在推荐系统的评估场景，会在用户上发生testing，这里讨论的悖论通常会涉及到user-item feedback生成过程。在另一方面，当因果关系（causal relations）在统计建模中被合理解决时，辛普森悖论可被解决。
