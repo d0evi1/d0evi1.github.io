@@ -59,7 +59,8 @@ Simpson’s paradox是统计学中的一个现象，当多个不同分组的观�
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/f612b059e405ddc741835a8dafee4c3a6f7f692900a804b8866dce7b42ece08a6cf2b6cb68d125bbcdabd62d03b04e49?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
 
-表1 
+表1  a) 肾结石示例。每个条目表示：恢复数/总病人数，成功率见括号  b) 推荐系统中离线评估的辛普森悖论。每个条目表示了受检模型在相应分层上的效果。*表示对比其它模型的一个显著差异（paired t-test, p<0.05）
+
 
 假设 1: 医生趋向于对不严重病例（例如：小结石）选择treatment B，对于更严重病例（例如：大结石）使用treatment A进行治疗
 
