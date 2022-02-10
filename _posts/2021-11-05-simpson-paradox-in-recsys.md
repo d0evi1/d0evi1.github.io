@@ -22,9 +22,9 @@ Recommendation Systems》中提出推荐系统中的Simpson’s Paradox：
 
 第一阶段可以服从不同类型的confounders，即可以是由用户关于item的选择行为来初始化，或者通过受deployed推荐系统的动作影响来初始化。例如，除了其它交互机制（比如：搜索）之外，**用户更可能会与被曝光的items进行交互**。在这种方式下，在一个新推荐模型的离线评估中使用历史交互，而这样的交互从deployed推荐系统中获取得到，**形成一个closed loop feedback**，例如：deployed recommender system存在对收集到的feedback的具有一个直接影响，它可以被用来进行对其它推荐模型的离线评估。因而，新的推荐模型会根据它趋向于模拟由deployed model收集到的交互有多像来进行评估，而非有多满足用户的真实偏好。另一方面，在一个**open loop（随机化）场景**中，deployed model是一个随机推荐模型，例如：为users曝光随机的items。因此，在deployed model与新的推荐model间的feedback loop会打破，deployed model不会对收集到的feedback dataset具有影响，相应的，它对于在基于收集到的feedback dataset上对任意新模型的离线评估都没有影响。然而，为users曝光随机items是天然不实际的，用户体验会降级。**因此，基于closed loop feedback对推荐系统进行训练和评估会是一个严重问题**。
 
-Simpson’s paradox是统计学中的一个现象，当多个不同分组的观察数据中出现的一个显著趋势，会在这些分组组合在一起时消失或者逆转【29】。**在推荐场景中，当曝光（例如：推荐items）和结果（例如：用户的隐式和显式反馈）相关联时，并且曝光和结果会受一个第三方变量强烈影响时，会发生Simpson’s paradox**。在统计学上，如果观察到的feedback是Simpson’s paradox的一个产物，根据confounding variable对feedback进行分层，会造成悖论的消失。我们会争论在推荐系统的情况下，该confounding variable是：交互数据被收集的deployed model（或系统），a.k.a：closed loop feedback【17】。在本paper中，我们的核心目标是，对于closed loop feedback在推荐系统离线评估上提供一个in-depth研究，并提供了一个健壮的解来解决该问题。特别的，我们会讨论：从一个deployed model收集到的feedback datasets会偏向于deployed model的特性，并导致证实Simpson’s paradox的结论。我们通过研究在推荐系统离线评估上condounding variable（例如：deployed model's的特性），可以观察到显著趋势；当从经典离线setting上报observations时，该趋势接着会消失或逆转。另外，我们提出了一种新的评估方法，它可以解决Simpson’s paradox，以便产生一种更合理的推荐系统离线评估方法。
+Simpson’s paradox是统计学中的一个现象，当多个不同分组的观察数据中出现的一个显著趋势，会在这些分组组合在一起时消失或者逆转【29】。**在推荐场景中，当曝光（例如：推荐items）和结果（例如：用户的隐式和显式反馈）相关联时，并且曝光和结果会受一个第三方变量强烈影响时，会发生Simpson’s paradox**。在统计学上，如果观察到的feedback是Simpson’s paradox的一个产物，根据confounding variable对feedback进行分层，可以消除悖论。**我们会讨论：在推荐系统的情况下，该confounding variable是交互数据被收集的deployed model（或系统），a.k.a：closed loop feedback【17】**。在本paper中，我们的核心目标是，对于closed loop feedback在推荐系统离线评估上提供一个in-depth研究，并提供了一个健壮的解来解决该问题。特别的，我们会讨论：从一个deployed model收集到的feedback datasets会偏向于deployed model的特性，并导致证实Simpson’s paradox的结论。我们通过研究在推荐系统离线评估上的confounding variable（例如：deployed model's的特性），可以观察到显著趋势；当从经典离线setting中上报observations时，该趋势接着会消失或逆转。另外，我们提出了一种新的评估方法，它可以解决Simpson’s paradox，以便产生一种更合理的推荐系统离线评估方法。
 
-为了更好地理解该问题的微妙之处，考虑一个deployed推荐模型，它会提升一个指定分组的items（例如：流行的items）——对比起只有少量交互的长尾items，存在一些少量的头部items，它们会被广泛曝光给用户并获得大量交互。当我们基于从前面deployed model收集到的feedback来评估一个新的推荐模型时，如果没有解释不同的items曝光的有多频繁，评估过程会由deployed model的特性所混淆，例如：任意模型的效果会具有一个趋势，展示相似的属性给已经存在的deployed model，很可能会过估计（over-estimated）。在这种情况下，我们会选择部署一个新的模型，它会匹配已经demployed model的特性，而它则比来自实际用户角度另一个模型会更低效。在本paper中，我们通过研究该问题在标准离线评估中做出结论的结果，并提出一种新的方法来解决该问题。特别的，本paper的贡献有两块：
+为了更好地理解该问题的微妙之处，考虑一个deployed推荐模型，它会提升一个指定分组的items（例如：流行的items）——**对比起只有少量交互的长尾items，存在一些少量的头部items，它们会被广泛曝光给用户并获得大量交互**。当我们基于从前面deployed model收集到的feedback来评估一个新的推荐模型时，如果没有解释不同的items曝光的有多频繁，评估过程会被deployed model的特性所混淆，例如：**任意模型的效果会具有这样一个趋势，展示与已经存在的deployed model相似的属性，这很可能会引起过估计（over-estimated）**。在这种情况下，我们可能会选择部署一个匹配已deployed model的特性的新模型，从实际用户角度看，它会比另一个模型更低效。在本paper中，我们通过研究该问题在标准离线评估中做出结论的结果，并提出一种新的方法来解决该问题。特别的，本paper的贡献有两块：
 
 - 我们提出了一种in-depth分析
 - 为了解决该问题，提出了一个新的propensity-based stratified evaluation方法
@@ -39,11 +39,25 @@ Simpson’s paradox是统计学中的一个现象，当多个不同分组的观�
 
 ... 
 
+# 3.离线评估法
+
+本节中，我们会将当前offline evaluation方法进行总结，称为标准holdout evaluation和counterfactual evaluation。
+
+## 3.1 Holdout Evaluation
+
+...
+
+## 3.2 Counterfactual Evaluation
+
+...
+
 # 4.介绍
 
-辛普森悖论（Simpson’s paradox）是统计学中的一种观察现象，它会出现在观察数据集的许多不同groups中的一个显著趋势，当这些groups组合在一起时会消失甚至反转。该topic在许多文献上被广泛讨论。在该现象中会出现一个明显的悖论，当聚合数据时会支持这么一个结论：它与在数据聚合前的相同的分层数据的结论相反。当两个变量间的关系被研究时，如果这些变量会被一个协变量（confounding variable）所强烈影响时，就会发生辛普森悖论。当该数据根据混杂变量（confounding variable）进行分层时，该悖论会展示出相悖的结论。在这种情况下，使用一个显著性检验（significance test）可以识别出在一个指定层做出的错误结论，如第7节所示，显著性检验不可能区分出这样的统计趋势（trends）。在推荐系统的评估场景，会在用户上发生testing，这里讨论的悖论通常会涉及到user-item feedback生成过程。在另一方面，当因果关系（causal relations）在统计建模中被合理解决时，辛普森悖论可被解决。
+辛普森悖论（Simpson’s paradox）是统计学中的一种观察现象：**在观察数据集的许多不同groups中都出现的一个显著趋势，当将这些groups组合在一起时会消失甚至反转**。该topic在许多文献上被广泛讨论。在该现象中会出现一个明显的悖论，当聚合数据时会支持这么一个结论：它与在数据聚合前的相同的分层数据的结论相反。**当两个变量间的关系被研究时，如果这些变量会被一个协变量（confounding variable）所强烈影响时，就会发生辛普森悖论**。当该数据根据混杂变量（confounding variable）进行分层时，该悖论会展示出相悖的结论。在这种情况下，使用一个显著性检验（significance test）可以识别出在一个指定层做出的错误结论；然而，如第7节所示，显著性检验不可能识别出这样的统计趋势（trends）。在推荐系统的评估场景，会在所有用户上进行testing，这里讨论的悖论通常会涉及到user-item feedback生成过程。在另一方面，当因果关系（causal relations）在统计建模中被合理解决时，辛普森悖论可被解决。
 
-在本节中，为了演示辛普森悖论，我们会从一个paper[8]中呈现一个真实示例，它会对比肾结石（kidney stone disease）的两种治疗方法（treatments）的成功率。这里的目标是：基于观察找出哪个treatment更高效。【8】会随机抽样350个病人，它们会接受每个治疗，并上报如表1所示的成功率。一个合理的结论是，treatment B要比treatment A更高效（83% vs. 78%的康复率）。另一方面，悖论是，当考虑上结石大小时，比如：treatment A对于小size（93% vs. 87%），大size（73% vs. 69%）两者都要有效，但最终的成功率会反转。[8]会讨论treatment (A vs. B) 以及结果（成功 vs. 失败）会与一个第三个混杂变量（confounding variable：这里的结石大小）有关。
+在本节中，为了演示辛普森悖论，我们会从一个paper[8]中呈现一个真实示例，它会对比肾结石（kidney stone disease）的两种治疗方法（treatments）的成功率。这里的目标是：**基于观察找出哪个treatment更高效**。【8】会随机抽样350个病人，它们会接受每个治疗，并上报如表1所示的成功率。一个合理的结论是：treatment B要比treatment A更高效（83% vs. 78%的康复率）。另一方面，悖论是，当考虑上结石大小时，比如：treatment A对于小size（93% vs. 87%），大size（73% vs. 69%）两者都要有效，但最终的成功率会反转。[8]会讨论treatment (A vs. B) 以及结果（成功 vs. 失败）会与一个第三个混杂变量（confounding variable：这里的结石大小）有关。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/f612b059e405ddc741835a8dafee4c3a6f7f692900a804b8866dce7b42ece08a6cf2b6cb68d125bbcdabd62d03b04e49?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
 
 表1 
 
@@ -56,6 +70,11 @@ Simpson’s paradox是统计学中的一个现象，当多个不同分组的观�
 # 5.基于倾向的分层评估（PROPENSITY-BASED STRATIFIED EVALUATION)
 
 当为一个推荐系统的离线评估创建一个数据集时，用户反馈不仅会从与推荐items的交互上会通过推荐系统被收集，也会通过其它其它形式（比如：当浏览item的目录时发生的交互、或者点了sponsored items的链接）进行收集。对于区分用户的不同反馈源来说并不简单，因为没有公共数据集提供这样的数据来确定用户反馈的source。因此，在本paper中，我们的研究主要关注于用户反馈的主源，称为deployed system。为了演示在推荐系统中的辛普森悖论，我们需要一个因果假设，它与第4节中的假设1相似。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/d2a0fdf4409da08dda40e6ac67c7fff584e4bbdd5022516ecc6cf34e5338021682d83f89c1118f9f135ea2455dfbe20f?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
+
+图1
+
 
 图1a展示了一个典型推荐系统的信息流，其中用户反馈会通过deployed system进行收集。部署好的推荐系统组件（通过RecSys表示）会为target user（例如：通过推荐items的一个ranked list）过滤出items进行曝光（exposure: e）。另一方面，用户在items上记录的偏好（例如：ratings或clicks）（用r表示）会被作为交互数据来训练 或 评估推荐模型的下一次生成（next-generation）。因而，由于用户点击是从RecSys曝光的items获得的，模型本身会影响数据的genreation，它们会用于训练和评估它。图1a中的系统是一个动态系统，其中，系统进行简单联想推理（associative
 reasoning ）的原因是很难的，因为每个组件会互相影响。图1b表明了在这样一个闭合循环反馈场景下的因果关系图。实线表示了在原因和效果间一个explicit/observed关系，而虚线表示了一个implicit/unobserved关系。如上所示，在推荐系统的case中，主要的混合变量是，来自交互数据的deployed model会被收集。我们的目标是，基于来自deployed model收集到的封闭循环反馈（r））评估一个推荐模型（Y）的效果会影响主干扰因子（main confounder），例如：deployed model的特性。在该情况下，很难区分: 来源于用户真实偏好影响的的用户交互，或者受deployed recommendation model影响的用户交互。因此，在该场景下，用户反馈通常会通过deployed system进行收集，我们会假定，基于闭循环反馈数据集的推荐模型离线评估，会受以下deployed recommendation model的强烈影响：
@@ -103,6 +122,9 @@ $$
 
 下面，我们会通过实验来解决两个前面的研究问题。图2表示了实验的总结构。每个评估方法（X, Y和Z）会会基于它们的相对表现对多个检查的推荐模型进行排序。我们会使用Kendall’s $$\tau$$ rank相关系数来对受检模型在每个评估方法上（Y or Z）的相对顺序间的联系，对比ground truth进行measure，例如：open loop（randomiszed） evaluation(X)。这样的相关值会在图2中被描述成$$\tau_{XY}$$和$$\tau_{XZ}$$。另外，我们会使用Steiger’s方法来测试在两个评估方法间的差异显著性，例如：baseline evaluation method(Y)以及提出的evaluation method(Z)。我们会对比propensity-based stratified evaluation、标准offline holdout和counterfactual evaluation方法作为baseline两者。以下，我们描述了我们实验设定的详情，包含：使用的数据集和评估指标、受检推荐模型、以及如何在实验中估计propensities。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/6fce44f0628acab3b00bb27f1f7a78f6978137ec692742583afd8d2411a031d4321c49d49825445e4864609c9813c15f?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
+
+图2 
 
 ## 6.1 
 
