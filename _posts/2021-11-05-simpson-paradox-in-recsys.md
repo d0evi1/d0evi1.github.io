@@ -55,7 +55,7 @@ Simpson’s paradox是统计学中的一个现象，当多个不同分组的观�
 
 辛普森悖论（Simpson’s paradox）是统计学中的一种观察现象：**在观察数据集的许多不同groups中都出现的一个显著趋势，当将这些groups组合在一起时会消失甚至反转**。该topic在许多文献上被广泛讨论。在该现象中会出现一个明显的悖论，当聚合数据时会支持这么一个结论：它与在数据聚合前的相同的分层数据的结论相反。**当两个变量间的关系被研究时，如果这些变量会被一个协变量（confounding variable）所强烈影响时，就会发生辛普森悖论**。当该数据根据混杂变量（confounding variable）进行分层时，该悖论会展示出相悖的结论。在这种情况下，使用一个显著性检验（significance test）可以识别出在一个指定层做出的错误结论；然而，如第7节所示，显著性检验不可能识别出这样的统计趋势（trends）。在推荐系统的评估场景，会在所有用户上进行testing，这里讨论的悖论通常会涉及到user-item feedback生成过程。在另一方面，当因果关系（causal relations）在统计建模中被合理解决时，辛普森悖论可被解决。
 
-在本节中，为了演示辛普森悖论，我们会从一个paper[8]中呈现一个真实示例，它会对比肾结石（kidney stone disease）的两种治疗方法（treatments）的成功率。这里的目标是：**基于观察找出哪个treatment更高效**。【8】会随机抽样350个病人，它们会接受每个治疗，并上报如表1所示的成功率。一个合理的结论是：treatment B要比treatment A更高效（83% vs. 78%的康复率）。另一方面，悖论是，当考虑上结石大小时，比如：treatment A对于小size（93% vs. 87%），大size（73% vs. 69%）两者都要有效，但最终的成功率会反转。[8]会讨论treatment (A vs. B) 以及结果（成功 vs. 失败）会与一个第三个混杂变量（confounding variable：这里的结石大小）有关。
+在本节中，为了演示辛普森悖论，我们会从一个paper[8]中呈现一个真实示例，它会对比肾结石（kidney stone disease）的两种治疗方法（treatments）的成功率。这里的目标是：**基于观察找出哪个treatment更高效**。【8】会随机抽样350个病人，它们会接受每个治疗，并上报如表1所示的成功率。一个合理的结论是：treatment B要比treatment A更高效（83% vs. 78%的康复率）。另一方面，悖论是，当考虑上结石大小时，**比如：treatment A对于小size（93% vs. 87%），大size（73% vs. 69%）两者都要有效，但最终的成功率会反转**。[8]会讨论treatment (A vs. B) 以及结果（成功 vs. 失败）会与一个第三个混杂变量（confounding variable：这里的结石大小）有关。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/f612b059e405ddc741835a8dafee4c3a6f7f692900a804b8866dce7b42ece08a6cf2b6cb68d125bbcdabd62d03b04e49?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
 
@@ -64,7 +64,7 @@ Simpson’s paradox是统计学中的一个现象，当多个不同分组的观�
 
 假设 1: 医生趋向于对不严重病例（例如：小结石）选择treatment B，对于更严重病例（例如：大结石）使用treatment A进行治疗
 
-表1验证了以上的假设，例如：大多数接受treatment A的病人都是大结石病例（group 3中350个随机病人中有263个），而大多数接受treatment B的病人都是小结石病例（Group 2的350中的270）。因此，当从接受A或B治疗的病人中被随机挑选样本时，抽样过程并不纯随机，例如：样本会倾向于：严重病例进行treatment A进行measuring，而轻症病例进行treatment B进行measuring。这就是因果分析中著名的现象：辛普森悖论。
+表1验证了以上的假设，例如：大多数接受treatment A的病人都是大结石病例（group 3中350个随机病人中有263个），而大多数接受treatment B的病人都是小结石病例（Group 2的350中的270）。**因此，当从接受A或B治疗的病人中被随机挑选样本时，抽样过程并不纯随机，例如：样本会倾向于：严重病例进行treatment A进行measuring，而轻症病例进行treatment B进行measuring**。这就是因果分析中著名的现象：辛普森悖论。
 
 表1b展示了在推荐系统的离线评估中的辛普森悖论示例。我们对两个推荐模型的有效性进行评估，如表1b中的A、B模型。两个模型会在相同的dataset上使用相同的evaluation metric进行评估。根据一个paired t-test，在检查的数据集上的标准离线评估表明：模型A要明显好于模型B。然而，将待检测数据集划分成两个层（Q1和Q2）表明：模型B对于待测数据集的99%（Q1）要更好，而模型A在1%（Q2）上面要更好。当Q1和Q2进行聚合时，模型B在99%待测数据集上的的统计优势会消失。在以下部分，我们会呈现：辛普森悖论是如何影响推荐系统的离线评估的，并讨论这样的悖论的原因，以及提出一个新的评估方法来解决它。
 
