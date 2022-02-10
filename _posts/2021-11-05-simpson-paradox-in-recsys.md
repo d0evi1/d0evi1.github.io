@@ -70,12 +70,11 @@ Simpson’s paradox是统计学中的一个现象，当多个不同分组的观�
 
 # 5.基于倾向的分层评估（PROPENSITY-BASED STRATIFIED EVALUATION)
 
-当为一个推荐系统的离线评估创建一个数据集时，用户反馈不仅会从与推荐items的交互上会通过推荐系统被收集，也会通过其它其它形式（比如：当浏览item的目录时发生的交互、或者点了sponsored items的链接）进行收集。对于区分用户的不同反馈源来说并不简单，因为没有公共数据集提供这样的数据来确定用户反馈的source。因此，在本paper中，我们的研究主要关注于用户反馈的主源，称为deployed system。为了演示在推荐系统中的辛普森悖论，我们需要一个因果假设，它与第4节中的假设1相似。
+当为一个推荐系统的离线评估创建一个数据集时，用户反馈不仅会用户与来自deployed recommendation system推出的items交互上被收集到，也会通过其它形式（比如：当浏览item的目录时发生的交互、或者点了sponsored items的链接）进行收集。**对于区分用户的不同反馈源来说并不简单，因为没有公共数据集提供这样的数据来确定用户反馈的source**。因此，在本paper中，我们的研究主要关注于用户反馈的主源，称为deployed system。为了演示在推荐系统中的辛普森悖论，我们需要一个因果假设，它与第4节中的假设1相似。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/d2a0fdf4409da08dda40e6ac67c7fff584e4bbdd5022516ecc6cf34e5338021682d83f89c1118f9f135ea2455dfbe20f?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
-图1
-
+图1 推荐系统中的Closed loop feedback
 
 图1a展示了一个典型推荐系统的信息流，其中用户反馈会通过deployed system进行收集。部署好的推荐系统组件（通过RecSys表示）会为target user（例如：通过推荐items的一个ranked list）过滤出items进行曝光（exposure: e）。另一方面，用户在items上记录的偏好（例如：ratings或clicks）（用r表示）会被作为交互数据来训练 或 评估推荐模型的下一次生成（next-generation）。因而，由于用户点击是从RecSys曝光的items获得的，模型本身会影响数据的genreation，它们会用于训练和评估它。图1a中的系统是一个动态系统，其中，系统进行简单联想推理（associative
 reasoning ）的原因是很难的，因为每个组件会互相影响。图1b表明了在这样一个闭合循环反馈场景下的因果关系图。实线表示了在原因和效果间一个explicit/observed关系，而虚线表示了一个implicit/unobserved关系。如上所示，在推荐系统的case中，主要的混合变量是，来自交互数据的deployed model会被收集。我们的目标是，基于来自deployed model收集到的封闭循环反馈（r））评估一个推荐模型（Y）的效果会影响主干扰因子（main confounder），例如：deployed model的特性。在该情况下，很难区分: 来源于用户真实偏好影响的的用户交互，或者受deployed recommendation model影响的用户交互。因此，在该场景下，用户反馈通常会通过deployed system进行收集，我们会假定，基于闭循环反馈数据集的推荐模型离线评估，会受以下deployed recommendation model的强烈影响：
