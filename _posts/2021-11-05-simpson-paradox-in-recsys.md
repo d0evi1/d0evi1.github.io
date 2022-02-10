@@ -13,14 +13,14 @@ Recommendation Systems》中提出推荐系统中的Simpson’s Paradox：
 
 # 1.介绍
 
-推荐系统通常会以online（A/B testing或interleaving）或offline方式进行评估。然而，推荐系统的离线评估仍然是大范围使用的evaluation，归因于online evaluation[6,14]部署研究系统的难度。实际上，很难以一个离线方式，通过使用历史用户交互日志可靠地评估一个推荐模型的效果【7，16，43】。该问题是存在混淆因子（confounders），例如：那些可以影响items的曝光（exposure）以及结果（outcomes）（比如：ratings）的变量。**confounding问题会在当一个平台尝试建模用户行为时，如果没有解释在曝光的推荐items的选择偏差（selection bias）时会出现，从而导致不可预料的结果**。在这种情况下，很难区别用户交互是来自于用户的真实偏好、还是受部署推荐系统的影响。
+推荐系统通常会以online（A/B testing或interleaving）或offline方式进行评估。然而，由于online evaluation[6,14]部署研究系统的难度，推荐系统的离线评估仍然是大范围使用的evaluation方式。实际上，很难以离线方式通过使用历史用户交互日志可靠地评估一个推荐模型的效果【7，16，43】。该问题是因为存在混淆因子（confounders），例如：那些可以影响items的曝光（exposure）以及结果（outcomes）（比如：ratings）的变量。**在当一个平台尝试建模用户行为时，如果没有解释在曝光的推荐items的选择偏差（selection bias），这时会出现confounding问题，从而导致不可预料的结果**。在这种情况下，**很难区别用户交互是来自于用户的真实偏好、还是受部署推荐系统（deployed recommender system）的影响**。
 
 通常，推荐系统的离线评估会具有两个阶段：
 
 - 1) 收集来自一个deployed system的用户反馈集合
 - 2) 使用这样的feedback来经验性评估和比较不同的推荐模型
 
-第一阶段可以遵循不同类型的donfounders，即可以是：由用户的item选择行为来初始化，或者通过受deployed推荐系统的动作影响。例如，除了其它交互机制（比如：搜索）之外，用户很可能会与这些被曝光的items交互。在这种方式下，在一个新推荐模型的离线评估中，使用历史交互，这样的交互已经从deployed推荐系统中获取得到，形成一个closed loop feedback，例如：deployed recommender system具有一个对收集到的feedback的直接影响，它可以被用来进行对其它推荐模型的离线评估。因而，新的推荐模型会根据它趋向于模拟由deployed model收集到的交互有多像来进行评估，而非有多满足用户的真实偏好。另一方面，在一个open loop（随机化）场景中，deployed model是一个随机推荐模型，例如：为users曝光随机的items。因此，在deployed model与新的推荐model间的feedback loop会打破，deployed model不会对收集到的feedback dataset具有影响，相应的，它对于在基于收集到的feedback dataset上对任意新模型的离线评估都没有影响。然而，为users曝光随机items是天然不实际的，用户体验会降级。因此，基于closed loop feedback对推荐系统进行训练和评估会是一个严重问题。
+第一阶段可以服从不同类型的confounders，即可以是由用户关于item的选择行为来初始化，或者通过受deployed推荐系统的动作影响来初始化。例如，除了其它交互机制（比如：搜索）之外，**用户更可能会与被曝光的items进行交互**。在这种方式下，在一个新推荐模型的离线评估中使用历史交互，而这样的交互从deployed推荐系统中获取得到，**形成一个closed loop feedback**，例如：deployed recommender system存在对收集到的feedback的具有一个直接影响，它可以被用来进行对其它推荐模型的离线评估。因而，新的推荐模型会根据它趋向于模拟由deployed model收集到的交互有多像来进行评估，而非有多满足用户的真实偏好。另一方面，在一个**open loop（随机化）场景**中，deployed model是一个随机推荐模型，例如：为users曝光随机的items。因此，在deployed model与新的推荐model间的feedback loop会打破，deployed model不会对收集到的feedback dataset具有影响，相应的，它对于在基于收集到的feedback dataset上对任意新模型的离线评估都没有影响。然而，为users曝光随机items是天然不实际的，用户体验会降级。**因此，基于closed loop feedback对推荐系统进行训练和评估会是一个严重问题**。
 
 Simpson’s paradox是统计学中的一个现象，当多个不同分组的观察数据中出现的一个显著趋势，会在这些分组组合在一起时消失或者逆转【29】。**在推荐场景中，当曝光（例如：推荐items）和结果（例如：用户的隐式和显式反馈）相关联时，并且曝光和结果会受一个第三方变量强烈影响时，会发生Simpson’s paradox**。在统计学上，如果观察到的feedback是Simpson’s paradox的一个产物，根据confounding variable对feedback进行分层，会造成悖论的消失。我们会争论在推荐系统的情况下，该confounding variable是：交互数据被收集的deployed model（或系统），a.k.a：closed loop feedback【17】。在本paper中，我们的核心目标是，对于closed loop feedback在推荐系统离线评估上提供一个in-depth研究，并提供了一个健壮的解来解决该问题。特别的，我们会讨论：从一个deployed model收集到的feedback datasets会偏向于deployed model的特性，并导致证实Simpson’s paradox的结论。我们通过研究在推荐系统离线评估上condounding variable（例如：deployed model's的特性），可以观察到显著趋势；当从经典离线setting上报observations时，该趋势接着会消失或逆转。另外，我们提出了一种新的评估方法，它可以解决Simpson’s paradox，以便产生一种更合理的推荐系统离线评估方法。
 
