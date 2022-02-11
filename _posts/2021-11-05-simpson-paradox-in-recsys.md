@@ -129,11 +129,11 @@ $$
 
 E(A) > E(B)，它可以更好地估计treatments的实验效果。
 
-相似的，对于表1b的推荐示例，模型A和模型B的期望值分别被计算为：0.343和0.351（计算所需数据参考第7节），E(B) > E(A)。如上所示，在推荐系统中，主要的假设混淆变量是deployed model（假设2）。该变量可以量化成propensity scores（定义5.1）。Propensity是一个连续变量。在本paper中，我们会通过将propensity scores进行排序和分片成将它转换成一个categorical variable，然后转成一个预定义好数目的分层，例如：表1b中的Q1和Q2分层。在表1a和表1b的两个case，都基于假设混淆变量并使用等式（4）对等验证分层进行边缘化，会解决Simpson’s paradox。例如，在表1b中，模型B会被认为superior model，因为它对于99%的user-item feedback在效果上要好。这个重要的趋势会被提出的分层评估进行捕获，而在标准离线评估中，当将Q1和Q2分层聚合在一起时，结论会完全逆转。在下节中，我们会研究simpson paradox的效应，以及提出的propensity-based分层评估的好处。特别的，我们研究了以下问题：
+相似的，对于表1b的推荐示例，模型A和模型B的期望值分别被计算为：0.343和0.351（计算所需数据参考第7节），E(B) > E(A)。如上所示，在推荐系统中，主要的假设混淆变量是deployed model（假设2）。该变量可以量化成propensity scores（定义5.1）。Propensity是一个连续变量。在本paper中，我们会通过将propensity scores进行排序和分片成将它转换成一个categorical variable，然后转成一个预定义好数目的分层，例如：表1b中的Q1和Q2分层。在表1a和表1b的两个case，都基于假设混淆变量并使用等式（4）对等验证分层进行边缘化，会解决Simpson’s paradox。例如：**在表1b中，模型B会被认为更好的model，因为它对于99%的user-item feedback在效果上要好。这个重要的趋势会被提出的分层评估进行捕获，而在标准离线评估中，当将Q1和Q2分层聚合在一起时，结论会完全逆转**。在下节中，我们会研究simpson paradox的效应，以及提出的propensity-based分层评估的好处。特别的，我们研究了以下问题：
 
-**研究问题1：在闭环feedback场景下，推荐系统的离线评估有多大程度是受deployed model特性所影响的**
+**研究问题1：在closed loop feedback场景下，推荐系统的离线评估有多大程度是受deployed model特性所影响的**
 
-然而，我们的目标是评估deployed model特性在推荐模型离线评估中的donfounding effect，如图1b所示。就这一点而言，相似的原理图示例如第4节所示，我们对于将基于deployed model的特征的observed closed-loop feedback进行分层这一点比较感兴趣。这样的分层分析使得我们可以去评估：在推荐系统的标准离线评估中辛普森悖论的存在。从而，我们会研究许多不同推荐模型的相关关系的显著趋势，其中：在层的大多数上观察到的一个趋势，在标准离线评估中会消失或者逆转。
+然而，我们的目标是评估deployed model特性在推荐模型离线评估中的confounding effect，如图1b所示。就这一点而言，相似的原理图示例如第4节所示，我们对于将基于deployed model的特性的observed closed-loop feedback进行分层这一点比较感兴趣。这样的分层分析使得我们可以去评估：在推荐系统的标准离线评估中辛普森悖论的存在。从而，我们会研究许多不同推荐模型的相关关系的显著趋势，其中：在大多数层上观察到的一个趋势，在标准离线评估中会消失或者逆转。
 
 **研究问题2:当进行一个可比离线评估时，propensity-based stratified evaluation是否可以帮助我们更好地估计实际的模型效果**
 
@@ -145,11 +145,42 @@ E(A) > E(B)，它可以更好地估计treatments的实验效果。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/6fce44f0628acab3b00bb27f1f7a78f6978137ec692742583afd8d2411a031d4321c49d49825445e4864609c9813c15f?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
 
-图2 
+图2 基于Steiger's方法的依赖相关度（dependent correlations）显著性测试。每种评估方法（Y and Z）的效果可以通过基于与open loop (randomised) evaluation (X)之间的Kendall's $$\tau$$ rank collrelation进行measur。在baseline evaluation方法（Y）和提出的evaluation方法（Z）间的显著性差异可以基于Steiger's方法进行measure。
 
-## 6.1 
+## 6.1 Datasets和Evaluation Metrics
 
-## 6.2 
+我们会使用4种数据集，它们被推荐系统的离线评测所广泛使用，称为：MovieLens、Netflix、Yahoo! music rating、Coat shopping dataset。
+
+- MovieLens包含了6k users对4k items的1M的ratings
+- Netflix包含了10k users对5k items的607k ratings
+- 而Yahoo! dataset包含了300K ratings，它由15.4k个users对1k items进行rate得到
+- Coat shopping dataset：模拟以在线方式购买coat。包含了mh 290 users对 300 items的7k ratings。
+
+所有datasets都通过一个unknown deployed recommendation system以closed loop方式进行收集得到。另外，Yahoo! dataset还有一个独特的feature：一个关于users(5.4k)的子集会被要求对10个随机选中的items（open loop场景）进行评分（rate）。因此，对于该子集，我们会具有closed loop和open loop（random） feedback。相似的，对于Coat dataset，每个用户会被要求提供对于24个self-selected(closed loop) items、以及16个随机选中（open loop） items进行ratings。然而，在一个真实的evaluation setup中，模型会基于收集到的closed loop feedback进行训练；因为实际评估会基于open loop(random) feedback进行很难进行收集。
+
+我们会使用normalised Discounted Cumulative Gain(nDCG@k) metric
+对不同的cut-offs（k={5,10,20,30,100}），而非使用不带rank cutoff的nDCG。以便表示对于每个user的所有items的rank metric。对于所有datasets的用户rating值是一个整数 $$r \in [0, 5]$$。我们的目标是：对每个user的最相关items进行排序。因此，我们会将所有explicit rating values进行二值化，通过（r>=4）来保留最高的推荐items。在closed loop evaluation中，我们会使用80%的closed loop dataset（MovieLens, Yahoo!和Coat）来进行训练，另外20% random split作为testing另一方面，对于open loop evaluation(Yahoo! & Coat)，我们会在所有提供的open loop(randomised) feedback上进行评估。
+
+## 6.2 推荐模型
+
+我们使用由Cornac framework提供的实验来评估以下的模型：
+
+- BO: 一个简单的baseline model：会在忽略用户偏好的情况下，推荐一个随机的items组合给每个用户
+- GA：一个baseline model，会在忽略用户偏好的情况下，推荐全局平均rating给每个user
+- POP：一个baseline model，会在忽略用户偏好的情况下，它会基于流行度（popularity：例如：一个指定item被评分的次数）来对items进行rank
+- MF：Matrix Factorisation，一个rating prediction模型，它会将users和items表示为latent vectors。该模型会被用来预测每个user-item pair的observed rating
+- PMF：Probabilistic Matrix Factorisation。MF的扩展版本。
+- SVD++：
+- WMF：Weighted MF。MF的扩展版本。
+- NMF：Non-negative Matrix Factorisation。
+- BPR：Bayesian Personalised Ranking。
+- MMMF：Maximum Margin Matrix Factorisation
+- NCF: Neural Collaborative Filtering
+- MLP: Multi-Layer Perceptron
+- GMF: Generalised Matrix Factorisation
+- NeuMF: Neural Matrix Factorisation
+
+我们对在closed-loop和open loop场景下的模型效果的相对顺序比较关心。因此，根据以下研究，我们会采用不同的超参数来控制latent factors的size：{10, 20, ..., 100}，从而导致有104个模型需要评估。每个受检模型会指定相应的latent variable size。比如：size m=40 MF，则为$$MF^{40}$$。我们的代码和数据集可以在： https://github.com/terrierteam/stratified_recsys_eval.提供。
 
 ## 6.3 估计Propensity Scores
 
