@@ -70,29 +70,34 @@ Simpson’s paradox是统计学中的一个现象，当多个不同分组的观�
 
 # 5.基于倾向的分层评估（PROPENSITY-BASED STRATIFIED EVALUATION)
 
-当为一个推荐系统的离线评估创建一个数据集时，用户反馈不仅会用户与来自deployed recommendation system推出的items交互上被收集到，也会通过其它形式（比如：当浏览item的目录时发生的交互、或者点了sponsored items的链接）进行收集。**对于区分用户的不同反馈源来说并不简单，因为没有公共数据集提供这样的数据来确定用户反馈的source**。因此，在本paper中，我们的研究主要关注于用户反馈的主源，称为deployed system。为了演示在推荐系统中的辛普森悖论，我们需要一个因果假设，它与第4节中的假设1相似。
+当为一个推荐系统的离线评估创建一个数据集时，用户反馈不仅会用户与来自deployed recommendation system推出的items交互上被收集到到，也会通过其它形式（比如：当浏览item的目录时发生的交互、或者点了sponsored items的链接）进行收集得到。**对于区分用户的不同反馈源来说并不简单，因为没有公共数据集提供这样的数据来确定用户反馈的source**。因此，在本paper中，我们的研究主要关注于用户反馈的主源，称为deployed system。为了演示在推荐系统中的辛普森悖论，我们需要一个因果假设，它与第4节中的假设1相似。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/d2a0fdf4409da08dda40e6ac67c7fff584e4bbdd5022516ecc6cf34e5338021682d83f89c1118f9f135ea2455dfbe20f?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
 图1 推荐系统中的Closed loop feedback
 
-图1a展示了一个典型推荐系统的信息流，其中用户反馈会通过deployed system进行收集。部署好的推荐系统组件（通过RecSys表示）会为target user（例如：通过推荐items的一个ranked list）过滤出items进行曝光（exposure: e）。另一方面，用户在items上记录的偏好（例如：ratings或clicks）（用r表示）会被作为交互数据来训练 或 评估推荐模型的下一次生成（next-generation）。因而，由于用户点击是从RecSys曝光的items获得的，模型本身会影响数据的genreation，它们会用于训练和评估它。图1a中的系统是一个动态系统，其中，系统进行简单联想推理（associative
-reasoning ）的原因是很难的，因为每个组件会互相影响。图1b表明了在这样一个闭合循环反馈场景下的因果关系图。实线表示了在原因和效果间一个explicit/observed关系，而虚线表示了一个implicit/unobserved关系。如上所示，在推荐系统的case中，主要的混合变量是，来自交互数据的deployed model会被收集。我们的目标是，基于来自deployed model收集到的封闭循环反馈（r））评估一个推荐模型（Y）的效果会影响主干扰因子（main confounder），例如：deployed model的特性。在该情况下，很难区分: 来源于用户真实偏好影响的的用户交互，或者受deployed recommendation model影响的用户交互。因此，在该场景下，用户反馈通常会通过deployed system进行收集，我们会假定，基于闭循环反馈数据集的推荐模型离线评估，会受以下deployed recommendation model的强烈影响：
+图1a展示了一个典型推荐系统的信息流，其中用户反馈会通过deployed system进行收集。
 
-假设2: 闭环循环反馈（closed loop feedback）会从一个deployed recommendation model来收集到，并倾向于deployed model的特性（characteristics）（例如：曝光items），**deployed model的特性**会在推荐模型的离线评估中作为一个混淆因子（confounding factor）。
+- 部署好的推荐系统组件（通过RecSys表示）会为target user（例如：通过推荐items的一个ranked list）过滤出items进行**曝光（exposure: e）**。
+- 另一方面，用户在items上记录的偏好**（例如：ratings或clicks）（用r表示）**会被作为交互数据来训练 或 评估推荐模型的下一次生成（next-generation）。
 
-deployed recommendation model的核心问题是：尝试建模潜在的用户偏好，这使得它很难在没有解释算法混淆的情况下对用户行为（或者使用用户数据）做出断言。另一方面，如果图1a中的RecSys组件是一个random模型，那么在User和RecSys组件间的连接会被移除，RecSys组件会在收集到的feedback dataset上没有影响，这种情况 称为“开环循环反馈（open loop feedback）”，对比起在collection中的任意其它item，没有items会接收到或多或少的期望曝光。
+因而，由于用户点击是从RecSys曝光的items获得的，模型本身会影响数据的生成，而它们则会被用于训练和评估。图1a中的系统是一个动态系统，其中，系统进行简单联想推理（associative
+reasoning ）的原因是很难的，因为每个组件会互相影响。图1b表明了在这样一个闭合循环反馈场景下的因果关系图。**实线表示了在原因和效果间一个explicit/observed关系，而虚线表示了一个implicit/unobserved关系**。如上所示，在推荐系统的case中，主要的混合变量是，来自交互数据的deployed model会被收集。我们的目标是，基于来自deployed model收集到的封闭循环反馈（r））评估一个推荐模型（Y）的效果会影响主干扰因子（main confounder），例如：deployed model的特性。在该情况下，很难区分: 来源于用户真实偏好影响的的用户交互，或者受deployed recommendation model影响的用户交互。因此，在该场景下，用户反馈通常会通过deployed system进行收集，我们会假定，基于闭循环反馈数据集的推荐模型离线评估，会受以下deployed recommendation model的强烈影响：
+
+**假设2: 闭环循环反馈（closed loop feedback）会从一个deployed recommendation model来收集到，并倾向于deployed model的特性（characteristics）（例如：曝光items）**，**deployed model的该特性**会在推荐模型的离线评估中作为一个混淆因子（confounding factor）。
+
+deployed recommendation model的核心问题是：尝试建模潜在的用户偏好，在没有解释算法混淆的情况下，这使得它很难对用户行为（或者使用用户数据）做出断言。另一方面，如果图1a中的RecSys组件是一个random模型，那么在User和RecSys组件间的连接会被移除，RecSys组件会在收集到的feedback dataset上没有影响，这种情况 称为**“开环循环反馈（open loop feedback）”**，对比起在collection中的任意其它item，没有items会接收到或多或少的期望曝光。
 
 如图1b所示，如果deployed model的特性（e）可以被标识和评估，离线评估（Y）会与confounder独立。因此，为了验证在推荐系统中（假设2）closed loop feedback的影响，我们必须量化deployed model的特性。结尾处，根据5,47，我们会如下定义propensity score：
 
 **定义5.1  propensity score $$p_{u,i}$$是deployed model（如图1a中的RecSys描述）对于expose item $$i \in I$$的**曝光给user $$u \in U$$的趋势
 
-propensity $$p_{u,i}$$是在一个闭环反馈场景下，deployed model将item i曝光给user u的概率。该值会量化来自一个无偏开环曝光（unbiased
-open loop exposure）场景的系统偏差（deviation），其中：随机items会被曝光给该用户，deployed model对收集到的feedback没有影响。propensity score $$p_{u,i}$$允许我们基于观察到的闭环feedback来设计并分析推荐模型的离线评估，因此它会模拟一些开环场景的特殊特性。
+propensity $$p_{u,i}$$是在一个闭环反馈场景下，deployed model将item i曝光给user u的概率。该值会对来自一个无偏开环曝光（unbiased
+open loop exposure）场景的系统偏差（deviation）进行量化，其中：随机items会被曝光给该用户，deployed model对收集到的feedback没有影响。propensity score $$p_{u,i}$$允许我们基于观察到的闭环feedback来设计并分析推荐模型的离线评估，因此它会模拟一些开环场景的特殊特性。
 
-分层（Stratification）是用来标识和估计因果效应的知名方法，会在每个层调查因果效应之前，首先标识出潜在层（underlying strata）。总意图是，在confounding variable上进行分层，并研究在每个层上的潜在结果。因此，衡量不考虑confounding variable的潜在结果是可能的。在这种情况下，在confounding variable上的边缘化（marginalisation）可以作为一个组合估计（combined estimate）被使用。如前所述，在推荐系统中的假设condounding variable是deployed model的特征（假设2）。定义5.1会将该变量量化成倾向（propensities）。在这种情况下，在propensity scores上的分层会允许我们分析deployed model特性在推荐模型的离线评估上的该效应。
+分层（Stratification）是用来标识和估计因果效应的知名方法，会在每个层调查因果效应之前，**首先标识出潜在层（underlying strata）**。总意图是：**在confounding variable上进行分层，并研究在每个层上的潜在结果**。因此，衡量不考虑confounding variable的潜在结果是可能的。在这种情况下，在confounding variable上的边缘化（marginalisation）可以作为一个组合估计（combined estimate）被使用。如前所述，在推荐系统中的假设condounding variable是deployed model的特征（假设2）。定义5.1会将该变量量化成倾向（propensities）。在这种情况下，在propensity scores上的分层会允许我们分析deployed model特性在推荐模型的离线评估上的该效应。
 
-出于简洁性，假设我们具有一个单一的categorical confounding variable X。如果我们基于X的可能值将观察到的结果进行分层，那么潜在结果（Y）的期望值如下所示：
+**出于简洁性，假设我们具有一个单一的categorical confounding variable X**。如果我们基于X的可能值将观察到的结果进行分层，那么潜在结果（Y）的期望值如下所示：
 
 $$
 E(Y) = \sum\limits_x E(Y | X=x) P(X=x)
@@ -100,7 +105,12 @@ $$
 
 ...(4)
 
-其中，$$E(Y \mid X = x)$$是在给定分层x下对于observed结果的条件期望，$$P(X=x)$$是x的边缘分布。例如，在肾结石的示例中，condounding variable是结石大小，它基于我们的分层（$$X = \lbrace small, large \rbrace$$）以及潜在结果是treatment效果。我们可以基于等式(4)计算每个treatment的期望值。例如：treatment A的期望值可以按如下方式计算：
+其中：
+
+- $$E(Y \mid X = x)$$是在给定分层x下对于observed结果的条件期望，
+- $$P(X=x)$$是x的边缘分布。
+
+例如，在肾结石的示例中，condounding variable是结石大小，基于它进行分层（$$X = \lbrace small, large \rbrace$$），潜在结果是treatment效果。我们可以基于等式(4)计算每个treatment的期望值。例如：treatment A的期望值可以按如下方式计算：
 
 $$
 E(A) = E(A | X = small) P(X=small) + E(A | X = large) P(X = large)
@@ -108,7 +118,18 @@ $$
 
 ...(5)
 
-基于表1a和等式(5)中的数字，treatment A的期望值（resp. B）分别计算为：0.832和0.782，例如：E(A) > E(B)，它可以更好地估计treatments的实验效果。相似的，对于表1b的推荐示例，模型A和模型B的期望值分别被计算为：0.343和0.351，例如：E(B) > E(A)。如上所示，在推荐系统中，主要的假设混淆变量是deployed model（假设2）。该变量可以量化成propensity scores（定义5.1）。Propensity是一个连续变量。在本paper中，我们会通过将propensity scores进行排序和分片成将它转换成一个categorical variable，然后转成一个预定义好数目的分层，例如：表1b中的Q1和Q2分层。在表1a和表1b的两个case，都基于假设混淆变量并使用等式（4）对等验证分层进行边缘化，会解决Simpson’s paradox。例如，在表1b中，模型B会被认为superior model，因为它对于99%的user-item feedback在效果上要好。这个重要的趋势会被提出的分层评估进行捕获，而在标准离线评估中，当将Q1和Q2分层聚合在一起时，结论会完全逆转。在下节中，我们会研究simpson paradox的效应，以及提出的propensity-based分层评估的好处。特别的，我们研究了以下问题：
+例如：基于表1a和等式(5)中的数字，treatment A的期望值（resp. B）分别计算为：0.832和0.782，
+
+计算：
+
+- P(X=small)=(87+270)/(87+270+263+80)=0.51,
+- P(X=large)=(263+80)/(87+270+263+80)=0.49
+- E(A) = 0.93 x 0.51 + 0.49 x 0.73 = 0.832
+- E(B) = 0.87 x 0.51 + 0.69 x 0.49 = 0.782
+
+E(A) > E(B)，它可以更好地估计treatments的实验效果。
+
+相似的，对于表1b的推荐示例，模型A和模型B的期望值分别被计算为：0.343和0.351（计算所需数据参考第7节），E(B) > E(A)。如上所示，在推荐系统中，主要的假设混淆变量是deployed model（假设2）。该变量可以量化成propensity scores（定义5.1）。Propensity是一个连续变量。在本paper中，我们会通过将propensity scores进行排序和分片成将它转换成一个categorical variable，然后转成一个预定义好数目的分层，例如：表1b中的Q1和Q2分层。在表1a和表1b的两个case，都基于假设混淆变量并使用等式（4）对等验证分层进行边缘化，会解决Simpson’s paradox。例如，在表1b中，模型B会被认为superior model，因为它对于99%的user-item feedback在效果上要好。这个重要的趋势会被提出的分层评估进行捕获，而在标准离线评估中，当将Q1和Q2分层聚合在一起时，结论会完全逆转。在下节中，我们会研究simpson paradox的效应，以及提出的propensity-based分层评估的好处。特别的，我们研究了以下问题：
 
 **研究问题1：在闭环feedback场景下，推荐系统的离线评估有多大程度是受deployed model特性所影响的**
 
