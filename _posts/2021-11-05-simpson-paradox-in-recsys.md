@@ -129,7 +129,14 @@ $$
 
 E(A) > E(B)，它可以更好地估计treatments的实验效果。
 
-相似的，对于表1b的推荐示例，模型A和模型B的期望值分别被计算为：0.343和0.351（计算所需数据参考第7节），E(B) > E(A)。如上所示，在推荐系统中，主要的假设混淆变量是deployed model（假设2）。该变量可以量化成propensity scores（定义5.1）。Propensity是一个连续变量。在本paper中，我们会通过将propensity scores进行排序和分片成将它转换成一个categorical variable，然后转成一个预定义好数目的分层，例如：表1b中的Q1和Q2分层。在表1a和表1b的两个case，都基于假设混淆变量并使用等式（4）对等验证分层进行边缘化，会解决Simpson’s paradox。例如：**在表1b中，模型B会被认为更好的model，因为它对于99%的user-item feedback在效果上要好。这个重要的趋势会被提出的分层评估进行捕获，而在标准离线评估中，当将Q1和Q2分层聚合在一起时，结论会完全逆转**。在下节中，我们会研究simpson paradox的效应，以及提出的propensity-based分层评估的好处。特别的，我们研究了以下问题：
+相似的，对于表1b的推荐示例，模型A和模型B的期望值分别被计算为：0.343和0.351（计算所需数据参考第7节），计算如下：
+
+- E(A) = 0.339 * 0.99 + 0.695 * 0.01 = 0.343
+- E(B) = 0.350 * 0.99 + 0.418 * 0.01 = 0.351
+
+从而得到E(B) > E(A)。
+
+如上所示，在推荐系统中，主要的假设混淆变量是deployed model（假设2）。该变量可以量化成propensity scores（定义5.1）。Propensity是一个连续变量。在本paper中，我们会通过将propensity scores进行排序和分片成将它转换成一个categorical variable，然后转成一个预定义好数目的分层，例如：表1b中的Q1和Q2分层。在表1a和表1b的两个case，都基于假设混淆变量并使用等式（4）对等验证分层进行边缘化，会解决Simpson’s paradox。例如：**在表1b中，模型B会被认为更好的model，因为它对于99%的user-item feedback在效果上要好。这个重要的趋势会被提出的分层评估进行捕获，而在标准离线评估中，当将Q1和Q2分层聚合在一起时，结论会完全逆转**。在下节中，我们会研究simpson paradox的效应，以及提出的propensity-based分层评估的好处。特别的，我们研究了以下问题：
 
 **研究问题1：在closed loop feedback场景下，推荐系统的离线评估有多大程度是受deployed model特性所影响的**
 
