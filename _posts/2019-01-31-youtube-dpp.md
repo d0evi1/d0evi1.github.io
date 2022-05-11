@@ -10,16 +10,16 @@ youtube也开放了它们的diversity方法:《Practical Diversified Recommendat
 
 # 介绍
 
-在线推荐服务通常以feed一个有序的item列表的方式来呈现内容给用户浏览。比如：youtube mobile主页、Facebook news feed。挑选和排序k个items的集合的目标是，最大化该set的效用(utility)。通常times recommenders会基于item的质量的排序来这样做——为每个item i分配一个pointwise的质量分$$q_i$$，并通过对该score进行排序(sorting)。然而，这通常是次优的，因为pointwise estimator会忽略items间的关联性。例如，给定一个已经在页面上被展示过的篮球视频，再展示另一个篮球视频可能会收效更小。相似视频会趋向于具有相近的质量分，这个问题会加剧。不幸的是，即使我们构建一个好的set-wise estimator，对每种可能的ranked list的排列进行打分的代价高昂。
+在线推荐服务通常以feed一个有序的item列表的方式来呈现内容给用户浏览。比如：youtube mobile主页、Facebook news feed。挑选和排序k个items的集合的目标是，最大化该set的效用(utility)。通常times recommenders会基于item的质量的排序来这样做——为每个item i分配一个pointwise的质量分$$q_i$$，并通过对该score进行排序(sorting)。然而，这通常是次优的，因为**pointwise estimator会忽略items间的关联性。例如，给定一个已经在页面上被展示过的篮球视频，再展示另一个篮球视频可能会收效更小**。相似视频会趋向于具有相近的质量分，这个问题会加剧。不幸的是，即使**我们构建一个好的set-wise estimator，对每种可能的ranked list的排列进行打分的代价高昂**。
 
-本paper中，我们使用一种称为DPP的机器学习模型，它是一种排斥(repulsion)的概率模型，用于对推荐items进行diversity。DPP的一个关键点是，它可以有效地对一整个items list进行有效打分，而非每个进行单独打分，使得可以更好地解释item关联性。
+本paper中，我们使用一种称为DPP的机器学习模型，它是一种**排斥(repulsion)的概率模型**，用于对推荐items进行diversity。DPP的一个关键点是：它可以有效地对一整个items list进行有效打分，而非每个进行单独打分，使得可以更好地解释item关联性。
 
 在成熟的推荐系统中实现一个DPP-based的解决方案是non-trivial的。首先，DPP的训练方法在一些通用的推荐系统中[3,12,14,20,21,26,27]非常不同。第二，对已经存在的推荐系统集成DPP optimization是很复杂的。一种选择是，使用set-wise的推荐重组整个基础，但这会抛弃在已经存在的pointwise estimators上的大量投入。作为替代，我们使用DPP在已经存在的基础顶层作为last-layer model。这允许许多底层的系统组件可以独立演进。更特别的，对于一个大规模推荐系统，我们使用两个inputs来构建一个DPP：
 
 - 1) 从一个DNN来构建pointwise estimators[9]，它会给我们一个关于item质量分$$q_i$$的高精度估计
-- 2) pairwise item distances $$D_{ij}$$会以一个稀疏语义embedding space中计算（比如：[19]）
+- 2) **pairwise item distances $$D_{ij}$$会以一个稀疏语义embedding space中计算**（比如：[19]）
 
-从这些输入中，我们可以构建一个DPP，并将它应用到在feed上的top n items上。我们的方法可以便研究团队继续开发$$q_i$$和$$D_{ij}$$的estimators、以及开发一个set-wise scoring系统。因此，我们可以达到diversification的目标，并能在大规模预测系统中利用上现有投入的系统。在Youtube上的经验结果表明，会增加short-term和long-term的用户满意度。
+从这些输入中，我们可以构建一个DPP，并将它应用到在feed上的top n items上。我们的方法可以便研究团队继续开发$$q_i$$和$$D_{ij}$$的estimators、以及开发一个set-wise scoring系统。因此，我们可以达到diversification的目标，并能在大规模预测系统中利用上现有投入的系统。**在Youtube上的经验结果表明，会增加short-term和long-term的用户满意度**。
 
 # 2.相关工作
 
@@ -49,7 +49,7 @@ youtube也开放了它们的diversity方法:《Practical Diversified Recommendat
 
 总之，许多研究者在我们之前已经研究了，如何在推荐和搜索结果中提升diversity。一些研究者同时处理许多这些diversity概念。例如，Vargas[39]解决了覆盖度与冗余性，以及推荐列表的size。我们关心的是在实践中在一个大规模推荐系统中能运行良好的技术。diversity的概念足够灵活，它可以随时间演化。因此，我们不会选择纠缠taxonomic或topic-coverage方法，因为他们需要一些关于diversity的显式表示（例如：在用户意图或topic ocverage上的一个显式猜测）。
 
-相反的，我们提出了一种使用DPP（determinantal point processes）方法。DPP是一种set-wise的推荐模型，它只需要提供两种显式的、天然的element：一个item对于某个用户有多好，以及items pair间有多相似。
+相反的，我们提出了一种使用DPP（determinantal point processes）方法。**DPP是一种set-wise的推荐模型**，它只需要提供两种显式的、天然的element：一个item对于某个用户有多好，以及items pair间有多相似。
 
 # 3.背景
 
@@ -68,11 +68,11 @@ youtube也开放了它们的diversity方法:《Practical Diversified Recommendat
 
 candidate generation受用户在系统中之前行为的影响。ranking阶段则趋向于对相似的视频给出相近的utility预测，这会经常导致feeds具有重复的内容以及非常相似的视频。
 
-为了消除redundancy问题。首先，我们引入了受[32,45]的启发法到policy layer，比如：对于任意用户的feed，单个的uploader可以贡献不超过n个items。而该规则有时很有效，我们的体验是它与底层推荐系统的交互相当贫乏(poorly)。由于candidate generation和ranking layers不知道该启发法（heuristic），他们会浪费掉那些不会被呈现items的空间，做出次优的预测。再者，由于前两个layers会随时间演进，我们需要重新调整heuristics的参数——该任务相当昂贵，因此实践中不会这么做去很频繁地维持该规则效果。最终，实际上，多种heuristics类型间的交互，提出了一种很难理解的推荐算法。结果是，系统是次优的，很难演进。
+为了消除冗余（redundancy）问题。首先，我们引入了受[32,45]的启发法到policy layer，**比如：对于任意用户的feed，单个up主的内容不超过n个items**。而该规则有时很有效，我们的经验：这种方式与底层推荐系统的交互相当少。**由于candidate generation和ranking layers不知道该启发法（heuristic），他们会浪费掉那些不会被呈现items的空间，做出次优的预测**。再者，由于前两个layers会随时间演进，我们需要重新调整heuristics的参数——该任务相当昂贵，因此实践中不会这么做去很频繁地维持该规则效果。最终，实际上，多种heuristics类型间的交互，会生成一种很难理解的推荐算法。另外从结果看：系统是次优的，很难演进。
 
 ## 3.2 定义
 
-为了更精准，假设一个用户与在一个给定feed中的items中所观察到的交互表示成一个二元向量y（比如：$$y=[0,1,0,1,1,0,0,\cdots]$$），其中可以理解的是，用户通常不会查看整个feed，但会以较低数目的索引开始。我们的目标是，最大化用户交互数：
+为了更精准，假设一个用户与在一个给定feed中的items中所观察到的交互表示成一个二元向量y（比如：$$y=[0,1,0,1,1,0,0,\cdots]$$），其中：可以理解的是，用户通常不会检查整个feed流，但会从较低数目的索引开始。我们的目标是，最大化用户交互数：
 
 $$
 G'=\sum\limits_{u \sim Users} \sum\limits_{i \sim Items} y_{ui}
@@ -88,12 +88,14 @@ $$
 
 ...(2)
 
-其中，j是模型分配给一个item的新rank。该quantity会随着rank我们对交互进行的越高而增加。(实践中，我们会最小化$$j y_{ui}$$，而非最大化$$\frac{y_{ui}}{j}$$，但两个表达式具有相似的optima) 在下面的讨论中，我们出于简洁性会抛弃u下标，尽管所有值都应假设对于每个user biasis是不同的
+其中：**j是模型分配给一个item的新rank**。
+
+该quantity会随着rank我们对交互进行的越高而增加。**(实践中，我们会最小化$$j y_{ui}$$，而非最大化$$\frac{y_{ui}}{j}$$，但两个表达式具有相似的optima) **在下面的讨论中，我们出于简洁性会抛弃u下标，尽管所有值都应假设对于每个user biasis是不同的
 
 我们进一步假设，使用一些黑盒估计y的quality：
 
 $$
-q_i \approx P(y_i = 1 | features \ of \ item i)
+q_i \approx P(y_i = 1 | \ features \ of \ item \ i)
 $$
 
 ...(3)
@@ -106,7 +108,7 @@ $$
 
 ...(4)
 
-换句话说，当一起出现时，它们是负相关的——说明其中之一是冗余的。如果在feed中存在相似的items，那么通过q进行sorting不再是最优的policy。
+换句话说，**当一起出现时，它们是负相关的——说明其中之一是冗余的**。如果在feed中存在相似的items，那么通过q进行sorting不再是最优的policy。
 
 假设我们提供了黑盒item distances：
 
@@ -116,21 +118,45 @@ $$
 
 ...(5)
 
-这些距离被假设成是“无标定的（uncalibrated）”，换句话说，他们无需直接与等式(4)相关。例如，如果问题中的items是新闻文章，D可以是一个在每篇文章中tokenized words的Jaccard distance。现在的目标是，基于q、D、y生成一个ranking policy, 比起通过q简单排序，它可以达到一个关于G的更小值。这可以很理想地与现有基础设施集成和演进。
+这些距离被假设成是“无标定的（uncalibrated）”，换句话说，他们无需直接与等式(4)相关。**例如，如果问题中的items是新闻文章，D可以是一个在每篇文章中tokenized words的Jaccard distance**。现在的目标是，基于q、D、y生成一个ranking policy, 比起通过q简单排序，它可以达到一个关于G的更小值。这可以很理想地与现有基础设施集成和演进。
 
 ## 3.3 设计需要
+
+如果item similarity（如等式4定义）存在于dataset中，并且dataset足够大，那么我们的目标可以通过多种不同的方法来达成。我们喜欢这样的方法：
+
+- 1）能很好满足存在的逻辑框架：基于已观测的事件来构建机器学习estimators
+- 2）可以优雅地在复杂性上随时间进行扩展
+- 3）不需要巨大变更就可以应用到已存在的系统和专家意见上
+
+启发法【45】可能会有效但并不理想。例如：假设强制一个规则：在n个相邻的items内，任意两个items必须满足$$D_{ij} < \tau$$。会引起多个问题：
+
+- 1) 该规则运作与q独立，意味着，高得分的items会与低得分的items具有相似条件。在应用该策略后，对q的accuracy进行独立提升会失去
+- 2）参数n和$$\tau$$可以通过grid search进行暴力搜索，但增加的复杂性变得相当高，因为训练时间随参数数目指数级增长。
+- 3）关于如何扩展该规则并随时间做出增量提升，除了包括q，这一点并不明显。
+
+一个重要点是：该启发法会隐式地将冗余问题（redundancy problem）看成是一个与最大化utility不同的目标。事实上，它建议：该hypothesis会提升diversity，并可能减少utility（至少在短期内），因为它会丢掉那些具有高分q的items。相反的，我们提出的方法会考虑：items的pairs上的utility（通过等式4描述的anti-correlation），因而，使用utility本身能更好地调整的特定items。
+
+当然，基于上述的anti-correlation会定义一个启发法是可能的，比如“在相同的feed中不允许这样的两个items：$$\frac{P(y_i=1, y_j=1)}{P(y_i=1)P(y_j=1)}$$在x以下”。然而，如上所述，该规则不能说明q，可能需要频繁地对参数x进行re-tuning，并且即使有常规的调整，对于精准捕获我们期望的行为也不够灵活，我们会引入DPPs到系统中，作为多样性推荐的方式。
+
+我们会在policy layer之前插入DPPs，但在point-wise scoring layer之后（如图2）所示。这允许我们以一个十分复杂的pointwise scorer进行研究，并确保遵守商业策略（business policies）。
 
 # 4.方法
 
 ## 4.1 DPP总览
 
+
+
 ## 4.2 Kernel参数化
+
+
 
 ## 4.3 训练方法
 
-我们的训练集包含了将近4w的样本，它们从Youtube mobile主页feed上收集的某天数据中抽样得到。每个训练样本是单个主页feed曝光：单个实例，一个用户在youtube mobile主页上的，并被呈现一个关于推荐视频的有序列表。对于每个这样的曝光，我们有一个关于用户喜欢哪些视频的记录，我们表示为 set Y。我们注意到，使用这样的数据来训练模型存在一个partial-label bias，因为我们只观察到用户与那些被选中呈现给他们的视频的交互，而非随机均匀选中的视频。通常，我们会使用与过去训练pointwise模型相同类型的方式来解决该问题，比如：使用一个e-greedy exploration策略。
+我们的训练集包含了将近4w的样本，它们从Youtube mobile主页feed上收集的某天数据中抽样得到。**每个训练样本是单个homepage的feed曝光：一个用户的单个实例，对应于用户访问了youtube mobile主页，并被呈现出一个关于推荐视频的有序列表**。
 
-对于前面章节中描述的basic kernel，存在两个参数：$$\alpha$$和$$\sigma$$，因此我们可以做一个grid search来找来能使等式(2)中的累积增益最大化的值。图3展示了$$\alpha$$和$$\sigma$$的多种选择所获得的累积增益。颜色越暗，结果越糟糕。有意思的是，你可以观察到。。。
+对于每个这样的曝光，我们有一个关于用户喜欢哪些视频的记录，我们表示为 set Y。我们注意到，使用这样的数据来训练模型存在一个partial-label bias，因为我们只观察到用户与那些被选中呈现给他们的视频的交互，而非随机均匀选中的视频。通常，我们会使用与过去训练pointwise模型相同类型的方式来解决该问题，比如：使用一个e-greedy exploration策略。
+
+对于前面章节中描述的basic kernel，存在两个参数：$$\alpha$$和$$\sigma$$，因此我们可以做一个grid search来找来能使等式(2)中的累积增益最大化的值。图3展示了$$\alpha$$和$$\sigma$$的多种选择所获得的累积增益。颜色越暗，结果越糟糕。有意思的是，你可以观察到，在右上角象限中的灾难性悬崖（catastrophic clif），以及随后的高原。必须对训练样本使用DPP kernels来变为增加non-PSD。记住，随着$$\alpha$$增长，L的非对角阵也会增长，这会增加一个non-PSD L的机率。由于非对角阵一定程度上会随$$\sigma$$增加，对于许多训练样本来说，大的$$\alpha, \sigma$$组合会导致non-PSD矩阵。直觉上，看起来整个右上角会具有低累积增益值，而非：低的值会集中在观察带上。然而，记住，我们会将任意non-PSD矩阵投影回PSD空间上。该投影分别对于$$\alpha$$和$$\sigma$$来说都是非线性的，因此，在投影后的矩阵的quanlity，不会期望与我们关于这些参数的直觉强相关。整体上，我们发现，具有最高的累积增益会在$$\sigma$$的中间区间、以及$$\alpha$$的上半区间达到。由这些参数产生的L kernels更可能是PSD，因此，只有一个偶然的训练样本的kernel需要投影。
 
 ## 4.4 Deep Gramian Kernels
 
