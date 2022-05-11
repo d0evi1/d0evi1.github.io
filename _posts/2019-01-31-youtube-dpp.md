@@ -14,16 +14,18 @@ youtube也开放了它们的diversity方法:《Practical Diversified Recommendat
 
 本paper中，我们使用一种称为DPP的机器学习模型，它是一种**排斥(repulsion)的概率模型**，用于对推荐items进行diversity。DPP的一个关键点是：它可以有效地对一整个items list进行有效打分，而非每个进行单独打分，使得可以更好地解释item关联性。
 
-在成熟的推荐系统中实现一个DPP-based的解决方案是non-trivial的。首先，DPP的训练方法在一些通用的推荐系统中[3,12,14,20,21,26,27]非常不同。第二，对已经存在的推荐系统集成DPP optimization是很复杂的。一种选择是，使用set-wise的推荐重组整个基础，但这会抛弃在已经存在的pointwise estimators上的大量投入。作为替代，我们使用DPP在已经存在的基础顶层作为last-layer model。这允许许多底层的系统组件可以独立演进。更特别的，对于一个大规模推荐系统，我们使用两个inputs来构建一个DPP：
+在成熟的推荐系统中实现一个DPP-based的解决方案是non-trivial的。首先，DPP的训练方法在一些通用的推荐系统中[3,12,14,20,21,26,27]非常不同。第二，对已经存在的推荐系统集成DPP optimization是很复杂的。一种选择是，使用set-wise的推荐重组整个基础，但这会抛弃在已经存在的pointwise estimators上的大量投入。**作为替代，我们使用DPP在已经存在的基础顶层作为last-layer model**。这允许许多底层的系统组件可以独立演进。更特别的，对于一个大规模推荐系统，我们使用两个inputs来构建一个DPP：
 
 - 1) 从一个DNN来构建pointwise estimators[9]，它会给我们一个关于item质量分$$q_i$$的高精度估计
 - 2) **pairwise item distances $$D_{ij}$$会以一个稀疏语义embedding space中计算**（比如：[19]）
 
-从这些输入中，我们可以构建一个DPP，并将它应用到在feed上的top n items上。我们的方法可以便研究团队继续开发$$q_i$$和$$D_{ij}$$的estimators、以及开发一个set-wise scoring系统。因此，我们可以达到diversification的目标，并能在大规模预测系统中利用上现有投入的系统。**在Youtube上的经验结果表明，会增加short-term和long-term的用户满意度**。
+从这些输入中，我们可以构建一个DPP，并将它应用到在feed上的top n items上。我们的方法可以让研究团队继续独立开发$$q_i$$和$$D_{ij}$$的estimators、以及开发一个set-wise scoring系统。因此，我们可以达到diversification的目标，并能在大规模预测系统中利用上现有投入的系统。**在Youtube上的经验结果表明，会增加short-term和long-term的用户满意度**。
 
 # 2.相关工作
 
-当前推荐研究主要关注：提升pointwise estimate $$q_i$$，即：一个用户对于一个特定item有多喜欢。该研究线开始于20年前的UCF和ICF，接着是MF。在我们的系统中，我们从DNN中获得这些pointwise estimates，其中：一个用户的偏好特征可以组合上item features来一起估计用户有多喜欢该内容。
+当前推荐研究主要关注：**提升pointwise estimate $$q_i$$（quanlity），即：一个用户对于一个特定item有多喜欢**。
+
+该研究线开始于20年前的UCF和ICF，接着是MF。在我们的系统中，我们从DNN中获得这些pointwise estimates，其中：一个用户的偏好特征可以组合上item features来一起估计用户有多喜欢该内容。
 
 在这些改进的过程中，对于推荐结果的新颖性（novelty）和多样性（diversity）也得到了很大的研究【16，24，29，39，41，43，45】。相似的，在信息检索系统上，关于diversitication已经取得了较大的研究。【6，8，10，11，15，33，35，40，42】。考虑到所有这些文献，研究者已经提出了许多diversification概念。这里我们关于内容多样性总结并对比了两种不同的视角。
 
@@ -34,20 +36,20 @@ youtube也开放了它们的diversity方法:《Practical Diversified Recommendat
 - (A)帮助它们发现新的兴趣主题
 - (B)帮助推荐系统发现更多与用户相关的东西
 
-为了发现用户兴趣，信息检索有一分支的研究是，使用分类(taxonomy)来解决用户意图上的二义性(ambiguity)。例如，[2]中的IA-Select使用一个taxonomy来发现一个ambiguous query，接着最大化用户选择至少一个返回结果的概率。。。。
+为了发现用户兴趣，信息检索有一个分支研究是，使用分类(taxonomy)来解决用户意图上的二义性(ambiguity)。例如，[2]中的IA-Select使用一个taxonomy来发现一个ambiguous query，接着最大化用户选择至少一个返回结果的概率。。。。
 
 
 ## 2.2 实用服务的多样化
 
-关于多样化的的一种不同视角是，多样性直接控制着实用(utility)服务——通过合适的多样化曝光，可以最大化feed的utility。从该角度看，diversity更与交互关联，增加多样性意味着：使用用户更可能同时喜欢的items替换掉冗余(redundant)的视频曝光。这些新视频通常具有更低的个体得分（individual scores），但会产生一个更好的总体页面收益。
+关于多样化的的一种不同视角是，**多样性直接控制着utility服务——通过合适的多样化曝光，可以最大化feed的utility**。从该角度看，diversity更与交互关联，**增加多样性意味着：使用用户更可能同时喜欢的items替换掉冗余(redundant)的视频曝光**。这些新视频通常具有更低的个体得分（individual scores），但会**产生一个更好的总体页面收益**。
 
-简洁的，一种达到多样性是，避免冗余项，它对于推荐系统特别重要。例如，在2005 Ziegler[45]中，使用一种贪婪算法利用books的taxonomy来最小化推荐items间的相似度。输出(output)接着使用一个利用一个多样化因子的非多样化的结果列表(non-diversitified result list)进行合并。在另一个信息检索的研究中，Carbonell和Goldstein提出了最大间隔相关度（MMR:maxinal marginal relevance）的方法。该方法涉及迭代式地一次选择一个item。一个item的score与它的相关度减去一个penalty项（用于衡量之前与选中items的相似度）成比例。其它关于redundancy的显式概念在【32】有研究，它使用一个关pairwise相似度上的decay函数。最近，Nassif【30】描述了一种使用次模优化的方式来对音乐推荐多样化。Lin[25]描述了一种使用次模函数来执行文档归纳的多样性。[38]描述了一种次模最大化的方式来选择items序列，[37]描述了使用次模多样性来基于category来进行top items re-rank。我们的目标与本质上相当相似，但使用了一个不同的优化技术。另外，我们不会将item idversity作为一个优先目标；我们的目标是：通过多性化信息提供给整个推荐系统，来尝试增加正向的用户交互数。你可以想像，这里表述的模型上的迭代用于表示一个个性化的diversity概念。被推荐内容的feed也是该方案的一个context，因为用户通常并不会寻找一个特定的item，在一个session过程中与多个items交互。
+简洁的说，**一种达到多样性的方式是：避免冗余项，它对于推荐系统特别重要**。例如，在2005 Ziegler[45]中，使用一种贪婪算法利用books的taxonomy来最小化推荐items间的相似度。输出(output)接着使用一个利用一个多样化因子的非多样化的结果列表(non-diversitified result list)进行合并。在另一个信息检索的研究中，Carbonell和Goldstein提出了最大间隔相关度（MMR:maxinal marginal relevance）的方法。该方法涉及迭代式地一次选择一个item。一个item的score与它的相关度减去一个penalty项（用于衡量之前与选中items的相似度）成比例。其它关于redundancy的显式概念在【32】有研究，它使用一个关pairwise相似度上的decay函数。最近，Nassif【30】描述了一种使用次模优化的方式来对音乐推荐多样化。Lin[25]描述了一种使用次模函数来执行文档归纳的多样性。[38]描述了一种次模最大化的方式来选择items序列，[37]描述了使用次模多样性来基于category来进行top items re-rank。我们的目标与本质上相当相似，但使用了一个不同的优化技术。另外，我们不会将item idversity作为一个优先目标；我们的目标是：通过多性化信息提供给整个推荐系统，来尝试增加正向的用户交互数。你可以想像，这里表述的模型上的迭代用于表示一个个性化的diversity概念。被推荐内容的feed也是该方案的一个context，因为用户通常并不会寻找一个特定的item，在一个session过程中与多个items交互。
 
 冗余的概念可以进一步划分成两个独立的相关性概念：替代（substitutes）和补足（complements）。这些概念已经被许多推荐系统所采用。在一个电商推荐应用中，用户做出一个购买决策之前，提供在考虑中的candidates的substitutes可能会更有用；而在用户做出购买行为之后，可以提供补全(complements)的商品。
 
 ## 2.3 相关工作
 
-总之，许多研究者在我们之前已经研究了，如何在推荐和搜索结果中提升diversity。一些研究者同时处理许多这些diversity概念。例如，Vargas[39]解决了覆盖度与冗余性，以及推荐列表的size。我们关心的是在实践中在一个大规模推荐系统中能运行良好的技术。diversity的概念足够灵活，它可以随时间演化。因此，我们不会选择纠缠taxonomic或topic-coverage方法，因为他们需要一些关于diversity的显式表示（例如：在用户意图或topic ocverage上的一个显式猜测）。
+总之，许多研究者在我们的工作之前已经开始研究：如何在推荐和搜索结果中提升diversity。一些研究者同时处理许多这些diversity概念。例如，Vargas[39]解决了覆盖度与冗余性，以及推荐列表的size。我们关心的是在实践中在一个大规模推荐系统中能运行良好的技术。diversity的概念足够灵活，它可以随时间演化。因此，我们不会选择纠缠taxonomic或topic-coverage方法，因为他们需要一些关于diversity的显式表示（例如：在用户意图或topic ocverage上的一个显式猜测）。
 
 相反的，我们提出了一种使用DPP（determinantal point processes）方法。**DPP是一种set-wise的推荐模型**，它只需要提供两种显式的、天然的element：一个item对于某个用户有多好，以及items pair间有多相似。
 
@@ -57,23 +59,36 @@ youtube也开放了它们的diversity方法:《Practical Diversified Recommendat
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/adef073ee62bc2466603e91f4827eb97b40f86ac6d3bfd654162091031191d272871ba402c91de2da3b8ab3e975e9ab1?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
 
-图1
+图1 基础的serving scheme
 
 在Youtube mobile主页feed上生成视频推荐的整体架构如图1所示。该系统由三个阶段组成：
 
-- (1) candidata generation，feed items从一个大的catalogue中选中
-- (2) ranking，它会对feed items进行排序
-- (3) policy，它会强加一些商业需求（比如：需要在页面的某些特定位置出现一些内容）
+- (1) 候选生成（candidata generation）：feed items从一个大的catalogue中选中
+- (2) 排序（ranking）：它会对feed items进行排序
+- (3) 机制（policy）：它会强加一些商业需求（比如：需要在页面的某些特定位置出现一些内容）
 
 第(1)和(2)阶段都会大量使用DNN。
 
-candidate generation受用户在系统中之前行为的影响。ranking阶段则趋向于对相似的视频给出相近的utility预测，这会经常导致feeds具有重复的内容以及非常相似的视频。
+candidate generation受用户在系统中之前行为的影响。**ranking阶段则趋向于对相似的视频给出相近的utility预测，这会经常导致feeds具有重复的内容以及非常相似的视频**。
 
-为了消除冗余（redundancy）问题。首先，我们引入了受[32,45]的启发法到policy layer，**比如：对于任意用户的feed，单个up主的内容不超过n个items**。而该规则有时很有效，我们的经验：这种方式与底层推荐系统的交互相当少。**由于candidate generation和ranking layers不知道该启发法（heuristic），他们会浪费掉那些不会被呈现items的空间，做出次优的预测**。再者，由于前两个layers会随时间演进，我们需要重新调整heuristics的参数——该任务相当昂贵，因此实践中不会这么做去很频繁地维持该规则效果。最终，实际上，多种heuristics类型间的交互，会生成一种很难理解的推荐算法。另外从结果看：系统是次优的，很难演进。
+为了消除冗余（redundancy）问题。首先，我们引入了受[32,45]的启发法到policy layer，**比如：对于任意用户的feed，单个up主的内容不超过n个items**。而该规则有时很有效，我们的经验：这种方式与底层推荐系统的交互相当少。
+
+- **由于candidate generation和ranking layers不知道该启发法（heuristic），他们会浪费掉那些不会被呈现items的空间，做出次优的预测**。
+- 再者，由于**前两个layers会随时间演进，我们需要重新调整heuristics的参数**——该任务代价相当高昂，因此实践中不会这么做去很频繁地维持该规则效果。
+
+最终，实际上，多种heuristics类型间的交互，会生成一种很难理解的推荐算法。另外从结果看：系统是次优的，很难演进。
 
 ## 3.2 定义
 
-为了更精准，假设一个用户与在一个给定feed中的items中所观察到的交互表示成一个二元向量y（比如：$$y=[0,1,0,1,1,0,0,\cdots]$$），其中：可以理解的是，用户通常不会检查整个feed流，但会从较低数目的索引开始。我们的目标是，最大化用户交互数：
+为了更精准些，我们假设：
+
+一个用户与在一个给定feed中的items中所观察到的交互表示成一个二元向量y：
+
+$$y=[0,1,0,1,1,0,0,\cdots]$$
+
+其中：可以理解的是，用户通常不会检查整个feed流，但会从较低数目的索引开始。
+
+我们的目标是，最大化用户交互数：
 
 $$
 G'=\sum\limits_{u \sim Users} \sum\limits_{i \sim Items} y_{ui}
@@ -91,7 +106,7 @@ $$
 
 其中：**j是模型分配给一个item的新rank**。
 
-该quantity会随着rank我们对交互进行的越高而增加。**(实践中，我们会最小化$$j y_{ui}$$，而非最大化$$\frac{y_{ui}}{j}$$，但两个表达式具有相似的optima) **在下面的讨论中，我们出于简洁性会抛弃u下标，尽管所有值都应假设对于每个user biasis是不同的
+该quantity会随着rank我们对交互进行的越高而增加。(**实践中，我们会最小化$$j y_{ui}$$，而非最大化$$\frac{y_{ui}}{j}$$，但两个表达式具有相似的optima**) 在下面的讨论中，我们出于简洁性会抛弃u下标，尽管所有值都应假设对于每个user biasis是不同的
 
 我们进一步假设，使用一些黑盒估计y的quality：
 
@@ -101,7 +116,7 @@ $$
 
 ...(3)
 
-明显的ranking policy是根据q对items进行sort。注意，尽管$$q_i$$是一个只有单个item的函数。如果存在许多相似的items具有与$$q_i$$相近的值，它会在排序(rank)时会相互挨着，这会导致用户放弃继续feed。我们的最终目标是，最大化feed的总utility，我们可以调用两个items，等同于当：
+明显的ranking policy是根据q对items进行sort。注意，尽管$$q_i$$是一个只有单个item的函数。如果存在许多具有与$$q_i$$相近值的相似items，它们会在排序(rank)时会相互挨着，这会导致用户放弃继续下刷feed。我们的最终目标是：最大化feed的总utility，我们可以调用两个items，等同于当：
 
 $$
 P(y_i=1, y_j=1) < P(y_i=1) P(y_j=1)
