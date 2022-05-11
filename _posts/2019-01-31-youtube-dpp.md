@@ -152,17 +152,19 @@ $$
 
 一个重要点是：**该启发法会隐式地将冗余问题（redundancy problem）看成是一个与最大化utility具有不同的目标**。事实上，它建议：该hypothesis会提升diversity，并可能减少utility（至少在短期内），因为它会丢掉那些具有高分q的items。相反的，我们提出的方法会考虑：items的pairs上的utility（通过等式4描述的anti-correlation），因而，使用utility本身能更好地调整的特定items。
 
-当然，基于上述的anti-correlation会定义一个启发法是可能的，比如“在相同的feed中不允许这样的两个items：$$\frac{P(y_i=1, y_j=1)}{P(y_i=1)P(y_j=1)}$$在x以下”。然而，如上所述，该规则不能说明q，可能需要频繁地对参数x进行re-tuning，并且即使有常规的调整，对于精准捕获我们期望的行为也不够灵活，我们会引入DPPs到系统中，作为多样性推荐的方式。
+当然，基于上述的anti-correlation会定义一个启发法是可能的，比如“在相同的feed中不允许这样的两个items：$$\frac{P(y_i=1, y_j=1)}{P(y_i=1)P(y_j=1)}$$在x以下”。然而，**如上所述，该规则不能说明q，可能需要频繁地对参数x进行re-tuning**，并且即使有常规的调整，对于精准捕获我们期望的行为也不够灵活，我们会引入DPPs到系统中，作为多样性推荐的方式。
 
 我们会在policy layer之前插入DPPs，但在point-wise scoring layer之后（如图2）所示。这允许我们以一个十分复杂的pointwise scorer进行研究，并确保遵守商业策略（business policies）。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/0083b98e81ea6f2ec616cac8d0755ba7192a6fdb924bb7a96a097a9f5d2eca8810f19cf6aa772a4d70f5d315f3309af6?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 新的serving schema
 
 # 4.方法
 
 ## 4.1 DPP总览
+
+我们首先回顾下DPPs（deternminantal point processes）的总览。在一个集合$$S=\lbrace 1, 2, \cdots, N \rbrace$$（例如：在一个用户的Youtube移动首页feed中的N个视频的集合）上的一个point process P是一个概率分布（S的所有子集）。也就是说，...
 
 
 
