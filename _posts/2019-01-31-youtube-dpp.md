@@ -55,16 +55,17 @@ youtube也开放了它们的diversity方法:《Practical Diversified Recommendat
 
 ## 3.1 Youtube主页feed
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/adef073ee62bc2466603e91f4827eb97b40f86ac6d3bfd654162091031191d272871ba402c91de2da3b8ab3e975e9ab1?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
+
+图1
+
 在Youtube mobile主页feed上生成视频推荐的整体架构如图1所示。该系统由三个阶段组成：
 
 - (1) candidata generation，feed items从一个大的catalogue中选中
 - (2) ranking，它会对feed items进行排序
-- (3) policy，它会强制商业需求（比如：需要在页面的某些特定位置出现一些内容）
+- (3) policy，它会强加一些商业需求（比如：需要在页面的某些特定位置出现一些内容）
 
 第(1)和(2)阶段都会大量使用DNN。
-
-
-图1
 
 candidate generation受用户在系统中之前行为的影响。ranking阶段则趋向于对相似的视频给出相近的utility预测，这会经常导致feeds具有重复的内容以及非常相似的视频。
 
@@ -139,6 +140,10 @@ $$
 当然，基于上述的anti-correlation会定义一个启发法是可能的，比如“在相同的feed中不允许这样的两个items：$$\frac{P(y_i=1, y_j=1)}{P(y_i=1)P(y_j=1)}$$在x以下”。然而，如上所述，该规则不能说明q，可能需要频繁地对参数x进行re-tuning，并且即使有常规的调整，对于精准捕获我们期望的行为也不够灵活，我们会引入DPPs到系统中，作为多样性推荐的方式。
 
 我们会在policy layer之前插入DPPs，但在point-wise scoring layer之后（如图2）所示。这允许我们以一个十分复杂的pointwise scorer进行研究，并确保遵守商业策略（business policies）。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/0083b98e81ea6f2ec616cac8d0755ba7192a6fdb924bb7a96a097a9f5d2eca8810f19cf6aa772a4d70f5d315f3309af6?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
+
+图2
 
 # 4.方法
 
