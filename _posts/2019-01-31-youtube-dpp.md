@@ -213,7 +213,7 @@ L_y =  \left[
 \right] 
 $$
 
-该submatrix的行列式为：$$det(L_Y) = L_{11}L_{22} - L_{12}L_{21}$$。因此，它是一个item quanlities减去归一化item相似度（scaled item similarities）的乘积。该行列式表达式对于更大子矩阵来说更复杂，但直觉上是相似的。
+该submatrix的行列式为：$$det(L_Y) = L_{11}L_{22} - L_{12}L_{21}$$。因此，**它是一个item quanlities乘积减去归一化item相似度（scaled item similarities）的乘积**。该行列式表达式对于更大子矩阵来说更复杂，但直觉上是相似的。
 
 在以下的章节，我们讨论在L从系统输入的多种构建方式，比如：pointwise item quanlity scores，q，第3.2节描述。
 
@@ -230,14 +230,19 @@ $$
 
 $$
 L_{ii} = q_i^2 \\
-L_{ij} = \alpha q_i q_j exp(-\frac{D_{ij}}{2\sigma^2}), for i \neq j
+L_{ij} = \alpha q_i q_j exp(-\frac{D_{ij}}{2\sigma^2}), for \  i \neq j
 $$
 
 ...(9) (10)
 
-每个$$D_{ij}$$通过$$\phi_i$$和$$\phi_j$$计算得到；第5节描述了准确的embedding $$\phi$$
+每个$$D_{ij}$$通过$$\phi_i$$和$$\phi_j$$计算得到；第5节描述了准确的embedding $$\phi$$和distance function。$$\alpha$$和$$\sigma$$是自由变量。注意，该公式等同于一个标准（高斯）radial basis function（RBF） kernel，其中$$\alpha=1$$。
 
+- 对于更小值，$$\alpha \in [0, 1)$$，矩阵的非对角是按比例缩小的，它必须对应于：**所有items会更多样化**。
+- 对于更大值$$\alpha>1$$，矩阵的非对角部分是按比例放大的，这会具有反作用：**所有items会更相似**。
 
+随着$$\alpha$$的变大，小集合（small sets）的概率会增长，而大集合（large sets）的概率会收缩（shrinks）。因而，一个大的$$\alpha$$对于在setting中的用户行为来说是个较好的满足，其中：在feed中一个相对小的视频子集会交互（$$\mid Y \mid 很小$$）。
+
+对于我们来说，使用大的$$\alpha$$很有价值，因为：如第4.3节所示，它提供了一个对真实用户数据的较好fit。然而，存在一个技术要求：允许$$\alpha > 1$$。回顾等式6，当有一个合适的DPP时，kernal matrix L必须是半正定的（PSD）。PSD条件确保了所有子矩阵的行列式是非负的。这很重要，因为：一个set Y的概率与$$det(L_Y)$$成比例，负的“概率”没有意义。如果我们允许$$\alpha > 1$$，这会潜在做出L是非-PSD的。实际上，我们通过将任何non-PSD matrix的投影进行简化来解决该问题：一个大的$$\alpha$$值会造成返回任何PSD matrices的空间。（投影是简单的：我们计算L的特征分解并将任意负特征值替代为0）
 
 ## 4.3 训练方法
 
