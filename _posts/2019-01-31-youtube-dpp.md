@@ -270,7 +270,7 @@ $$
 
 其中，$$Y_j$$是来自与用户交互的训练样本j的items的子集。使用log似然作为一个目标函数的能力，允许我们使用比grid search更复杂的方法（并且更有效）来学习DPP参数。
 
-我们然后通过使用在LogLike上的gradient descent，开始探索学习一个kernel，它具有许多参数，比如：前面提过的$$\alpha$$和$$\simga$$。我们仍会使用输入$$\phi$$ embeddings来区别视频内容。对于个性化视频的quality scores来说（非scalar score $$q_i$$），我们可以从已经存在的基础设施中获得quanlity scores $$q_i$$的整个vector，因此我们使用该vector来更通用地做出我们的模型。（vector $$q_i$$的每个entry一定程度上会捕获：对于一个用户做出一个好的视频选择），我们从input data中学到的full kernel $$L(\phi, q)$$可以通过下面方式进行表示：
+我们然后通过使用在LogLike上的gradient descent，开始探索学习一个kernel，它具有许多参数，比如：前面提过的$$\alpha$$和$$\sigma$$。我们仍会使用输入$$\phi$$ embeddings来区别视频内容。对于个性化视频的quality scores来说（非scalar score $$q_i$$），我们可以从已经存在的基础设施中获得quanlity scores $$q_i$$的整个vector，因此我们使用该vector来更通用地做出我们的模型。（vector $$q_i$$的每个entry一定程度上会捕获：对于一个用户做出一个好的视频选择），我们从input data中学到的full kernel $$L(\phi, q)$$可以通过下面方式进行表示：
 
 $$
 L_{i,j} = f(q_i) g(\phi_i)^T g(\phi_i)^T g(\phi_j) f(q_j) + \sigma 1_{i,j}
