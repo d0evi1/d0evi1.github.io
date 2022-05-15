@@ -185,7 +185,9 @@ $$
 
 其中：
 
-$$L_{Y}$$是L限制了只有它的行、列，通过Y进行index（例如：$$Y=\lbrace 2,5,6 \rbrace$$，对应的矩阵$$L_Y$$是size 3X3）。注意，等式(6)的分母简化为一个规范术语(normalizing term)，它可以被写成和有效计算成一个简单的行列式：
+- $$L_{Y}$$是L限制了只有它的行、列，通过Y进行index（例如：$$Y=\lbrace 2,5,6 \rbrace$$，对应的矩阵$$L_Y$$是size 3X3）。
+
+注意，等式(6)的分母简化为一个规范术语(normalizing term)，它可以被写成和有效计算成一个简单的行列式：
 
 $$
 \sum_{Y \subseteq S} det(L_Y) = det(L + I)
@@ -204,7 +206,7 @@ $$
 
 $$
 L_y =  \left[
-\begin{array}
+\begin{array}{cc}
   L_{11}&L_{12}\\
   L_{21}&L_{22}
 \end{array}
