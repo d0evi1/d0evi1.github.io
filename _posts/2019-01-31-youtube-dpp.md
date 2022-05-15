@@ -164,11 +164,76 @@ $$
 
 ## 4.1 DPP总览
 
-我们首先回顾下DPPs（deternminantal point processes）的总览。在一个集合$$S=\lbrace 1, 2, \cdots, N \rbrace$$（例如：在一个用户的Youtube移动首页feed中的N个视频的集合）上的一个point process P是一个概率分布（S的所有子集）。也就是说，...
+我们首先回顾下DPPs（deternminantal point processes）的总览。在一个集合$$S=\lbrace 1, 2, \cdots, N \rbrace$$（例如：在一个用户的Youtube移动首页feed中的N个视频的集合）上的一个point process P是一个概率分布（S的所有子集）。也就是说，$$\forall S \subseteq S$$, P会分配一些概率P(S)，并且$$\sum_{S \subseteq S} = 1$$。DPPs表示一个概率分布族（family），它的参数可调，以便一个subset的概率P(S)与在S中的items的quality以及这些items的diversity的一个组合measure成比例。这样，发现set $$max_{S:\mid S \mid = k} P(S)$$是从一个N个items的更大池中选择关于k个items的high-quality和diverse的subset的一种方式。
 
+如第2节所述，存在许多合理的measures，可以解释：item quality和diversity，比如：MMR方法（maximal marginal relevance）。使用DPPs的优点有两块：
 
+- 1） DPPs在推荐任务中可以胜过MMR
+- 2）一个DPP是一个概率模型（probalilistic model）
+
+后一点意味着，我们可以利用概率operations算法的优点，比如：边缘化（marginalization）、调节（conditioning）、采样（sampling）。这些operations与构建一个系统的目标对齐得很好，可以很优雅地随时间在复杂度上可扩展。
+
+我们现在描述，如何我们使用一个DPP来建模用户行为。对于一个有N items的feed，长度为N的binary vector y，表示用户与哪个视频交互。假设：Y表示这些items的index set（例如：对于y=[0, 1, 0, 0, 1, 1]，我们有$$Y = \lbrace 2, 5, 6 \rbrace$$）。接着我们假设，一个用户u的行为是通过一个具有概率分布P的DPP建模，以如下方式：$$Y ~ P_u$$。也就是说，互交的视频集合Y，表示由一个user-specific DPP定义的概率分布中抽取。
+
+尽管一个DPP定义了一个在指数数目集合（所有$$2^N$$的子集有$$S=\lbrace 1,2, \cdots, N \rbrace$$）上的概率分布，它可以通过一个N X N的半正定kernel matrix进行密集参数化（compactly），我们称它为L。更具体的，一个DPP的概率可以写成一个关于L子矩阵的行列式：
+
+$$
+P(Y) = \frac{det(L_Y)}{\sum_{Y' \subseteq S} det(L_{Y^'})}
+$$
+
+...(6)
+
+其中：
+
+$$L_{Y}$$是L限制了只有它的行、列，通过Y进行index（例如：$$Y=\lbrace 2,5,6 \rbrace$$，对应的矩阵$$L_Y$$是size 3X3）。注意，等式(6)的分母简化为一个规范术语(normalizing term)，它可以被写成和有效计算成一个简单的行列式：
+
+$$
+\sum_{Y \subseteq S} det(L_Y) = det(L + I)
+$$
+
+...(7)
+
+其中，I是单位矩阵。
+
+为了看到$$det(L_Y)$$如何定义一个关于items集合的quality和diversity的balanced measure，它可以帮助以如下方式理解L的entries：
+
+- 1）一个对角entry $$L_{ii}$$是一个关于item i的quanlity的measurement
+- 2）一个非对角（off-diagonal）元素$$L_{ij}$$：是一个关于item i和item j间的相似度的归一化measurement
+
+有了这些直觉，我们考虑一个$$\mid Y \mid = 2$$的case。如果$$Y=\lbrace 1,2 \rbrace$$，接着：
+
+$$
+L_y =  \left[
+\begin
+  L_{11}&L_{12}\\
+  L_{21}&L_{22}
+\end
+\right] 
+$$
+
+该submatrix的行列式为：$$det(L_Y) = L_{11}L_{22} - L_{12}L_{21}$$。因此，它是一个item quanlities减去归一化item相似度（scaled item similarities）的乘积。该行列式表达式对于更大子矩阵来说更复杂，但直觉上是相似的。
+
+在以下的章节，我们讨论在L从系统输入的多种构建方式，比如：pointwise item quanlity scores，q，第3.2节描述。
 
 ## 4.2 Kernel参数化
+
+当前部署如图2所示，diversification发现在pipeline的相对靠后，因此一个典型的输入set size是：N=100.  对于这些N个视频中的每一个，我们具有两个主要的输入特征（input features）：
+
+- 一个个性化quanlity score q
+- 一个sparse embedding $$\phi$$，从视频的主题内容中提取出
+
+这些features完全由独立的子系统生成。通过将我们的diversification系统叠加到它们的top上，我们可以利用这些子系统的持续提升。
+
+对于DPPs初始引入，我们首先使用一个相对简单的参数，关于$$N \times N$$的DPP kernel matrix L：
+
+$$
+L_{ii} = q_i^2 \\
+L_{ij} = \alpha q_i q_j exp(-\frac{D_{ij}}{2\sigma^2}), for i \neq j
+$$
+
+...(9) (10)
+
+每个$$D_{ij}$$通过$$\phi_i$$和$$\phi_j$$计算得到；第5节描述了准确的embedding $$\phi$$
 
 
 
