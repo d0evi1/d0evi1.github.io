@@ -204,10 +204,10 @@ $$
 
 $$
 L_y =  \left[
-\begin
+\begin{array}
   L_{11}&L_{12}\\
   L_{21}&L_{22}
-\end
+\end{array}
 \right] 
 $$
 
