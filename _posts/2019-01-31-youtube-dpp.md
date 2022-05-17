@@ -252,9 +252,15 @@ $$
 
 我们的训练集包含了将近4w的样本，它们从Youtube mobile主页feed上收集的某天数据中抽样得到。**每个训练样本是单个homepage的feed曝光：一个用户的单个实例，对应于用户访问了youtube mobile主页，并被呈现出一个关于推荐视频的有序列表**。
 
-对于每个这样的曝光，我们有一个关于用户喜欢哪些视频的记录，我们表示为 set Y。我们注意到，使用这样的数据来训练模型存在一个partial-label bias，因为我们只观察到用户与那些被选中呈现给他们的视频的交互，而非随机均匀选中的视频。通常，我们会使用与过去训练pointwise模型相同类型的方式来解决该问题，比如：使用一个e-greedy exploration策略。
+对于每个这样的曝光，我们有一个关于用户喜欢哪些视频的记录，我们表示为 set Y。我们注意到，**使用这样的数据来训练模型存在一个partial-label bias，因为我们只观察到用户与那些被选中呈现给他们的视频的交互，而非随机均匀选中的视频**。通常，我们会使用与过去训练pointwise模型相同类型的方式来解决该问题，比如：使用一个e-greedy exploration策略。
 
-对于前面章节中描述的basic kernel，存在两个参数：$$\alpha$$和$$\sigma$$，因此我们可以做一个grid search来找来能使等式(2)中的累积增益最大化的值。图3展示了$$\alpha$$和$$\sigma$$的多种选择所获得的累积增益。颜色越暗，结果越糟糕。有意思的是，你可以观察到，在右上角象限中的灾难性悬崖（catastrophic clif），以及随后的高原。必须对训练样本使用DPP kernels来变为增加non-PSD。记住，随着$$\alpha$$增长，L的非对角阵也会增长，这会增加一个non-PSD L的机率。由于非对角阵一定程度上会随$$\sigma$$增加，对于许多训练样本来说，大的$$\alpha, \sigma$$组合会导致non-PSD矩阵。直觉上，看起来整个右上角会具有低累积增益值，而非：低的值会集中在观察带上。然而，记住，我们会将任意non-PSD矩阵投影回PSD空间上。该投影分别对于$$\alpha$$和$$\sigma$$来说都是非线性的，因此，在投影后的矩阵的quanlity，不会期望与我们关于这些参数的直觉强相关。整体上，我们发现，具有最高的累积增益会在$$\sigma$$的中间区间、以及$$\alpha$$的上半区间达到。由这些参数产生的L kernels更可能是PSD，因此，只有一个偶然的训练样本的kernel需要投影。
+对于前面章节中描述的basic kernel，存在两个参数：$$\alpha$$和$$\sigma$$，因此我们可以做一个grid search来找来能使等式(2)中的累积增益最大化的值。**图3展示了$$\alpha$$和$$\sigma$$的多种选择所获得的累积增益。颜色越暗，结果越糟糕**。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b99cac9e5796b8132bad8b3397eb4ab4f913358b72862e39627b73642a0848ad34fed09580ba93d6da2019a5040c3a34?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
+
+图3
+
+有意思的是，你可以观察到，在右上角象限中的灾难性悬崖（catastrophic clif），以及随后的高原。必须对训练样本使用DPP kernels来变为增加non-PSD。记住，随着$$\alpha$$增长，L的非对角阵也会增长，这会增加一个non-PSD L的机率。由于非对角阵一定程度上会随$$\sigma$$增加，对于许多训练样本来说，大的$$\alpha, \sigma$$组合会导致non-PSD矩阵。直觉上，看起来整个右上角会具有低累积增益值，而非：低的值会集中在观察带上。然而，记住，我们会将任意non-PSD矩阵投影回PSD空间上。该投影分别对于$$\alpha$$和$$\sigma$$来说都是非线性的，因此，在投影后的矩阵的quanlity，不会期望与我们关于这些参数的直觉强相关。整体上，我们发现，具有最高的累积增益会在$$\sigma$$的中间区间、以及$$\alpha$$的上半区间达到。由这些参数产生的L kernels更可能是PSD，因此，只有一个偶然的训练样本的kernel需要投影。
 
 ## 4.4 Deep Gramian Kernels
 
