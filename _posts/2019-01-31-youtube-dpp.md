@@ -164,7 +164,11 @@ $$
 
 ## 4.1 DPP总览
 
-我们首先回顾下DPPs（deternminantal point processes）的总览。在一个集合$$S=\lbrace 1, 2, \cdots, N \rbrace$$（例如：在一个用户的Youtube移动首页feed中的N个视频的集合）上的一个point process P是一个概率分布（S的所有子集）。也就是说，$$\forall S \subseteq S$$, P会分配一些概率P(S)，并且$$\sum_{S \subseteq S} = 1$$。DPPs表示一个概率分布族（family），它的参数可调，以便一个subset的概率P(S)与在S中的items的quality以及这些items的diversity的一个组合measure成比例。**这样，发现set $$max_{S:\mid S \mid = k} P(S)$$是从一个N个items的更大池中选择关于k个items的high-quality和diverse的subset的一种方式**。
+我们首先回顾下DPPs（deternminantal point processes）的总览。在一个集合$$S=\lbrace 1, 2, \cdots, N \rbrace$$（例如：在一个用户的Youtube移动首页feed中的N个视频的集合）上的一个point process P是一个概率分布（S的所有子集）。也就是说：
+
+$$\forall S \subseteq S$$，P会分配一些概率P(S)，并且$$\sum_{S \subseteq S} = 1$$
+
+DPPs表示一个概率分布族（family），它的参数可调，以便一个subset的概率P(S)与在S中的items的quality以及这些items的diversity的一个组合measure成比例。**这样，发现set $$max_{S:\mid S \mid = k} P(S)$$是从一个N个items的更大池中选择关于k个items的high-quality和diverse的subset的一种方式**。
 
 如第2节所述，存在许多合理的measures，可以解释：item quality和diversity，比如：MMR方法（maximal marginal relevance）。使用DPPs的优点有两块：
 
@@ -175,7 +179,7 @@ $$
 
 我们现在描述，如何我们使用一个DPP来建模用户行为。对于一个有N items的feed，长度为N的binary vector y，表示用户与哪个视频交互。假设：Y表示这些items的index set（例如：对于y=[0, 1, 0, 0, 1, 1]，我们有$$Y = \lbrace 2, 5, 6 \rbrace$$）。接着我们假设，一个用户u的行为是通过一个具有概率分布P的DPP建模，以如下方式：$$Y \sim P_u$$。也就是说，**互交的视频集合Y，表示由一个user-specific DPP定义的概率分布中抽取得到**。
 
-尽管一个DPP定义了一个在指数数目集合（所有$$2^N$$的子集有$$S=\lbrace 1,2, \cdots, N \rbrace$$）上的概率分布，它可以通过一个N X N的半正定kernel matrix进行密集参数化（compactly），我们称它为L。更具体的，一个DPP的概率可以写成一个关于L子矩阵的行列式：
+尽管一个DPP定义了一个在指数数目集合（所有$$2^N$$的子集有$$S=\lbrace 1,2, \cdots, N \rbrace$$）上的概率分布，它可以通过一个**$$N \times N$$的半正定kernel matrix进行密集参数化（compactly），我们称它为L**。更具体的，**一个DPP的概率可以写成一个关于L子矩阵的行列式**：
 
 $$
 P(Y) = \frac{det(L_Y)}{\sum_{Y' \subseteq S} det(L_{Y'})}
