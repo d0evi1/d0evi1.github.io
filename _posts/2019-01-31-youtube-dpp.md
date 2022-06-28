@@ -3,7 +3,7 @@ layout: post
 title: youtube dpp介绍
 description: 
 modified: 2019-01-30
-tags: 
+tags: youtube、dpp
 ---
 
 youtube也开放了它们的diversity方法:《Practical Diversified Recommendations on YouTube with Determinantal Point Processes》, 我们来看下：
@@ -260,16 +260,18 @@ $$
 
 图3
 
-有意思的是，你可以观察到，在右上角象限中的灾难性悬崖（catastrophic clif），以及随后的高原。必须对训练样本使用DPP kernels来变为增加non-PSD。记住，随着$$\alpha$$增长，L的非对角阵也会增长，这会增加一个non-PSD L的机率。由于非对角阵一定程度上会随$$\sigma$$增加，对于许多训练样本来说，大的$$\alpha, \sigma$$组合会导致non-PSD矩阵。直觉上，看起来整个右上角会具有低累积增益值，而非：低的值会集中在观察带上。然而，记住，我们会将任意non-PSD矩阵投影回PSD空间上。该投影分别对于$$\alpha$$和$$\sigma$$来说都是非线性的，因此，在投影后的矩阵的quanlity，不会期望与我们关于这些参数的直觉强相关。整体上，我们发现，具有最高的累积增益会在$$\sigma$$的中间区间、以及$$\alpha$$的上半区间达到。由这些参数产生的L kernels更可能是PSD，因此，只有一个偶然的训练样本的kernel需要投影。
+有意思的是，你可以观察到，在右上角象限中的灾难性悬崖（catastrophic clif），以及随后的高原。必须对训练样本使用DPP kernels来变为增加non-PSD。**记住，随着$$\alpha$$增长，L的非对角阵也会增长，这会增加一个non-PSD L的机率**。由于非对角阵一定程度上会随$$\sigma$$增加，对于许多训练样本来说，大的$$\alpha, \sigma$$组合会导致non-PSD矩阵。直觉上，看起来整个右上角会具有低累积增益值，而非：低的值会集中在观察带上。然而，记住，我们会将任意non-PSD矩阵投影回PSD空间上。该投影分别对于$$\alpha$$和$$\sigma$$来说都是非线性的，因此，在投影后的矩阵的quanlity，不会期望与我们关于这些参数的直觉强相关。整体上，我们发现，**具有最高的累积增益会在$$\sigma$$的中间区间、以及$$\alpha$$的上半区间达到**。由这些参数产生的L kernels更可能是PSD，因此，只有一个偶然的训练样本的kernel需要投影。
 
 ## 4.4 Deep Gramian Kernels
 
-正如之前所讨论，通过启发法使用DPP的一个主要好处是，DPP允许我们构建一个在复杂度上可以随时间优雅扩展的系统。启发法的复杂度扩展性很差，因为必须在参数上做grid search来调参，因此，对于训练一个启发法的runtime，与参数数目成指数关系。在本节中，使用DPP，我们可以超越grid search，使用许多参数来高效训练一个模型。
+正如之前所讨论，通过启发法使用DPP的一个主要好处是，DPP允许我们构建一个在复杂度上可以随时间优雅扩展的系统。启发法的复杂度扩展性很差，因为必须在参数上做grid search来调参，因此，**训练一个启发法的runtime与参数数目成指数关系**。在本节中，使用DPP，我们可以超越grid search，使用许多参数来高效训练一个模型。
 
 可以以多种方式来学习DPP kernel matrices。这些工作通常是为了最大化训练数据的log似然。更具体的，假设：
 
-- L的参数是一些长度为r的vector w
-- 我们具有M个训练样本，每个包含了：1）一个关于N个items的集合 2) 用户与之交互的这些items的子集Y
+- L的参数是：一些长度为r的vector w
+- 我们具有M个训练样本，每个包含了：
+	- 1）一个关于N个items的集合 
+	- 2) 用户与之交互的这些items的子集Y
 
 假设：L(w)是N x N的kernel matrix，通过参数w进行索引。接着训练数据的log似然是：
 
@@ -278,7 +280,9 @@ LogLike(w) = \sum\limits_{j=1}^M log(P_{L(w)}(Y_j)) \\
  = \sum\limits_{j=1}^M [log(det(L(w)_{Y_j})) - log(det(L(w) + I))]
 $$
 
-其中，$$Y_j$$是来自与用户交互的训练样本j的items的子集。使用log似然作为一个目标函数的能力，允许我们使用比grid search更复杂的方法（并且更有效）来学习DPP参数。
+其中：
+
+- $$Y_j$$是来自与用户交互的训练样本j的items的子集。使用log似然作为一个目标函数的能力，允许我们使用比grid search更复杂的方法（并且更有效）来学习DPP参数。
 
 我们然后通过使用在LogLike上的gradient descent，开始探索学习一个kernel，它具有许多参数，比如：前面提过的$$\alpha$$和$$\sigma$$。我们仍会使用输入$$\phi$$ embeddings来区别视频内容。对于个性化视频的quality scores来说（非scalar score $$q_i$$），我们可以从已经存在的基础设施中获得quanlity scores $$q_i$$的整个vector，因此我们使用该vector来更通用地做出我们的模型。（vector $$q_i$$的每个entry一定程度上会捕获：对于一个用户做出一个好的视频选择），我们从input data中学到的full kernel $$L(\phi, q)$$可以通过下面方式进行表示：
 

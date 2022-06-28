@@ -3,7 +3,7 @@ layout: post
 title: youtube推荐强化学习介绍
 description: 
 modified: 2019-06-20
-tags: 
+tags: youtube,rl
 ---
 
 Minmin Chen、Alex Beutel等在《Top-K Off-Policy Correction

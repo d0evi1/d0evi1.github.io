@@ -3,7 +3,7 @@ layout: post
 title: youtube RNN推荐
 description: 
 modified: 2018-01-10
-tags:
+tags: youtube
 ---
 
 我们来看下youtube RNN: Alex Beutel等提出的《Latent Cross: Making Use of Context in Recurrent

@@ -2,7 +2,7 @@
 layout: post
 title: 2010 youtube推荐系统 
 modified: 2014-03-28
-tags: [大数据]
+tags: youtube
 ---
 
 本文是youtube在2010年提出的系统，现在回过头去看看它在当时是如何实现youtube的推荐系统的。
