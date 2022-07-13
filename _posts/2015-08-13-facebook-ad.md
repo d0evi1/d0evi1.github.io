@@ -18,11 +18,11 @@ Fackbook提出的gbdt+LR来预测广告点击，本文简单重温下相应的pa
 
 # 2.实验Setup
 
-取2013年第4季度，某一个周的数据。为了在不同条件下维护相同的训练／测试数据，我们准备了离线训练数据，它与线上观测到的数据相似。我们将这些保存下来的离线数据划分成：训练数据和测试数据，并使用它们来模拟在线训练和预测的streaming数据。
+为了达到严谨受控的实验，我们会取2013年第4季度某一个周的数据作为离线训练数据。为了在不同条件下维护相同的训练／测试数据，我们准备了离线训练数据，它与线上观测到的数据相似。我们将这些保存下来的离线数据划分成：训练数据和测试数据，并使用它们来模拟在线训练和预测的streaming数据。
 
-评估的metrics: 使用预测的accuracy，而非利润和回报。我们使用**归一化熵（NE: Normalized Entropy）**作为主要的评测指标。
+**评估的metrics**: 由于我们最关心的是机器学习模型的影响因子，我们使用prediction的accuracy作为metrics，而非利润和回报。在本文中，我们使用**归一化熵（NE: Normalized Entropy）以及calibration**作为主要的评测指标。
 
-NE，或者更准确地被称为NCE：**归一化的Cross-Entropy**，等价于每次曝光（impression）的平均log loss，再除以如果一模型为每个曝光预测了相应后台CTR(backgroud CTR)，所对应的每个曝光的log loss平均。换句话说，预测的log loss通过backgroud CTR的熵进行归一化。backgroud CTR是训练数据集的平均期望CTR(average empirical CTR)。它可能更多描述是指关于归一化log loss（Normalized Logarithmic Loss）。值越低，通过该模型预测的效果越好。使用该归一化的原因是，backgroud CTR越接近0或1,也容易达到一个更好的log loss。除以backgroud CTR的熵，使得NE对于backgroud CTR不敏感。假设一个给定的数据集，具有N个样本，对应的labels为: \$ yi \in {-1,+1} \$，点击概率pi，其中i=1,2,...,N。平均期望CTR为p：
+NE，或者更准确地被称为NCE：**归一化的Cross-Entropy**，等价于每次曝光（impression）的平均log loss，再除以如果一模型为每个曝光预测了相应后台CTR(background CTR)，所对应的每个曝光的log loss平均。换句话说，预测的log loss通过backgroud background CTR是训练数据集的平均期望CTR(average empirical CTR)。它可能更多描述是指关于归一化log loss（Normalized Logarithmic Loss）。值越低，通过该模型预测的效果越好。使用该归一化的原因是，background CTR越接近0或1,也容易达到一个更好的log loss。除以background CTR的熵，使得NE对于background CTR不敏感。假设一个给定的数据集，具有N个样本，对应的labels为: \$ yi \in {-1,+1} \$，点击概率pi，其中i=1,2,...,N。平均期望CTR为p：
 
 $$
 NE=\frac{-\frac{1}{N}\sum_{i=1}^{n}(\frac{1+y_i}{2}log(p_i)+\frac{1-y_i}{2}log(1-p_i))}{-(p*log(p)+(1-p)*log(1-p))}
@@ -254,6 +254,6 @@ Facebook的一整天的广告曝光数据是海量的。注意，我们不会展
 参考：
 
 1.[Practical Lessons from Predicting Clicks on Ads at
-Facebook](https://pdfs.semanticscholar.org/daf9/ed5dc6c6bad5367d7fd8561527da30e9b8dd.pdf)
+Facebook](https://scontent-hkt1-1.xx.fbcdn.net/v/t39.8562-6/240842589_204052295113548_74168590424110542_n.pdf?_nc_cat=109&ccb=1-7&_nc_sid=ad8a9d&_nc_ohc=0FEGw93n1XIAX9HDnsy&_nc_ht=scontent-hkt1-1.xx&oh=00_AT-2tNhXW-T4j5ElPGTkjQ_wu95c1Zr717r46ZfhgrbZZA&oe=62D3004A)
 2.[kaggle:gbdt+libffm](https://github.com/guestwalk/kaggle-2014-criteo)
 
