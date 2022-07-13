@@ -77,7 +77,7 @@ $$
 
 我们开展实验来展示将tree features作为线性模型的效果。在该实验中，我们比较了两个logistic regression模型，一个使用tree feature转换，另一个使用普通的(未转换)特征。我们也加了一个单独的boosted决策树模型作为对比。所表1所示：
 
-<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/0c9df0440abb57d974c98335ec91c9c5639fc7fd5f759b315d95d2101a743792b0a2293c2705304bbb22c6a88595201a?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
+
 
 相对于没有树特征转换的模型，树特征变换可以帮助减小3.4%的NE。这是非常大的相对提升。作为参考，一个典型的特征工程实验，可减小20-30%左右的相对NE。LR和树模型以独立方式运行下的比较也很有意思（LR的预测accuracy更好一点点），但它们组合起来会有大幅提升。预测acuracy的增益是很大；作为参考，特征工程的好坏可以影响NE更多。
 
@@ -87,7 +87,7 @@ $$
 
 在该实验中，我们训练了一天的数据，在后面的6天进行评估，计算每天的NE。结果如图2所示。
 
-<img src="http://pic.yupoo.com/wangdren23/GkU2Pm3H/medish.jpg">
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/0c9df0440abb57d974c98335ec91c9c5639fc7fd5f759b315d95d2101a743792b0a2293c2705304bbb22c6a88595201a?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
 图2: 预测accuracy和时间关系
 
