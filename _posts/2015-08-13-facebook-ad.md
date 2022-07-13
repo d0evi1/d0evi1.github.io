@@ -22,7 +22,7 @@ Fackbook提出的gbdt+LR来预测广告点击，本文简单重温下相应的pa
 
 **评估的metrics**: 由于我们最关心的是机器学习模型的影响因子，我们使用prediction的accuracy作为metrics，而非利润和回报。在本文中，我们使用**归一化熵（NE: Normalized Entropy）以及calibration**作为主要的评测指标。
 
-NE，或者更准确地被称为NCE：**归一化的Cross-Entropy**，等价于每次曝光（impression）的平均log loss，再除以如果一模型为每个曝光预测了相应后台CTR(background CTR)，所对应的每个曝光的log loss平均。换句话说，预测的log loss通过backgroud background CTR是训练数据集的平均期望CTR(average empirical CTR)。它可能更多描述是指关于归一化log loss（Normalized Logarithmic Loss）。值越低，通过该模型预测的效果越好。使用该归一化的原因是，background CTR越接近0或1,也容易达到一个更好的log loss。除以background CTR的熵，使得NE对于background CTR不敏感。假设一个给定的数据集，具有N个样本，对应的labels为: \$ yi \in {-1,+1} \$，点击概率pi，其中i=1,2,...,N。平均期望CTR为p：
+Nonmalized Entropy，或者更准确地被称为NCE：**归一化的Cross-Entropy**，等价于：【每次曝光（impression）的平均log loss】除以【如果一个模型为每个曝光预测了相应后台CTR(background CTR)，每个曝光的平均log loss】。换句话说，它是预测log loss，通过s通过background CTR进行归一化。background CTR是训练数据集的平均期望CTR(average empirical CTR)。它可能更多描述是指关于归一化log loss（Normalized Logarithmic Loss）。值越低，通过该模型预测的效果越好。使用该归一化的原因是，background CTR越接近0或1,也容易达到一个更好的log loss。除以background CTR的熵，使得NE对于background CTR不敏感。假设一个给定的数据集，具有N个样本，对应的labels为: \$ yi \in {-1,+1} \$，点击概率$$p_i$$，其中i=1,2,...,N。平均期望CTR为p：
 
 $$
 NE=\frac{-\frac{1}{N}\sum_{i=1}^{n}(\frac{1+y_i}{2}log(p_i)+\frac{1-y_i}{2}log(1-p_i))}{-(p*log(p)+(1-p)*log(1-p))}
@@ -30,11 +30,11 @@ $$
 
 ......（1)
 
-NE是一个必需单元，用于计算相关的信息增益(RIG: Relative Information Gain). RIG=1-NE
+NE是用于计算相关的信息增益(RIG: Relative Information Gain)的一个必需单元. RIG=1-NE
 
-Calibration(校准)是一个关于平均估计CTR和期望CTR的比值。该比值相当于：期望点击数与实际观察点击数。Calibration是一个非常重要的指标，因为关于CTR的准确（accurate）和well-calibrated预测，对于在线竞价和拍卖的成功很重要。Calibration离1越小，模型越好。
+**Calibration(校准)是一个关于【平均估计CTR】和【期望CTR】的ratio。该比值相当于：【期望点击数】与【实际观察点击数】**。Calibration是一个非常重要的指标，因为关于CTR的accurate、well-calibrated的预测，对于在线竞价和拍卖的成功很重要。**Calibration与1的差异越小，模型越好**。我们只会报告：在实验中的calibration，它是non-trivial的。
 
-注意，对于评估ranking的质量（不考虑Calibration），AUC也是一个相当好的指标。真实环境下，我们希望预测够准，而非仅仅获取最优的rank顺序，以避免欠拟合（under-delivery）或过拟合（overdelivery）。NE可以权衡预测的好坏，并隐式地影响calibration。例如，如果一个模型过度预测2倍，我们可以使用一个全局的乘子0.5来修正calibration，对应的NE也会提升，即使AUC仍相同。详见paper[12]
+注意，对于评估ranking的质量，AUC也是一个相当好的指标，无需考虑Calibration。真实环境下，我们希望预测够准，而非仅仅获取最优的rank顺序，以避免欠拟合（under-delivery）或过拟合（overdelivery）。NE可以权衡预测的好坏，并隐式地影响calibration。例如，如果一个模型过度预测2倍，我们可以使用一个全局的乘子0.5来修正calibration，对应的NE也会提升，即使AUC仍相同。详见paper[12]
 
 # 3.预测模型结构
 
