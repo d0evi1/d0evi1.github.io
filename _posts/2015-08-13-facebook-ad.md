@@ -34,13 +34,13 @@ NE是用于计算相关的信息增益(RIG: Relative Information Gain)的一个�
 
 **Calibration(校准)是一个关于【平均估计CTR】和【期望CTR】的ratio。该比值相当于：【期望点击数】与【实际观察点击数】**。Calibration是一个非常重要的指标，因为关于CTR的accurate、well-calibrated的预测，对于在线竞价和拍卖的成功很重要。**Calibration与1的差异越小，模型越好**。我们只会报告：在实验中的calibration，它是non-trivial的。
 
-注意，对于评估ranking的质量，AUC也是一个相当好的指标，无需考虑Calibration。真实环境下，我们希望预测够准，而非仅仅获取最优的rank顺序，以避免欠拟合（under-delivery）或过拟合（overdelivery）。NE可以权衡预测的好坏，并隐式地影响calibration。例如，如果一个模型过度预测2倍，我们可以使用一个全局的乘子0.5来修正calibration，对应的NE也会提升，即使AUC仍相同。详见paper[12]
+注意，对于评估ranking的质量，AUC也是一个相当好的指标，无需考虑Calibration。**真实环境下，我们希望预测够准确，而非仅仅获取最优的rank顺序**，以避免欠拟合（under-delivery）或过拟合（overdelivery）。**NE可以measure预测的好坏，并隐式地影响calibration**。例如，如果一个模型过度预测了2倍，我们可以使用一个全局的乘子0.5来修正calibration，对应的NE也会提升，尽管AUC仍相同。详见paper[12]
 
 # 3.预测模型结构
 
 本部分我们提出了一种混合模型结构：将GBDT与一个概率稀疏的线性分类器相串联，如图1所示。在3.1中，决策树对于输入特征的转换十分强大，可以极大增加概率线性分类器的accuracy。在3.2中，会展示训练数据的新鲜度是如何影响更准确的预测。这激发了我们使用一个在线学习方法来训练线性分类器。在3.3中，我们比较一些在线学习变种。
 
-<img src="http://pic.yupoo.com/wangdren23/GkT2sAkF/medium.jpg">
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c2f77d00bf30cf227e68edb6e1833ea434d0efcb27d9c3e078b2bc025663a966438ada780a27cc75fee21691562d4564?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
 
 图1: 混合模型结构。输入特征通过boosted决策树的方式进行转换，每棵树的输出作为一个类别型输入特征，输入到一个稀疏的线性分类器上。Boosted决策树提供了非常强的特征转换.
 
@@ -77,7 +77,7 @@ $$
 
 我们开展实验来展示将tree features作为线性模型的效果。在该实验中，我们比较了两个logistic regression模型，一个使用tree feature转换，另一个使用普通的(未转换)特征。我们也加了一个单独的boosted决策树模型作为对比。所表1所示：
 
-<img src="http://pic.yupoo.com/wangdren23/GkTbV98f/medium.jpg">
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/0c9df0440abb57d974c98335ec91c9c5639fc7fd5f759b315d95d2101a743792b0a2293c2705304bbb22c6a88595201a?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
 相对于没有树特征转换的模型，树特征变换可以帮助减小3.4%的NE。这是非常大的相对提升。作为参考，一个典型的特征工程实验，可减小20-30%左右的相对NE。LR和树模型以独立方式运行下的比较也很有意思（LR的预测accuracy更好一点点），但它们组合起来会有大幅提升。预测acuracy的增益是很大；作为参考，特征工程的好坏可以影响NE更多。
 
@@ -137,7 +137,7 @@ $$
 
 对于连续学习（continuous learning），我们可以将learning rate设置为一个较低的边界0.00001. 我们使用上述的learning rate scheme来在相同的数据上训练和测试LR模型。相应的试验结果如图3所示。
 
-<img src="http://pic.yupoo.com/wangdren23/GsPkuuea/medish.jpg">
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a6e7578822af88367316a82daa1452cc644813591ca20731c9bb8f50dc1daf5fbfdfbfada2efa4f03e3ffa915ddfcaed?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
 
 图3: 不同learning rate schema的实验. X表示不同的learning rate。左侧为calibration，y轴右侧为NE.
 
@@ -155,7 +155,7 @@ $$
 
 使用太长的时间窗口(time window)，会延迟实时训练数据，并增加内存分配开销来缓存要等待点击信号的impressions。一个过短时间的时间窗口，会造成一些点击丢失，因为相应的impression可以会被冲掉，并当成no-clicked label来对待。这种负面影响称为"点击覆盖（click coverage）"，它是一个关于所有成功的clicks与impressions相join的一个分数。作为结果，online joiner系统必须在最新性（recency）和点击覆盖(click coverage)间做出一个平衡。
 
-<img src="http://pic.yupoo.com/wangdren23/GsPm02kk/medish.jpg">
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/2690e1913bdd887045dd1f8421526eab53a50a88e728362c8db884b52414804e85840142f49189e69f86501eda8f0af1?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=4.jpg&amp;size=750">
 
 [图4]: Online Learning Data/Model Flows
 
