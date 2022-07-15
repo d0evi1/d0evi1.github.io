@@ -266,7 +266,11 @@ $$
 L = Diag(r_u) \cdot S \cdot Diag(r_u)
 $$
 
-其中，$$Diag(r_u)$$是对角阵（diagonal matrix），它的对角向量（diagonal vector）是$$r_u$$。$$R_u$$的log概率是：
+其中：
+
+- $$Diag(r_u)$$是对角阵（diagonal matrix），它的对角向量（diagonal vector）是$$r_u$$。
+
+$$R_u$$的log概率是：
 
 $$
 log det(L_{R_u}) = \sum\limits_{i \in R^u} log(r_{u,i}^2) + log det(S_{R_u})
