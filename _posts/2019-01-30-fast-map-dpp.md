@@ -286,7 +286,7 @@ $$
 log P(R_u) \propto \theta \cdot \sum\limits_{i \in R^u} r_{u,i} + (1-\theta) \cdot log det(S_{R_u})
 $$
 
-其中$$\theta \in [0, 1]$$。这对应于一个使用以下kernel的DPP：
+其中$$\theta \in [0, 1]$$。**这对应于一个使用以下kernel的DPP**：
 
 $$
 L' = Diag(exp(\alpha r_u)) \cdot S \cdot Diag(exp(\alpha r_u))
