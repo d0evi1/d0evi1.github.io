@@ -77,7 +77,11 @@ $$
 f(X \cup \lbrace i \rbrace) - f(X) \geq f(Y \cup \lbrace i \rbrace) - f(Y)
 $$
 
-其中，f是次模函数(submodular)。**在DPP中的log概率函数$$f(Y)=log det(L_Y)$$也是次模函数(submodular)，在[17]中有介绍**。次模最大化（submodular maximization）对应是：寻找能让一个次模函数最大化的一个集合。DPP的MAP inference是一个次模最大化过程。
+其中：
+
+- f是次模函数(submodular)
+
+**在DPP中的log概率函数$$f(Y)=log det(L_Y)$$是次模函数(submodular)，在[17]中有介绍**。次模最大化（submodular maximization）对应是：寻找能让一个次模函数最大化的一个集合。DPP的MAP inference是一个次模最大化过程。
 
 **次模函数最大化通常是NP-hard的。一个流行的近似方法是基于贪心法[37]**。初始化为$$\emptyset$$，在每次迭代中，如果增加一个item能最大化边际增益(marginal gain):
 
@@ -113,7 +117,11 @@ $$
 L_{Y_g} = V V^{\top}
 $$
 
-其中V是一个可逆下三角矩阵。对于任意$$i \in Z \backslash Y_g$$，$$L_{Y_g \cup \lbrace i \rbrace}$$的柯列斯基分解(Cholesky decomposition)可以定为：
+其中：
+
+- V是一个可逆下三角矩阵
+
+对于任意$$i \in Z \backslash Y_g$$，$$L_{Y_g \cup \lbrace i \rbrace}$$的柯列斯基分解(Cholesky decomposition)可以定为：
 
 $$
 L_{Y_g \cup \lbrace i \rbrace} = \begin{bmatrix}
@@ -160,7 +168,7 @@ $$
 
 ...(6)
 
-一旦等式(6)被求解，根据等式(2)，$$L_{Y_g \cup \lbrace i \rbrace}$$的Cholesky decomposition变成是：
+**一旦等式(6)被求解**，我们可以根据等式(2)，进一步，$$L_{Y_g \cup \lbrace j \rbrace}$$的Cholesky decomposition变成是：
 
 $$
 L_{Y_g \cup \lbrace j \rbrace} = \begin{bmatrix}
