@@ -246,13 +246,13 @@ $$
 
 该方法会采用三个输入：
 
-- 一个候选item集合$$C_u$$
-- 一个分值向量（score vector) $$r_u$$，它表示在$$C_u$$中的items的相关性
-- 一个半正定矩阵$$S$$表示每个items pair的相似度。
+- $$C_u$$：表示一个候选item集合
+- $$r_u$$：指的是一个分值向量（score vector) ，它表示在$$C_u$$中的items的**相关性（relevance）**
+- $$S$$：一个半正定矩阵，表示每个items pair的**相似度**
 
-前两个输入可以通过许多传统的推荐算法的内部结果中获得。第三个输入（相似矩阵S），可以基于items的属性、与用户的交互关系、或者两者组合来获得。该方法可以看成是对items相关度及它们的相似度的一个ranking算法。
+前两个输入可以通过许多传统的推荐算法的内部结果中获得。**第三个输入（相似矩阵S），可以基于items的属性、与用户的交互关系、或者两者组合来获得**。该方法可以看成是对items相关度及它们的相似度的一个ranking算法。
 
-为了在推荐任务上应用DPP模型，我们需要构建kernel matrix。在[30]中所示，kernel matrix可以写成一个格拉姆矩阵(Gram matrix): $$L=B^T B$$，其中B的列可以是表示items的向量(vectors)。我们可以将每个列向量$$B_i$$通过$$r_i \geq 0$$（item score）和一个$$f_i \in R^D$$（具有$$\| f_i \|_2 = 1$$的归一化向量）的两者乘积的方式来构建。kernel L的条目可以被写成是：
+**为了在推荐任务上应用DPP模型，我们需要构建kernel matrix**。在[30]中所示，kernel matrix可以写成一个格拉姆矩阵(Gram matrix): $$L=B^T B$$，其中B的列可以是表示items的向量(vectors)。我们可以将每个列向量$$B_i$$通过$$r_i \geq 0$$（item score）和一个$$f_i \in R^D$$（具有$$\| f_i \|_2 = 1$$的归一化向量）的两者乘积的方式来构建。kernel L的条目可以被写成是：
 
 $$
 L_{ij} = \langle B_i,B_j \rangle = \langle r_i f_i, r_j f_j \rangle = r_i r_j \langle f_i, f_j \rangle
@@ -260,7 +260,7 @@ $$
 
 ...(11)
 
-我们可以将$$\langle f_i, f_j \rangle $$看成是item i和item j间的相似度的度量，例如：$$\langle f_i, f_j \rangle = S_{ij}$$。因此，user u的kernel matrix可以被写成是：
+我们可以将** $$\langle f_i, f_j \rangle $$ ** 看成是item i和item j间的相似度的度量，例如：$$\langle f_i, f_j \rangle = S_{ij}$$。因此，user u的kernel matrix可以被写成是：
 
 $$
 L = Diag(r_u) \cdot S \cdot Diag(r_u)
