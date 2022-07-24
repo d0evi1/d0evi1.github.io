@@ -9,7 +9,7 @@ tags:
 
 # 摘要
 
-隐式反馈（比如：用户点击）尽管在在线信息服务中非常丰富，但在用户评估系统输出方面并没有提供实质帮助。如果没有合理地进行建模，会误导模型估计，特别是在bandit learning setting中（feedback会即时获取）。在本工作中，我们会执行使用implicit feedback的contextual bandit learning，它会建模feedback作为用户结果检查（result examination）、以及相关性评估（relavance evaluation）的一部分。由于用户的检查行为是观察不到的，我们会引入隐变量（latent variables）来建模它。我们会在变分贝叶斯推断（variational Bayesian inference）之上执行Thompson sampling来进行arm selection以及模型更新。我们算法的upper regert bound analysis表明了在一个bandit setting中从implicit feedback中学习的可行性。
+隐式反馈（比如：用户点击）尽管在在线信息服务中非常丰富，但在用户评估系统输出方面并没有提供实质帮助。如果没有合理地进行建模，会误导模型估计，特别是在bandit learning setting中（feedback会即时获取）。在本工作中，我们会执行使用implicit feedback的contextual bandit learning，它会建模feedback作为用户结果查看（result examination）、以及相关评估（relavance evaluation）的一部分。**由于用户的查看行为是观察不到的，我们会引入隐变量（latent variables）来建模它**。我们**会在变分贝叶斯推断（variational Bayesian inference）之上执行Thompson sampling来进行arm selection以及模型更新**。我们算法的upper regert bound analysis表明了在一个bandit setting中从implicit feedback中学习的可行性。
 
 
 # 1.介绍
