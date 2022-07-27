@@ -91,17 +91,19 @@ $$
 
 # 4.算法
 
-learner需要基于从click feedback $$\lbrace x_i, C_i \rbrace_{i=1}^t$$获得的随时间的互交，估计bandit参数 $$\theta_C^*$$和$$\theta_E^*$$。理想情况下，该估计可以根据bandit model参数通过最大化data likelihood来获得。然而，在我们的bandit learning setting中examination的包含作为一个隐变量，对于参数估计和arm selection来说会造成严重挑战。由于相应最优化问题的非凸性，传统的最小二乘估计、极大似然估计可以被轻易获取，更不必说计算效率。更糟的是，两个流行的bandit learning范式，UCB principle和Thompson sampling，都需要一个关于bandit参数及不确定性的精准估计。在本节中，我们提出一个有效的新解法来解决这两个挑战，它会利用variational Bayesian inference技术来近似学习即时参数，同时桥接参数估计（parameter estimaiton）和(arm selection policy)设计。
+learner需要基于从click feedback $$\lbrace x_i, C_i \rbrace_{i=1}^t$$获得的随时间的互交，估计bandit参数 $$\theta_C^*$$和$$\theta_E^*$$。理想情况下，该估计可以根据bandit model参数通过最大化data likelihood来获得。然而，**在我们的bandit learning setting中查看（examination）的加入作为一个隐变量，对于参数估计和arm selection来说会造成严重挑战**。由于相应最优化问题的非凸性，传统的最小二乘估计、极大似然估计可以被轻易获取，更不必说计算效率。更糟的是，两个流行的bandit learning范式，**UCB principle和Thompson sampling，都需要一个关于bandit参数及不确定性的精准估计**。在本节中，我们提出一个有效的新解法来解决这两个挑战，它会利用variational Bayesian inference技术来近似学习即时参数，同时桥接参数估计（parameter estimaiton）和(arm selection policy)设计。
 
 ## 4.1 Variational Bayesian进行参数估计
 
 为了完成在第3节中定义的生成过程，我们进一步假设$$\theta_C$$和$$\theta_E$$分别遵循高斯分布 $$N(\hat{\theta}_C, \sum_C)$$以及$$N(\hat{\theta}_E, \sum_E)$$。当一个新获得的observation $$(x_C, x_E, C)$$变得可提供时，我们会对开发一个闭式近似后验感兴趣。通过在log space中使用Bayes' rule，我们有：
 
 $$
-log P(\theta_C, \theta_E | x_C, x_E, C)  \\
-        = log P(C | \theta_C, \theta_E, x_C, x_E) + log P(\theta_C, \theta_E) + log const \\
-        = C log \rho(x_C^T \theta_C) \rho(x_E^T \theta_E) + (1 - C) log(1 - \rho(x_C^T \theta_C) \rho(x_E^T \theta_E)) \\
-        = - \frac{1}{2} (\theta_C - \hat{\theta}_C)^T \sum_C^{-1} (\theta_C - \hat{\theta}_C) - \frac{1}{2} (\theta_E - \hat{\theta}_E)^T \sum_E^{-1} (\theta_E - \hat{\theta}_E) + log const
+\begin{align}
+log P(\theta_C, \theta_E | x_C, x_E, C) & \\
+        &= log P(C | \theta_C, \theta_E, x_C, x_E) + log P(\theta_C, \theta_E) + log const \\
+        &= C log \rho(x_C^T \theta_C) \rho(x_E^T \theta_E) + (1 - C) log(1 - \rho(x_C^T \theta_C) \rho(x_E^T \theta_E)) \\
+        &= - \frac{1}{2} (\theta_C - \hat{\theta}_C)^T \sum_C^{-1} (\theta_C - \hat{\theta}_C) - \frac{1}{2} (\theta_E - \hat{\theta}_E)^T \sum_E^{-1} (\theta_E - \hat{\theta}_E) + log const
+\end{align}
 $$
 
 关键思想是，会为似然函数开发一个$$\theta_C$$和$$\theta_E$$的quadratic form的variational lower bound。由于 $$log \rho(x) - \frac{x}{2}$$的convexity，对应于$$x^2$$，以及logx的Jensen’s不等式，所需形式的一个lower bound是可以达到的。当C=1时，通过等式(16)，我们有：
