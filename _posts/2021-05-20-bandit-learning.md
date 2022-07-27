@@ -74,7 +74,7 @@ $$E[C_t \mid x_t] = \rho(x_{C,t}^T \theta_C^*) \rho(x_{E,t}^T \theta_E^*)$$
 **作为结果，观察到的click feedback $$C_t$$是来自该生成过程的一个样本**。我们定义$$f_{\theta}(x) := E[C \mid x, \theta] = \rho(x_C^T \theta_C) \rho(x_E^T \theta_E)$$。到达time T一个policy $$\pi$$的accumulated regret的定义如下：
 
 $$
-Regret(T, \pi, \theta^*) = \sum\limits_{t=1}^T \underset{\alpha \in A_t}{max} f_{\theta^*} (x^a) - f_{\theta^*}(x^{a_t})
+Regret(T, \pi, \theta^*) = \sum\limits_{t=1}^T \underset{\alpha \in A_t}{max} \ f_{\theta^*} (x^a) - f_{\theta^*}(x^{a_t})
 $$
 
 其中：
@@ -84,7 +84,7 @@ $$
 Bayesian regret的定义为$$E[Regret(T, \pi, \theta^*)]$$，其中采用的期望根据在$$\theta^* $$上的先验分布采用的，它可以被写成：
 
 $$
-BayesRegret(T, \pi) = \sum\limits_{t=1}^T E[max_{a \in A_t} f_{\theta^*}(x^a) - f_{\theta^*}(x^{a_t})]
+BayesRegret(T, \pi) = \sum\limits_{t=1}^T E[\underset{a \in A_t}{max} f_{\theta^*}(x^a) - f_{\theta^*}(x^{a_t})]
 $$
 
 在我们的在线学习环境中，我们的目标是：**发现policy $$\pi$$，并最小化在T上的accumulated regret**。
