@@ -14,13 +14,18 @@ tags:
 
 # 1.介绍
 
-contextual bandit算法为现代信息服务系统提供了一种有效解决方案，可以自适应地发现items和users间的良好匹配。这类算法会使用关于user和item的side information顺序选择items提供服务给用户，并能**基于用户立即反馈（immediate user feedback）来调节选择策略，从而最大化用户的long-term满意度**。他们被广泛部署在实际系统中：内容推荐【20，5，26】和展示广告【6，22】。
+contextual bandit算法为现代信息服务系统提供了一种有效解决方案，可以自适应地发现items和users间的良好匹配。这类算法会使用关于user和item的side information顺序选择items提供服务给用户，并能**基于用户立即反馈（immediate user feedback）来调节选择策略（selection policy），从而最大化用户的long-term满意度**。他们被广泛部署在实际系统中：内容推荐【20，5，26】和展示广告【6，22】。
 
 然而，user feedback的最多形式是implicit feedback（比如：clicks），而它是有偏的，并且对于系统输出的用户评估是不完整的。例如：**一个用户跳过一个推荐item，并不因为是他不喜欢该item，有可能是因为他没有查看（examine）那个展示位置（例如：position bias）**。不幸的是，在contextual bandit应用中一个常见惯例是：**简单地将未点击（no click）看成是负反馈（negative feedback）的一种形式**。这会对模型更新引入不一致性（inconsistency），由于跳过的items并非真正不相关，因而它不可避免地会导致随时间的bandit算法的次优结果。
 
-在本工作中，我们会关注使用user click feedback来学习contextual bandits、并建模这样的implicit feedback，作为用户结果查看（result examination）和相关度评估（relevance judgment）的一个部分。 **查看假设(Examination hypothesis)**【8】在点击建模型上是一个基础假设，会假设：在一个系统上的一个用户点击的返回结果，当且仅当结果被用户查看（examination）时，它与在该时刻的用户信息是相关的。**由于一个用户的查看行为是不可观测的（unobserved）**，我们会建模它作为一个隐变量，并在一个概率模型中实现该查看假设。我们会通过在相应的contextual features上的logistic functions公定义结果查看（result examination）和相关评判（relevance judgement）的条件概率。为了执行模型更新，我们会采用一个变分贝叶斯方法来开发一个闭式（closed form）近似即时模型参数的后验分布。 该近似也会为在bandit learning中使用Thompson sampling策略进行arm selection来铺路。我们的有限时间分析表明，尽管在参数估计中由于引入隐式变量增加了复杂度，我们的Thompson sampling policy会基于真实后验 ，从而保证能达到一个具有高概率的sub-linear Bayesian regert。我们也会演示，基于近似后验的Thompson sampling的regret是良性有界的（well-bounded）. 另外，我们会证明：当某人在点击反馈中建模结果查看（result examination）失败时，一个线性递增的regret是可能的，因为在负反馈中模型不能区分查看驱动的跳过（examination driven skips）还是不相关驱动的跳过（relevance driven skips）。
+在本工作中，我们会关注使用user click feedback来学习contextual bandits、并建模这样的implicit feedback，作为用户结果查看（result examination）和相关度评估（relevance judgment）的一个部分。 **查看假设(Examination hypothesis)**【8】在点击建模型上是一个基础假设，会假设：在一个系统上的一个用户点击的返回结果，当且仅当结果被用户查看（examination）时，它与在该时刻的用户信息是相关的。**由于一个用户的查看行为是不可观测的（unobserved）**，我们会建模它作为一个隐变量，并在一个概率模型中实现该查看假设。我们会通过在相应的contextual features上的logistic functions中定义结果查看（result examination）和相关评判（relevance judgement）的条件概率。为了执行模型更新，我们**会采用一个变分贝叶斯方法来开发一个闭式（closed form）近似即时模型参数的后验分布。 该近似也会为在bandit learning中使用Thompson sampling策略进行arm selection来铺路**。我们的有限时间分析表明，尽管在参数估计中由于引入隐式变量增加了复杂度，我们的Thompson sampling policy会基于真实后验 ，从而保证能达到一个具有高概率的sub-linear Bayesian regert。我们也会演示，基于近似后验的Thompson sampling的regret是良性有界的（well-bounded）. 另外，我们会证明：当某人在点击反馈中建模结果查看（result examination）失败时，一个线性递增的regret是可能的，因为在负反馈中模型不能区分查看驱动的跳过（examination driven skips）还是不相关驱动的跳过（relevance driven skips）。
 
-我们会在中国的MOOC个性化教育平台上测试该算法。为了在该平台上个性化学生的学习体验，当学生正观察视频时，我们会在课程视频顶部以banner的形式推荐类似测试的问题（quiz-like quenstions）。该算法需要决定，在一个视频中在哪里向一个特定用户展示哪个问题。如果学生觉得展示的问题对他理解课程有用，他可能会点击该banner并阅读问题以及更多关于该问题的在线内容。因此，我们的目标是在选中问题上最大化CTR。该应用有多个特性，会放大bias以及点击反馈的不完整性。首先，基于用户体验的考虑，为了最小化讨厌度，一个banner的展示时间会限定在几秒内。第二，由于该feature对于该平台来说是新引入的，许多用户可能不会意识到：他们会在该问题上点击，并且阅读更多相关内容。作为结果，在一个问题上没有点击，并不能表示不相关。我们会在4个月周期内测试该算法，其中：总共有69个问题会用到该算法上来选择超过20个主要的视频，超过10w的学习观看session。基于无偏离线评估策略，对比起标准的contextual bandits，我们的算法会达到一个8.9%的CTR提升，它不会建模用户的查看行为（examination behavior）。
+我们会在中国的MOOC个性化教育平台上测试该算法。为了在该平台上个性化学生的学习体验，当学生正观察视频时，我们会在课程视频顶部以banner的形式推荐类似测试的问题（quiz-like quenstions）。**该算法需要决定，在一个视频中在哪里向一个特定用户展示哪个问题**。如果学生觉得展示的问题对他理解课程有用，他可能会点击该banner并阅读问题以及更多关于该问题的在线内容。因此，**我们的目标是在选中问题上最大化CTR**。该应用有多个特性，会放大bias以及点击反馈的不完整性。
+
+- 首先，基于用户体验的考虑，为了最小化讨厌度，一个banner的展示时间会限定在几秒内。
+- 第二，由于该feature对于该平台来说是新引入的，许多用户可能不会意识到：他们会在该问题上点击，并且阅读更多相关内容。
+
+作为结果，**在一个问题上没有点击，并不能表示不相关**。我们会在4个月周期内测试该算法，其中：总共有69个问题会用到该算法上来选择超过20个主要的视频，超过10w的学习观看session。基于无偏离线评估策略，对比起标准的contextual bandits，我们的算法会达到一个8.9%的CTR提升，它不会建模用户的查看行为（examination behavior）。
 
 # 2.相关工作
 
@@ -28,14 +33,33 @@ contextual bandit算法为现代信息服务系统提供了一种有效解决方
 
 # 3.问题设定
 
-我们考虑一个contextual bandit问题，它具有有限但可能较大的arms。我们将arm set表示为A。在每个trial t=1, ..., T上，learner会观察到candidate arms的子集$$A_t \subset A$$，其中，每个arm a与一个context vector $$x^a$$有关，会对arm的side information进行归纳。一旦arm $$a_t \in A_t$$根据一些policy $$\pi$$被选中后，对应的隐式二元反馈$$C_{a_t}$$，例如：user click，会由learner给出作为reward。learner的目标是，判断它的arm selection策略来最大化它随时间的累积收益（cumulative reward）。使得该问题唯一和挑战的是：$$C_{a_t}$$不会真正影响用户关于选中arm $$a_t$$的评估。基于检查假设【13，8】，当$$C_{a_t}=1$$时，选中的$$a_t$$必须与用户在time t需要的信息相关；但当$$C_{a_t}=0$$时，$$a_t$$必须相关，但用户不会检查它。不幸的是，产生的检查条件对learner来说是不可观察的。
+我们考虑一个contextual bandit问题，它具有有限但可能较大的arms。我们将：
 
-我们会通过一个二元隐变量$$E_{a_t}$$来建模一个用户的结果检查（result examination），并假设arm a的context vector $$x_t^a$$可以被分解成$$(x_{C,t}^a, x_{E,t}^a)$$，其中：$$x_{C,t}^a$$和$$x_{E,t}^a$$分别是$$d_C$$和$$d_E$$。相应的，用户的结果检查和相关判断决策被假设是：通过一个$$(x_{C,t}^a, x_{E,t}^a)$$推测，并且相似的bandit参数为$$\theta^* = (\theta_C^*, \theta_E^*)$$。在本文其余部分，当没有二义性引入时，我们会drop掉index a以简化概念。作为结果，我们对在arm $$a_t$$的一个observed click $$C_t$$上做出以下的生成假设：
+- arm set：表示为A
+- candidate arms子集：在每个trial t=1, ..., T上，learner会观察到candidate arms的子集**$$A_t \subset A$$**，其中，每个arm a与一个context vector $$x^a$$有关，会对arm的side information进行归纳。
+- 一旦arm $$a_t \in A_t$$根据一些policy $$\pi$$被选中后，对应的隐式二元反馈$$C_{a_t}$$ （例如：user click），会由learner给出作为reward。
+
+**learner的目标是：判断它的arm selection策略来最大化它随时间的累积收益（cumulative reward）**。使得该问题唯一和挑战的是：$$C_{a_t}$$不会真正影响用户关于选中arm $$a_t$$的评估。基于查看假设【13，8】:
+
+- 当$$C_{a_t}=1$$时，选中的$$a_t$$必须与用户在time t需要的信息相关；
+- 但当$$C_{a_t}=0$$时，$$a_t$$必须相关，但用户不会查看它
+
+不幸的是，产生的查看条件对learner来说是不可观察的。
+
+我们会通过一个**二元隐变量$$E_{a_t}$$**来建模一个用户的结果查看（result examination），并假设：arm a的context vector $$x_t^a$$可以被分解成：
+
+$$(x_{C,t}^a, x_{E,t}^a)$$
+
+- 其中：$$x_{C,t}^a$$和$$x_{E,t}^a$$分别是$$d_C$$和$$d_E$$。
+
+相应的，用户的结果查看和相关判断决策被假设成：**通过一个$$(x_{C,t}^a, x_{E,t}^a)$$猜想、以及相应的bandit参数为$$\theta^* = (\theta_C^*, \theta_E^*)$$来进行管理**。在本文其余部分，当没有二义性引入时，我们会drop掉index a以简化概念。作为结果，我们对在arm $$a_t$$的一个observed click $$C_t$$上做出以下的生成假设：
 
 $$
-P(C_t = 1 | E_t = 0, x_{C,t}) = 0 \\
-P(C_t = 1 | E_t = 1, x_{C,t}) = \rho(x_{C,t}^T \theta_C^*) \\
-P(E_t = 1 | x_{E,t}) = \rho(x_{E,t}^T \theta_E^*)
+\begin{align}
+P(C_t = 1 | E_t = 0, x_{C,t}) & = 0 \\
+P(C_t = 1 | E_t = 1, x_{C,t}) & = \rho(x_{C,t}^T \theta_C^*) \\
+P(E_t = 1 | x_{E,t}) & = \rho(x_{E,t}^T \theta_E^*)
+\end{align}
 $$
 
 
