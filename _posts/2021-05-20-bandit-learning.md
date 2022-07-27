@@ -99,14 +99,14 @@ learner需要基于从click feedback $$\lbrace x_i, C_i \rbrace_{i=1}^t$$获得�
 
 $$
 \begin{align}
-log P(\theta_C, \theta_E | x_C, x_E, C) & \\
+log P(\theta_C, \theta_E | x_C, x_E, C)  \\
         &= log P(C | \theta_C, \theta_E, x_C, x_E) + log P(\theta_C, \theta_E) + log const \\
         &= C log \rho(x_C^T \theta_C) \rho(x_E^T \theta_E) + (1 - C) log(1 - \rho(x_C^T \theta_C) \rho(x_E^T \theta_E)) \\
         &= - \frac{1}{2} (\theta_C - \hat{\theta}_C)^T \sum_C^{-1} (\theta_C - \hat{\theta}_C) - \frac{1}{2} (\theta_E - \hat{\theta}_E)^T \sum_E^{-1} (\theta_E - \hat{\theta}_E) + log const
 \end{align}
 $$
 
-关键思想是，会为似然函数开发一个$$\theta_C$$和$$\theta_E$$的quadratic form的variational lower bound。由于 $$log \rho(x) - \frac{x}{2}$$的convexity，对应于$$x^2$$，以及logx的Jensen’s不等式，所需形式的一个lower bound是可以达到的。当C=1时，通过等式(16)，我们有：
+关键思想是：我们会为似然函数开发一个$$\theta_C$$和$$\theta_E$$的二次型（quadratic form）的variational lower bound。由于 $$log \rho(x) - \frac{x}{2}$$的convexity，对应于$$x^2$$，以及logx的Jensen’s不等式，所需形式的一个lower bound是可以达到的。当C=1时，通过等式(16)，我们有：
 
 $$
 l_{C=1}(x_C, x_E, \theta) := log( \rho(x_C^T \theta_C) \rho(x_E^T \theta_E)) \geq g(x_C^T\theta, \epsilon_C) + g(x_E^T \theta, \epsilon_E)
@@ -114,7 +114,9 @@ $$
 
 ...(1)
 
-其中，$$g(x, \epsilon) := \frac{x}{2} - \frac{\epsilon}{2} + log \rho(\epsilon) - \lambda(\epsilon)(x^2 - \epsilon^2), \lambda(\epsilon) = \frac{tanh \frac{epsilon}{2}}{4 \epsilon}, x, \epsilon \in R$$。更特别的是，$$g(x, \epsilon)$$是一个度为2的对应于x的多项式。当C=0时，通过等式（17），我们有：
+其中：
+
+- $$g(x, \epsilon) := \frac{x}{2} - \frac{\epsilon}{2} + log \rho(\epsilon) - \lambda(\epsilon)(x^2 - \epsilon^2), \lambda(\epsilon) = \frac{tanh \frac{epsilon}{2}}{4 \epsilon}, x, \epsilon \in R$$。更特别的是，$$g(x, \epsilon)$$是一个度为2的对应于x的多项式。当C=0时，通过等式（17），我们有：
 
 $$
 l_{C=0} (x_C, x_E, \theta) := log( 1-\rho(x_C^T \theta_C) \rho(x_E^T \theta_E)) \\
@@ -126,10 +128,12 @@ $$
 其中，$$H(q) := - qlog q - (1 - q) log(1-q)$$。一旦在quadratic form中的lower bound确定后，我们可以使用一个Gaussian分布来近似我们的target后验，它的均值和covariance matrix由以下等式确定：
 
 $$
-\sum_{C, post}^{-1} = \sum_C^{-1} + 2q ^{1-C} \lambda (\epsilon) x_C x_C^T \\
-\hat{\theta}_{C, post} = \sum_{C,post} (\sum_{C}^{-1} \hat{\theta}_C + \frac{1}{2} (-q)^{1-C} x_C) \\
-\sum_{E,post}^{-1} = \sum_{E}^{-1} + 2 \lambda(\epsilon_E) x_E x_E^T \\
-\hat{\theta}_{E,post} = \sum_{E,post} (\sum_E^{-1} \hat{\theta}_E + \frac{1}{2}(2q-1)^{1-C} x_E)
+\begin{align}
+\sum_{C, post}^{-1} & = \sum_C^{-1} + 2q ^{1-C} \lambda (\epsilon) x_C x_C^T \\
+\hat{\theta}_{C, post} & = \sum_{C,post} (\sum_{C}^{-1} \hat{\theta}_C + \frac{1}{2} (-q)^{1-C} x_C) \\
+\sum_{E,post}^{-1} & = \sum_{E}^{-1} + 2 \lambda(\epsilon_E) x_E x_E^T \\
+\hat{\theta}_{E,post} & = \sum_{E,post} (\sum_E^{-1} \hat{\theta}_E + \frac{1}{2}(2q-1)^{1-C} x_E)
+\end{align}
 $$
 
 ...(3)(4)(5)(6)
