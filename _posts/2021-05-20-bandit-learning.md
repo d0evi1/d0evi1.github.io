@@ -77,13 +77,17 @@ $$
 Regret(T, \pi, \theta^*) = \sum\limits_{t=1}^T \underset{\alpha \in A_t}{max} f_{\theta^*} (x^a) - f_{\theta^*}(x^{a_t})
 $$
 
-其中，$$x^{a_t} := (x_C^{a_t}, x_E^{a_t})$$是arm $$a_t \in A_t$$的context vector，该arm会在time t时基于历史 $$H_t := \lbrace (A_i, x_i, C_i) \rbrace_{i=1}^{t-1}$$由policy $$\pi$$ 中。Bayesian regret的定义为$$E[Regret(T, \pi, \theta^*)]$$，其中采用的期望根据在$$\theta^* $$上的先验分布采用的，它可以被写成：
+其中：
+
+- $$x^{a_t} := (x_C^{a_t}, x_E^{a_t})$$是arm $$a_t \in A_t$$的context vector，该arm会在time t时基于历史 $$H_t := \lbrace (A_i, x_i, C_i) \rbrace_{i=1}^{t-1}$$由policy $$\pi$$ 中。
+
+Bayesian regret的定义为$$E[Regret(T, \pi, \theta^*)]$$，其中采用的期望根据在$$\theta^* $$上的先验分布采用的，它可以被写成：
 
 $$
 BayesRegret(T, \pi) = \sum\limits_{t=1}^T E[max_{a \in A_t} f_{\theta^*}(x^a) - f_{\theta^*}(x^{a_t})]
 $$
 
-在我们的在线学习环境中，objective是发现policy $$\pi$$，并最小化在T上的accumulated regret。
+在我们的在线学习环境中，我们的目标是：**发现policy $$\pi$$，并最小化在T上的accumulated regret**。
 
 # 4.算法
 
