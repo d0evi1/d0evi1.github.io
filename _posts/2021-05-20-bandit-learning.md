@@ -46,7 +46,7 @@ contextual bandit算法为现代信息服务系统提供了一种有效解决方
 
 不幸的是，产生的查看条件对learner来说是不可观察的。
 
-我们会通过一个**二元隐变量$$E_{a_t}$$**来建模一个用户的结果查看（result examination），并假设：arm a的context vector $$x_t^a$$可以被分解成：
+我们会通过一个**二元隐变量$$E_{a_t}$$来建模一个用户的结果查看（result examination）**，并假设：arm a的context vector $$x_t^a$$可以被分解成：
 
 $$(x_{C,t}^a, x_{E,t}^a)$$
 
@@ -63,10 +63,18 @@ P(E_t = 1 | x_{E,t}) & = \rho(x_{E,t}^T \theta_E^*)
 $$
 
 
-其中：$$\rho(x) = \frac{1}{1 + e^{-x}}$$。基于该假设，我们有：$$E[C_t \mid x_t] = \rho(x_{C,t}^T \theta_C^*) \rho(x_{E,t}^T \theta_E^*)$$。作为结果，观察到的click feedback $$C_t$$是来自该生成过程的一个样本。我们定义$$f_{\theta}(x) := E[C \mid x, \theta] = \rho(x_C^T \theta_C) \rho(x_E^T \theta_E)$$。到达time T一个policy $$\pi$$的accumulated regret的定义如下：
+其中：
+
+- $$\rho(x) = \frac{1}{1 + e^{-x}}$$
+
+基于该假设，我们有：
+
+$$E[C_t \mid x_t] = \rho(x_{C,t}^T \theta_C^*) \rho(x_{E,t}^T \theta_E^*)$$
+
+**作为结果，观察到的click feedback $$C_t$$是来自该生成过程的一个样本**。我们定义$$f_{\theta}(x) := E[C \mid x, \theta] = \rho(x_C^T \theta_C) \rho(x_E^T \theta_E)$$。到达time T一个policy $$\pi$$的accumulated regret的定义如下：
 
 $$
-Regret(T, \pi, \theta^*) = \sum\limits_{t=1}^T max_{\alpha \in A_t} f_{\theta^*} (x^a) - f_{\theta^*}(x^{a_t})
+Regret(T, \pi, \theta^*) = \sum\limits_{t=1}^T \underset{\alpha \in A_t}{max} f_{\theta^*} (x^a) - f_{\theta^*}(x^{a_t})
 $$
 
 其中，$$x^{a_t} := (x_C^{a_t}, x_E^{a_t})$$是arm $$a_t \in A_t$$的context vector，该arm会在time t时基于历史 $$H_t := \lbrace (A_i, x_i, C_i) \rbrace_{i=1}^{t-1}$$由policy $$\pi$$ 中。Bayesian regret的定义为$$E[Regret(T, \pi, \theta^*)]$$，其中采用的期望根据在$$\theta^* $$上的先验分布采用的，它可以被写成：
