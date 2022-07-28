@@ -75,7 +75,7 @@ $$
 
 two towers具有相同的结构但具有不同的参数。
 
-再者，为了估计augmented vectors $$a_u$$和$$a_v$$，我们设计了一个Adaptive-Mimic Mechanism(AMM)，它会集成一个mimic loss和一个stop gradient策略。mimic loss的目标是，使用augmented vector来拟合在其它tower上的所有正交叉（postive interactions），它属于相应的query或item。对于label=1的每个样本，我们定义了mimic loss作为在augmented vector和query/item embedding $$p_u, p_v$$间MSE：
+再者，为了估计augmented vectors $$a_u$$和$$a_v$$，我们设计了一个Adaptive-Mimic Mechanism(AMM)，它会集成一个**mimic loss**和一个**stop gradient策略**。mimic loss的目标是：使用augmented vector来拟合在其它tower上的所有正交叉（postive interactions），它属于相应的query或item。**对于label=1的每个样本，我们定义了mimic loss作为在augmented vector与query/item embedding $$p_u, p_v$$间的MSE**：
 
 $$
 loss_u = \frac{1}{T} \sum\limits_{(u,v,y) \in T} [y a_u + (1-y)p_v - p_v]^2 \\
@@ -84,7 +84,17 @@ $$
 
 ...(2)
 
-其中，T是在training dataset T中的query-item pairs数目，$$y \in \lbrace 0, 1 \rbrace$$是label。我们在接下来的子章节中讨论了标记过程（labeling process）。如上所示，如果label y=1, $$a_v$$和$$a_u$$会靠近query embedding $$p_u$$和item embedding $$p_v$$；如果label $$y=0$$, 则loss等于0. 如图1所示，augmented vectors被用于一个tower中，query/item embeddings会从另一个生成。也就是说，augmented vectors $$a_u$$和$$a_v$$会总结关于一个query或一个item与另一个tower相匹配的高级信息。因为mimic loss是为了更新$$a_u$$和 $$a_v$$，我们应将$$p_u$$和$$p_v$$的值进行freeze。为了这么做，stop gradient策略会用来阻止$$loss_u$$和$$loss_v$$反向梯度传播到$$p_v$$和$$p_u$$。
+其中：
+
+- T是在training dataset T中的query-item pairs数目
+- $$y \in \lbrace 0, 1 \rbrace$$是label
+
+我们在接下来的子章节中讨论了标记过程（labeling process）。如上所示：
+
+- 如果label y=1, $$a_v$$和$$a_u$$会靠近query embedding $$p_u$$和item embedding $$p_v$$；
+- 如果label $$y=0$$, 则loss等于0
+
+如图1所示，augmented vectors被用于一个tower中，query/item embeddings会从另一个生成。也就是说，augmented vectors $$a_u$$和$$a_v$$会总结关于一个query或一个item与另一个tower相匹配的高级信息。因为mimic loss是为了更新$$a_u$$和 $$a_v$$，我们应将$$p_u$$和$$p_v$$的值进行freeze。为了这么做，stop gradient策略会用来阻止$$loss_u$$和$$loss_v$$反向梯度传播到$$p_v$$和$$p_u$$。
 
 一旦获得两个augmented vectors $$a_u$$和$$a_v$$，他们会将它们看成了两个towers的input features，来建模在two towers间的信息交叉。最终，模型的output是query embedding和item embedding的inner product：
 
