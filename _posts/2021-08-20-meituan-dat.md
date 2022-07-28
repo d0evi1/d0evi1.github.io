@@ -10,7 +10,7 @@ tags:
 
 # 抽要
 
-许多现代推荐系统具有非常大的item库（corpus），处理大规模检索的工业界方案是，使用two-tower模型来从content features中学习query和item表示。然而，模型通常存在缺失two towers间的信息交互的问题。另外，不均衡的类目数据也会阻碍模型效果。在本paper中，我们提出一个新的模型，称为对偶增强双截模型（Dual Augmented two-tower model: DAT），它会集成一个新的自适应模仿机制（Adaptive-Mimic-Mechanism）以及一个类目对齐Loss（Category Alignment Loss: CAL）。我们的AMM会为每个uqery和item定制一个增强向量（augmented vector）来缓和信息交叉的缺失问题。再者，我们通过对不平衡的类目（uneven categories）进行对齐item representation，我们的CAL可以进一步提升效果。在大规模datasets上的离线实验表示了DAT的优越性。另外，在线A/B testings证实：DAT可以进一步提升推荐质量。
+许多现代推荐系统具有非常大的item库（corpus），处理大规模检索的工业界方案是，使用two-tower模型来从content features中学习query和item表示。**然而，模型通常存在缺失two towers间的信息交互的问题。另外，不均衡的类目数据也会阻碍模型效果**。在本paper中，我们提出一个新的模型，称为对偶增强双塔模型（Dual Augmented two-tower model: DAT），它会集成一个新的**自适应模仿机制（Adaptive-Mimic-Mechanism）**以及一个**类目对齐Loss（Category Alignment Loss: CAL）**。我们的AMM会为每个query和item定制一个增强向量（augmented vector）来缓和信息交叉的缺失问题。再者，我们通过对不平衡的类目（uneven categories）进行对齐item representation，我们的CAL可以进一步提升效果。在大规模datasets上的离线实验表示了DAT的优越性。另外，在线A/B testings证实：DAT可以进一步提升推荐质量。
 
 # 1.介绍
 
@@ -20,38 +20,49 @@ tags:
 
 ## 2.1 问题声明
 
-我们考虑一个推荐系统，它具有一个query set $$\lbrace u_i \rbrace_{i=1}^N$$以及一个item set $$\lbrace v_j \rbrace_{j=1}^M$$，其中：N是users数目，M是items数目。这里，$$u_i, v_j$$是许多features（例如：IDs和content features）的concatenations，由于稀疏性它可以是非常高维的。query-item feedback可以通过一个matrix $$R \in R^{N \times M}$$进行表示，其中：当query i 给出在item j上的一个postive feedback时，$$R_{ij}=1$$；否则为$$R_{ij}=0$$。我们的目标是：给定一个特定query，从整个item corpus中有效选择可能的数千个candidate items。
+我们考虑一个推荐系统，它具有一个query set $$\lbrace u_i \rbrace_{i=1}^N$$以及一个item set $$\lbrace v_j \rbrace_{j=1}^M$$，其中：N是users数目，M是items数目。这里，$$u_i, v_j$$是许多features（例如：IDs和content features）的concatenations，由于稀疏性它可以是非常高维的。query-item feedback可以通过一个matrix $$R \in R^{N \times M}$$进行表示，其中：
+
+- 当query i 给出在item j上的一个postive feedback时，$$R_{ij}=1$$；
+- 否则为$$R_{ij}=0$$。
+
+我们的目标是：给定一个特定query，从整个item corpus中有效选择可能的数千个candidate items。
 
 ## 2.2 对偶增强双塔模型
 
-我们提出的模型框架如图1所示。DAT模型使用一个增强向量（augmented vector）$$a_u(a_v)$$来从其它tower中捕获信息，并将该vector看成是一个tower的input feature。另外，Category Alighment Loss会将从具有大量数据的category中学到知识并迁移到其它categories中。
+我们提出的模型框架如图1所示。DAT模型使用一个增强向量（augmented vector）$$a_u(a_v)$$来从其它tower中捕获信息，并将该vector看成是一个tower的input feature。另外，Category Alignment Loss会将从具有大量数据的category中学到知识并迁移到其它categories中。
 
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/676ac9f50b8cc5a8bf504e170388ff78d5a1f6a45193df3f4362f4a245967f812ad8be417e34d83193ba82318a001249?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
 
-图1
+图1 得出的对偶增强双塔模型的网络架构
 
 ### 2.2.1 Embedding Layer
 
-与two-tower模型相似的是，在$$u_i$$和$$v_j$$中的每个feature $$f_i \in R$$（例如：一个item ID）会通过一个embedding layer，然后被映射到一个低维dense vector $$e_i \in R^K$$中，其中K是embedding维度。特别的，我们定义了一个embedding matrix $$E \in R^{K \times D}$$，其中：E会被学到，D是唯一特征数，embedding vector $$e_i$$是embedding matrix E的第i列。
+与two-tower模型相似的是，在$$u_i$$和$$v_j$$中的每个feature $$f_i \in R$$（例如：一个item ID）会经过一个embedding layer，接着被映射到一个低维dense vector $$e_i \in R^K$$中，其中K是embedding维度。特别的，我们定义了一个embedding matrix $$E \in R^{K \times D}$$，其中：E通过学习得到，D是唯一特征数，embedding vector $$e_i$$是embedding matrix E的第i列。
 
 ### 2.2.2 Dual Augmented layer
 
-对于一个特定query和candidate item，我们会通过它们的IDs来创建相应的增强向量（augmented vectors）$$a_u$$和$$a_v$$，并将它们与feature embedding vectors进行cancatenate一起来获得增强输入向量（augmented input vectors） $$z_u, z_v$$。例如，如果query u具有features "uid=253,city=SH,gender=male,..."，item v具有features "iid=149,price=10,class=cate,..."，我们有：
+对于一个特定query和candidate item，**我们会通过它们的IDs来创建相应的增强向量（augmented vectors）$$a_u$$和$$a_v$$**，并将它们与feature embedding vectors进行cancatenate一起来获得**增强后的输入向量（augmented input vectors）** $$z_u, z_v$$。例如，如果query u具有features "uid=253,city=SH,gender=male,..."，item v具有features "iid=149,price=10,class=cate,..."，我们有：
 
 $$
 z_u = [e_{253} || e_{sh} || e_{male} || \cdots || a_u] \\
-z_v = [e_{149} || e_{p_{10}}] || e_{cate} || \cdots || a_v]
+z_v = [e_{149} || e_{p_{10}} || e_{cate} || \cdots || a_v ]
 $$
 
-其中，“||”表示向量连接操作符（concatenation op)。增强输入向量（augmented input vectors） $$z_u$$和$$z_v$$不仅包含了关于当前query和item的信息，也包含了通过$$a_u$$和$$a_v$$的历史正交叉。
+其中:
 
-接着，我们将$$z_u$$和$$z_v$$ feed到two towers上（它们由使用ReLU的FC layers组成），以便达到在由 $$a_u$$和$$a_v$$的two towers间的信息交叉。接着，FC layers的output会穿过一个L2 normalization layer来获得关于query $$p_u$$和item $$p_v$$的augmented regresentations。正式的，two steps的定义如下：
+- “||”表示向量连接操作符（concatenation op)
+
+增强后的输入向量（augmented input vectors） $$z_u$$和$$z_v$$不仅包含了关于当前query和item的信息，**也包含了通过$$a_u$$和$$a_v$$的历史正交叉**。
+
+接着，我们将$$z_u$$和$$z_v$$ feed到two towers上（它们由使用ReLU的FC layers组成），以便达到在由 $$a_u$$和$$a_v$$的two towers间的信息交叉。接着，FC layers的output会穿过一个L2 normalization layer来获得关于query $$p_u$$和item $$p_v$$的**增强后表示（augmented regresentations）**。正式的，two steps的定义如下：
 
 $$
-h_1 = ReLU(W_1 z + b), \cdots \\
-h_L = ReLU(W_l h_{L-1} + b_l) \\
-p = L2Norm(h_L)
+\begin{align}
+h_1 & = ReLU(W_1 z + b), \cdots \\
+h_L & = ReLU(W_l h_{L-1} + b_l) \\
+p & = L2Norm(h_L)
+\end{align}
 $$
 
 ...(1)
@@ -167,7 +178,7 @@ Amazon Books dataset则相对较小，我们只保持至少被看过5次的items
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/61bdcb95d3b26d83e8a60a34b636264c638880b7fdf1c5e0cf0db26ee19cd8fe108481efd4bde7a694fc80a58b7a5ff7?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 在两个datasets上，在HR@100和MRR上的效果，随着augmented vectors的维度变化
 
 ### 3.4 在线实验
 
@@ -175,7 +186,7 @@ Amazon Books dataset则相对较小，我们只保持至少被看过5次的items
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/98817cc5c3b68c90ea42174709c4411ad5fcced78b0f0300814ab9ecae82871eecd81bf4094551de7156497ce27f991b?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
 
-图3
+图3 DAT的在线效果和baselines
 
 # 4.结论
 
