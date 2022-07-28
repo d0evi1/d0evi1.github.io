@@ -26,6 +26,11 @@ tags:
 
 我们提出的模型框架如图1所示。DAT模型使用一个增强向量（augmented vector）$$a_u(a_v)$$来从其它tower中捕获信息，并将该vector看成是一个tower的input feature。另外，Category Alighment Loss会将从具有大量数据的category中学到知识并迁移到其它categories中。
 
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/676ac9f50b8cc5a8bf504e170388ff78d5a1f6a45193df3f4362f4a245967f812ad8be417e34d83193ba82318a001249?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=1.jpg&amp;size=750">
+
+图1
+
 ### 2.2.1 Embedding Layer
 
 与two-tower模型相似的是，在$$u_i$$和$$v_j$$中的每个feature $$f_i \in R$$（例如：一个item ID）会通过一个embedding layer，然后被映射到一个低维dense vector $$e_i \in R^K$$中，其中K是embedding维度。特别的，我们定义了一个embedding matrix $$E \in R^{K \times D}$$，其中：E会被学到，D是唯一特征数，embedding vector $$e_i$$是embedding matrix E的第i列。
@@ -134,6 +139,10 @@ $$
 
 Amazon Books dataset则相对较小，我们只保持至少被看过5次的items，以及至少看过5个items的用户。我们留下剩下的item作为testing。详细如表1所示。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/f8b92ed9a38adb987c357e35400f3e1cef711699059f5658d1a8be9f6c7bf20f003c03d0e35fde39c2805d1a894e0e43?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=t1.jpg&amp;size=750">
+
+表1
+
 ## 3.2 实验设定
 
 下面的方法被广泛用于工作界，用于与DAT model的对比：
@@ -156,9 +165,17 @@ Amazon Books dataset则相对较小，我们只保持至少被看过5次的items
 
 在DAT中的augmented vector在建模信息交叉上会扮演着一个主要角色，为了分析维度的影响，我们研究了在两个datasets上对应不同augmented vectors维度的DAT效果。如图2所示，在Meituan的DAT的效果提升会随着dimension的增加而获得提升，而在Amazon上的DAT效果提升只发生在首个位置，接着会下降。这是因为两个datasets的数据量的不同造成的。另外，忽略维度外，它总是能达到更好效果，这对augmented vector的有效性作出了解释。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/61bdcb95d3b26d83e8a60a34b636264c638880b7fdf1c5e0cf0db26ee19cd8fe108481efd4bde7a694fc80a58b7a5ff7?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=2.jpg&amp;size=750">
+
+图2
+
 ### 3.4 在线实验
 
 除了离线研究外，我们会通过部署DAT来处理一周的真实流量，系统每天会服务6000w用户。为了做出公平对比，retrieval stage会遵循相同的ranking procedure。在线实验的baseline方法是一个two-tower模型，它是base retrieval算法，会服务online traffic的主要流量。有上百个candidate items通过一个方法进行检索，并feed给ranking stage。图3展示了7个连续天的在线结果。我们的模型效果要胜过baseline一大截，在CTR、GMV上的整体平均提升分别为：4.17%、3.46%。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/98817cc5c3b68c90ea42174709c4411ad5fcced78b0f0300814ab9ecae82871eecd81bf4094551de7156497ce27f991b?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=3.jpg&amp;size=750">
+
+图3
 
 # 4.结论
 
