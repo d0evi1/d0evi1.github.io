@@ -94,7 +94,7 @@ $$
 - 如果label y=1, $$a_v$$和$$a_u$$会靠近query embedding $$p_u$$和item embedding $$p_v$$；
 - 如果label $$y=0$$, 则loss等于0
 
-如图1所示，augmented vectors被用于一个tower中，query/item embeddings会从另一个生成。也就是说，augmented vectors $$a_u$$和$$a_v$$会总结关于一个query或一个item与另一个tower相匹配的高级信息。因为mimic loss是为了更新$$a_u$$和 $$a_v$$，我们应将$$p_u$$和$$p_v$$的值进行freeze。为了这么做，stop gradient策略会用来阻止$$loss_u$$和$$loss_v$$反向梯度传播到$$p_v$$和$$p_u$$。
+如图1所示，augmented vectors被用于一个tower中，query/item embeddings会从另一个生成。**也就是说，augmented vectors $$a_u$$和$$a_v$$会总结关于一个query或一个item与另一个tower相匹配的高级信息。因为mimic loss是为了更新$$a_u$$和 $$a_v$$，我们应将$$p_u$$和$$p_v$$的值进行freeze。为了这么做，会使用stop gradient策略来阻止$$loss_u$$和$$loss_v$$反向梯度传播到$$p_v$$和$$p_u$$**。
 
 一旦获得两个augmented vectors $$a_u$$和$$a_v$$，他们会将它们看成了两个towers的input features，来建模在two towers间的信息交叉。最终，模型的output是query embedding和item embedding的inner product：
 
