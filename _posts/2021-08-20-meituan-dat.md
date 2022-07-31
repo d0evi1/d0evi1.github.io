@@ -10,7 +10,7 @@ tags:
 
 # 抽要
 
-许多现代推荐系统具有非常大的item库（corpus），处理大规模检索的工业界方案是，使用two-tower模型来从content features中学习query和item表示。**然而，模型通常存在缺失two towers间的信息交互的问题。另外，不均衡的类目数据也会阻碍模型效果**。在本paper中，我们提出一个新的模型，称为对偶增强双塔模型（Dual Augmented two-tower model: DAT），它会集成一个新的**自适应模仿机制（Adaptive-Mimic-Mechanism）**以及一个**类目对齐Loss（Category Alignment Loss: CAL）**。我们的AMM会为每个query和item定制一个增强向量（augmented vector）来缓和信息交叉的缺失问题。再者，我们通过对不平衡的类目（uneven categories）进行对齐item representation，我们的CAL可以进一步提升效果。在大规模datasets上的离线实验表示了DAT的优越性。另外，在线A/B testings证实：DAT可以进一步提升推荐质量。
+许多现代推荐系统具有非常大的item库（corpus），处理大规模检索的工业界方案是，使用two-tower模型来从content features中学习query和item表示。**然而，模型通常存在缺失two towers间的信息交互的问题。另外，不均衡的类目数据也会阻碍模型效果**。在本paper中，我们提出一个新的模型，称为对偶增强双塔模型（Dual Augmented two-tower model: DAT），它会集成一个新的**自适应模仿机制（Adaptive-Mimic-Mechanism）**以及一个**类目对齐Loss（Category Alignment Loss: CAL）**。我们的AMM会**为每个query和item定制一个增强向量（augmented vector）**来缓和信息交叉的缺失问题（注：此种实现决定了该方法在工程实现上效率不高）。再者，我们通过对不平衡的类目（uneven categories）进行对齐item representation，我们的CAL可以进一步提升效果。在大规模datasets上的离线实验表示了DAT的优越性。另外，在线A/B testings证实：DAT可以进一步提升推荐质量。
 
 # 1.介绍
 
