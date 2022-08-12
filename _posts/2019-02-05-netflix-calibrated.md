@@ -50,9 +50,18 @@ Calibration在机器学习中是一个通用概念，最近在机器学习算法
 
 该节开发了一种略微更复杂些的思维实验（thought experiment）：我们假设：
 
-每个电影i具有一个不同的概率$$p(i \mid g)$$，它表示用户u决定播放genre g电影的概率。
+- $$p(i \mid g)$$：用户u决定从genre g播放，电影i被播放的概率
 
-之前的示例中，我们已知：$$p(g_r \mid u)$$=0.7 （r: romance movies即爱情片），$$p(g_a \mid u)=0.3$$ （a: action movies即动作片）。假设两个电影集合genres是相互排斥的，用户u播放在genre g上的电影i的概率可以通过以下得到：$$p(i \mid u) = p(i \mid g) \cdot p(g \mid u)$$。为了得到最佳预测accuracy，我们已经找到具有被该用户播放的最高概率$$p(i \mid u)$$的10部电影i。我们考虑下：最可能播放的动作片$$i_{g_a,1}$$（例如：在动作片中排序第1的），以及最可能播放的第10个爱情片$$i_{g_r,10}$$，我们会获得：
+之前的示例中，我们已知：
+
+- $$p(g_r \mid u)=0.7$$ （r: romance movies即爱情片）
+- $$p(g_a \mid u)=0.3$$ （a: action movies即动作片）
+
+假设两个电影集合genres是相互排斥的，用户u播放在genre g上的电影i的概率可以通过以下公式得到：
+
+$$p(i \mid u) = p(i \mid g) \cdot p(g \mid u)$$
+
+为了得到**最佳预测accuracy**，我们必须找到被该用户播放的具有最高概率$$p(i \mid u)$$的10部电影i。我们考虑下：最可能播放的动作片$$i_{g_a,1}$$（例如：在动作片中排序第1的），以及最可能播放的第10个爱情片$$i_{g_r,10}$$，我们会获得：
 
 $$
 \frac{p(i_{g_r,10} | u)}{p(i_{g_a,1} | u)} = \underbrace{\frac{p(i_{g_r,10} | g_r)}{p(i_{g_a,1} | g_a)}}_{\approx 1/2.1} \cdot \underbrace{\frac{p(g_r | u)}{p(g_a | u)}}_{=\frac{0.7}{0.3} \approx 2.33} \approx \frac{2.33}{2.1} > 1
@@ -124,7 +133,7 @@ $$
 
 # 4.Calibration方法
 
-推荐的calibration是一个与list相关的特性（list-property）。由于许多推荐系统以用一种pointwise/pariwise的方式进行训练，在训练中可能不包括calibration。因而建议：对推荐系统的预测列表以post-processing方式进行re-rank，这也是机器学习中一种calibrating常用方法。为了决定N个推荐电影的最优集合$$I^*$$，我们会使用最大间隔相关度（maximum marginal relevance）：
+推荐的calibration是一个与list相关的特性（list-property）。由于许多推荐系统以用一种pointwise/pariwise的方式进行训练，在训练中可能不包括calibration。因而建议：对推荐系统的预测列表以post-processing方式进行re-rank，这也是机器学习中一种calibrating常用方法。为了决定N个推荐电影的最优集合$$I^*$$，我们会使用**最大间隔相关度MMR（maximum marginal relevance）**：
 
 $$
 I^* = \underset{I,|I|=N}{argmax} \lbrace (1-\lambda) \cdot s(I) - \lambda \cdot C_{KL} (p, q(I)) \rbrace
@@ -134,8 +143,8 @@ $$
 
 其中，$$\lambda \in [0, 1]$$决定着两项间的trade-off:
 
-- (1) s(I)：$$s(i)$$表示电影$$i \in I$$被推荐系统预测的scores ，其中：$$s(I) = \sum_{i \in I} s(i)$$。注意，你可以为每个电影的score使用一个单调转换。
-- (2) $$C_{KL}$$：calibration metric(等式4)，我们已经显式表示了在推荐电影I上的q依赖，它会在等式(6)进行优化
+- (1) **s(I)：$$s(i)$$表示电影$$i \in I$$被推荐系统预测的scores**，其中：$$s(I) = \sum_{i \in I} s(i)$$。注意，你可以为每个电影的score使用一个单调转换。
+- (2) **$$C_{KL}$$：calibration metric**(等式4)，我们已经显式表示了在推荐电影I上的q依赖，它会在等式(6)进行优化
 
 同时注意，更好的calibration会引起一个更低的calibration score，因此我们在最大化问题中必须使用它的负值。
 
