@@ -69,15 +69,32 @@ $$
 
 ...(1)
 
-其中，值2.1通过MovieLens 20 Million数据集[13]确定。**在该示例的变种中，第10部爱情片要比最好的动作片具有一个更大的播放概率**。因此，根据accuracy，待推荐的最优的10个titles可以全是爱情片title（没有一部动作片）。
+其中：
+
+- 值2.1通过MovieLens 20 Million数据集[13]确定。**在该示例的变种中，第10部爱情片要比最好的动作片具有一个更大的播放概率**。
+
+因此，**根据accuracy，待推荐的最优的10个titles可以全是爱情片title（没有一部动作片）**。
 
 ## 2.3 LDA
 
-该示例受LDA的启发。LDA描述了一个用户会以一个2-step方式来选择一个电影：用户首先选择一个genre(topic)，然后在该选中genre中选择一个电影(word)。提到LDA有三个原因。
+该示例受LDA的启发。LDA描述了一个用户会以一个2-step方式来选择一个电影：**用户首先选择一个genre(topic)，然后在该选中genre中选择一个电影(word)**。提到LDA有三个原因。
 
-首先，如果我们假设，真实用户选择一部电影会遵循2-step过程，那么LDA模型是合适的模型。当该LDA被训练时，它可以捕获每个用户兴趣的正确平衡(correct balance)，以及正确的比例。因而，当遵循该生成过程时，会得到平衡的推荐，推荐列表会通过一次添加一个title的方式迭代式生成：首先，为用户u学到的genre分布$$p(g \mid u)$$中抽样一个genre g，接着根据genre g从学到的分布$$p(i \mid g)$$中抽样一个电影i。与根据$$p(i \mid u)$$进行ranking的电影相对比，Sampling出来的电影会产生更低的accuracy，其中: $$p(i \mid u) = \sum_g p(i \mid g) \cdot p(g \mid u)$$。原因是，具有较小概率值$$p(i \mid u)$$的电影i，会在接近推荐列表的top位置的被抽样到。相反的，ranking是deterministic的，并能保证：用户u喜欢具有最大概率$$p(i \mid u)$$的电影i，会在推荐列表的top，很明显：如果学到的概率$$p(i \mid u)$$被正确估计，那么可以在test data上达到最佳的accuracy。
+首先，如果我们假设，真实用户选择一部电影会遵循2-step过程，那么LDA模型是合适的模型。当该LDA被训练时，它可以捕获每个用户兴趣的正确平衡(correct balance)，以及正确的比例。因而，当遵循该生成过程时，会得到平衡的推荐，推荐列表会通过一次添加一个title的方式迭代式生成：
 
-略 
+- 首先，为用户u学到的genre分布$$p(g \mid u)$$中抽样一个genre g，
+- 接着根据genre g从学到的分布$$p(i \mid g)$$中抽样一个电影i。
+
+与根据$$p(i \mid u)$$进行ranking的电影相对比，Sampling出来的电影会产生更低的accuracy，其中: 
+
+$$p(i \mid u) = \sum_g p(i \mid g) \cdot p(g \mid u)$$
+
+原因是，具有较小概率值$$p(i \mid u)$$的电影i，会在接近推荐列表的top位置的被抽样到。相反的，ranking是deterministic的，并能保证：用户u喜欢具有最大概率$$p(i \mid u)$$的电影i，会在推荐列表的top，很明显：如果学到的概率$$p(i \mid u)$$被正确估计，那么可以在test data上达到最佳的accuracy。
+
+。。。
+
+第二：注意，unbalanced推荐问题，不论当显示类目（例如：genres）被使用时，还是当使用latent topics或embeddings都会存在。
+
+第三：unbalanced推荐问题会提出：不管一个电影是否属于单个genre（硬分配），或者是否属于多个genres（例如：LDA model）
 
 # 3.Calibration指标
 
