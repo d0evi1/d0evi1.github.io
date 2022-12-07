@@ -23,6 +23,10 @@ inductive node embedding问题是特别难的，对比起转换设置（transduc
 为每个node训练一个不同的embedding vector，我们会训练一个关于aggregator functions的集合，它们会从一个node的局部邻居（local neighborhood）
 （图1）中学习到聚合特征信息（aggregates feature information）。每个aggregator function会从一个远离一个给定结点的不同跳数、搜索深度的信息进行聚合。在测试时，或推断时（inference time），我们使用已训练系统来为整个unseen nodes通过使用学到的aggregation functions来生成embeddings。根据之前在node embeddings生成上的工作，我们设计了一个无监督loss function，它允许GraphSage使用task-specific supervision来进行训练。我们也表明了：GraphSage可以以一个完全监督的方式进行训练。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/2c7b3fe1cd792a1068bd0bd839f5fb073ccdd51cdfaeb519967afaa817db7e62e2caea63bd3369bacdfcadd62032f79e?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
+
+图1
+
 我们会在三个node分类benchmarks上评估我们的算法，它们会测试GraphSAGE的能力来在unseen data上生成有用的embeddings。我们会使用两个演进的document graphs，它们基于citation data和Reddit post data（分别预估paper和post类目），以及基于一个一个蛋白质的相互作用的multi-graph生成实验。使用这些benchmarks，我们展示了我们的方法能够有效生成unseen nodes的表示，效果对比baseline有一个大的提升。。。
 
 # 2.相关工作
@@ -36,6 +40,10 @@ inductive node embedding问题是特别难的，对比起转换设置（transduc
 ## 3.1 Embedding生成算法（例如：forward propagation）
 
 在本节中，我们描述了embedding生成，或者forward propagation算法（算法1），它会假设：模型已经被训练过，并且参数是固定的。特别的，我们会假设：我们已经学到了关于K个aggregator functions的参数（表示为：$$AGGREGATE_k, \forall k \in \lbrace 1,\cdots,K\rbrace$$），它会被用于在模型的不同layers间、或者“搜索深度”上传播信息。第3.2节描述了我们是如何训练这些参数的。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/8d3afb65037d1c67dbf3b89b4b1973f9bd322ac43ccc7e320432466ac6238e5d442763915778694c09baaedb6594c8a7?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=a1.jpg&amp;size=750">
+
+算法1
 
 算法1的背后意图是：在每个迭代中，或者搜索深度上，节点会聚合来自它们的local neighbors的信息；并且随着该过程迭代，nodes会从graph的更进一步达到渐近地获得越来越多的信息。
 
