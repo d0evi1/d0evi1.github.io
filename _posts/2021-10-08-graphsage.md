@@ -20,11 +20,11 @@ standford在《Inductive Representation Learning on Large Graphs》中提出了G
 
 我们提出了一个关于inductive node embedding的general framework，称为**GraphSage（抽样和聚合：SAmple and aggreGatE）**。不同于基于MF的embedding方法，**我们会利用node features（例如：文本属性、node profile信息、node degrees）来学习一个embedding function，它会泛化到unseen nodes上**。通过在学习算法中包含node features，我们会同时学习每个node邻居的拓朴结构，以及在邻居上的node features分布。当我们关注feature-rich graphs（例如：具有文本属性的引文数据、功能/分子标记的生物学数据），我们的方法也会利用出现在所有graphs（例如：node degrees）中的结构化features，因而，我们的算法也会被应用于没有node features的graphs中。
 
-不同于为每个node训练一个不同的embedding vector的方式，**我们的方法会训练一个关于aggregator functions的集合，它们会从一个node的局部邻居（local neighborhood）（图1）中学习到聚合特征信息（aggregates feature information）**。每个aggregator function会从一个远离一个给定结点的不同跳数、搜索深度的信息进行聚合。在测试时，或推断时（inference time），我们使用已训练系统来为整个unseen nodes通过使用学到的aggregation functions来生成embeddings。根据之前在node embeddings生成上的工作，我们设计了一个无监督loss function，它允许GraphSage使用task-specific supervision来进行训练。我们也表明了：GraphSage可以以一个完全监督的方式进行训练。
+不同于为每个node训练一个不同的embedding vector的方式，**我们的方法会训练一个关于aggregator functions的集合，它们会从一个node的局部邻居（local neighborhood）（图1）中学习到聚合特征信息（aggregates feature information）**。每个aggregator function会从一个远离一个给定结点的不同跳数、搜索深度的信息进行聚合。在测试（test）或推断（inference time）时，我们使用已训练系统来为整个unseen nodes通过使用学到的aggregation functions来生成embeddings。根据之前在node embeddings生成方面的工作，我们设计了一个无监督loss function，它允许GraphSage使用task-specific supervision来进行训练。我们也表明了：GraphSage可以以一个完全监督的方式进行训练。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/2c7b3fe1cd792a1068bd0bd839f5fb073ccdd51cdfaeb519967afaa817db7e62e2caea63bd3369bacdfcadd62032f79e?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
-图1
+图1 GraphSAGE抽样和聚合方法的可视化演示
 
 我们会在三个node分类benchmarks上评估我们的算法，它们会测试GraphSAGE的能力来在unseen data上生成有用的embeddings。我们会使用两个演进的document graphs，它们基于citation data和Reddit post data（分别预估paper和post类目），以及基于一个一个蛋白质的相互作用的multi-graph生成实验。使用这些benchmarks，我们展示了我们的方法能够有效生成unseen nodes的表示，效果对比baseline有一个大的提升。。。
 
@@ -46,14 +46,21 @@ standford在《Inductive Representation Learning on Large Graphs》中提出了G
 
 算法1的背后意图是：在每个迭代中，或者搜索深度上，节点会聚合来自它们的local neighbors的信息；并且随着该过程迭代，nodes会从graph的更进一步达到渐近地获得越来越多的信息。
 
-算法1描述了case中的embedding生成过程，其中：整个graph$$G = (V, \epsilon)$$，以及对于所有的nodes $$x_v, \forall v \in V$$的features，会被提供作为input。我们在下面描述了如何生成该过程到minibatch setting中。算法1的外循环中的每个step过程如下，其中：
+算法1描述了case中的embedding生成过程，其中：
+
+- 整个graph$$G = (V, \epsilon)$$，以及对于所有的nodes $$x_v, \forall v \in V$$的features，会被提供作为input。
+
+
+我们在下面描述了如何生成该过程到minibatch setting中。算法1的外循环中的每个step过程如下，其中：
 
 - k表示在外循环（或者搜索深度）中的当前step
 - $$h^k$$表示在该step中一个node的representation
 
-首先，每个node $$v \in V$$会将在它的立即邻居（immediate neighborhood）$$h_u^{k-1}, \forall u \in N(v) \rbrace$$上的nodes 的representations聚合到单个vector $$h_{N(v)}^{k-1}$$中。注意，该聚合step依赖于：在outer loop的前一迭代生成的representations，并且k=0（"bad case"）representations会被定义成input node features。在聚合了邻近的feature vectors之后，GraphSAGE接着会将该node的当前representation $$h_v^{k-1}$$与聚合的邻近vector $$h_{N(v)}^{k-1}$$进行拼接（concatenates），该concatenated vector会通过一个具有非线性activation function $$\sigma$$的fully connected layer进行feed，它会将representations转换成在算法的下一step进行使用（例如：$$h_v^k, \forall v \in V$$）。neighbor representations的聚合可以通过多个aggregator结构来完成，并且我们会在第3.3节中讨论不同的结构选择。
+首先，每个node $$v \in V$$会将在它的立即邻居（immediate neighborhood）$$\lbrace h_u^{k-1}, \forall u \in N(v) \rbrace$$上的nodes 的representations聚合到单个vector $$h_{N(v)}^{k-1}$$中。注意，该聚合step依赖于：在outer loop的前一迭代生成的representations，并且k=0（"bad case"）representations会被定义成input node features。
 
-为了扩展算法1到minibatch setting中，给定一个关于input nodes的集合，我们首先对所需要的neighborhood sets（到深度K）进行forward sample，接着我们在inner loop进行运行，通过替代迭代所有nodes，我们会计算：只有representations必须满足在每个depth上的递归。
+接着，在聚合了邻近的feature vectors之后，GraphSAGE会将该node的当前representation $$h_v^{k-1}$$与聚合的邻近vector $$h_{N(v)}^{k-1}$$进行拼接（concatenates），该concatenated vector会通过一个具有非线性activation function $$\sigma$$的fully connected layer进行feed，它会将representations转换成在算法的下一step进行使用（例如：$$h_v^k, \forall v \in V$$）。neighbor representations的聚合可以通过多个aggregator结构来完成，并且我们会在第3.3节中讨论不同的结构选择。
+
+为了扩展算法1到minibatch setting中，给定一个关于input nodes的集合，**我们首先对所需要的neighborhood sets（到深度K）进行forward sample**，接着我们在inner loop进行运行，通过替代迭代所有nodes，我们会计算：只有representations必须满足在每个depth上的递归。
 
 **与 Weisfeiler-Lehman Isomorphism Test的关系**
 
@@ -99,7 +106,7 @@ $$
 我们的第一个候选 aggregator function是mean aggregator，其中：我们简单地对在$$\lbrace h_u^{k-1}, \forall u \in N(v) \rbrace$$中的vectors做elementwise平均。该mean aggregator接近等于在transductive GCN network中的convolutional propagation rule。特别的，我们可以通过在算法1中的第4和第5行使用下面进行替换，派生一个关于GCN方法的inductive variant：
 
 $$
-h_v^k \leftarrow \sigma(W \cdot MEAN(\lbrace h_v^{k-1} \rbrace \union \lbrace h_u^{k-1}, \forall u \in N(v) \rbrace)
+h_v^k \leftarrow \sigma(W \cdot MEAN(\lbrace h_v^{k-1} \rbrace \cup \lbrace h_u^{k-1}, \forall u \in N(v) \rbrace)
 $$
 
 ...(2)
