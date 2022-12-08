@@ -10,18 +10,17 @@ standford在《Inductive Representation Learning on Large Graphs》中提出了G
 
 # 介绍
 
-在large graphs中的节点（nodes）的低维vector embedding，已经被证明：对于许多预估和图分析任务来说作为feature inputs是很有用的。在node embedding方法的基本思想是：使用降维技术将关于一个node的图邻居的高维信息蒸馏（distill）到一个dense vector embedding中。这些node embeddings可以接着被feed到下游的机器学习系统中，并用于分类、聚类、连接预测等任务中。
+在large graphs中的节点（nodes）的低维vector embedding，已经被证明：对于许多预估和图分析任务来说作为feature inputs是很有用的。在node embedding方法的基本思想是：使用降维技术将关于**一个node的图邻居的高维信息**蒸馏（distill）到一个dense vector embedding中。这些node embeddings可以接着被feed到下游的机器学习系统中，并用于分类、聚类、连接预测等任务中。
 
-然而，之前的工作主要关注于来自单个fixed graph的embedding nodes，许多真实应用，会对于未知nodes、或者全新的subgraphs也能快速生成embeddings。这些归纳能力对于高吞吐、生产环境机器学习系统来说很重要，它会在演进的图上操作、并能总是遇到未知的nodes（例如：在Reddit上的posts、在Youtube上的users和videos）。对于生成node embeddings的一个归纳法来说，会面临着在不同的具有相同形式features的图上的泛化（generalization）：例如：来自一个模式生物的在蛋白质的相互作用图上，训练一个embedding genreator，接着可以很容易使用训练好的模型，来对于新的生物体（organisms）收集来的数据生成node embeddings。
+然而，之前的工作主要关注于来自单个fixed graph的embedding nodes，**许多真实应用，会对于未知nodes、或者全新的subgraphs也能快速生成embeddings**。这些归纳能力对于高吞吐、生产环境机器学习系统来说很重要，它会在演进的图上操作、并能总是遇到未知的nodes（例如：在Reddit上的posts、在Youtube上的users和videos）。对于生成node embeddings的归纳法来说，会面临着在具有相同形式features的各种图上的泛化（generalization）：例如：来自一个模式生物的在蛋白质的相互作用图上，训练一个embedding genreator，接着可以很容易使用训练好的模型，来对于新的生物体（organisms）收集来的数据生成node embeddings。
 
-inductive node embedding问题是特别难的，对比起转换设置（transductive setting），因为泛化到unseen nodes需要将新观察到的subgraphs“安排（aligning）”到算法已经在最优化的node embeddings中。一个inductive framework必须学习去认识一个node的邻居的结构化属性，它能表明节点的在图中的局部角色（local role），以及全局位置（global position）。
+对比起转换设置（transductive setting），**inductive node embedding问题是特别难的，因为泛化到unseen nodes需要将新观察到的subgraphs“安排（aligning）”到已经通过算法最优化好的node embeddings中**。一个inductive framework必须学习去认识一个node的邻居的结构化属性，它能表明节点的在图中的**局部角色（local role）**，以及**全局位置（global position）**。
 
-对于生成node embeddings的大多数已经存在的方法，是天然直推式的（transductive）。绝大多数这些方法，是直接使用MF-based目标来最优化每个节点的embeddings，不会天然生成unseen data，因为他们会在一个单一fixed graph上做出预估。这些方法可以在一个inductive setting环境中被修改来执行，但这些修改版本的计算开销都很大，需要在做出新预估之前额外迭代好几轮gradient descent。一些最近的方法使用卷积操作（convolutional operators）来在图结构上进行学习，能提供一个embedding方法。因此，GCNs（graph convolutional networks）已经被应用到在fixed graph的transductive setting上。在本工作中，我们同时将GCNs扩展到inductive unsupervised learning任务上，并提出一个framework来生成GCN方法，它使用**trainable aggregation function（而不是简单的convolutions）**.
+对于生成node embeddings的大多数已经存在的方法，是天然直推式的（transductive）。绝大多数方法是直接使用MF-based目标来最优化每个节点的embeddings，不会天然生成unseen data，因为他们会在一个单一fixed graph上做出预估。这些方法可以在一个inductive setting环境中被修改来执行，但这些修改版本的计算开销都很大，需要在做出新预估之前额外迭代好几轮gradient descent。一些最近的方法使用卷积操作（convolutional operators）来在图结构上进行学习，能提供一个embedding方法。因此，GCNs（graph convolutional networks）已经被应用到在fixed graph的transductive setting上。在本工作中，我们同时将GCNs扩展到inductive unsupervised learning任务上，并提出一个framework来生成GCN方法，它使用**trainable aggregation function（而不是简单的convolutions）**.
 
-当前工作。我们提出了一个关于inductive node embedding的general framework，称为GraphSage（SAmple and aggreGatE）。不同于基于MF的embedding方法，我们会利用node features（例如：文本属性、node profile信息、node degrees）来学习一个embedding function，它会泛化到unseen nodes上。通过在学习算法中吸到node features，我们会同时学习每个node邻居的拓朴结构，以及在邻居上的node features分布。当我们关注feature-rich graphs（例如：具有文本属性的引文数据、功能/分子标记的生物学数据），我们的方法也会利用出现在所有graphs（例如：node degrees）中的结构化features，因而，我们的算法也会被应用于没有node features的graphs中。
+我们提出了一个关于inductive node embedding的general framework，称为**GraphSage（抽样和聚合：SAmple and aggreGatE）**。不同于基于MF的embedding方法，**我们会利用node features（例如：文本属性、node profile信息、node degrees）来学习一个embedding function，它会泛化到unseen nodes上**。通过在学习算法中包含node features，我们会同时学习每个node邻居的拓朴结构，以及在邻居上的node features分布。当我们关注feature-rich graphs（例如：具有文本属性的引文数据、功能/分子标记的生物学数据），我们的方法也会利用出现在所有graphs（例如：node degrees）中的结构化features，因而，我们的算法也会被应用于没有node features的graphs中。
 
-为每个node训练一个不同的embedding vector，我们会训练一个关于aggregator functions的集合，它们会从一个node的局部邻居（local neighborhood）
-（图1）中学习到聚合特征信息（aggregates feature information）。每个aggregator function会从一个远离一个给定结点的不同跳数、搜索深度的信息进行聚合。在测试时，或推断时（inference time），我们使用已训练系统来为整个unseen nodes通过使用学到的aggregation functions来生成embeddings。根据之前在node embeddings生成上的工作，我们设计了一个无监督loss function，它允许GraphSage使用task-specific supervision来进行训练。我们也表明了：GraphSage可以以一个完全监督的方式进行训练。
+不同于为每个node训练一个不同的embedding vector的方式，**我们的方法会训练一个关于aggregator functions的集合，它们会从一个node的局部邻居（local neighborhood）（图1）中学习到聚合特征信息（aggregates feature information）**。每个aggregator function会从一个远离一个给定结点的不同跳数、搜索深度的信息进行聚合。在测试时，或推断时（inference time），我们使用已训练系统来为整个unseen nodes通过使用学到的aggregation functions来生成embeddings。根据之前在node embeddings生成上的工作，我们设计了一个无监督loss function，它允许GraphSage使用task-specific supervision来进行训练。我们也表明了：GraphSage可以以一个完全监督的方式进行训练。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/2c7b3fe1cd792a1068bd0bd839f5fb073ccdd51cdfaeb519967afaa817db7e62e2caea63bd3369bacdfcadd62032f79e?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
