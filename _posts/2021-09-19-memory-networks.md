@@ -46,7 +46,7 @@ facebook在《MEMORY NETWORKS》中提出了memory networks：
 
 **I component**
 
-component I可以使用标准的预处理：例如：关于文本输入的解析、共指、实体解析。它可以将input编码成一个internal feature representation，例如：将text转换成一个sparse或dense feature vector。
+component I可以使用标准的预处理：例如：关于文本输入的解析、共指、实体解析。**它可以将input编码成一个internal feature representation**，例如：将text转换成一个sparse或dense feature vector。
 
 **G component**
 
@@ -58,28 +58,28 @@ $$
 
 ...(1)
 
-其中，$$H(.)$$是一个选择slot的函数。也就是说，G会更新关于index $$H(x)$$的m，但memory的其它部分不会动。G的许多复杂变量可以回来，并基于当前input x的新证据来更新更早存储的memories。如果input在character和word级别，你可以将inputs（例如：将它们分割成 chunks）进行group，并将每个chunk存储到memory slot中。
+其中：**$$H(.)$$是一个slot选择函数**。也就是说，G会更新关于index $$H(x)$$对应的m，但memory的其它部分不会动。G的许多复杂变种可以回溯并基于当前input x的新证据来更新更早存储的memories。**如果input在character和word级别，你可以将inputs（例如：将它们分割成 chunks）进行group，并将每个chunk存储到memory slot中**。
 
-如果memory很大（例如：考虑Freebase或Wikipedia），你需要将memories进行组织。这可以通过使用前面描述的slot choosing function H来达到：例如，它可以被设计、或被训练、或者通过entity或topoic来存储记忆。因此，出于规模上的效率考虑，G（和O）不需要在所有memories上进行操作：他们可以只在一个关于候选的恢复子集上进行操作（只在合适主题上操作相应的memories）。在我们的实验中，我们会探索一个简单变种。
+如果memory很大（例如：考虑Freebase或Wikipedia），你需要将memories进行合理组织。这可以通过使用前面描述的slot choosing function H来达到：例如，它可以被设计、或被训练、或者通过entity或topoic来存储记忆。因此，出于规模上的效率考虑，G（和O）不需要在所有memories上进行操作：他们可以只在一个关于候选的恢复子集上进行操作（只在合适主题上操作相应的memories）。在我们的实验中，我们会探索一个简单变种。
 
-如果memory变得满了（full），会有一个“遗忘过程（forgetting）”，它通过H来实现，它会选择哪个memory需要被替换，例如：H可以对每个memory的功率（utility）进行打分，并覆盖写掉最少用处的。我们不会在该实验中进行探索。
+**如果memory满了（full），会有一个“遗忘过程（forgetting）”，它通过H来实现，它会选择哪个memory需要被替换**，例如：H可以对每个memory的功率（utility）进行打分，并对用处最少的一个进行覆盖写。我们不会在该实验中进行探索。
 
 **O和R components**
 
-O组件通常负责读取memory和执行inferenece，例如：计算相关的memories并执行一个好的response。R component则通过给定O来生成最终的response。例如，在一个QA过程中，O能找到相关的memories，接着R能生成关于该回答的实际wording，例如：R可以是一个RNN，它会基于output O生成。我们的假设是：如果在这样的memories上没有conditioning，那么这样的RNN会执行很差。
+O组件通常负责读取memory和执行inferenece，例如：计算相关的memories并执行一个好的response。R component则通过给定O来生成最终的response。例如，在一个QA过程中，O能找到相关的memories，接着R能生成关于该回答的实际wording，**例如：R可以是一个RNN，它会基于output O生成**。我们的假设是：如果在这样的memories上没有conditioning，那么这样的RNN会执行很差。
 
 # 3.文本的MEMNN实现
 
-一个memory network的特殊实例是：其中的components是neural networks。我们称之为memory neural networks（MemNNs）。在本节中，我们描述了关于一个MemNN的相对简单实现，它具有文本输入和输出。
+**一个memory network的特殊实例是：其中的components是neural networks。我们称之为memory neural networks（MemNNs）**。在本节中，我们描述了关于一个MemNN的相对简单实现，它具有文本输入和输出。
 
 ## 3.1 基础模型
 
-在我们的基础结构中，I模块会采用一个input text。我们首先假设这是一个句子：也可以是一个事实的声明，或者待回答的一个问题（后续我们会考虑word-based input sequences）。该text会以原始形式被存储到下一个提供的memory slot中，例如：S(x)会返回下一个空的memory slot N：$$m_N = x, N = N+1$$。G模块只会被用来存储该新的memory，因此，旧的memories不会被更新。更复杂的模型会在后续描述。
+在我们的基础结构中，I模块会采用一个input text。我们首先假设这是一个句子：也可以是一个关于事实的statement，或者待回答的一个问题（后续我们会考虑word-based input sequences）。该text会以原始形式被存储到下一个提供的memory slot中，例如：S(x)会返回下一个空的memory slot N：$$m_N = x, N = N+1$$。G模块只会被用来存储该新的memory，因此，旧的memories不会被更新。更复杂的模型会在后续描述。
 
 inference的核心依赖于O和R模块。O模块会通过由给定的x寻找k个supporting memories来生成output features。我们使用k直到2，但该过程会被泛化到更大的k上。对于k=1，最高的scoring supporing memory会被检索：
 
 $$
-o_1 = O_1(x, m) = \underset{argmax}{i=1,\cdots,N} s_O(x, m_i)
+o_1 = O_1(x, m) = \underset{i=1,\cdots,N}{argmax} s_O(x, m_i)
 $$
 
 ...(2)
@@ -87,7 +87,7 @@ $$
 其中，$$s_O$$是一个函数，它会对在sentenses x和$$m_i$$的pair间的match程度进行打分。例如：k=2，我们接着找到一个second supporting memory，它基于前一迭代给出：
 
 $$
-o_2 = O_2(x, m) =  \underset{argmax}{i=1,\cdots,N} s_o([x, m_{o_1}], m_i)
+o_2 = O_2(x, m) =  \underset{i=1,\cdots,N}{argmax} s_o([x, m_{o_1}], m_i)
 $$
 
 ...(3)
@@ -97,12 +97,12 @@ $$
 最终，R需要生成一个文本response r。最简单的response是返回$$m_{o_k}$$，例如：输出我们检索的之前公开的句子。为了执行真实的句子生成，我们可以采用一个RNN来替代。在我们的实验中，我们也会考虑一个简单的评估折中方法，其中，我们会通过将它们排序，将文本响应限制到单个word（输出的所有words会在模型中被见过）：
 
 $$
-r = \underset{argmax}{w \in W} s_R([x, m_{o_1}, m_{o_2}], w)
+r = \underset{w \in W}{argmax} s_R([x, m_{o_1}, m_{o_2}], w)
 $$
 
 ...(4)
 
-其中，W是字典中所有words的集合，并且$$S_R$$是一个关于match程度的得分函数。
+其中：W是字典中所有words的集合，并且$$S_R$$是一个关于match程度的得分函数。
 
 一个示例任务如图1所示。为了回答该问题：x = "where is the milk now?"，O module会首先对所有memories进行打分，例如：所有之前见过的句子，与x相反来检索最可能相关的事实：该case中的$$m_{o_1}$$="Joe left the milk"。接着，它会由给定的$$[x, m_{o_1}]$$再次搜索该memory来找出第二可能的fact，也就是 $$m_{o_2} = "joe travelled to the office"$$（Joe在倒掉牛奶之前到过的最后的地方）。最终，R module使用等式(4)对给定的$$[x, m_{o_1}, m_{o_2}]$$的words进行打分，并输出 r = "office"。
 
@@ -114,7 +114,7 @@ $$
 
 ...(5)
 
-其中，U是一个$$n \times D$$的矩阵，其中，D是features的数目，n是embedding的维度。$$\phi_x$$和$$\phi_y$$的角色是，将原始文本映射到D维feature space中。最简单的feature space是选择一个BOW的representation，我们为$$s_O$$选择 $$D = 3 \mid W \mid$$，例如，在字典中的每个word会具有三个不同的representations：一个是为$$\phi_y(.)$$，另一个是为$$\phi_x(.)$$，依赖于关于input arguments的words是否来自于实际的input x或者来自于supporting memories，以便他们可以不同方式建模。相似的，我们会为$$S_R$$使用$$D=3\mid W \mid$$。$$S_O$$和$$S_R$$会使用不同的weight矩阵$$U_O$$和$$U_R$$。
+其中：U是一个$$n \times D$$的矩阵，其中，D是features的数目，n是embedding的维度。$$\phi_x$$和$$\phi_y$$的角色是，将原始文本映射到D维feature space中。最简单的feature space是选择一个BOW的representation，我们为$$s_O$$选择 $$D = 3 \mid W \mid$$，例如，在字典中的每个word会具有三个不同的representations：一个是为$$\phi_y(.)$$，另一个是为$$\phi_x(.)$$，依赖于关于input arguments的words是否来自于实际的input x或者来自于supporting memories，以便他们可以不同方式建模。相似的，我们会为$$S_R$$使用$$D=3\mid W \mid$$。$$S_O$$和$$S_R$$会使用不同的weight矩阵$$U_O$$和$$U_R$$。
 
 图1
 
