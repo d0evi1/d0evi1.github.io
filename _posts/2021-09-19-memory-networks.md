@@ -11,19 +11,23 @@ facebook在《MEMORY NETWORKS》中提出了memory networks：
 
 # 摘要
 
-我们描述了一种新的学习模型，称为：memory networks。memory networks会让inference components与一个long-term meory component进行组合；他们会学习如何使用这些联合机制。long-term memory可以读取和写入，目标是使用它进行预估。我们会在QA场景对这些模型进行研究，其中，long-term memory会有效扮演着一个动态的knowledge base，输出是一个textual response。我们会在一个大规模QA任务上对它们进行评估，并从一个仿真世界生成一个很少并且复杂的toy task。在后者，我们展示了这些模型的强大之处，它们会将多个支持的句子串联来回答需要理解动词强度的问题.
+我们描述了一种称为"memory networks"的新学习模型。memory networks会让inference components与一个long-term meory component进行组合；他们会学习如何使用这些联合机制。其中：long-term memory可以读取和写入，我们的目标是使用它进行预估。我们会在QA场景对该模型进行研究，其中，long-term memory会有效扮演着一个动态的knowledge base，输出是一个textual response。我们会在一个大规模QA任务上对它们进行评估，并从一个仿真世界生成一个很少并且复杂的toy task。在后者，我们展示了这些模型的强大之处，它们会将多个支持的句子串联来回答需要理解动词强度的问题.
 
 # 1.介绍
 
-大多数机器学习模型缺少一种简单方式来读取和写入long-term memory component的部分，并将它与inference进行无缝组合。因而，他们不能利用一个现代计算机的最大优点。例如，考虑这样一个任务：告诉一个事实或故事的集合，接着回答该主题相关的问题。原则上，这会通过一个语言建模器（language modeler，比如：RNN）来达到。因为这些模型会被训练：当读取一个words流后，预测关输出下一个word(s)或者集合。然而，它们的memory（通过hidden states和weights进行encode）通常很小，没有被分得足够开来准确记住来自过往知识的事实（知识会被压缩到dense vectors中）。RNNs很难执行记忆，例如：简单的copying任务：读入一个句子输出相同的句子（Zaremba 2014）。其它任务也类似，例如：在视觉和音频领域，需要long-term memory来watch一个电影并回答关于它的问题。
+大多数机器学习模型缺少一种简单方式来读取和写入long-term memory component的部分，并将它与inference进行无缝组合。因而，他们不能利用现代计算机的最大优势。例如，**考虑这样一个任务：告诉一个关于事实（facts）或故事（story）的集合，接着回答与该主题相关的问题**。通常这会通过一个语言建模器（language modeler，比如：RNN）来达到。这些模型会被训练成：当读取一个words流后，预测并输出下一个word(s)或者集合。**然而，它们的memory（通过hidden states和weights进行encode）通常很小，没有被分得足够开来准确记住来自过往知识的事实（知识会被压缩到dense vectors中）**。RNNs很难执行记忆，例如：简单的copying任务：读入一个句子输出相同的句子（Zaremba 2014）。其它任务也类似，例如：在视觉和音频领域，需要long-term memory来watch一个电影并回答关于它的问题。
 
 在本工作中，我们介绍了一种新的模型，称为memory networks，它会尝试解决该问题。中心思想是：通过将成功的学习策略（其它机器学习文献中）进行组合，使用可读可写的memory component进行inference。该模型接着会被训练来学习如何有效操作memory component。我们引入了第二节中的通用框架，并提出一个在文本领域关于QA的指定实现。
 
 # 2.Memory Networks
 
 一个memory network包含了：
-- 1个memory： m（一个通过使用$$m_i$$索引的objects的数组）
-- 4个components：I、G、O、R
+
+- **1个memory： m**（一个通过使用$$m_i$$索引的objects的数组）
+- **4个components：I、G、O、R**
+
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/df77a6b0a0322e52f31f301b3d788899df7247fbae7386965839ecfafe955ca8fdfc6f9e6017cb58e390d87b53c01b0b?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
 其中：
 - I（input feature map）: 将incoming input转换成内部的feature representation
@@ -38,11 +42,15 @@ facebook在《MEMORY NETWORKS》中提出了memory networks：
 - 3.给定new input和该memories，计算output features o：$$o = O(I(x), m)$$
 - 4.最终，将output features o解码给出最终的response: $$r = R(o)$$
 
-该过程会同时被应用到train和test时，但在这样的过程间存在差别，也就是说，memories会在test time时被存储，但I、G、O、R模型参数不会被更新。Memory networks会覆盖许多种可能实现。I、G、O、R的components可以潜在使用任何机器学习文献的思想：例如：使用你最喜欢的模型（SVMs，或者decision trees等）
+该过程会同时被应用到train和test时，但在这样的过程间存在差别，也就是说，**memories会在test time时已经被存储下来，但I、G、O、R模型参数不会被更新**。Memory networks会覆盖许多种可能实现。I、G、O、R的components可以潜在使用任何机器学习文献的思想：例如：使用你最喜欢的模型（SVMs，或者decision trees等）
 
-- I component：component I可以使用标准的预处理：例如：关于文本输入的解析、共指、实体解析。它可以将input编码成一个internal feature representation，例如：将text转换成一个sparse或dense feature vector。
+**I component**
 
-- G component：G的最简单形式是，将I(x)存储到在memory中的一个"slot"上：
+component I可以使用标准的预处理：例如：关于文本输入的解析、共指、实体解析。它可以将input编码成一个internal feature representation，例如：将text转换成一个sparse或dense feature vector。
+
+**G component**
+
+G的最简单形式是，将I(x)存储到在memory中的一个"slot"上：
 
 $$
 m_{H(x)} = I(x)
@@ -56,7 +64,9 @@ $$
 
 如果memory变得满了（full），会有一个“遗忘过程（forgetting）”，它通过H来实现，它会选择哪个memory需要被替换，例如：H可以对每个memory的功率（utility）进行打分，并覆盖写掉最少用处的。我们不会在该实验中进行探索。
 
-- O和R components：O组件通常负责读取memory和执行inferenece，例如：计算相关的memories并执行一个好的response。R component则通过给定O来生成最终的response。例如，在一个QA过程中，O能找到相关的memories，接着R能生成关于该回答的实际wording，例如：R可以是一个RNN，它会基于output O生成。我们的假设是：如果在这样的memories上没有conditioning，那么这样的RNN会执行很差。
+**O和R components**
+
+O组件通常负责读取memory和执行inferenece，例如：计算相关的memories并执行一个好的response。R component则通过给定O来生成最终的response。例如，在一个QA过程中，O能找到相关的memories，接着R能生成关于该回答的实际wording，例如：R可以是一个RNN，它会基于output O生成。我们的假设是：如果在这样的memories上没有conditioning，那么这样的RNN会执行很差。
 
 # 3.文本的MEMNN实现
 
