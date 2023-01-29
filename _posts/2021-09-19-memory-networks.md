@@ -118,12 +118,14 @@ $$
 
 ...(5)
 
-其中：U是一个$$n \times D$$的矩阵，其中，D是features的数目，n是embedding的维度。$$\phi_x$$和$$\phi_y$$的角色是，将原始文本映射到D维feature space中。最简单的feature space是选择一个BOW的representation，我们为$$s_O$$选择 $$D = 3 \mid W \mid$$，例如，在字典中的每个word会具有三个不同的representations：一个是为$$\phi_y(.)$$，另一个是为$$\phi_x(.)$$，依赖于关于input arguments的words是否来自于实际的input x或者来自于supporting memories，以便他们可以不同方式建模。相似的，我们会为$$S_R$$使用$$D=3\mid W \mid$$。$$S_O$$和$$S_R$$会使用不同的weight矩阵$$U_O$$和$$U_R$$。
+其中：U是一个$$n \times D$$的矩阵（D是features的数目，n是embedding的维度）。$$\phi_x$$和$$\phi_y$$的角色是，将原始文本映射到D维feature space中。**最简单的feature space是选择一个BOW的representation**，我们为$$s_O$$选择 $$D = 3 \mid W \mid$$，例如，在字典中的每个word会具有三个不同的representations：一个是为$$\phi_y(.)$$，另一个是为$$\phi_x(.)$$，依赖于关于input arguments的words是否来自于实际的input x或者来自于supporting memories，以便他们可以不同方式建模。相似的，我们会为$$S_R$$使用$$D=3\mid W \mid$$。$$S_O$$和$$S_R$$会使用不同的weight矩阵$$U_O$$和$$U_R$$。
 
 **training** 我们以一个fully supervised setting方式训练，其中给定想要的inputs和responses，supporting sentences会在训练数据中被标记（在test data中，我们只输了inputs）。也就是说，在训练期间，我们知道在等式 （2）和(3)中的max functions的最佳选择。训练会接着使用一个margin ranking loss和SGD来执行。特别的，对于一个给定的question x，它具有true response r，supporting sentences $$m_{o_1}$$和$$m_{o_2}$$（当k=2），我们会通过模型参数$$U_O$$和$$U_R$$进行最小化：
 
 $$
-
+\sum\limits{\bar{f} \neq m_{o_1}} max(0, \gamma - s_O(x, m_{o_1}) + s_O(x, \bar{f})) +  \\
+\sum\limits{\bar{f}' \neq m_{o_2}} max(0, \gamma - s_O([x, m_{o_1}], m_{o_2}) + s_O([x, m_{o_1}, \bar{f}'])) + \\
+\sum\limits{\bar{r} \neq r} max(0, \gamma - s_R([x, m_{o_1}, m_{o_2}], r) + s_R([x, m_{o_1}, m_{o_2}], \bar{r}))
 $$
 
 ...(6)(7)(8)
