@@ -34,7 +34,7 @@ facebook在《MEMORY NETWORKS》中提出了memory networks，在另一文《End
 
 ## 2.1 Single Layer
 
-我们在single layer的case中开始描述我们的模型，它会实现一个单个memory hop操作。我们接着展示了它可以被stack来给出在memory上的多跳。
+我们先在single layer的case中开始描述我们的模型，它会实现一个单个memory hop操作。后续我们会展示可以对它进行stack来给出在memory上的多跳。
 
 **Input memory representation**
 
@@ -71,6 +71,8 @@ $$
 ...(3)
 
 整体模型如图1(a)所示。在训练期间，所有三个embedding matrics A, B, C，以及W都通过最小化$$\hat{a}$$和 true label a间的一个标准的cross-entropy loss进行联合学习。训练会使用SGD进行执行。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/94708c16686231fa048d6b94012a468218e8d74777e30b3e98cd3d8e5b77558801005da5a75a405c8b0004f76facebe5?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
 图1
 
