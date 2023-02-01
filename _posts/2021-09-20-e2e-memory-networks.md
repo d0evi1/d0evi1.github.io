@@ -98,8 +98,8 @@ $$
 
 我们探索了在模型中两种类型的weight tying机制：
 
-- 1.Adjacent：一个layer的output embedding是下一个的input embedding，例如：$$A^{k+1} = C^k$$。我们也会限制：a) answer prediction matrix会与最终的output embedding相似，例如：$$W^T = C^K$$， b) question embedding会与第一层的input embedding相匹配，例如：$$B = A^1$$
-- 2.Layer-wise（RNN-like）：input和output embeddings对于不同的layers是相同的，例如：$$A^1 = A^2 = \cdots = A^K$$以及$$C^1 = C^2 = \cdots = C^K$$。我们已经发现：添加一个线性映射H到在hops间的u的update上是有用的；也就是说：$$u^{k+1} = H u^k + o^k$$。该mapping会随着剩余参数学习，并在我们的实验上用于layer-wise weight tying。
+- 1.**Adjacent：一个layer的output embedding是下一个的input embedding**，例如：$$A^{k+1} = C^k$$。我们也会限制：a) answer prediction matrix会与最终的output embedding相似，例如：$$W^T = C^K$$， b) question embedding会与第一层的input embedding相匹配，例如：$$B = A^1$$
+- 2.**Layer-wise（RNN-like）：input和output embeddings对于不同的layers是相同的**，例如：$$A^1 = A^2 = \cdots = A^K$$以及$$C^1 = C^2 = \cdots = C^K$$。我们已经发现：添加一个线性映射H到在hops间的u的update上是有用的；也就是说：$$u^{k+1} = H u^k + o^k$$。该mapping会随着剩余参数学习，并在我们的实验上用于layer-wise weight tying。
 
 图1(b)展示了一个3-layer版本。总体上，它与[23]中的Memory Network相似，除了每一layer中的hard max操作已经使用了一个来自softmax的continuous weighting替换外。
 
