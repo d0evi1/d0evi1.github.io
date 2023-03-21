@@ -12,13 +12,17 @@ google在2021《Self-supervised Learning for Large-scale Item Recommendations》
 
 # 介绍
 
-在本paper中关注的推荐任务是：给定一个query，从一个很大的item catalog中找出最相关的items。large-scale item推荐的问题已经被多个应用广泛使用。取决于query的类型，一个推荐任务可以是：
+在本paper中关注的推荐任务是：给定一个query，从一个很大的item catalog中找出与该query最相关的items。large-scale item推荐的问题已经被多个应用广泛使用。一个推荐任务可以根据query类型划分为：
 
-- i) 个性化推荐： 当query是一个用户时
-- ii) item to item推荐：当query是一个item时
-- iii) 搜索（search）：当query是一个自由文本片段时。
+- i) 个性化推荐： 此时query是一个用户
+- ii) item to item推荐：此时query是一个item
+- iii) 搜索（search）：此时query是一个自由文本片段
 
 为了建模一个query和一个item间的交叉，广告使用的方法是：embedding-based neural networks。推荐任务通常被公式化为一个极端分类问题：其中每个item被表示成在output space中的一个dense vector。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/e635c8c69de7b04db764f8679d51e4761195b2696b801784c14acf1ea289781bd37aa5cbdda663d7be68da932e0da2e1?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
+
+图1 
 
 该paper主要关注于two-tower DNNs（见图1），它在许多真实推荐系统中很常见。在本架构中，一个neural network会将item features集合编码成一个embedding，使得它可以用于检索cold-start items。另外，two-tower DNN结构使得可以实时serving大量的items，将一个top-k NN搜索问题转成一个NIPS（Maximum-Inner-Product Search），可以在sublinear的复杂度中求解。
 
@@ -69,6 +73,10 @@ $$
 ...(3)
 
 其中：$$\tau$$是一个对于softmax temperature可调的超参数。上述的loss function学习了一个健壮的embedding space，使得：在数据增强后相似items会相互更近些，随机样本则会被push更远。整个框架如图2所示。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/d3acfa0a979fb7e545601b12960598267648e850559562452436a8ea62e189fc9f9c71adc566efa468ed3f16772a6fac?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
+
+图2
 
 **Encoder结构**
 
@@ -134,6 +142,11 @@ $$
 **不同样本分布（Heterogeneous Sample Distribution）**
 
 来自$$D_{train}$$的边缘item分布（The marginal item distribution）通常会遵循二八定律（power-law）。因此，对于$$L_{self}$$使用training item分布会造成学到的feature关系会偏向于head items。作为替代，对于$$L_{self}$$我们会从corpus中均匀抽样items。换句话说，$$D_{item}$$是均匀item分布。实际上，我们发现：**对于main task和ssl tasks使用不同分布（Heterogeneous Distribution）对于SSL能达到更优效果来说非常重要**。
+
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/09fc357b71ed182bb3daa52290ae81b9a0ef8fa04a6621951c4a4b72a30c342369d9ccf7cd72d7c45b72c3120a1b4e4f?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
+
+图3
 
 **Main task的loss**
 
