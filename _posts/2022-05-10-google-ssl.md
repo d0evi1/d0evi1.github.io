@@ -122,12 +122,12 @@ $$
 
 我们引入了数据增强，例如，在图2中的h和g。给定一个item features的集合，**关键思想是：通过将部分信息进行masking，创建两个augmented examples**。一个好的transformation和data augmentation应在该数据上做出最少的假设，以便它可以被应用于大量任务和模型上。**masking的思想受BERT中的Masked Language Modeling的启发**。不同于sequential tokens，**features的集合不会有顺序**，使得masking方式是一个开放问题， 我们会通过探索特征相关性（feature corelation）来找到masking模式。我们提出了相关特征masking（Correlated Feature Masking (CFM)），通过知道feature correlations，对于categorical features进行裁剪。
 
-在详究masking细节前，我们首先提出一种two-stage augmentation算法。注意，无需augmentation，input layer会通过将所有categorical featuresr embeddings进行concatenating来创建。该two-stage augmentation包含：
+在详究masking细节前，我们首先提出一种two-stage augmentation算法。注意，无需augmentation，**input layer会通过将所有categorical features embeddings进行concatenating的方式来创建**。该two-stage augmentation包含：
 
-- Masking：通过在item features集合上使用一个masking模式。我们会在input layer上使用一个缺省的 embedding来表示被masked的features。
-- Dropout：对于多个值的categorical features，我们会使用一定概率来丢弃掉每个值。它会进一步减少input信息，并增加SSL任务的hardness
+- Masking：通过在item features集合上使用一个masking pattern。我们会在input layer上使用一个缺省embedding来表示被masked的features。
+- Dropout：对于多个值的categorical features，我们会：对于每个值都一定概率来丢弃掉。它会进一步减少input信息，并增加SSL任务的hardness
 
-masking阶段可以被解释成一个关于dropout 100%的特例，我们的策略是互补masking（complementary masking）模式，我们会将feature set分割成两个排它的feature sets到两个增强样本上。特别的，我们可以随机将feature set进行split到两个不相交的subsets上。我们将这样的方法为Random Feature Masking（RFM），它会使用作为我们的baselines。我们接着介绍Correlated Feature Masking(CFM) ，其中，当创建masking patterns时，我们会进一步探索feature相关性。
+masking step可以被解释成一个关于dropout 100%的特例，我们的策略是互补masking模式（complementary masking pattern），我们会将feature set分割成两个互斥的feature sets到两个增强样本上。特别的，**我们可以随机将feature set进行split到两个不相交的subsets上。我们将这样的方法为Random Feature Masking（RFM），它会使用作为我们的baselines**。我们接着介绍Correlated Feature Masking(CFM) ，其中，当创建masking patterns时，我们会进一步探索feature相关性。
 
 **Categorical Feature的互信息**
 
