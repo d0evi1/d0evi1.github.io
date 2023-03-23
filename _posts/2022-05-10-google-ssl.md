@@ -147,12 +147,12 @@ $$V_i, V_j$$表示它们的vocab sets。所有features的pairs的互信息可以
 
 有了预计算互信息，我们提出Correlated Feature Masking (CFM)，对于更有意义的SSL任务，它会利用feature-dependency patterns。对于masked features的集合，$$F_m$$，我们会寻找将高度相关的features一起进行mask。我们会：
 
-- 首先从所有可能的features $$F=\lbrace f_1, \cdots, f_k \rbrace$$中均匀抽样一个seed feature $$f_{feed}$$；
-- 接着根据与$$f_{seed}$$的互信息，选择top-n个最相关的features $$F_c = \lbrace f_{c,1}, \cdots, f_{c,n} \rbrace$$。我们会选择$$n = \lfloor k / 2 \floor$$，以便关于features的masked set和retained set，会具有完全相同的size。我们会变更每个batch的seed feature，以便SSL任务可以学习多种masking patterns。
+- 首先从所有可能的features $$F=\lbrace f_1, \cdots, f_k \rbrace$$中，均匀抽样一个seed feature $$f_{feed}$$；
+- 接着根据与$$f_{seed}$$的互信息，**选择top-n个最相关的features $$F_c = \lbrace f_{c,1}, \cdots, f_{c,n} \rbrace$$。我们会选择$$n = \lfloor k / 2 \floor$$**，以便关于features的masked set和retained set，会具有完全相同的size。我们会变更每个batch的seed feature，以便SSL任务可以学习多种masking patterns。
 
 ## 3.3 Multi-task训练
 
-，为了确保SSL学到的representations可以帮助提升主要监督任务（比如：回归或分类）的学习，我们会利用一个 multi-task training策略，其中：主要(main)监督任务和辅助(auxiliary) SSL任务会进行联合优化（jointly optimized）。准确的，
+为了确保SSL学到的representations可以帮助提升主要监督任务（比如：回归或分类）的学习，我们会利用一个 multi-task training策略，其中：主要(main)监督任务和辅助(auxiliary) SSL任务会进行联合优化（jointly optimized）。准确的，
 
 - $$\lbrace (q_i, x_i)\rbrace$$是一个关于query-item pairs的batch，它从训练数据分布$$D_{train}$$抽样得到；
 - $$\lbrace x_i \rbrace$$是一个从item分布$$D_{item}$$抽样得到的items的batch；
