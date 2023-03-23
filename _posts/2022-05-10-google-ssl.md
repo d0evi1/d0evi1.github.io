@@ -139,11 +139,16 @@ $$
 
 ...(4)
 
-其中，$$V_i, V_j$$表示它们的词汇集合（vocab sets）。所有features的pairs的互信息可以被预计算好。
+其中：
+
+$$V_i, V_j$$表示它们的vocab sets。所有features的pairs的互信息可以被预计算好。
 
 **相关特征掩码（Correlated Feature Masking）**
 
-有了预计算互信息，我们提出Correlated Feature Masking (CFM)，对于更有意义的SSL任务，它会利用feature-dependency patterns。对于masked features的集合，$$F_m$$，我们会寻找将高度相关的features一起进行mask。我们会首先从所有可能的features $$F=\lbrace f_1, \cdots, f_k \rbrace$$中均匀抽样一个seed feature $$f_{feed}$$；接着根据与$$f_{seed}$$的互信息，选择top-n个最相关的features $$F_c = \lbrace f_{c,1}, \cdots, f_{c,n} \rbrace$$。我们会选择$$n = \lceil k / 2 \rceil$$，以便关于features的masked and retained set，会具有完全相同的size。我们会变更每个batch的seed feature，以便SSL任务可以学习多种masking patterns。
+有了预计算互信息，我们提出Correlated Feature Masking (CFM)，对于更有意义的SSL任务，它会利用feature-dependency patterns。对于masked features的集合，$$F_m$$，我们会寻找将高度相关的features一起进行mask。我们会：
+
+- 首先从所有可能的features $$F=\lbrace f_1, \cdots, f_k \rbrace$$中均匀抽样一个seed feature $$f_{feed}$$；
+- 接着根据与$$f_{seed}$$的互信息，选择top-n个最相关的features $$F_c = \lbrace f_{c,1}, \cdots, f_{c,n} \rbrace$$。我们会选择$$n = \lfloor k / 2 \floor$$，以便关于features的masked set和retained set，会具有完全相同的size。我们会变更每个batch的seed feature，以便SSL任务可以学习多种masking patterns。
 
 ## 3.3 Multi-task训练
 
