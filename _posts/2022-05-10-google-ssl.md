@@ -172,16 +172,16 @@ $$
 
 **不同样本分布（Heterogeneous Sample Distribution）**
 
-来自$$D_{train}$$的边缘item分布（The marginal item distribution）通常会遵循二八定律（power-law）。因此，对于$$L_{self}$$使用training item分布会造成学到的feature关系会偏向于head items。作为替代，对于$$L_{self}$$我们会从corpus中均匀抽样items。换句话说，$$D_{item}$$是均匀item分布。实际上，我们发现：**对于main task和ssl tasks使用不同分布（Heterogeneous Distribution）对于SSL能达到更优效果来说非常重要**。
+来自$$D_{train}$$的边缘item分布（The marginal item distribution）通常会遵循二八定律（power-law）。因此，**对于$$L_{self}$$使用training item分布会造成学到的feature关系会偏向于head items**。作为替代，对于$$L_{self}$$我们会从corpus中均匀抽样items。换句话说，$$D_{item}$$是均匀item分布。实际上，我们发现：**对于main task和ssl tasks使用不同分布（Heterogeneous Distribution）对于SSL能达到更优效果来说非常重要**。
 
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/09fc357b71ed182bb3daa52290ae81b9a0ef8fa04a6621951c4a4b72a30c342369d9ccf7cd72d7c45b72c3120a1b4e4f?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
 
-图3
+图3 模型结构：带SSL的two-tower model。在SSL任务中，我们会在item features上使用feature masking和dropout来学习item embeddings。整个item tower（红色）会与supervised task共享
 
 **Main task的loss**
 
-对于依赖objectives的main loss来说有多个选择。在本paper中，对于优化top-k accuracy，我们考虑batch softmax loss。详细的，如果$$q_i, x_i$$是关于query和item样本$$(q_i, x_i)$$的embeddings（它会通过两个neural networks编码得到），接着对于一个关于pairs $$\lbrace (q_i, x_i) \rbrace_{i=1}^N$$的batch和temperature $$\tau$$，batch softmax cross entropy loss为：
+**对于依赖objectives的main loss来说有多个选择**。在本paper中，对于优化top-k accuracy，我们考虑batch softmax loss。详细的，如果$$q_i, x_i$$是关于query和item样本$$(q_i, x_i)$$的embeddings（它会通过两个neural networks编码得到），接着对于一个关于pairs $$\lbrace (q_i, x_i) \rbrace_{i=1}^N$$的batch和temperature $$\tau$$，batch softmax cross entropy loss为：
 
 $$
 L_{main} = - \frac{1}{N} \sum\limits_{i \in [N]} log \frac{exp(s(q_i, x_i)/\tau)}{\sum_{j \in [N]} exp(s(q_i, x_j) / \tau)}
@@ -189,7 +189,7 @@ $$
 
 ...(6)
 
-其它Baselines。如第2节所示，对于main task，我们使用two-tower DNNs作为baseline模型。对比起经典的MF和分类模型，two-tower模型对于编码item features具有独特性。前两种方法可以被用于大规模item检索，但他们只基于IDs学到item embeddings，不符合使用SSL来利用item feature relations。
+其它Baselines。如第2节所示，对于main task，我们使用two-tower DNNs作为baseline模型。对比起经典的MF和分类模型，two-tower模型对于编码item features具有独特性。前两种方法可以被用于大规模item检索，**但他们只基于IDs学到item embeddings**，不符合使用SSL来利用item feature relations。
 
 
 
