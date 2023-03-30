@@ -39,7 +39,7 @@ wechat在《Reweighting Clicks with Dwell Time in Recommendation》中提出了�
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ad72d479603dc8f4ff46ea0f301b27e709f1dde356b560bf4a08495e394ebf6b630b57ad306090bec4a4623d3addfb43?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
-图2 
+图2 log dwell time在我们系统中的趋势（左）以及normalized dwell time的趋势（右）
 
 简单做法是：直接设置一个共享的dwell time阈值来收集有效阅读。然而，简单依赖阈值来定义有效阅读，会不可避免地忽略掉关于轻度用户和short items的大量行为信息。因此，我们定义了三种类型的user-item clicks作为我们的合法阅读行为：
 
