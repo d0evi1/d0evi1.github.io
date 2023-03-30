@@ -1,4 +1,4 @@
- ---
+---
 layout: post
 title:  Dwell Time Modeling介绍
 description: 
@@ -9,24 +9,27 @@ tags:
 
 wechat在《Reweighting Clicks with Dwell Time in Recommendation》中提出了一种基于停留时长加权的建模：
 
-
 # 2.模型设计与分析
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/faf185aa65c3b51289631f1a4ad89fcd104cf779b168e2fe151ea869e1d49d17883f103a9a65b59c0e71d2578b67e756?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
+
+图1 
 
 ## 2.1 Dwell Time Modeling
 
-用户真正需要什么样的推荐？最近研究表明：对于CTR，停留时长（dweill time）更会影响用户的真实满意度。然而，直接最优化原始的dwell time会导致模型过度增强具有long total duration的items，使得重度用户和long items会主宰模型训练。
+用户真正需要什么样的推荐？最近研究表明：对于CTR，停留时长（dweill time）更会影响用户的真实满意度。然而，直接对原始的dwell time进行最优化会导致模型过度增强具有long total duration的items，使得重度用户和long items会主宰模型训练。
 
 我们相信：用户使用推荐系统的中心诉求是获得信息。因此，我们会返回：在dwell time、信息增益、用户偏好间的关系本质，并做出以下猜想：
 
-- (A1) 对于不同的items和users，具有相同dwell time的正信号是相当的。因为他们通常表示会具有相同的time cost，对每个人公平
-- (A2) 用户需要一个最小的dwell time，以便从items获得信息。太短的dwell time表示着非常少的收益
-- (A3) 当当前dwell time足够长时，信息增益（information gain）会逐渐随着dwell time的增加而递减。
+- **(A1) 对于不同的items和users交互，具有相同dwell time，则正信号是相当的**。因为他们通常表示会具有相同的time cost，对每个人公平
+- **(A2) 用户需要一个最小的dwell time，以便从items获得信息**。太短的dwell time表示着非常少的收益
+- **(A3) 当前dwell time足够长时，信息增益（information gain）会逐渐随着dwell time的增加而递减**。
 
 基于这些，我们在click reweighting中使用一个normalized dwell time function作为一个更好的监督信号来定义有效阅读（valid read）.
 
 ## 2.2 有效阅读选择（valid read selection）
 
-有效阅读是高质量点击行为，可以更好反映用户的真实偏好，它通过dwell time来天然选择。对于dwell time的一个更深理解，我们会抽取点击数随不同log dwell time的趋势。图2左可以看到：
+有效阅读是高质量点击行为，可以更好反映用户的真实偏好，它可以通过dwell time来天然选择。对于dwell time的一个更深理解，我们会抽取点击数随不同log dwell time的趋势。图2左可以看到：
 
 - 1) 总体上，我们可以假设：log dwell time具有一个近似高斯分布，例如： $$lnT=\mu + \sigma \epsilon$$，其中：T是一个random dwell time，$$\epsilon \sim N(0,1)$$。
 - 2) 我们会将$$[\mu-\sigma, \mu + \sigma]$$看成是主要的dwell time区间
@@ -34,7 +37,9 @@ wechat在《Reweighting Clicks with Dwell Time in Recommendation》中提出了�
 
 根据上述假设A2和A3，具有过短和过长的dwell time的点击行为在click reweighting上会被降级。
 
-图2
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ad72d479603dc8f4ff46ea0f301b27e709f1dde356b560bf4a08495e394ebf6b630b57ad306090bec4a4623d3addfb43?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
+
+图2 
 
 简单做法是：直接设置一个共享的dwell time阈值来收集有效阅读。然而，简单依赖阈值来定义有效阅读，会不可避免地忽略掉关于轻度用户和short items的大量行为信息。因此，我们定义了三种类型的user-item clicks作为我们的合法阅读行为：
 
