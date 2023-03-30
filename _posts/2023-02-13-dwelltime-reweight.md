@@ -72,9 +72,9 @@ $$
 
 图2（右）展示了$$T_N$$的趋势。对比起log dwell time，$$T_N$$会使用设置好的rates单调增加，其中：offset和$$\tau$$本质上是满足C1和C2的参数。
 
-- offset决定了具有最大梯度的dwell time point。对于C1，我们会设置：$$offset = exp(\mu - \sigma)$$来使得normalized dwell time在有效阅读/无效阅读边界上具有最大的梯度，它会基于supervised training与有效阅读很好的一起协作。
-- $$\tau$$定义了dwell time曲线的sharpness。对于C2，我们定义了一个upper阈值 $$x_h$$作为$$exp(\mu + \sigma)$$，假设：比$$x_h$$更大的dwell time T对$$T_N$$没啥贡献（例如：$$T_N$$提升$$x_h \rightarrow T$$要小于最小精度，例如：在系统中为1e-5）。$$\tau$$被设置成满合$$x_h$$的上述假设。
-- A和B是超参数，可以将$$T_N$$归一化成$$[0, T_{max}]$$，其中：$$T_{max}$$是当前在线dwell time模型的最大dwell time值。我们将normalized dwell time范围保持不变，减少可能的不匹配问题。
+- offset：决定了具有最大梯度的dwell time point。对于C1，我们会设置：$$offset = exp(\mu - \sigma)$$来使得normalized dwell time在有效阅读/无效阅读边界上具有最大的梯度，它会基于supervised training与有效阅读很好的一起协作。
+- $$\tau$$：定义了dwell time曲线的sharpness。对于C2，我们定义了一个upper阈值 $$x_h$$作为$$exp(\mu + \sigma)$$，假设：比$$x_h$$更大的dwell time T对$$T_N$$没啥贡献（例如：$$T_N$$提升$$x_h \rightarrow T$$要小于最小精度，例如：在系统中为1e-5）。$$\tau$$被设置成满合$$x_h$$的上述假设。
+- A和B：是超参数，可以将$$T_N$$归一化成$$[0, T_{max}]$$，**其中：$$T_{max}$$是当前在线dwell time模型的最大dwell time值**。我们将normalized dwell time范围保持不变，减少可能的不匹配问题。
 
 最终，基于上述讨论，我们设置：$$offset=15, \tau = 20, A = 2.319, B = 0.744$$来满足C1和C2 。 我们也对这些参数做了grid search，发现当前setting可以达到最好的在线效果。
 
