@@ -80,7 +80,7 @@ $$
 
 ## 2.4 Click Reweighting
 
-有效阅读和normalized dwell time被设置成过滤噪声，选出符合点击的分位数，以便更好的进行学习。在click reweighting中，我们采用一个multi-task learning框架来进行有效阅读预估（valid read prediction）以及加权有效阅读预估（weighted valid read prediction）。特别的，我们会进行一个共享bottom来跨任务共享原始的user/item features。
+有效阅读和normalized dwell time被设置成过滤噪声，选出符合点击的分位数，以便更好的进行学习。在click reweighting中，我们采用一个multi-task learning框架来进行有效阅读预估（valid read prediction）以及**加权有效阅读预估（weighted valid read prediction）**。特别的，我们会进行一个共享bottom来跨任务共享原始的user/item features。
 
 对于valid read tower，我们会采用一个3- layer MLP，它会采用原始user/item features $$f_u, f_{d_i}$$作为inputs，并输出用户u在item $$d_i$$上的预估点击概率$$P_{u, d_i}$$。接着，有效阅读loss $$L_v$$定义如下：
 
@@ -90,7 +90,11 @@ $$
 
 ...(2)
 
-$$S_p$$和$$S_n$$表示正样本集（有效阅读）和负样本集（无效点击和未点击）。相似的对于weighted valid read tower，我们直接使用normalized dwell time $$T_N^{u, d_i}$$作为每个$$(u, d_i)$$的weight。另一个3-layer MLP会被用来输出预估点击概率$$P_{u,d_i}^'$$。加权有效阅读tower接着会在loss $$L_w$$下被训练：
+其中：
+
+- $$S_p$$和$$S_n$$表示正样本集（有效阅读）和负样本集（无效点击和未点击）。
+
+相似的对于weighted valid read tower，**我们直接使用normalized dwell time $$T_N^{u, d_i}$$作为每个$$(u, d_i)$$的weight**。另一个3-layer MLP会被用来输出预估点击概率$$P_{u,d_i}'$$。加权有效阅读tower接着会在loss $$L_w$$下被训练：
 
 $$
 L_w = \sum\limits_{(u,d_j) \in S_n} T_N^{(u,d_j)} log(1 - P_{u,d_j}') - \sum\limits_{(u,d_i) \in S_p} T_N^{(u,d_i)} log P_{u,d_i}'
