@@ -28,11 +28,11 @@ $$
 
 ## 3.2 建模方法
 
-我们采用一个two-tower DNN模型结构来计算logits $$\eplison(x,y)$$。
+我们采用一个two-tower DNN模型结构来计算logits $$\epsilon(x,y)$$。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a722d6b90f78dcc3e66ef1f65570841b9068aa42521a6a52c54693833f8be64a9fb4c6c8deac795fdd03eeb98dac090d?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
-图1
+图1 双塔结构
 
 如图1所示，left tower和right tower会分别学习query和item的latent representations。正式的，我们通过函数$$u(x; \theta)$$和$$v(y; \theta)$$来分别表示两个towers，它们会将query features x和item features y映射到一个共享的embedding space上。这里$$\theta$$表示所有的模型参数。该模型会输出query和item embeddings的内积作为等式(1)中的logits：
 
@@ -40,10 +40,15 @@ $$
 \epsilon(x, y) = <u(x;\theta), v(y;\theta)>
 $$
 
-出于简单，我们会将u表示成：一个给定query x的的embedding，$$v_j$$表示从corpus C中的item j的embedding。对于一个$$\lbrace query(x), item(y_l, postive \ label) \rbrace$$pair的cross-entropy loss变为：
+出于简单，我们会：
+
+- u表示成一个给定query x的的embedding
+- $$v_j$$表示从corpus C中的item j的embedding
+
+对于一个$$\lbrace query(x), item(y_l, postive \ label) \rbrace$$pair的cross-entropy loss变为：
 
 $$
-L = - log(P(y_l | x)) = - log(\frac{e^{<u, u_l>}}{\sum_{j \in C} e^{<u, v_j>}})
+L = - log(P(y_l | x)) = - log(\frac{e^{<u, v_l>}}{\sum_{j \in C} e^{<u, v_j>}})
 $$
 
 ...(3)
@@ -51,17 +56,17 @@ $$
 对等式(2)根据参数$$\theta$$做梯度，给出：
 
 $$
-\Delta_{\theta} (- log P(y_l | x))  \\
-    = - \Delta_{\theta}(<u, v_l>) + \sum\limits \frac{e^{<u,v_j>}}{\sum_{j \in C} e^{<u, v_j>}} \Delta_{\theta}(<u, v_j>)   \\
-    = - \Delta_{\theta}(<u, v_l>) + \sum\limits_{j \in C} P(y_j | x) \Delta_{\theta}(<u, v_j>)
+\nabla_{\theta} (- log P(y_l | x))  \\
+    = - \Delta_{\theta}(<u, v_l>) + \sum\limits \frac{e^{<u,v_j>}}{\sum_{j \in C} e^{<u, v_j>}} \nabla_{\theta}(<u, v_j>)   \\
+    = - \nabla_{\theta}(<u, v_l>) + \sum\limits_{j \in C} P(y_j | x) \Delta_{\theta}(<u, v_j>)
 $$
 
-第二项表示：$$\Delta_{\theta}(<u, v_j>)$$是对于$$P(\cdot \mid x)$$（指的是target分布）的期望（expectation）。通常在大的corpus上对所有items计算第二项是不实际的。因此，我们会通过使用importance sampling的方式抽样少量items来逼近该期望（expectation）。
+第二项表示：$$\nabla_{\theta}(<u, v_j>)$$是对于$$P(\cdot \mid x)$$（指的是target分布）的期望（expectation）。通常在大的corpus上对所有items计算第二项是不实际的。因此，我们会通过使用importance sampling的方式抽样少量items来逼近该期望（expectation）。
 
 特别的，我们会从corpus中使用一个预定义分布Q来抽样一个items子集$$C'$$，其中$$Q_j$$是item j的抽样概率（sampling probability），并用来估计等式(3)中的第二项：
 
 $$
-E_P [\Delta_{\theta}(<u, v_j>)] \approx_{j \in C'} \frac{w_j}{\sum_{j' \in C'} w_{j'}} \Delta_{\theta}(<u, v_j>)
+E_P [\nabla_{\theta}(<u, v_j>)] \approx_{j \in C'} \frac{w_j}{\sum_{j' \in C'} w_{j'}} \nabla_{\theta}(<u, v_j>)
 $$
 
 ...(4)
