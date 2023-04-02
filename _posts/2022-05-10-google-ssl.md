@@ -124,7 +124,7 @@ $$
 
 ## 3.2 two-stage data augmentation
 
-我们引入了数据增强，例如，在图2中的h和g。给定一个item features的集合，**关键思想是：通过将部分信息进行masking，创建两个augmented examples**。一个好的transformation和data augmentation应在该数据上做出最少的假设，以便它可以被应用于大量任务和模型上。**masking的思想受BERT中的Masked Language Modeling的启发**。不同于sequential tokens，**features的集合不会有顺序**，使得masking方式是一个开放问题， 我们会通过探索特征相关性（feature corelation）来找到masking模式。我们提出了相关特征masking（Correlated Feature Masking (CFM)），通过知道feature correlations，对于categorical features进行裁剪。
+我们引入了**数据增强，例如：在图2中的h和g**。给定一个item features的集合，**关键思想是：通过将部分信息进行masking，创建两个augmented examples**。一个好的transformation和data augmentation应在该数据上做出最少的假设，以便它可以被应用于大量任务和模型上。**masking的思想受BERT中的Masked Language Modeling的启发**。不同于sequential tokens，**features的集合不会有顺序**，使得masking方式是一个开放问题， 我们会通过探索特征相关性（feature corelation）来找到masking模式。我们提出了**相关特征masking（Correlated Feature Masking (CFM)）**，通过知道feature correlations，对于categorical features进行裁剪。
 
 在详究masking细节前，我们首先提出一种two-stage augmentation算法。注意，无需augmentation，**input layer会通过将所有categorical features embeddings进行concatenating的方式来创建**。该two-stage augmentation包含：
 
