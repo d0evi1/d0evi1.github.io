@@ -102,21 +102,25 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/d3acfa0a979fb7e545601b12960598267648e850559562452436a8ea62e189fc9f9c71adc566efa468ed3f16772a6fac?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
-图2 self-suprevised learning框架说明。两个数据增强h和g会被应用到input上；encoders H和G会被应用到增强样本$$y_i$$和$$y_i'$$来生成embeddings $$z_i$$和$$z_i'$$。SSL loss $$L_{self} w.r.t. z_i$$会朝着最大化与$$z_i'$$的相似度，并且最小化$$z_j$$和$$z_j'$$的相似度进行
+图2 self-suprevised learning框架说明。两个数据增强h和g会被应用到input上；encoders H和G会被应用到增强样本$$y_i$$和$$y_i'$$来生成embeddings $$z_i$$和$$z_i'$$。SSL loss $$L_{self} w.r.t. z_i$$会朝着最大化与$$z_i'$$的相似度、以及最小化$$z_j$$和$$z_j'$$的相似度的方式进行
 
 **Encoder结构**
 
-对于categorical features的输入样本，**通常在其上使用一个input layer和一个multi-layer perceptron（MLP）来构建H, G**。input layer通常是一个关于normalized dense features和多个sparse feature embeddings的concatenation，其中，sparse feature embeddings是学到的representations，会存储在embedding tables中（作为对比，CV和语言模型的input layers，会直接作用于raw inputs中）。为了使用SSL对监督学习更容易，对于network H和G，我们会共享的sparse features的embedding table。这取决于数据增强(h, g)的技术，H和G的MLPs可以被完全或部分共享。
+对于categorical features的输入样本，**通常在其上使用一个input layer和一个multi-layer perceptron（MLP）来构建H, G**。
+
+- input layer：通常是一个关于normalized dense features和多个sparse feature embeddings的concatenation，其中，sparse feature embeddings是学到的representations，会存储在embedding tables中（作为对比，CV和语言模型的input layers，会直接作用于raw inputs中）。
+
+为了使用SSL对监督学习更容易，对于network H和G，我们会**共享sparse features的embedding table**。这取决于数据增强(h, g)的技术，H和G的MLPs可以被完全或部分共享。
 
 **Connection with Spread-out Regularization**
 
-如果是这样的特征：(h,g)是identical map, H,G是相同的neural network，在等式(3)中的loss function退化为：
+如果是这样的特征：(h,g)是相同的map, H,G是相同的neural network，在等式(3)中的loss function退化为：
 
 $$
-- N^{-1} \sum_i log \frac{exp(1/\tau)}{ exp(1 / \tau) + \sum_{j \neq i} exp(s(z_i, z_j) / \tau)}
+-\frac{1}{N} \sum_i log \frac{exp(1/\tau)}{ exp(1 / \tau) + \sum_{j \neq i} exp(s(z_i, z_j) / \tau)}
 $$
 
-**它会鼓励不同样本的representations具有很小的cosine相似度**。该loss与[41]中引入的e spread-out regularization相近，除了：原始提出会使用square loss，例如：$$N^{-1} \sum_i \sum_{j \neq i} <z_i, z_j>^2$$，会替代softmax。spread-out regularization已经被证明是会改进大规模检索模型的泛化性。在第4节中，我们展示了，引入特定的数据增强，使用SSL-based regularization可以进一步提升模型效果。
+**它会鼓励不同样本的representations具有很小的cosine相似度**。该loss与[41]中引入的e spread-out regularization相近，除了：原文建议使用square loss，例如：$$\frac{1}{N} \sum\limits_i \sum\limits_{j \neq i} \langle z_i, z_j \rangle^2$$，而非softmax。spread-out regularization已经被证明是会改进大规模检索模型的泛化性。在第4节中，我们展示了，引入特定的数据增强，使用SSL-based regularization可以进一步提升模型效果。
 
 ## 3.2 two-stage data augmentation
 
