@@ -151,10 +151,10 @@ $$V_i, V_j$$表示它们的vocab sets。**所有features的pairs的互信息可�
 
 **相关特征掩码（Correlated Feature Masking）**
 
-有了**预计算好的互信息**，我们提出Correlated Feature Masking (CFM)，对于更有意义的SSL任务，它会利用feature-dependency patterns。对于masked features的集合，$$F_m$$，我们会寻找将高度相关的features一起进行mask。我们会：
+有了**预计算好的互信息**，我们提出Correlated Feature Masking (CFM)，对于更有意义的SSL任务，它会利用feature-dependency patterns。对于masked features的集合$$F_m$$，我们会寻找将高度相关的features一起进行mask。我们会：
 
 - 首先从所有可能的features $$F=\lbrace f_1, \cdots, f_k \rbrace$$中，均匀抽样一个seed feature $$f_{feed}$$；
-- 接着根据与$$f_{seed}$$的互信息，**选择top-n个最相关的features $$F_c = \lbrace f_{c,1}, \cdots, f_{c,n} \rbrace$$。我们会选择$$n = \lfloor k / 2 \floor$$**，以便关于features的masked set和retained set，会具有完全相同的size。我们会变更每个batch的seed feature，以便SSL任务可以学习多种masking patterns。
+- 接着根据与$$f_{seed}$$的互信息，**选择top-n个最相关的features $$F_c = \lbrace f_{c,1}, \cdots, f_{c,n} \rbrace$$。我们会选择$$n = \lfloor k / 2 \rfloor$$**，以便关于features的masked set和retained set，会具有完全相同的size。我们**会变更每个batch的seed feature**，以便SSL任务可以学习多种masking patterns。
 
 ## 3.3 Multi-task训练
 
@@ -187,7 +187,11 @@ $$
 
 **Main task的loss**
 
-**对于依赖objectives的main loss来说有多个选择**。在本paper中，对于优化top-k accuracy，我们考虑batch softmax loss。详细的，如果$$q_i, x_i$$是关于query和item样本$$(q_i, x_i)$$的embeddings（它会通过两个neural networks编码得到），接着对于一个关于pairs $$\lbrace (q_i, x_i) \rbrace_{i=1}^N$$的batch和temperature $$\tau$$，batch softmax cross entropy loss为：
+**对于依赖objectives的main loss来说有多个选择**。在本paper中，对于优化top-k accuracy，我们考虑batch softmax loss。详细的，如果：
+
+- $$q_i, x_i$$是关于query和item样本$$(q_i, x_i)$$的embeddings（它会通过两个neural networks编码得到），
+
+那么对于一个关于pairs $$\lbrace (q_i, x_i) \rbrace_{i=1}^N$$的batch和temperature $$\tau$$，batch softmax cross entropy loss为：
 
 $$
 L_{main} = - \frac{1}{N} \sum\limits_{i \in [N]} log \frac{exp(s(q_i, x_i)/\tau)}{\sum_{j \in [N]} exp(s(q_i, x_j) / \tau)}
