@@ -18,13 +18,13 @@ google在2021《Self-supervised Learning for Large-scale Item Recommendations》
 - ii) item to item推荐：此时query是一个item
 - iii) 搜索（search）：此时query是一个自由文本片段
 
-为了建模一个query和一个item间的交叉，广告使用的方法是：embedding-based neural networks。推荐任务通常被公式化为一个极端分类问题：其中每个item被表示成在output space中的一个dense vector。
+为了建模一个query和一个item间的交叉，广告使用的方法是：embedding-based neural networks。推荐任务通常被公式化为一个**极端分类问题（extreme classification problem）：其中每个item被表示成在output space中的一个dense vector**。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/e635c8c69de7b04db764f8679d51e4761195b2696b801784c14acf1ea289781bd37aa5cbdda663d7be68da932e0da2e1?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
 图1 模型结构：使用 query和 item representations的Two-tower DNN
 
-该paper主要关注于two-tower DNNs（见图1），它在许多真实推荐系统中很常见。在该结构中，一个neural network会将一个item features的集合编码成一个embedding，使得它甚至适用于检索cold-start items。另外，two-tower DNN结构使得可以实时serving大量的items，将一个top-k NN搜索问题转成一个NIPS（Maximum-Inner-Product Search），可以在sublinear的复杂度中求解。
+该paper主要关注于two-tower DNNs（见图1），它在许多真实推荐系统中很常见。在该结构中，一个neural network会将一个item features的集合编码成一个embedding，使得它甚至适用于检索cold-start items。另外，two-tower DNN结构使得可以实时serving大量的items，将一个top-k NN搜索问题转成一个**NIPS（Maximum-Inner-Product Search）**，可以在sublinear的复杂度中求解。
 
 Embedding-based deep models通常具有大量参数，因为他们会使用高维embeddings进行构建，可以表示高维稀疏features，比如：topics或item IDs。在许多已经存在的文献中，训练这些模型的loss functions会被公式化为一个监督学习问题。监督学习需求收集labels（比如：clicks）。现代推荐系统会从用户侧收集数十亿的footprints，并提供大量的训练数据来构建deep models。然而，当它建模一个大量items问题时，数据仍会非常稀疏，因为：
 
@@ -37,7 +37,7 @@ Embedding-based deep models通常具有大量参数，因为他们会使用高�
 - 在NLU中，masked language任务会在BERT模型中被引入，来帮助提升语言模型的预训练。
 - 相似的，其它预训练任务（比如：预估周围句子、将wikipedia文章中的句子进行链接）已经被用于提升dual-encoder type models.
 
-对比起常规则的监督学习，SSL提供互补目标（complementary objectives），来消除人工收集labels的前提。另外，SSL可以利用input features的内部关系来自主发现好的语义表示。
+对比起常规则的监督学习，**SSL提供互补目标（complementary objectives），来消除人工收集labels的前提**。另外，SSL可以利用input features的内部关系来自主发现好的语义表示。
 
 SSL在CV和NLP中的广泛使用，但在推荐系统领域还没有被研究过。最近的研究[17,23,41]，会研究一些正则技术，它用来设计强制学到的表示（例如：一个multi-layer perception的output layer），不同样本会相互远离，在整个latent embedding space中分散开来。尽管SSL中共享相似的精神，这些技术不会显式构建SSL任务。对比起CV和NLU应用中的建模，推荐模型会使用极度稀疏的input，其中高维categorical featurers是one-hot（）编码的，比如：item IDs或item categories。这些features通常被表示为在深度模型中的可学习embedding vectors。由于在CV和NLU中大多数模型会处理dense input，创建SSL任务的已存在方法不会直接应用于在推荐系统中的稀疏模型。最近，一些研究研究SSL来改进在推荐系统中的sequential user modeling。。。。
 
@@ -53,8 +53,8 @@ SSL在CV和NLP中的广泛使用，但在推荐系统领域还没有被研究过
 
 受SimCLR框架的启发，对于visual representation learning，我们采用相似的对比学习算法来学习categorical features的表示。基本思想是两部分：
 
-- 首先，对于相似的训练样本，我们使用不同的数据增强来进行学习表示；
-- 接着使用contrastive loss函数来鼓励从相同训练样本中学习的representations是相似的。contrastive loss会被用于训练two-tower DNNs（见：[23, 39]），尽管这里的目标是：使得正样本（postive item）会与它相应的queries一致。
+- 首先，对于相似的训练样本，我们**使用不同的数据增强**来进行学习表示；
+- 接着使用contrastive loss函数来**鼓励从相同训练样本中学习的representations是相似的**。contrastive loss会被用于训练two-tower DNNs（见：[23, 39]），尽管这里的目标是：使得正样本（postive item）会与它相应的queries一致。
 
 我们会考虑关于N个item样本的一个batch：$$x_1, \cdots, x_N$$，
 
@@ -71,7 +71,7 @@ $$
 给定关于样本i的相同输入，我们希望学习在增强后（augmentation）不同的表示$$y_i, y_i'$$，确认模型仍能识别$$y_i$$和$$y_i'$$代表相同的input i。
 
 - 换句话说，contrastive loss会学习**最小化在$$y_i, y_i'$$间的不同之处**
-- 同时，对于不同的样本i和j，contrastive loss会**最大化在数据不同增强后在学到的$$y_i, y_i'$$间的representations的不同之处**
+- 同时，对于不同的样本i和j，contrastive loss会**最大化在数据进行不同增强后在学到的$$y_i, y_i'$$间的representations的不同之处**
 
 假设：$$z_i, z_i'$$表示通过两个nueral networks $$H, G: \rightarrow R^d$$对$$y_i, y_i'$$进行编码后的embeddings，也就是说：
 
@@ -86,7 +86,7 @@ $$
 - $$z_i, z_i'$$看成是postive pairs
 - $$(z_i, z_j')$$看成是negative pairs，其中：$$i \neq j$$
 
-假设：$$s(z_i, z_j') = <z_i,z_j'> / \| z_i \| \cdot \|z_j'\|$$。为了鼓励上述的属性，我们将一个关于N个样本$$\lbrace  x_i \rbrace$$的batch的SSL loss定义为：
+假设：$$s(z_i, z_j') = \frac{<z_i,z_j'>}{\| z_i \| \cdot \|z_j'\|}$$（即余弦相似度）。为了鼓励上述的属性，我们将一个关于N个样本$$\lbrace  x_i \rbrace$$的batch的SSL loss定义为：
 
 $$
 L_{self} ( \lbrace x_i \rbrace; H, G) := -\frac{1}{N} \sum\limits_{i \in [N]} log \frac{exp(s(z_i, z_i')) / \tau}{\sum\limits_{i \in [N]} exp(s(z_i, z_j'))/ \tau}
@@ -191,11 +191,13 @@ $$
 
 其它Baselines。如第2节所示，对于main task，我们使用two-tower DNNs作为baseline模型。对比起经典的MF和分类模型，two-tower模型对于编码item features具有独特性。前两种方法可以被用于大规模item检索，**但他们只基于IDs学到item embeddings**，不符合使用SSL来利用item feature relations。
 
-
-
 # 4.离线实验
+
+## 4.1 
+
+表1展示了wikipedia和AAI datasets的一些基础状态。图4展示了两个datasets的最高频items的CDF，它表示了一个高度倾斜的数据分布。例如，在AAI dataset中top 50 items会在训练数据中占据10%。
 
 评估
 
 
-[https://dl.acm.org/doi/pdf/10.1145/3459637.3481952]{https://dl.acm.org/doi/pdf/10.1145/3459637.3481952}
+[https://dl.acm.org/doi/pdf/10.1145/3459637.3481952](https://dl.acm.org/doi/pdf/10.1145/3459637.3481952)
