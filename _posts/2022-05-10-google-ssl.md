@@ -128,14 +128,16 @@ $$
 
 在详究masking细节前，我们首先提出一种two-stage augmentation算法。注意，无需augmentation，**input layer会通过将所有categorical features embeddings进行concatenating的方式来创建**。该two-stage augmentation包含：
 
-- Masking：通过在item features集合上使用一个masking pattern。我们会在input layer上使用一个缺省embedding来表示被masked的features。
-- Dropout：对于多个值的categorical features，我们会：对于每个值都一定概率来丢弃掉。它会进一步减少input信息，并增加SSL任务的hardness
+- Masking：通过在item features集合上使用一个masking pattern。我们会在input layer上**使用一个缺省embedding来表示被masked的features**。
+- Dropout：**对于multi-value的categorical features，我们会：对于每个值都一定概率来丢弃掉**。它会进一步减少input信息，并增加SSL任务的hardness
 
 masking step可以被解释成一个关于dropout 100%的特例，我们的策略是互补masking模式（complementary masking pattern），我们会将feature set分割成两个互斥的feature sets到两个增强样本上。特别的，**我们可以随机将feature set进行split到两个不相交的subsets上。我们将这样的方法为Random Feature Masking（RFM），它会使用作为我们的baselines**。我们接着介绍Correlated Feature Masking(CFM) ，其中，当创建masking patterns时，我们会进一步探索feature相关性。
 
 **Categorical Feature的互信息**
 
-如果整个feature set具有k个feature， 一旦masked features集合以随机方式选择，(h, g)必须从$$2^k$$个不同的masking patterns上抽样得到，这对于SSL任务会天然地导致不同效果。**例如，SSL contrastive learning任务必须利用在两个增强样本间高度相关features的shortcut，这样可以使SSL任务太easy**。为了解决该问题，我们提出将features根据feature相关性进行分割，通过互信息进行measure。两个类别型features的互信息如下：
+如果整个feature set具有k个feature， 一旦masked features集合以随机方式选择，(h, g)必须从$$2^k$$个不同的masking patterns上抽样得到，这对于SSL任务会天然地导致不同效果。**例如，SSL contrastive learning任务必须利用在两个增强样本间高度相关features的shortcut，这样可以使SSL任务太easy**。
+
+为了解决该问题，我们提出将features根据feature相关性进行分割，**通过互信息进行measure**。两个类别型features的互信息如下：
 
 $$
 MI(V_i, V_j) = \sum\limits_{v_i \in V_i, v_j \in V_j} P(v_i, v_j) log \frac{P(v_i, v_j)}{P(v_i)p(v_j)}
@@ -145,11 +147,11 @@ $$
 
 其中：
 
-$$V_i, V_j$$表示它们的vocab sets。所有features的pairs的互信息可以被预计算好。
+$$V_i, V_j$$表示它们的vocab sets。**所有features的pairs的互信息可以被预计算好**。
 
 **相关特征掩码（Correlated Feature Masking）**
 
-有了预计算互信息，我们提出Correlated Feature Masking (CFM)，对于更有意义的SSL任务，它会利用feature-dependency patterns。对于masked features的集合，$$F_m$$，我们会寻找将高度相关的features一起进行mask。我们会：
+有了**预计算好的互信息**，我们提出Correlated Feature Masking (CFM)，对于更有意义的SSL任务，它会利用feature-dependency patterns。对于masked features的集合，$$F_m$$，我们会寻找将高度相关的features一起进行mask。我们会：
 
 - 首先从所有可能的features $$F=\lbrace f_1, \cdots, f_k \rbrace$$中，均匀抽样一个seed feature $$f_{feed}$$；
 - 接着根据与$$f_{seed}$$的互信息，**选择top-n个最相关的features $$F_c = \lbrace f_{c,1}, \cdots, f_{c,n} \rbrace$$。我们会选择$$n = \lfloor k / 2 \floor$$**，以便关于features的masked set和retained set，会具有完全相同的size。我们会变更每个batch的seed feature，以便SSL任务可以学习多种masking patterns。
