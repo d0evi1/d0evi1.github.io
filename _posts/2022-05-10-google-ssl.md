@@ -194,7 +194,7 @@ $$
 那么对于一个关于pairs $$\lbrace (q_i, x_i) \rbrace_{i=1}^N$$的batch和temperature $$\tau$$，batch softmax cross entropy loss为：
 
 $$
-L_{main} = - \frac{1}{N} \sum\limits_{i \in [N]} log \frac{exp(s(q_i, x_i)/\tau)}{\sum_{j \in [N]} exp(s(q_i, x_j) / \tau)}
+L_{main} = - \frac{1}{N} \sum\limits_{i \in [N]} log \frac{exp(s(q_i, x_i)/\tau)}{\sum\limits_{j \in [N]} exp(s(q_i, x_j) / \tau)}
 $$
 
 ...(6)
