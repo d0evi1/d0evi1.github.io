@@ -34,7 +34,7 @@ $$
 
 其中：惯例上，会使用p的log变换。
 
-我们进一步将set decoding problem定义为：对于一个指定的基数k，在所有合法的subsets $$Y' \subseteq Y \mid \mid Y'\mid=k$$上，搜索一个具有最高分的set $$Y^*$$，定义为：
+我们进一步将set decoding problem定义为：对于一个指定的基数k，在所有合法的subsets $$\lbrace Y' \subseteq Y \mid \mid Y'\mid=k \rbrace$$上，搜索一个具有最高分的set $$Y^*$$，定义为：
 
 $$
 p(Y | x) = \prod\limits_{y \in Y} p(y | x)
@@ -55,13 +55,13 @@ $$
 - 首先，因为Y是一个指数大的空间，并且p通常是非马尔可夫（non-Markovian）性的，我们不能进行有效搜索，更不用说$$Y^k$$。
 - 第二，特别是对于语言生成任务，这些可能不是有用的目标
 
-### 退化目标
+### 目标降级
 
 需要重点注意的是：在 neural sequence models下具有最高概率解，并不总是高质量的（high-quality）；特别是涉及到语言生成的任务，比如：机器翻译等。相应的，启发式搜索方法或者一些替代目标通常会被用于decoding language generators.
 
 ## 2.1 Beam Search
 
-用于逼近等式(2)的decoding problem的一种常见启发法是：在每一item step t上，以最大化 $$p(y_t \mid y_{<t}, x)$$的方法，顺序选择token $$y_t$$，直到EOS otken被生成，或者达到最大序列长度$$n_{max}$$。该过程被称为greedy search。Beam search是一种经常使用（oft-employed）的greedy search的生成方法，它会返回k个candidates，并探索更多search space。在本工作中，我们关注于迭代子集选择(iterative subset selection)的beam search，它有一个很简洁的算法公式。给定一个初始集合$$Y_0$$，它只包含了BOS token，对于$$t \in \lbrace 1,\cdots,n_{max} \rbrace$$，我们会根据以下递归来选择子序列$$Y_t$$：
+用于逼近等式(2)的decoding problem的一种常见启发法是：**在每一timestep t上，以最大化 $$p(y_t \mid y_{<t}, x)$$的方法，顺序选择token $$y_t$$，直到EOS token被生成，或者达到最大序列长度$$n_{max}$$**。该过程被称为greedy search。Beam search是一种经常使用（oft-employed）的greedy search的生成方法，它会返回k个candidates，并探索更多search space。在本工作中，**我们关注于迭代式子集选择(iterative subset selection)的beam search**，它有一个很简洁的算法公式。给定一个初始集合$$Y_0$$，它只包含了BOS token，对于$$t \in \lbrace 1,\cdots,n_{max} \rbrace$$，我们会根据以下递归来选择子序列$$Y_t$$：
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c0bfb415afc784695875362a0027d594ed6ef9fa3353d29e81c0a482b10bf3c7789bde5a82db844adcde60c4e906caf0?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
@@ -70,12 +70,12 @@ $$
 其中，我们会限制，只扩展在beam set中的candidates，它被定义为：
 
 $$
-B_t = \lbrace y_{<t} \odot y |  y_{<t} \in Y_{t-1} and y \in \bar{V} \rbrace
+B_t = \lbrace y_{<t} \degree y |  y_{<t} \in Y_{t-1} \ and \ y \in \bar{V} \rbrace
 $$
 
 ...(6)
 
-其中，$$\odot$$会被用于表示string concatenations。注意：在$$Y_{t-1}$$中的candidates已经以EOS结尾，会直接添加到$$B_t$$上，例如：$$EOS \odot EOS = EOS$$。在该定义下，我们有基数约束：$$\mid B_t \mid \leq \mid \bar{V} \mid \cdot k$$.
+其中，$$\degree$$会被用于表示string concatenations。注意：在$$Y_{t-1}$$中的candidates已经以EOS结尾，会直接添加到$$B_t$$上，例如：$$EOS \degree EOS = EOS$$。在该定义下，我们有基数约束：$$\mid B_t \mid \leq \mid \bar{V} \mid \cdot k$$.
 
 ## 2.2 Determinanta新公式
 
