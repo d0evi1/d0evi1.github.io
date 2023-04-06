@@ -87,7 +87,7 @@ $$
 
 ...(7)
 
-这里：$$y_{\leq t}^{(i)}$$是在$$B_t$$中的第i个candidate，它根据一个unique mapping：对于每个element $$y_{\leq t} \in B_t$$会唯一映射到一个介于1和$$\mid B_t \mid$$间的integer。再者，我们会使用概念$$D_{Y_t}$$来表示只包含了对应于$$Y_t$$的elemtns的相应的行和列的submatrix，其中：$$Y_t \subsetq B_t$$。我们将等式(5)重写成：
+这里：$$y_{\leq t}^{(i)}$$是在$$B_t$$中的第i个candidate，它根据一个unique mapping：对于每个element $$y_{\leq t} \in B_t$$会唯一映射到一个介于1和$$\mid B_t \mid$$间的integer。再者，我们会使用概念$$D_{Y_t}$$来表示只包含了对应于$$Y_t$$的elemtns的相应的行和列的submatrix，其中：$$Y_t \subseteq B_t$$。我们将等式(5)重写成：
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/5508c94c502f883862f97ff48e6c52a20e1aaad08246f290a9bc7d2b539c0edd565fa4d15e9e21352c477dea0866a62d?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
@@ -107,7 +107,7 @@ $$
 
 ## 3.1 K的构建
 
-构建K的最简单方法是：Gram matrix，其中：每个i, j element会通过一个kernel function: $$K: S \times S \rightarrow R$$来计算，它会将空间中的两个items映射到一个实数上。特别的，我们会定义：$$K_{ij}=K(s_i, s_j)$$，其中$$s_i, s_j \in S$$是S的第i和第j个elements。概念上有些混洧，我们会该该kernel function K overload，它会采用一个set S，以便$$K = K(S)$$是在S的elements之上由pairwise计算的kernel matrix。根据Mercer理论，矩阵K=K(S)必须是PSD的，因为矩阵$$D_Y + w \cdot K_Y$$对于任意$$Y \subsetq S$$是PSD的。
+构建K的最简单方法是：Gram matrix，其中：每个i, j element会通过一个kernel function: $$K: S \times S \rightarrow R$$来计算，它会将空间中的两个items映射到一个实数上。特别的，我们会定义：$$K_{ij}=K(s_i, s_j)$$，其中$$s_i, s_j \in S$$是S的第i和第j个elements。概念上有些混洧，我们会该该kernel function K overload，它会采用一个set S，以便$$K = K(S)$$是在S的elements之上由pairwise计算的kernel matrix。根据Mercer理论，矩阵K=K(S)必须是PSD的，因为矩阵$$D_Y + w \cdot K_Y$$对于任意$$Y \subseteq S$$是PSD的。
 
 ## 3.2 与DPP关系
 
