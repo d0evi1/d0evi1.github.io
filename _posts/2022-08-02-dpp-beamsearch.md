@@ -101,11 +101,22 @@ $$
 
 图2
 
-这里的等式遵循对角阵行列式的定义。正式的，等式（8）被称为“子行列式最大化问题（subdeterminant maximization problem）”，该问题是发现一个行列式，它能最大化一个矩阵子集。而等式(8)引入的概念可能是人为的，它允许我们执行后续泛化。
+这里的等式遵循对角阵行列式的定义。正式的，等式（8）被称为“子行列式最大化问题（subdeterminant maximization problem）”，该问题是发现这样一个行列式：它能最大化一个矩阵子集。而等式(8)引入的概念可能是人为的，它允许我们执行后续泛化。
 
 # 3. Determinantal Beam Search
 
-现在，我们会问该工作的基础问题：如果我们使用一个non-diagonal matrix来替换 diagonal matrix D，会发生什么？这种替换会允许我们对在beam中的elements间的交叉（interactions）做出解释。正式的，我们会考虑一个时间独立半正定矩阵（ timestep-dependent positive semi-definite (PSD) matrix）：$$D+w \cdot K$$，其中：对角矩阵（off-diagonal matrix）K表示在candidates间交叉的strength。该非负权重$$w \geq 0$$控制着在decoding过程中交叉（interactions）的重要性。在本case中，beam search递归变为：
+现在，我们会问该工作的基础问题：**如果我们使用一个non-diagonal matrix来替换 diagonal matrix D，会发生什么？**这种替换会允许我们对在beam中的elements间的interactions做出解释。正式的，我们会考虑一个时间独立半正定矩阵（ timestep-dependent positive semi-definite (PSD) matrix）：
+
+$$
+D+w \cdot K
+$$
+
+其中：
+
+- K：对角矩阵（off-diagonal matrix），表示在candidates间interactions的strength。
+- $$w \geq 0$$：非负权重，控制着在decoding过程中interactions的重要性
+
+在本case中，beam search递归变为：
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b17a103b4ed72e942553fea3a115398100844e0ad39b1ab8416bc8546132ed99220d4104b1696fbd4f995fc487937b95?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
 
