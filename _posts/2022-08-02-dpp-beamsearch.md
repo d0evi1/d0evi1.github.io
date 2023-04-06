@@ -34,7 +34,7 @@ $$
 
 其中：惯例上，会使用p的log变换。
 
-我们进一步将set decoding problem定义为：对于一个指定的基数k，在所有合法的subsets $$Y' \subseteq Y \ | \ |Y'|=k$$上，搜索一个具有最高分的set $$Y^*$$，定义为：
+我们进一步将set decoding problem定义为：对于一个指定的基数k，在所有合法的subsets $$Y' \subseteq Y \ | \ \mid Y'\mid=k$$上，搜索一个具有最高分的set $$Y^*$$，定义为：
 
 $$
 p(Y | x) = \prod\limits_{y \in Y} p(y | x)
