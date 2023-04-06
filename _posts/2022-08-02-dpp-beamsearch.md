@@ -70,12 +70,12 @@ $$
 其中，我们会限制，只扩展在beam set中的candidates，它被定义为：
 
 $$
-B_t = \lbrace y_{<t} \degree y |  y_{<t} \in Y_{t-1} \ and \ y \in \bar{V} \rbrace
+B_t = \lbrace y_{<t} \circ y |  y_{<t} \in Y_{t-1} \ and \ y \in \bar{V} \rbrace
 $$
 
 ...(6)
 
-其中，$$\degree$$会被用于表示string concatenations。注意：在$$Y_{t-1}$$中的candidates已经以EOS结尾，会直接添加到$$B_t$$上，例如：$$EOS \degree EOS = EOS$$。在该定义下，我们有基数约束：$$\mid B_t \mid \leq \mid \bar{V} \mid \cdot k$$.
+其中，$$\circ$$会被用于表示string concatenations。注意：在$$Y_{t-1}$$中的candidates已经以EOS结尾，会直接添加到$$B_t$$上，例如：$$EOS \circ EOS = EOS$$。在该定义下，我们有基数约束：$$\mid B_t \mid \leq \mid \bar{V} \mid \cdot k$$.
 
 ## 2.2 Determinanta新公式
 
