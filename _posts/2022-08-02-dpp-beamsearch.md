@@ -24,17 +24,17 @@ $$
 
 我们的模型p通常通过一个具有weights $$\theta$$的neural network进行参数化。由于我们不关注底层模型本身，我们忽略掉p在参数$$\theta$$的依赖。
 
-我们将decoding problem定义为：在空间Y上的所有序列间，根据模型$$y(y \mid x)$$搜索具有最高scoring的y，它也被称为最大后验概率估计（maximum-a-posteriori（MAP）inference）：
+我们将decoding problem定义为：在空间Y上的所有序列间，根据模型$$y(y \mid x)$$搜索具有最高scoring的y，它也被称为**最大后验概率估计（maximum-a-posteriori（MAP）inference）**：
 
 $$
-y^{*} = \underset{argmax}{y \in Y} log p(y | x)
+y^{*} = \underset{y \in Y}{argmax} log p(y | x)
 $$
 
 ...(2)
 
 其中：惯例上，会使用p的log变换。
 
-我们进一步将set decoding problem定义为：**对于一个指定的基数k，在所有合法的subsets $$Y' \subseteq Y \ | \ \mid Y'\mid=k$$上，搜索一个具有最高分的set $$Y^*$$**，定义为：
+我们进一步将set decoding problem定义为：对于一个指定的基数k，在所有合法的subsets $$Y^{'} \subseteq Y \ | \ \mid Y^{'}\mid=k$$上，搜索一个具有最高分的set $$Y^{*}$$，定义为：
 
 $$
 p(Y | x) = \prod\limits_{y \in Y} p(y | x)
