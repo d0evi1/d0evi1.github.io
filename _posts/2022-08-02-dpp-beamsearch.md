@@ -12,10 +12,10 @@ Clara Meister等在《Determinantal Beam Search》中提出了Determinantal Beam
 
 # 2.Neural Sequence Models
 
-神经序列模型（Neural sequence models）是：给定一个input x，在一个output space Y上的序列y的概率分布$$p(y \mid x)$$。这里我们将Y定义成：来自词汇表中的所有合法句子序列，以BOS开头，以EOS结尾。通常，序列长度由一些值$$n_{max} \in Z_+$$给定，它会依赖于x。在本文，我们会考虑局部归一化模型（locally normalized models），例如：这里的p表示：给定之前生成的tokens $$y_{<t}$$ 是一个在$$\bar{V} = V \union \lbrace EOS \rbrace $$的概率分布。完整序列$$y = <y_1, y_2, \cdots>$$的概率接着通过概率的chain rule进行计算：
+神经网络序列模型（Neural sequence models）是：**给定一个input x，在一个output space Y上的序列y的概率分布$$p(y \mid x)$$**。这里我们将Y定义成来自词汇表中的所有合法句子序列，以BOS开头，以EOS结尾。通常，序列长度由值$$n_{max} \in Z_+$$给定，它会依赖于x。在本文，我们会考虑局部归一化模型（locally normalized models），例如：给定之前已生成的tokens序列 $$y_{<t}$$ ，这里的p表示：是一个在$$\bar{V} = V \cup \lbrace EOS \rbrace $$的概率分布。完整序列$$y = <y_1, y_2, \cdots>$$的概率接着通过概率的chain rule进行计算：
 
 $$
-p(y | x) = \prod\limits_{t=1} p(y_t | y_{<t}, x)
+p(y | x) = \prod\limits_{t=1}^{|y|} p(y_t | y_{<t}, x)
 $$
 
 ...(1)
@@ -27,7 +27,7 @@ $$
 我们将decoding problem定义为：在空间Y上的所有序列间，根据模型$$y(y \mid x)$$搜索具有最高scoring的y，它也被称为最大后验概率估计（maximum-a-posteriori（MAP）inference）：
 
 $$
-y^* = argmax\limits_{y \in Y} log p(y | x)
+y^{*} = \underset{argmax}{y \in Y} log p(y | x)
 $$
 
 ...(2)
