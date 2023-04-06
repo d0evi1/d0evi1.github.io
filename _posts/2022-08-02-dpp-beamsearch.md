@@ -75,11 +75,15 @@ $$
 
 ...(6)
 
-其中，$$\circ$$会被用于表示string concatenations。注意：在$$Y_{t-1}$$中的candidates已经以EOS结尾，会直接添加到$$B_t$$上，例如：$$EOS \circ EOS = EOS$$。在该定义下，我们有基数约束：$$\mid B_t \mid \leq \mid \bar{V} \mid \cdot k$$.
+其中：
+
+- $$\circ$$会被用于表示string concatenations。
+
+注意：在$$Y_{t-1}$$中的candidates已经以EOS结尾，会直接添加到$$B_t$$上，例如：$$EOS \circ EOS = EOS$$。在该定义下，我们有基数k的constraint：$$\mid B_t \mid \leq \mid \bar{V} \mid \cdot k$$.
 
 ## 2.2 Determinanta新公式
 
-对于公式（5），我们接着引入一种可选的等价概念，它使用matrics和determinants，它会阐明beam search的直接泛化。我们定义了一种timestep-dependent diagonal matrix $$D \in R^{\mid B_t \mid \times \mid B_t \mid}$$，其中：我们会采用diagonal entry:
+对于公式（5），我们接着引入另一种的等价概念，它使用matrics和determinants，它会阐明beam search的直接泛化（generation）。我们定义了一种timestep-dependent diagonal matrix $$D \in R^{\mid B_t \mid \times \mid B_t \mid}$$，其中：我们会采用diagonal entry:
 
 $$
 D_{ii} = p(Y_{\leq t}^{(i)} | x)
@@ -87,7 +91,12 @@ $$
 
 ...(7)
 
-这里：$$y_{\leq t}^{(i)}$$是在$$B_t$$中的第i个candidate，它根据一个unique mapping：对于每个element $$y_{\leq t} \in B_t$$会唯一映射到一个介于1和$$\mid B_t \mid$$间的integer。再者，我们会使用概念$$D_{Y_t}$$来表示只包含了对应于$$Y_t$$的elemtns的相应的行和列的submatrix，其中：$$Y_t \subseteq B_t$$。我们将等式(5)重写成：
+这里：
+
+- $$y_{\leq t}^{(i)}$$：表示在$$B_t$$中的第i个candidate，它根据一个unique mapping：对于每个element $$y_{\leq t} \in B_t$$会唯一映射到一个介于1和$$\mid B_t \mid$$间的integer
+- $$D_{Y_t}$$：来表示只包含了对应于$$Y_t$$的elements的相应行和列的submatrix，其中：$$Y_t \subseteq B_t$$
+
+我们将等式(5)重写成：
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/5508c94c502f883862f97ff48e6c52a20e1aaad08246f290a9bc7d2b539c0edd565fa4d15e9e21352c477dea0866a62d?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
