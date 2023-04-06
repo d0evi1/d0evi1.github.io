@@ -63,6 +63,8 @@ $$
 
 用于逼近等式(2)的decoding problem的一种常见启发法是：在每一item step t上，以最大化 $$p(y_t \mid y_{<t}, x)$$的方法，顺序选择token $$y_t$$，直到EOS otken被生成，或者达到最大序列长度$$n_{max}$$。该过程被称为greedy search。Beam search是一种经常使用（oft-employed）的greedy search的生成方法，它会返回k个candidates，并探索更多search space。在本工作中，我们关注于迭代子集选择(iterative subset selection)的beam search，它有一个很简洁的算法公式。给定一个初始集合$$Y_0$$，它只包含了BOS token，对于$$t \in \lbrace 1,\cdots,n_{max} \rbrace$$，我们会根据以下递归来选择子序列$$Y_t$$：
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c0bfb415afc784695875362a0027d594ed6ef9fa3353d29e81c0a482b10bf3c7789bde5a82db844adcde60c4e906caf0?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
+
 图1
 
 其中，我们会限制，只扩展在beam set中的candidates，它被定义为：
@@ -87,6 +89,8 @@ $$
 
 这里：$$y_{\leq t}^{(i)}$$是在$$B_t$$中的第i个candidate，它根据一个unique mapping：对于每个element $$y_{\leq t} \in B_t$$会唯一映射到一个介于1和$$\mid B_t \mid$$间的integer。再者，我们会使用概念$$D_{Y_t}$$来表示只包含了对应于$$Y_t$$的elemtns的相应的行和列的submatrix，其中：$$Y_t \subsetq B_t$$。我们将等式(5)重写成：
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/5508c94c502f883862f97ff48e6c52a20e1aaad08246f290a9bc7d2b539c0edd565fa4d15e9e21352c477dea0866a62d?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
+
 图2
 
 这里的等式遵循对角阵行列式的定义。正式的，等式（8）被称为“子行列式最大化问题（subdeterminant maximization problem）”，该问题是发现一个行列式，它能最大化一个矩阵子集。而等式(8)引入的概念可能是人为的，它允许我们执行后续泛化。
@@ -94,6 +98,8 @@ $$
 # 3. Determinantal Beam Search
 
 现在，我们会问该工作的基础问题：如果我们使用一个non-diagonal matrix来替换 diagonal matrix D，会发生什么？这种替换会允许我们对在beam中的elements间的交叉（interactions）做出解释。正式的，我们会考虑一个时间独立半正定矩阵（ timestep-dependent positive semi-definite (PSD) matrix）：$$D+w \cdot K$$，其中：对角矩阵（off-diagonal matrix）K表示在candidates间交叉的strength。该非负权重$$w \geq 0$$控制着在decoding过程中交叉（interactions）的重要性。在本case中，beam search递归变为：
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b17a103b4ed72e942553fea3a115398100844e0ad39b1ab8416bc8546132ed99220d4104b1696fbd4f995fc487937b95?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
 
 图3
 
