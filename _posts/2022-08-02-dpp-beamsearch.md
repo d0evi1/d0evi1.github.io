@@ -118,6 +118,8 @@ beam search的每轮迭代的runtime会是：$$O(c(k) + k^3 \mid \bar{V} \mid)$$
 
 # 4.Case Study: Diverse Beam Search
 
-略
+略略
+
+
 
 - 1.[https://arxiv.org/pdf/2106.07400.pdf](https://arxiv.org/pdf/2106.07400.pdf)
