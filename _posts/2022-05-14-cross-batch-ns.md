@@ -100,7 +100,13 @@ $$
 - $$\theta_g$$是$$g_v$$的参数
 - $$t, \Delta_t$$分别表示训练迭代数和训练迭代间隔（例如：mini-batch）
 
-我们会从头到尾使用in-batch negative softmax loss来训练一个Youtube DNN，并计算具有不同间隔$$\lbrace 1,5,10 \rbrace$$的feature drift。如图2所示，features会在早期激烈变化。随着learning rate的减小，在$$4 \times 10^4$$次迭代时features会变得相对稳定，使得它可以合理复用它们作为合法负样本（valid negatives）。我们将这样的现象称为“embedding stability”。我们进一步以公理3.1方式展示：embedding stability会提供一个关于scoring function的gradients error上界，因此， stable embeddings可以提供合法信息进行训练。
+我们会从头到尾使用in-batch negative softmax loss来训练一个Youtube DNN，并计算具有不同间隔$$\lbrace 1,5,10 \rbrace$$的feature drift。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/75432a7ac6f16b0d4041f4a44d5f2b1122bbb17770a9f8be5de0e30b2f8765ec6dbab6354c99499ae5ede5d7aa7a53c6?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
+
+图2  YoutubeDNN的Feature drift w.r.t. Δts, 数据集：Amazon-Books dataset
+
+如图2所示，features会在早期激烈变化。随着learning rate的减小，在$$4 \times 10^4$$次迭代时features会变得相对稳定，使得它可以合理复用它们作为合法负样本（valid negatives）。我们将这样的现象称为“embedding stability”。我们进一步以公理3.1方式展示：embedding stability会提供一个关于scoring function的gradients error上界，因此， stable embeddings可以提供合法信息进行训练。
 
 **引理3.1 假设：$$\| \hat{v}_j - v_j \|_2^2 < \epsilon$$，scoring function的output logit是$$\hat{o}_{ij} \triangleq u_i^T \hat{v}_j$$**并且user encoder $$f_u$$满足Lipschitz continuous condition，接着：gradient w.r.t user $$u_i$$的偏差为：
 
