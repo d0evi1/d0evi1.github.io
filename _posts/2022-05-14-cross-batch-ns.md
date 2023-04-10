@@ -20,14 +20,24 @@ huawei在2021《Cross-Batch Negative Sampling for Training Two-Tower Recommender
 
 我们考虑对于large-scale和content-aware推荐系统的公共设定。我们具有两个集合：
 
-$$U = \lbrace U_i \rbrace_i^{N_U}$$
-$$I = \lbrace I_j \rbrace_i^{N_I}$$
+- $$U = \lbrace U_i \rbrace_i^{N_U}$$
+- $$I = \lbrace I_j \rbrace_i^{N_I}$$
 
 其中：
 
 - $$U_i \in U$$和$$I_j \in I$$是features（例如：IDs, logs和types）的预处理vectors集合
 
-在用户为中心的场景，给定一个带features的user，目标是：检索一个感兴趣items的子集。通常，我们通过设置两个encoders（例如：“tower”）：$$f_u: U \rightarrow R^d, g_v: I \rightarrow R^d$$，这之后我们会通过一个scoring function $$s(U,I) = f_u(U)^T g_v(I) \triangleq u^T v$$估计user-item pairs的相关度，其中：u,v分别表示来自$$f_u, g_v$$的user、item的encoded embeddings。
+在用户为中心的场景，给定一个带features的user，目标是：检索一个感兴趣items的子集。通常，我们通过设置两个encoders（例如：“tower”）：
+
+$$f_u: U \rightarrow R^d, g_v: I \rightarrow R^d$$
+
+之后我们会通过一个scoring function估计user-item pairs的相关度：
+
+$$s(U,I) = f_u(U)^T g_v(I) \triangleq u^T v$$
+
+其中：
+
+- u,v分别表示来自$$f_u, g_v$$的user、item的encoded embeddings
 
 ## 3.2 基础方法
 
@@ -39,7 +49,13 @@ $$
 
 ...(1)
 
-其中：$$\theta$$表示模型参数，N是sampled negative set，上标“-”表示负样本。该模型会使用cross-entropy loss（）进行训练：
+其中：
+
+- $$\theta$$表示模型参数
+- N是sampled negative set
+- 上标“-”表示负样本
+
+该模型会使用cross-entropy loss（等价为log-likelihood）进行训练：
 
 $$
 L_{CE} = - \frac{1}{|B|} \sum\limits_{i \in [|B|]} log p(I_i | U_i; \theta)
@@ -50,18 +66,22 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/669e4ea943060b43daaf5329584fe4511fac84c2f4914bf1d2bd0b391d3b21744c2c137a19bb5727af0aab6b82888827?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
-图1 
+图1 双塔模型的采样策略
 
-为了提升双塔模型的训练效率，一个常用的抽样策略是in-batch negative sampling，如图1(a)所示。具体的，它会将相同batch中的其它不tems看成是负样本（negatives），负样本分布q遵循基于item frequency的unigram分布。根据sampled softmax机制，我们修改等式为：
+为了提升双塔模型的训练效率，一个常用的抽样策略是in-batch negative sampling，如图1(a)所示。具体的，**它会将相同batch中的其它items看成是负样本（negatives），负样本分布q遵循基于item frequency的unigram分布**。根据sampled softmax机制，我们修改等式为：
 
 $$
-P_{In\-batch} (I | U; \theta) = \frac{e^{s'(U,I;q)}}{e^{s'(U,I;q)} + \sum_{I^- \in B \ \lbrace I \rbrace} e^{s'(U, I^-;q)}} \\
+P_{In-batch} (I | U; \theta) = \frac{e^{s'(U,I;q)}}{e^{s'(U,I;q)} + \sum_{I^- \in B \ \lbrace I \rbrace} e^{s'(U, I^-;q)}} \\
 s'(U, I;q) = s(U,I) - log q(I) = u^T v - log q(I) 
 $$
 
 ...(3)(4)
 
-其中，logq(I) 是对sampling bias的一个correction。In-batch negative sampling会避免额外additional negative samples到item tower中，从而节约计算开销。不幸的是，in-batch items的数目batch size线性有界的，因而，在GPU上的受限batch size会限制模型表现。
+其中：
+
+- logq(I) 是对sampling bias的一个correction。
+
+In-batch negative sampling会避免额外additional negative samples到item tower中，从而节约计算开销。不幸的是，in-batch items的数目batch size线性有界的，因而，在GPU上的受限batch size会限制模型表现。
 
 ## 3.3 Cross Batch Negative Sampling
 
