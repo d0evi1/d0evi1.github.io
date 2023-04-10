@@ -12,7 +12,7 @@ huawei在2021《Cross-Batch Negative Sampling for Training Two-Tower Recommender
 
 # 摘要
 
-双塔结构被广泛用于学习item和user representations，它对于大规模推荐系统来说是很重要的。许多two-tower models会使用多样的in-batch negative sampling的策略，这些策略的效果天然依赖于mini-batch的size。然而，使用大batch size的双塔模型训练是低效的，它需要为item和user contents准备一个大内存容量，并且在feature encoding上消耗大量时间。有意思的是，我们发现，neural encoders在训练过程中在热启（warm up）之后对于相同的input可以输出相对稳定的features。基于该事实，我们提出了一个有效的sampling策略：称为“Cross-Batch Negative Sampling (CBNS)”，它可以利用来自最近mini-batches的encoded item embeddings来增强模型训练。理论分析和实际评估演示了CBNS的有效性。
+双塔结构被广泛用于学习item和user representations，它对于大规模推荐系统来说是很重要的。许多two-tower models会使用多样的in-batch negative sampling的策略，**这些策略的效果天然依赖于mini-batch的size**。然而，使用大batch size的双塔模型训练是低效的，它需要为item和user contents准备一个**大内存容量**，并且在feature encoding上消耗大量时间。有意思的是，我们发现，neural encoders在训练过程中在热启（warm up）之后对于相同的input可以输出相对稳定的features。基于该事实，我们提出了一个有效的sampling策略：称为“Cross-Batch Negative Sampling (CBNS)”，**它可以利用来自最近mini-batches的encoded item embeddings来增强模型训练**。理论分析和实际评估演示了CBNS的有效性。
 
 # 3.模型框架
 
@@ -20,10 +20,14 @@ huawei在2021《Cross-Batch Negative Sampling for Training Two-Tower Recommender
 
 我们考虑对于large-scale和content-aware推荐系统的公共设定。我们具有两个集合：
 
-- $$U = \lbrace U_i \rbrace_i^{N_U}$$
-- $$I = \lbrace I_j \rbrace_i^{N_I}$$
+$$U = \lbrace U_i \rbrace_i^{N_U}$$
+$$I = \lbrace I_j \rbrace_i^{N_I}$$
 
-其中，$$U_i \in U$$和$$I_j \in I$$是features（例如：IDs, logs和types）的预处理vectors集合。在用户为中心的场景，给定一个带features的user，目标是：检索一个感兴趣items的子集。通常，我们通过设置两个encoders（例如：“tower”）：$$f_u: U \rightarrow R^d, g_v: I \rightarrow R^d$$，这之后我们会通过一个scoring function $$s(U,I) = f_u(U)^T g_v(I) \triangleq u^T v$$估计user-item pairs的相关度，其中：u,v分别表示来自$$f_u, g_v$$的user、item的encoded embeddings。
+其中：
+
+- $$U_i \in U$$和$$I_j \in I$$是features（例如：IDs, logs和types）的预处理vectors集合
+
+在用户为中心的场景，给定一个带features的user，目标是：检索一个感兴趣items的子集。通常，我们通过设置两个encoders（例如：“tower”）：$$f_u: U \rightarrow R^d, g_v: I \rightarrow R^d$$，这之后我们会通过一个scoring function $$s(U,I) = f_u(U)^T g_v(I) \triangleq u^T v$$估计user-item pairs的相关度，其中：u,v分别表示来自$$f_u, g_v$$的user、item的encoded embeddings。
 
 ## 3.2 基础方法
 
@@ -114,4 +118,4 @@ $$
 
 
 
-[https://dl.acm.org/doi/pdf/10.1145/3404835.3463032]{https://dl.acm.org/doi/pdf/10.1145/3404835.3463032}
+[https://dl.acm.org/doi/pdf/10.1145/3404835.3463032](https://dl.acm.org/doi/pdf/10.1145/3404835.3463032)
