@@ -121,7 +121,8 @@ $$
 证明：近似梯度error可以被计算为：
 
 $$
-\| \frac{\partial \hat{o}_{ij}}{\partial \theta} - \frac{\partial o_{ij}}{\partial \theta} \|_2^2 = \| \frac{\partial \hat{o}_{ij}}{\partial \theta} - \frac{\partial o_{ij}}{\partial \theta} ) \frac{\partial u_i}{\partial \theta} \|_2^2 = \| (\hat{v}_j - v_j) \frac{\partial u_i}{\partial \theta} \|_2^2 \leq \| \hat{v}_j - v_j \|_2^2 \|\frac{\partial u_i}{\partial \theta} \|_2^2 \leq \| \frac{\partial f_u(U_i;\theta^t)}{\partial \theta} \|_2^2 \epsilon \leq C \epsilon
+\| \frac{\partial \hat{o}_{ij}}{\partial \theta} - \frac{\partial o_{ij}}{\partial \theta} \|_2^2 = \| \frac{\partial \hat{o}_{ij}}{\partial \theta} - \frac{\partial o_{ij}}{\partial \theta} ) \frac{\partial u_i}{\partial \theta} \|_2^2 = \| (\hat{v}_j - v_j) \frac{\partial u_i}{\partial \theta} \|_2^2 \\
+\leq \| \hat{v}_j - v_j \|_2^2 \|\frac{\partial u_i}{\partial \theta} \|_2^2 \leq \| \frac{\partial f_u(U_i;\theta^t)}{\partial \theta} \|_2^2 \epsilon \leq C \epsilon
 $$
 
 ...(7)(8)
