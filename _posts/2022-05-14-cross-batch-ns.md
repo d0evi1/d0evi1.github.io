@@ -131,7 +131,7 @@ $$
 
 ### 3.3.2 对于Cross Batch Features使用FIFO Memory Bank
 
-**由于embeddings在早期变化相对剧烈，我们会使用naive in-batch negative sampling对item encoder进行warm up到$$4 \times 10^4$$次迭代，它会帮助模型逼近一个局部最优解，并生成stable embeddings**。
+首先，由于embeddings在早期变化相对剧烈，**我们会使用naive in-batch negative sampling对item encoder进行warm up到$$4 \times 10^4$$次迭代**，它会帮助模型逼近一个局部最优解，并生成stable embeddings。
 
 接着，我们开始使用一个FIFO memory bank $$M = \lbrace (v_i, q(I_i)) \rbrace_{i=1}^M$$训练推荐系统，其中：
 
@@ -140,7 +140,7 @@ $$
 cross-batch negative sampling（CBNS）配合FIFO memory bank如图1(b)所示，CBNS的softmax的output被公式化为：
 
 $$
-p_{CBNS}(I | U; \Theta) = \frac{e^{s'(U,I;q)}}{e^{s'(U,I;q)} + \sum\limits_{I^- \in M U B \ \lbrace I \rbrace} e^{s'(U,I^-;q)}}
+p_{CBNS}(I | U; \Theta) = \frac{e^{s'(U,I;q)}}{e^{s'(U,I;q)} + \sum\limits_{I^- \in M U B \backslash \lbrace I \rbrace} e^{s'(U,I^-;q)}}
 $$
 
 ...(9)
