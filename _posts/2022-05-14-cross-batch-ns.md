@@ -145,7 +145,7 @@ $$
 
 ...(9)
 
-在每次迭代的结尾，我们会enqueue该embeddings 以及 对应当前mini-batch的抽样概率，并将早期的数据进行dequeue。注意，我们的memory bank会随embeddings更新，无需任何额外计算。另外，memory bank的size相对较大，因为它对于这些embeddings不需要更多memory开销。
+在每次迭代的结尾，**我们会enqueue该embeddings 以及 对应当前mini-batch的抽样概率，并将早期的数据进行dequeue**。注意，我们的memory bank会随embeddings更新，无需任何额外计算。另外，memory bank的size相对较大，因为它对于这些embeddings不需要更多memory开销。
 
 # 4.实验与结果
 
