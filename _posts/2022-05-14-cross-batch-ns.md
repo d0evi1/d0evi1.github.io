@@ -127,14 +127,14 @@ $$
 
 ...(7)(8)
 
-经验上，$$C \leq 1$$持有。因而，gradient error可以被embedding stability控制。
+经验上，线上的模型会保持$$C \leq 1$$。因而，gradient error可以通过embedding stability被控制。
 
 ### 3.3.2 对于Cross Batch Features使用FIFO Memory Bank
 
 由于embeddings在早期变化相对剧烈，我们会使用naive in-batch negative sampling对item encoder进行warm up到$$4 \times 10^4$$次迭代，它会帮助模型逼近一个局部最优解，并生成stable embeddings。接着，我们开始使用一个FIFO memory bank $$M = \lbrace (v_i, q(I_i)) \rbrace_{i=1}^M$$训练推荐系统，其中$$q(I_i)$$表示在unigram分布q下item $$I_i$$的抽样概率，其中M是memory size。cross-batch negative sampling（CBNS）配合FIFO memory bank如图1(b)所示，CBNS的softmax的output被公式化为：
 
 $$
-p_{CBNS}(I | U; \Theta) = \frac{e^{s'(U,I;q)}}{e^{e'(U,I;q) + \sum_{I^- \in M U B \\lbrace I \rbrace} e^{s'(U,I^-;q)}}}
+p_{CBNS}(I | U; \Theta) = \frac{e^{s'(U,I;q)}}{e^{e'(U,I;q) + \sum_{I^- \in M U B \ \lbrace I \rbrace} e^{s'(U,I^-;q)}}}
 $$
 
 ...(9)
