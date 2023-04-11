@@ -81,13 +81,13 @@ $$
 
 - logq(I) 是对sampling bias的一个correction。
 
-In-batch negative sampling会避免额外additional negative samples到item tower中，从而节约计算开销。不幸的是，in-batch items的数目batch size线性有界的，因而，在GPU上的受限batch size会限制模型表现。
+In-batch negative sampling会避免额外additional negative samples到item tower中，从而节约计算开销。不幸的是，**in-batch items的数目batch size线性有界的，因而，在GPU上的受限batch size会限制模型表现**。
 
 ## 3.3 Cross Batch Negative Sampling
 
 ### 3.3.1 Nueral model的embedding稳定性（embedding stability of neural model）
 
-由于encoder会在训练中**持续更新**，来自过往mini-batches的item embeddings通常会被认为是过期并且丢弃。然而，我们会识别这样的信息，并且被复用成一个在当前mini-batch的valid negatives，因为embedding stability of neural model。我们会通过估计item encoder $$g_v$$的feature drift【26】来研究该现象：
+由于encoder会在训练中**持续更新**，来自过往mini-batches的item embeddings通常会被认为是过期并且丢弃。然而，因为embedding stability of neural model，我们会识别这样的信息，并且被复用成一个在当前mini-batch的valid negatives。我们会通过估计item encoder $$g_v$$的feature drift【26】来研究该现象，feature drift定义如下：
 
 $$
 D(I, t; \Delta t) \triangleq \sum\limits_{I \in I} \| g_v(I; \theta_g^t) - g_v(I; \theta_g^{t - \Delta t}) \|_2
@@ -106,7 +106,7 @@ $$
 
 图2  YoutubeDNN的Feature drift w.r.t. Δts, 数据集：Amazon-Books dataset
 
-如图2所示，features会在早期激烈变化。随着learning rate的减小，在$$4 \times 10^4$$次迭代时features会变得相对稳定，使得它可以合理复用它们作为合法负样本（valid negatives）。我们将这样的现象称为“embedding stability”。我们进一步以公理3.1方式展示：embedding stability会提供一个关于scoring function的gradients error上界，因此， stable embeddings可以提供合法信息进行训练。
+如图2所示，features会在早期激烈变化。**随着learning rate的减小，在$$4 \times 10^4$$次迭代时features会变得相对稳定，使得它可以合理复用它们作为合法负样本（valid negatives）。我们将这样的现象称为“embedding stability”**。我们进一步以公理3.1方式展示：embedding stability会提供一个关于scoring function的gradients error上界，因此， stable embeddings可以提供合法信息进行训练。
 
 **引理3.1 假设：$$\| \hat{v}_j - v_j \|_2^2 < \epsilon$$，scoring function的output logit是$$\hat{o}_{ij} \triangleq u_i^T \hat{v}_j$$**并且user encoder $$f_u$$满足Lipschitz continuous condition，接着：gradient w.r.t user $$u_i$$的偏差为：
 
