@@ -10,12 +10,12 @@ facebook在《Focal Loss for Dense Object Detection》提出了focal loss。
 
 # 3.Focal loss
 
-focal loss被设计用来解决one-stage object detection场景，该场景在训练期间在foreground和backgroud classes间是极不平衡的（extreme impalance）（例如：1:1000）。我们会从二分类的cross entropy（CE）开始来介绍forcal loss：
+focal loss被设计用来解决one-stage object detection场景，该场景在训练期间在foreground和backgroud classes间是极不平衡的（extreme impalance）（例如：1:1000）。我们会从二分类的cross entropy（CE）开始来介绍focal loss：
 
 $$
 CE(p, y) = \begin{cases}
 -log(p),  & \text{if $y=1$} \\
-3n+1, & \text{otherwise.}
+-log(p-1), & \text{otherwise.}
 \end{cases}
 $$
 
@@ -23,8 +23,8 @@ $$
 
 其中：
 
-- $$y \in \lbrace underset{+}{-} \rbrace$$表示ground-truth class
-- $$p \in [0, 1]$$是对于label y=1的class的模型估计概率
+- $$y \in \lbrace \pm \rbrace$$：表示ground-truth class
+- $$p \in [0, 1]$$：是对于label y=1的class的模型估计概率
 
 对于简洁性，我们定义了$$p_t$$：
 
