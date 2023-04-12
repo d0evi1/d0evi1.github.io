@@ -10,7 +10,7 @@ facebook在《Focal Loss for Dense Object Detection》提出了focal loss。
 
 # 3.Focal loss
 
-focal loss被设计用来解决one-stage object detection场景，该场景在训练期间在foreground和backgroud classes间是极不平衡的（extreme impalance）（例如：1:1000）。我们会从二分类的cross entropy（CE）开始来介绍focal loss：
+focal loss被设计用来解决one-stage object detection场景，该场景在训练期间在foreground和backgroud classes间是**极不平衡的（extreme imbalance）（例如：1:1000）**。我们会从二分类的cross entropy（CE）开始来介绍focal loss：
 
 $$
 CE(p, y) = \begin{cases}
@@ -72,7 +72,7 @@ $$
 - (1) **当一个样本被误分类时，$$p_t$$会很小，调节因子（modulating factor）接近1，loss不受影响**。随着$$p_t \rightarrow 1$$，该因子会趋向为0，对于well-classified的样本的loss会down-weighted。
 - (2) focusing参数$$\gamma$$会平滑地调节easy样本被down-weighted的rate。**当$$\gamma=0$$时，FL接近于CE，随着$$\gamma$$的增加，调节因子的影响也可能增加（我们发现$$\gamma=2$$在实验中表现最好）**。
 
-**直觉上，调节因子会减小来自easy examples的loss贡献，并拓宽一个样本接收到low loss的范围**。例如，$$\gamma=2$$，使用$$p_t=0.9$$分类的样本会比CE低100倍loss，而使用$$p_t \approx 0.968$$则具有1000倍的更低loss。这会增加纠正误分类样本(对于$$p_t \geq 0.5$$和$$\gamma=2$$，它的loss会被缩放到至多4倍)的importance。
+**直觉上，调节因子会减小来自easy examples的loss贡献，并拓宽一个样本接收到low loss的范围**。例如，在$$\gamma=2$$，使用$$p_t=0.9$$分类的easy样本会比CE低100倍loss，而使用$$p_t \approx 0.968$$则具有1000倍的更低loss。对于$$p_t \leq 0.5$$和$$\gamma=2$$，它的loss会被缩放到至多4倍，这会增加纠正误分类样本（mis-classified examples）的importance。
 
 惯例上，我们使用一个focal loss的$$\alpha$$-balanced变种：
 
