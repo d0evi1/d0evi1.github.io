@@ -37,7 +37,7 @@ $$
 
 并重写为：$$CE(p, y) = CE(p_t) = - log(p_t)$$。
 
-CE loss可以被看成是图1中的蓝色曲线(top)。在该图中可以发现，该loss的一个重要属性是，即便是可以被轻松分类的样本（easy classified）（$$p_t >> 0.5$$），也会带来一个具有non-trivial规模的loss。当在大量easy样本（easy examples）进行求和时，这些小的loss values会淹没掉稀有类（rare class）。
+CE loss可以被看成是图1中的蓝色曲线(top)。在该图中可以发现，该loss的一个重要属性是，**即便是易分类样本（easy classified examples）（$$p_t \gg 0.5$$），也会带来一个具有non-trivial规模的loss**。当我们在大量easy样本（easy examples）之上进行求和时，**这些小的loss values会淹没掉稀有类（rare class）**。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a3db84ea68f85701fc6bc2e893edc9e6e56db2f8f3a9f9fe506c74ee2dfdfc52758ebf56d65f9d36f345deffa4f977f0?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
@@ -45,7 +45,7 @@ CE loss可以被看成是图1中的蓝色曲线(top)。在该图中可以发现�
 
 ## 3.1 Balanced Cross Entropy
 
-解决class imbalance的一个常用方法是，为class 1引入一个weighting因子$$\alpha \in [0, 1]$$，为class -1引入$$1 - \alpha$$。惯例上，$$\alpha$$可以通过inverse class frequency来设置，或者被看成是通过cross validation设置的一个超参数。对于简洁性，我们定义了：
+解决class imbalance的一个常用方法是：为class为1引入一个weighting因子$$\alpha \in [0, 1]$$，为class为-1引入$$(1 - \alpha)$$。惯例上，$$\alpha$$可以通过逆分类频次（inverse class frequency）来设置，或者被看成是通过cross validation设置的一个超参数。对于简洁性，我们定义了：
 
 $$
 CE(p_t) = -\alpha_t log(p_t)
@@ -57,7 +57,7 @@ $$
 
 ## 3.2 Focal Loss定义
 
-如实验所示，在dense detectors的训练期间遇到大类不均衡（large class imbalance）会淹没掉cross entropy loss。易分类负样本（Easily classified negatives）组成了loss的绝大多数，会主宰gradient。而$$\alpha$$会平衡正样本/负样本的importance，它不会区分easy/hard样本。作为替代，我们提出：将loss function变形为：对easy examples进行down-weight，从而在训练时更关注hard negatives。
+如实验所示，在dense detectors的训练期间遇到大类不均衡（large class imbalance）会淹没掉cross entropy loss。**易分类负样本（Easily classified negatives）构成了loss的绝大多数，会主宰gradient**。而$$\alpha$$会平衡正样本/负样本的importance，它不会区分easy/hard样本。作为替代，我们提出：**将loss function变形为：对easy examples进行down-weight，从而使得在训练时更关注hard negatives**。
 
 更正式的，我们提出了增加一个modulating factor $$(1 - p_t)^{\gamma}$$到cross entropy loss中，可调参数为$$\gamma \geq 0$$，我们定义focal loss为：
 
@@ -67,12 +67,12 @@ $$
 
 ...(4)
 
-该focal loss在图1中根据$$\gamma \in [0, 5]$$的多个值进行可视化。我们注意到focal loss的两个特性。
+该focal loss在图1中根据$$\gamma \in [0, 5]$$的多个值进行可视化。我们注意到**focal loss的两个特性**。
 
-- (1) 当一个样本被误分类时，$$p_t$$会很小，调节因子（modulating factor）接近1，loss不受影响。随着$$p_t \rightarrow 1$$，该因子会趋向为0，对于well-classified的样本的loss会down-weighted。
-- (2) focusing参数$$\gamma$$会平滑地调节easy样本被down-weighted的rate。当$$\gamma=0$$时，FL接近于CE，随着$$\gamma$$的增加，调节因子的影响也可能增加（我们发现$$\gamma=2$$在实验中表现最好）。
+- (1) **当一个样本被误分类时，$$p_t$$会很小，调节因子（modulating factor）接近1，loss不受影响**。随着$$p_t \rightarrow 1$$，该因子会趋向为0，对于well-classified的样本的loss会down-weighted。
+- (2) focusing参数$$\gamma$$会平滑地调节easy样本被down-weighted的rate。**当$$\gamma=0$$时，FL接近于CE，随着$$\gamma$$的增加，调节因子的影响也可能增加（我们发现$$\gamma=2$$在实验中表现最好）**。
 
-直觉上，调节因子会减小来自easy examples的loss贡献，并拓宽一个样本接收到low loss的范围。例如，$$\gamma=2$$，使用$$p_t=0.9$$分类的样本会比CE低100倍loss，而使用$$p_t \approx 0.968$$则具有1000倍的更低loss。这会增加纠正误分类样本(对于$$p_t \geq 0.5$$和$$\gamma=2$$，它的loss会被缩放到至多4倍)的importance。
+**直觉上，调节因子会减小来自easy examples的loss贡献，并拓宽一个样本接收到low loss的范围**。例如，$$\gamma=2$$，使用$$p_t=0.9$$分类的样本会比CE低100倍loss，而使用$$p_t \approx 0.968$$则具有1000倍的更低loss。这会增加纠正误分类样本(对于$$p_t \geq 0.5$$和$$\gamma=2$$，它的loss会被缩放到至多4倍)的importance。
 
 惯例上，我们使用一个focal loss的$$\alpha$$-balanced变种：
 
