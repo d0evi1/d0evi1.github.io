@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 离线评估/在线评估
+title: 离线/在线评估差异
 description: 
 modified: 2021-11-05
 tags: 
@@ -16,9 +16,13 @@ microsoft在《Predictive Model Performance: Offline and Online Evaluations》�
 
 另外，高度复杂的现代应用，比如：google/bing的搜索引擎，经常会在一个controlled AB testing平台上对最好的离线模型进行开展在线评估（称为online evaluation）。
 
-现实中模型评估的一个问题是，在离线评估中模型效果的提升有时不会收到实际效果，或者有时在在线评估时获得相反结果。不同于静态offline evaluation，在controlled环境下的在线测试是高度动态的，当然，在离线建模期间都没有考虑的许多因素会对结果有重要影响。然而，这些observations会抛出一个问题：是否存在会导致这样差异在离线评估指标上的基础biases或限制。
+现实中模型评估的一个问题是：**在离线评估中模型效果的提升有时不会收到实际效果，或者有时在在线评估时获得相反结果**。不同于静态offline evaluation，在controlled环境下的online Testing是**高度动态**的，当然，在离线建模期间都没有考虑的许多因素会对结果有重要影响。然而，这些observations会抛出一个问题：是否存在会导致这样差异在离线评估指标上的基础biases或限制。
 
-另一个问题是：使用不同类型的数据构建的模型的效果对比，特别是那些带有稀有事件（rare events）数据。稀有事件（rare events）会比其它以更低频率出现，从而导致在classese间的倾斜样本分布。在真实世界问题中，这是个相当常见的现象。（rare events）的样本包含了在web search结果链接上的点击、展示广告的点击、在产品广告上的购买。之前的研究已经表明，一些metrics可能会过度估计对于倾斜样本的模型效果。该observations会导致以下的问题。有了该bias，我们如何解释和对比应用不同类型数据的模型效果？例如，当我们构建对于文本广告和展示广告的预估模型时，我们可以使用离线指标作为可对比度量（comparative measures）来预估它的真实效果吗？假设我们知道一个模型的真实效果，我们获得了另一个具有相当offline metrics的其它模型。我们是否可以估计该模型的真实效果呢？如果不能，我们应使用哪种metrics进行替代？
+另一个问题是：**使用不同类型的数据构建的模型所进行的效果对比，特别是那些带有稀有事件（rare events）数据**。稀有事件（rare events）会比其它事件以更低频率出现，从而导致在classes间的倾斜样本分布。在真实世界问题中，这是个相当常见的现象。**（rare events）的样本包含了在web search结果链接上的点击、展示广告的点击、在产品广告上的购买**。之前的研究已经表明，一些metrics可能会过度估计对于倾斜样本的模型效果。该observations会导致以下的问题：
+
+- 有了该bias，**我们如何解释和对比应用不同类型数据的模型效果**？
+- 例如，当我们构建对于文本广告和展示广告的预估模型时，我们可以**使用离线指标作为可对比度量（comparative measures）来预估它的真实效果吗**？
+- 假设我们知道一个模型的真实效果，并且我们获得了另一个模型（the other model）相当的离线指标（offline metrics）。我们是否可以估计该另一个模型（the other model）的真实效果呢？如果不能，我们应使用哪种metrics进行替代？
 
 我们提出一种新的模型评估范式：仿真指标（simulated metrics）。对于在线行为的离线仿真，我们实现了 auction simulation，并使用simulated metrics来估计该点击预估模型的在线模型效果。由于simulated metrics被设计用于模拟在线行为，我们期望更少遭受效果差异问题。另外，由于simulated metrics直接估计像user CTR等在线指标，他们可以被直接对比，即使模型基于不同数据进行构建。
 
