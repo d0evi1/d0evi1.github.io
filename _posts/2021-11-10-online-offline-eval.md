@@ -134,10 +134,10 @@ $$
 
 Auction simulation，首先：**为给定query会离线复现ad auctions，并基于新的模型预估分、以及多个操作点集合选择一个ads集合**。
 
-我们使用付费搜索（sponsored search）点击日志数据来实现auction simulation，并生成多个simulated metrics。Auction simulation，首先，首先，为给定query离线复现ad auctions，并基于新模型预估分选择ads的一个集合。在仿真期间，会使用在日志中提供的(query, ad) pair的历史用户点击来预估用户点击：
+我们使用付费搜索（sponsored search）点击日志数据来实现auction simulation，并生成多个simulated metrics。Auction simulation，首先，为给定query离线复现ad auctions，并基于新模型预估分选择ads的一个集合。在仿真期间，会使用在日志中提供的(query, ad) pair的历史用户点击来预估用户点击：
 
-- 如果(query, ad) pair在日志中被发现，但仿真的ad-position与在日志中的posiiton不同，expected CTR会通过position-biased histric CTR（或click曲线）被校准（calibirated）。一般的，对于相同的(query, ad) pair，主线广告（mainline ads）会比sidebar ads获得更高的大CTR，在相同ad block内，对于相同的(query, ad) pair，在更高位置的广告会获得更高的CTR。
-- 如果predicted(query, ad) pair不会出现在historic logs中，会使用在ad-position上的平均CTR（也被称为：reference CTR）。
+- **如果(query, ad) pair在日志中被发现，但仿真的ad-position与在日志中的posiiton不同，expected CTR会通过position-biased histric CTR（或click曲线）被校准（calibirated）**。一般的，对于相同的(query, ad) pair，主线广告（mainline ads）会比sidebar ads获得更高的大CTR，在相同ad block内，对于相同的(query, ad) pair，在更高位置的广告会获得更高的CTR。
+- **如果predicted(query, ad) pair不会出现在historic logs中，会使用在ad-position上的平均CTR（也被称为：reference CTR）**。
 
 Click曲线和reference CTR来源于自在搜索广告日志中的historic user responses。
 
@@ -151,21 +151,40 @@ Click曲线和reference CTR来源于自在搜索广告日志中的historic user 
 
 AUC是一个可以评估预估模型效果的相当可靠的方法，它在样本数据的特定条件下仍会有缺点。该假设是：AUC是一个需要被重新检查模型效果的充分测试指标。
 
-首先，它忽略了预估的概率值（predicted probability values）。这使得它对于**预估概率的保序变换**不敏感。另一方面，这也是个优点，它使得在不同的measurement scales上生成的数值结果是可对比测式的。另一方面，对于两个tests来说，生成具有相似AUC scores、并且非常不同的预估输出是相当可能的。它可能是一个较差拟合（poorly fitted）的模型（对所有预估过拟合、或者欠拟合），具有一个良好的判别能力；而一个良好拟合（well-fitted）的模型，如果出现概率略微高于不出现概率时，会具有较差的判别。
+首先，它忽略了预估的概率值（predicted probability values）。这使得它对于**预估概率的保序变换**不敏感。
+
+- 一方面，这也是个优点，它使得在不同的measurement scales上生成的数值结果是可对比测式的。
+- 另一方面，对于两个tests来说，生成具有相似AUC scores、并且非常不同的预估输出是相当可能的。它可能是一个较差拟合（poorly fitted）的模型（对所有预估过拟合、或者欠拟合），具有一个良好的判别能力；而一个良好拟合（well-fitted）的模型，如果出现概率略微高于不出现概率时，会具有较差的判别。
 
 表2展示了关于一个poorly-fitted模型示例，它具有较高AUC score，其中，大量负样本具有非常低的pClick scores，从而有更低的CTR。在相对更高的pClick scores范围内，这会降低FPR，从而引出了AUC score。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/522432bbf074f32440d9a0819586780fcc983f5f3b3dcb2c41daad3daa97b410d176a81d0c3998033b982e16b955b6a3?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t2.jpg&amp;size=750">
+
+表2
 
 第二，在整个ROC空间的spectrum上（包括很少操作的区域），它会总结测试效果。例如，对于付费搜索，在mainline上放置一个ad会显著影响CTR，预估CTR如何拟合实际CTR（ad展示在mainline上或者它没有展示）并不是个大问题。换句话说，ROC的极左和极右通常很少用。Baker and Pinsky提出了**partial ROC曲线**作为整个ROC曲线的一个替代选择。
 
 已经观察到，**更高的AUC并不必然意味着更好的rankings**。如表3所示，在FPR尾部上，样本分布中的变化会大量影响AUC score。然而，在模型CTR效果上的影响可能是相同的，特别是在threshold的实际操作点上。由于AUC不会判别ROC空间的多个区域，通过最优化在数据的任意一端的模型效果，一个模型可能会被训练用来最大化AUC score。这会导致在实际在线流量上，低于期望效果增益。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/188b31ec3d689ae8aa4f58049a71b568023cb5d55d00a0ae81d823885bf62a563600f9fb5eb6c869a6e5c74e73d3c218?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t3.jpg&amp;size=750">
+
+表3
+
 第三，它会等价权衡omission和omission errors。例如，在付费搜索中，在mainline中没有放置最优ads的惩罚（penalty）（omission error）远远超过放置一个次优ads的惩罚（penalty）。当误分类代价不等时，对所有可等阈值进行汇总是有瑕疵的。
 
 最近，AUC高度依赖于数据底层分布。AUC会对两个具有不同负样本率的数据集进行计算。如果4所示，一个具有较低内在CTR的poorly-fitted模型，会与一个well-fitted模型具有相同的AUC。这意味着，**一个使用更高负样本率训练的模型，具有较高AUC score时，并不必然意味着模型具有更好的预估效果**。图1绘制了关于付费搜索和contextual ads的pClick模型的ROC曲线。如图所示，contextual ads的AUC score要比付费搜索的AUC高3%，尽管前者会更不准：付费搜索为$$\frac{avg \  pClick}{actual \ CTR} = 1.02$$，而contextual ads为0.86。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/9de05fba7dca7f1a4e71ba3edd28264ba76c8495f98f5d6470289a47ef270d4879658cb59324ebc9ce08566acd1b930f?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
+
+图1
+
 ## 5.2 RIG
 
 类似于AUC，RIG的一个问题是，它对评估数据的底层分布是高度敏感的。由于评估数据的RIG score的范围会随着数据分布非常不同，我们不能仅评RIG scores来决定一个预估模型有多好。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/161851b7a05a60c1666d9627bcf1581389e3b51ceea1d58c409e9c98c4859fa68c202bd7bb920ff779b44b5c6f3c2911?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
+
+图2
 
 图2展示了RIG（实线：solid curve）和PE（虚线：doted curve）随着一个关注的CTR区间的变化情况。我们观察到，RIG scores会随着dataset中的CTR的增加而降低，即使是相同的预估模型。图2中的prediction error意味着，prediction score与true CTR有多接近。正如所期望的，click prediction error要比低的pClick score区间要高。
 
@@ -177,13 +196,23 @@ AUC是一个可以评估预估模型效果的相当可靠的方法，它在样�
 
 # 6.离线和在线效果差异
 
-实践中，关于离线评估指标，一个非常显著的问题是：离线和在线间的效果差异。存在这样的情况：一个预估模型在离线指标上达到极大增益，在online testing环境部署时发现效果表现并不好。
+实践中，关于离线评估指标，一个非常显著的问题是：离线和在线间的效果差异。**存在这样的情况：一个预估模型在离线指标上达到显著增益，在online testing环境部署时发现效果表现并不好**。
 
 表5总结了一个点击预估模型在Bing付费搜索数据上构建的离线和在线指标，并在一个线上真实流量上进行online AB testing环境实验。Click yield（CY）是一个在线用户点击指标，它会measure每个搜索PV上广告的点击数。Mainline CY是在每次搜索PV下mainline ads的点击数。新模型vs baseline模型，会在在线环境中在user clicks上显著下降，即使在离线评估数据上AUC和RIG会有显著收益。
 
-力u 3
+
+
+表5
 
 图3对比了：在感兴趣pClick scores范围内，每个分位下（quantile），两个点击预估模型的log-loss（baseline：model-1，test：model2）。Model-2会在较低pClick score范围的分位上大量过度估计（overestimates）pClick scores。图4绘制了相同数据的prediction error。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b1fba34bedfd41112794910c5a078f6cb2d961dd50d6471c201a1b07470c173beb19d68ddb2a6a49405b72844e98b838?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
+
+图3
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/f460a90f8d8d7abbb9f888945bb659806087a15d32a8b775b014a55170a8f921159666ece337ce371444655dcb181f56?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=4.jpg&amp;size=750">
+
+图4
 
 对比起低pClick score范围的过度估计，pClick scores的更高范围上于click概率做出过度估计对于在线效果影响较小，因为在高pClick score范围上的广告最可能被多个模型选中。一旦展示给用户，user clicks大多数由ad-position和ads的relevances决定，而非分配的pClick scores。
 
