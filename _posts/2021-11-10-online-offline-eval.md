@@ -22,7 +22,7 @@ microsoft在《Predictive Model Performance: Offline and Online Evaluations》�
 
 - 有了该bias，**我们如何解释和对比应用不同类型数据的模型效果**？
 - 例如，当我们构建对于文本广告和展示广告的预估模型时，我们可以**使用离线指标作为可对比度量（comparative measures）来预估它的真实效果吗**？
-- 假设我们知道一个模型的真实效果，并且我们获得了另一个模型（the other model）相当的离线指标（offline metrics）。我们是否可以估计该另一个模型（the other model）的真实效果呢？如果不能，我们应使用哪种metrics进行替代？
+- **假设我们知道一个模型的真实效果，并且我们获得了另一个模型（the other model）相当的离线指标（offline metrics）。我们是否就可以估计该另一个模型（the other model）的真实效果呢**？如果不能，我们应使用哪种metrics进行替代？
 
 我们提出一种新的模型评估范式：仿真指标（simulated metrics）。对于在线行为的离线仿真，我们实现了 auction simulation，并使用simulated metrics来估计该点击预估模型的在线模型效果。由于simulated metrics被设计用于模拟在线行为，我们期望更少遭受效果差异问题。另外，由于simulated metrics直接估计像user CTR等在线指标，他们可以被直接对比，即使模型基于不同数据进行构建。
 
@@ -36,25 +36,30 @@ microsoft在《Predictive Model Performance: Offline and Online Evaluations》�
 
 ## 4.1 AUC
 
-考虑一个二元分类器，它会产生一个关于事件的概率：p。 1-p表示事件不会发生的概率，p和1-p表示：每个case是两种事件其中之g。为了预估所属class，阈值是必要的。AUC（Area under the ROC (Receiver Operating Characteristic) 曲线），提供了一个在阈值所有可能范围间的判别式衡量（discriminative measure）.
+考虑一个二元分类器，它会产生：
+
+- p：表示一个事件发生的概率
+- 1-p：表示事件不会发生的概率
+
+p和1-p表示：每个case是两种事件其中之一。为了预估所属class，阈值是必要的。AUC（Area under the ROC (Receiver Operating Characteristic) 曲线），提供了一个在阈值所有可能范围间的判别式衡量（discriminative measure）.
 
 在一个混淆矩阵中，4个不同部分的概率对比：
 
 - 真阳率- true positive rate (TPR) ：也叫做sensitivity
 - 真阴率- true negative rate (TNR) ：也叫做specificity
-- false positive rate (FPR) ：也叫做 commission
-- false negative rate (FNR) ：也叫做 omission errors
+- 假阳率- false positive rate (FPR) ：也叫做 commission
+- 假阴率- false negative rate (FNR) ：也叫做 omission errors
 
 从混淆矩阵中派生出的这4个scores和其它关于accuracy的measures，比如：precision, recall, or accuracy 都依赖于threshold。
 
 ROC曲线是一个关于sensitivity (or TPR)的一个图形描述，是一个关于二分类的FPR的函数，随threshold变化。AUC计算如下：
 
 - 按模型预估分的降序进行sort
-- 为每个预估值计算TPR和FPR
+- 为每个预估值计算真阳率（TPR）和假阳率（FPR）
 - 绘制ROC曲线
 - 使用梯度近似来计算AUC
 
-经验上，AUC是一个关于任意scoring model的预估能力的可靠指标。对于付费搜索，AUC，特别是只在主要广告上measure的AUC，是关于模型预估能力的最可靠指标。一个好的模型（AUC>0.8），如果AUC能提升1个点（0.01），通常具有统计显著提升（statistically significant improvement）。
+经验上，AUC是一个关于任意scoring model的预估能力的可靠指标。对于付费搜索，AUC，特别是只在主线广告上measure的AUC，是关于模型预估能力的最可靠指标。**一个好的模型（AUC>0.8），如果AUC能提升1个点（0.01），通常具有统计显著提升（statistically significant improvement）**。
 
 预估模型使用AUC的好处包括：
 
@@ -75,9 +80,9 @@ $$
 其中：
 
 - c和p分别表示observed click和pClick。
-- $$\gamma$$表示评估数据的CTR
+- $$\gamma$$表示**评估数据的CTR**
 
-Log-loss表示click的期望概率（expected probability）。最小化log-loss意味着pClick应收敛到expected click rate上，RIG score会增加。
+**Log-loss表示click的期望概率（expected probability）**。最小化log-loss意味着pClick应收敛到expected click rate上，RIG score会增加。
 
 ## 4.3 MSE
 
@@ -91,7 +96,7 @@ $$
 
 - $$p_i$$和$$c_i$$分别样本i是pClick和observed click
 
-NMSE（Normalized MSE）是由CTR, $$\gamma$$归一化的MSE：
+NMSE（Normalized MSE）是**由CTR, $$\gamma$$归一化的MSE**：
 
 $$
 NMSE(P) = \frac{MSE(P)}{\gamma \cdot (1-\gamma)}
@@ -119,19 +124,19 @@ $$
 PE(P) = \frac{avg(p)}{\gamma} - 1
 $$
 
-当平均pClick score准确估计CTR时，PE会变0。另一方面，当pClick scores相当不准时（有可能欠估计、过估计的混合，平均值与underlying CTR相似），PE可能接近0。这使得prediction error相当不稳定，它不能被用来可靠估计分类accuracy。
+当平均pClick score准确估计CTR时，PE会变0。另一方面，当pClick scores相当不准时（有可能欠估计、过估计的混合，平均值与underlying CTR相似），PE可能接近0。**这使得prediction error相当不稳定，它不能被用来可靠估计分类accuracy**。
 
 ## 4.6  Simulated Metric
 
 尽管在controlled AB testing环境下的在线实验会提供关于用户engagement方面的模型的真实效果对比指标，AB testing环境是通过一些固定参数值集合预设定的，因而，在testing环境上的模型效果指标只对应于操作点的给定集合。在多个操作点集合上开展实验，是不实际的，因为在线实验不仅耗时，而且如果新模型效果欠佳，对于用户体验和收益都很昂贵。
 
-作为在线评估的替代，在整个可行操作点的跨度（span）上，一个模型的效果可以使用历史在线用户engagement data进行仿真。Kumar et.为federated search 开发了一种在线效果仿真方法[20]。
+作为在线评估的替代，在整个可行操作点的范围（span）上，**一个模型的效果可以使用历史在线用户engagement data进行仿真。Kumar et.为federated search 开发了一种在线效果仿真方法[20]**。
 
-Auction simulation，首先为给定query会离线复现ad auctions，并基于新的模型预估分、以及多个操作点集合选择一个ads集合。
+Auction simulation，首先：**为给定query会离线复现ad auctions，并基于新的模型预估分、以及多个操作点集合选择一个ads集合**。
 
 我们使用付费搜索（sponsored search）点击日志数据来实现auction simulation，并生成多个simulated metrics。Auction simulation，首先，首先，为给定query离线复现ad auctions，并基于新模型预估分选择ads的一个集合。在仿真期间，会使用在日志中提供的(query, ad) pair的历史用户点击来预估用户点击：
 
-- 如果(query, ad) pair在日志中被发现，但仿真的ad-position与在日志中的posiiton不同，expected CTR会通过position-biased histric CTR（或click曲线）被校准（calibirated）。一般的，对于相同的(query, ad) pair，主要广告（mainline ads）会比sidebar ads获得更高的大CTR，在相同ad block内，对于相同的(query, ad) pair，在更高位置的广告会获得更高的CTR。
+- 如果(query, ad) pair在日志中被发现，但仿真的ad-position与在日志中的posiiton不同，expected CTR会通过position-biased histric CTR（或click曲线）被校准（calibirated）。一般的，对于相同的(query, ad) pair，主线广告（mainline ads）会比sidebar ads获得更高的大CTR，在相同ad block内，对于相同的(query, ad) pair，在更高位置的广告会获得更高的CTR。
 - 如果predicted(query, ad) pair不会出现在historic logs中，会使用在ad-position上的平均CTR（也被称为：reference CTR）。
 
 Click曲线和reference CTR来源于自在搜索广告日志中的historic user responses。
