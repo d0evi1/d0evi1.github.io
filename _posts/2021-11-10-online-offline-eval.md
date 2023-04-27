@@ -57,7 +57,7 @@ ROC曲线是一个关于sensitivity (or TPR)的一个图形描述，是一个关
 - 按模型预估分的降序进行sort
 - 为每个预估值计算真阳率（TPR）和假阳率（FPR）
 - 绘制ROC曲线
-- 使用梯度近似来计算AUC
+- 使用**梯形近似（trapezoid approximation）**来计算AUC
 
 经验上，AUC是一个关于任意scoring model的预估能力的可靠指标。对于付费搜索，AUC，特别是只在主线广告上measure的AUC，是关于模型预估能力的最可靠指标。**一个好的模型（AUC>0.8），如果AUC能提升1个点（0.01），通常具有统计显著提升（statistically significant improvement）**。
 
@@ -154,13 +154,13 @@ AUC是一个可以评估预估模型效果的相当可靠的方法，它在样�
 首先，它忽略了预估的概率值（predicted probability values）。这使得它对于**预估概率的保序变换**不敏感。
 
 - 一方面，这也是个优点，它使得在不同的measurement scales上生成的数值结果是可对比测试的。
-- 另一方面，对于两个tests来说，生成具有相似AUC scores、并且非常不同的预估输出是相当可能的。它可能是一个较差拟合（poorly fitted）的模型（对所有预估过拟合、或者欠拟合），具有一个良好的判别能力；而一个良好拟合（well-fitted）的模型，如果出现概率略微高于不出现概率时，会具有较差的判别。
+- 另一方面，对于两个tests来说，生成具有相似AUC scores、并且非常不同的预估输出是相当可能的。它可能是一个较差拟合模型（poorly fitted model）（对所有预估过拟合、或者欠拟合），具有一个良好的判别能力；而一个良好拟合模型（well-fitted model），如果出现概率略微高于不出现概率时，会具有较差的判别。
 
-表2展示了关于一个poorly-fitted模型示例，它具有较高AUC score，其中，大量负样本具有非常低的pClick scores，从而有更低的CTR。在相对更高的pClick scores范围内，这会降低FPR，从而引出了AUC score。
+表2中的示例展示了：一个poorly-fitted model，它使用大量负样本，具有非常低的pClick scores，从而有更低的CTR，反而具有较高AUC score。**在相对更高的pClick scores范围内，它会影响FPR的降低，从而提高AUC score**。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/522432bbf074f32440d9a0819586780fcc983f5f3b3dcb2c41daad3daa97b410d176a81d0c3998033b982e16b955b6a3?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t2.jpg&amp;size=750">
 
-表2 AUC反常示例1：一个poorly fitted模型，具有更高AUC，现在大量负样本集中在pClick score范围的低端(第一张表展示了：better1-fitted模型)
+表2 AUC反常示例1：一个poorly fitted model，具有更高AUC，现在大量负样本集中在pClick score范围的低端(第一张表展示了：better1-fitted模型)
 
 第二，在整个ROC空间的spectrum上（包括很少操作的区域），它会总结测试效果。例如，对于付费搜索，在mainline上放置一个ad会显著影响CTR，预估CTR如何拟合实际CTR（ad展示在mainline上或者它没有展示）并不是个大问题。换句话说，ROC的极左和极右通常很少用。Baker and Pinsky提出了**partial ROC曲线**作为整个ROC曲线的一个替代选择。
 
