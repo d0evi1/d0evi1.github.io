@@ -160,9 +160,9 @@ AUC是一个可以评估预估模型效果的相当可靠的方法，它在样�
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/522432bbf074f32440d9a0819586780fcc983f5f3b3dcb2c41daad3daa97b410d176a81d0c3998033b982e16b955b6a3?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t2.jpg&amp;size=750">
 
-表2 AUC反常示例1：一个poorly fitted model，具有更高AUC，现在大量负样本集中在pClick score范围的低端(第一张表展示了：better1-fitted模型)
+表2 AUC反常示例1：一个poorly fitted model，具有更高AUC，现在大量负样本集中在pClick score范围的低端(图中的第一张图展示了：better1-fitted模型)
 
-第二，在整个ROC空间的spectrum上（包括很少操作的区域），它会总结测试效果。例如，对于付费搜索，在mainline上放置一个ad会显著影响CTR，预估CTR如何拟合实际CTR（ad展示在mainline上或者它没有展示）并不是个大问题。换句话说，ROC的极左和极右通常很少用。Baker and Pinsky提出了**partial ROC曲线**作为整个ROC曲线的一个替代选择。
+第二，在整个ROC空间的spectrum上（包括很少操作的区域），它会总结测试效果。例如，对于付费搜索，在mainline上放置一个ad会显著影响CTR。不管ad在mainline上被展示、还是不被展示，predicted CTR如何拟合actual CTR并不是个大问题。换句话说，ROC的极左和极右通常很少用。Baker and Pinsky提出了**partial ROC曲线**作为整个ROC曲线的一个替代选择。
 
 已经观察到，**更高的AUC并不必然意味着更好的rankings**。如表3所示，在FPR尾部上，样本分布中的变化会大量影响AUC score。然而，在模型CTR效果上的影响可能是相同的，特别是在threshold的实际操作点上。由于AUC不会判别ROC空间的多个区域，通过最优化在数据的任意一端的模型效果，一个模型可能会被训练用来最大化AUC score。这会导致在实际在线流量上，低于期望效果增益。
 
