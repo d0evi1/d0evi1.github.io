@@ -112,7 +112,7 @@ $$
 
 其中：$$e_i = p_i - c_i $$是一个 absolute error.
 
-MAE会权衡在prediction和observation间的distance，同时忽略掉到关键操作点的距离。MAE常用于measure在时序分析中的forecast error。
+MAE会权衡在prediction和observation间的distance，同时忽略掉到关键operating points的距离。MAE常用于measure在时序分析中的forecast error。
 
 经验上，对于付费搜索（sponsored search），预估pClick模型的功率来说，该指标具有一个好的效果。它与AUC一起，是最可靠的指标之一。
 
@@ -128,11 +128,11 @@ $$
 
 ## 4.6  Simulated Metric
 
-尽管在controlled AB testing环境下的在线实验会提供关于用户engagement方面的模型的真实效果对比指标，AB testing环境是通过一些固定参数值集合预设定的，因而，在testing环境上的模型效果指标只对应于操作点的给定集合。在多个操作点集合上开展实验，是不实际的，因为在线实验不仅耗时，而且如果新模型效果欠佳，对于用户体验和收益都很昂贵。
+尽管在controlled AB testing环境下的在线实验会提供关于用户engagement方面的模型的真实效果对比指标，AB testing环境是通过一些固定参数值集合预设定的，因而，在testing环境上的模型效果指标只对应于operating points的给定集合。在多个operating points集合上开展实验，是不实际的，因为在线实验不仅耗时，而且如果新模型效果欠佳，对于用户体验和收益都很昂贵。
 
-作为在线评估的替代，在整个可行操作点的范围（span）上，**一个模型的效果可以使用历史在线用户engagement data进行仿真。Kumar et.为federated search 开发了一种在线效果仿真方法[20]**。
+作为在线评估的替代，在整个可行operating points的范围（span）上，**一个模型的效果可以使用历史在线用户engagement data进行仿真。Kumar et.为federated search 开发了一种在线效果仿真方法[20]**。
 
-Auction simulation，首先：**为给定query会离线复现ad auctions，并基于新的模型预估分、以及多个操作点集合选择一个ads集合**。
+Auction simulation，首先：**为给定query会离线复现ad auctions，并基于新的模型预估分、以及多个operating points集合选择一个ads集合**。
 
 我们使用付费搜索（sponsored search）点击日志数据来实现auction simulation，并生成多个simulated metrics。Auction simulation，首先，为给定query离线复现ad auctions，并基于新模型预估分选择ads的一个集合。在仿真期间，会使用在日志中提供的(query, ad) pair的历史用户点击来预估用户点击：
 
@@ -141,7 +141,7 @@ Auction simulation，首先：**为给定query会离线复现ad auctions，并�
 
 Click曲线和reference CTR来源于自在搜索广告日志中的historic user responses。
 
-经验上，对于操作点的给定集合，auction simulation会生成高度准确的ads集合，它们会被新模型选中。 Simulated metric通常结果是在线模型效果的最强离线估计之一。
+经验上，对于operating points的给定集合，auction simulation会生成高度准确的ads集合，它们会被新模型选中。 Simulated metric通常结果是在线模型效果的最强离线估计之一。
 
 # 5.METRICS在真实世界中的问题
 
@@ -164,7 +164,7 @@ AUC是一个可以评估预估模型效果的相当可靠的方法，它在样�
 
 第二，在整个ROC空间的spectrum上（包括很少操作的区域），它会总结测试效果。例如，对于付费搜索，在mainline上放置一个ad会显著影响CTR。不管ad在mainline上被展示、还是不被展示，predicted CTR如何拟合actual CTR并不是个大问题。换句话说，ROC的极左和极右通常很少用。Baker and Pinsky提出了**partial ROC曲线**作为整个ROC曲线的一个替代选择。
 
-已经观察到，**更高的AUC并不必然意味着更好的rankings**。如表3所示，在FPR尾部上，样本分布中的变化会大量影响AUC score。然而，在模型CTR效果上的影响可能是相同的，特别是在threshold的实际操作点上。由于AUC不会判别ROC空间的多个区域，通过最优化在数据的任意一端的模型效果，一个模型可能会被训练用来最大化AUC score。这会导致在实际在线流量上，低于期望效果增益。
+已经观察到，**更高的AUC并不必然意味着更好的rankings**。如表3所示，在FPR尾部上，样本分布中的变化会大量影响AUC score。然而，在模型CTR效果上的影响可能是相同的，特别是在threshold的实际operating points上。由于AUC不会判别ROC空间的多个区域，通过最优化在数据的任意一端的模型效果，一个模型可能会被训练用来最大化AUC score。这会导致在实际在线流量上，低于期望效果增益。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/188b31ec3d689ae8aa4f58049a71b568023cb5d55d00a0ae81d823885bf62a563600f9fb5eb6c869a6e5c74e73d3c218?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t3.jpg&amp;size=750">
 
