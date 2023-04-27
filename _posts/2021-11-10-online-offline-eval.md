@@ -153,14 +153,14 @@ AUC是一个可以评估预估模型效果的相当可靠的方法，它在样�
 
 首先，它忽略了预估的概率值（predicted probability values）。这使得它对于**预估概率的保序变换**不敏感。
 
-- 一方面，这也是个优点，它使得在不同的measurement scales上生成的数值结果是可对比测式的。
+- 一方面，这也是个优点，它使得在不同的measurement scales上生成的数值结果是可对比测试的。
 - 另一方面，对于两个tests来说，生成具有相似AUC scores、并且非常不同的预估输出是相当可能的。它可能是一个较差拟合（poorly fitted）的模型（对所有预估过拟合、或者欠拟合），具有一个良好的判别能力；而一个良好拟合（well-fitted）的模型，如果出现概率略微高于不出现概率时，会具有较差的判别。
 
 表2展示了关于一个poorly-fitted模型示例，它具有较高AUC score，其中，大量负样本具有非常低的pClick scores，从而有更低的CTR。在相对更高的pClick scores范围内，这会降低FPR，从而引出了AUC score。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/522432bbf074f32440d9a0819586780fcc983f5f3b3dcb2c41daad3daa97b410d176a81d0c3998033b982e16b955b6a3?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t2.jpg&amp;size=750">
 
-表2
+表2 AUC反常示例1：一个poorly fitted模型，具有更高AUC，现在大量负样本集中在pClick score范围的低端(第一张表展示了：better1-fitted模型)
 
 第二，在整个ROC空间的spectrum上（包括很少操作的区域），它会总结测试效果。例如，对于付费搜索，在mainline上放置一个ad会显著影响CTR，预估CTR如何拟合实际CTR（ad展示在mainline上或者它没有展示）并不是个大问题。换句话说，ROC的极左和极右通常很少用。Baker and Pinsky提出了**partial ROC曲线**作为整个ROC曲线的一个替代选择。
 
@@ -168,11 +168,15 @@ AUC是一个可以评估预估模型效果的相当可靠的方法，它在样�
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/188b31ec3d689ae8aa4f58049a71b568023cb5d55d00a0ae81d823885bf62a563600f9fb5eb6c869a6e5c74e73d3c218?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t3.jpg&amp;size=750">
 
-表3
+表3 AUC反常示例2: 在FPR两端上，样本分布的变化会非常影响AUC score，尽管实际效果提升与在实际操作上很相似
 
 第三，它会等价权衡omission和omission errors。例如，在付费搜索中，在mainline中没有放置最优ads的惩罚（penalty）（omission error）远远超过放置一个次优ads的惩罚（penalty）。当误分类代价不等时，对所有可等阈值进行汇总是有瑕疵的。
 
-最近，AUC高度依赖于数据底层分布。AUC会对两个具有不同负样本率的数据集进行计算。如果4所示，一个具有较低内在CTR的poorly-fitted模型，会与一个well-fitted模型具有相同的AUC。这意味着，**一个使用更高负样本率训练的模型，具有较高AUC score时，并不必然意味着模型具有更好的预估效果**。图1绘制了关于付费搜索和contextual ads的pClick模型的ROC曲线。如图所示，contextual ads的AUC score要比付费搜索的AUC高3%，尽管前者会更不准：付费搜索为$$\frac{avg \  pClick}{actual \ CTR} = 1.02$$，而contextual ads为0.86。
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a2a2047350986463780786775abdf5a1529d68c664d2ac58ed3429b67e1c5786557b1ca48739b6557fbb7eca8e617101?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t4.jpg&amp;size=750">
+
+表4 AUC反常示例3: 一个poorly fitted model与well-fitted model具有相似的AUC
+
+最后，AUC高度依赖于数据底层分布。AUC会对两个具有不同负样本率的数据集进行计算。如表4所示，一个具有较低内在CTR的poorly-fitted模型，会与一个well-fitted模型具有相同的AUC。这意味着，**一个使用更高负样本率训练的模型，具有较高AUC score时，并不必然意味着模型具有更好的预估效果**。图1绘制了关于付费搜索和contextual ads的pClick模型的ROC曲线。如图所示，contextual ads的AUC score要比付费搜索的AUC高3%，尽管前者会更不准：付费搜索为$$\frac{avg \  pClick}{actual \ CTR} = 1.02$$，而contextual ads为0.86。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/9de05fba7dca7f1a4e71ba3edd28264ba76c8495f98f5d6470289a47ef270d4879658cb59324ebc9ce08566acd1b930f?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
