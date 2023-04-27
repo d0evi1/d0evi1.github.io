@@ -41,7 +41,7 @@ microsoft在《Predictive Model Performance: Offline and Online Evaluations》�
 - p：表示一个事件发生的概率
 - 1-p：表示事件不会发生的概率
 
-p和1-p表示：每个case是两种事件其中之一。为了预估所属class，阈值是必要的。AUC（Area under the ROC (Receiver Operating Characteristic) 曲线），提供了一个在阈值所有可能范围间的判别式衡量（discriminative measure）.
+p和1-p表示：每个case是两种事件其中之一。为了预估所属class，threshold是必要的。AUC（Area under the ROC (Receiver Operating Characteristic) 曲线），提供了一个在threshold所有可能范围间的判别式衡量（discriminative measure）.
 
 在一个混淆矩阵中，4个不同部分的概率对比：
 
@@ -63,7 +63,7 @@ ROC曲线是一个关于sensitivity (or TPR)的一个图形描述，是一个关
 
 预估模型使用AUC的好处包括：
 
-- AUC提供了一个：在所有可能阈值范围上，对整个模型效果的单值判别式得分归纳。这可以避免在阈值选择中的主观因素
+- AUC提供了一个：在所有可能threshold范围上，对整个模型效果的单值判别式得分归纳。这可以避免在threshold选择中的主观因素
 - 可以应用到任意scoring function的预估模型上
 - AUC得分介于[0, 1]之间，得分0.5表示随机预估，1表示完美预估
 - AUC可以同时被用于预估模型的offline和online监控中
@@ -162,16 +162,18 @@ AUC是一个可以评估预估模型效果的相当可靠的方法，它在样�
 
 表2 AUC反常示例1：一个poorly fitted model，具有更高AUC，现在大量负样本集中在pClick score范围的低端(图中的第一张图展示了：better1-fitted模型)
 
+模型的预估点击率pClick、预估的
+
 第二，在整个ROC空间的spectrum上（包括很少操作的区域），它会总结测试效果。例如，对于付费搜索，在mainline上放置一个ad会显著影响CTR。不管ad在mainline上被展示、还是不被展示，predicted CTR如何拟合actual CTR并不是个大问题。换句话说，ROC的极左和极右通常很少用。Baker and Pinsky提出了**partial ROC曲线**作为整个ROC曲线的一个替代选择。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/188b31ec3d689ae8aa4f58049a71b568023cb5d55d00a0ae81d823885bf62a563600f9fb5eb6c869a6e5c74e73d3c218?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t3.jpg&amp;size=750">
 
 表3 AUC反常示例2: 在FPR两端上，样本分布的变化会非常影响AUC score，尽管实际效果提升与在实际操作上很相似
 
-已经观察到，**更高的AUC并不必然意味着更好的rankings**。如表3所示，在FPR尾部上，样本分布中的变化会大量影响AUC score。然而，在模型CTR效果上的影响可能是相同的，特别是在threshold的实际operating points上。由于AUC不会判别ROC空间的多个区域，通过最优化在数据的任意一端的模型效果，一个模型可能会被训练用来最大化AUC score。这会导致在实际在线流量上，低于期望效果增益。
+已经观察到，**更高的AUC并不必然意味着更好的rankings**。如表3所示，在FPR尾部上，样本分布中的变化会非常影响AUC score。然而，在模型CTR效果上的影响可能是相同的，特别是在threshold的实际operating points上。由于AUC不会判别ROC空间的多个区域，通过最优化在数据的任意一端的模型效果，一个模型可能会被训练用来最大化AUC score。这会导致在实际在线流量上，低于期望效果增益。
 
 
-第三，它会等价权衡omission和omission errors。例如，在付费搜索中，在mainline中没有放置最优ads的惩罚（penalty）（omission error）远远超过放置一个次优ads的惩罚（penalty）。当误分类代价不等时，对所有可等阈值进行汇总是有瑕疵的。
+第三，它会等价权衡omission和omission errors。例如，在付费搜索中，在mainline中没有放置最优ads的惩罚（penalty）（omission error）远远超过放置一个次优ads的惩罚（penalty）。当误分类代价不等时，对所有可等threshold进行汇总是有瑕疵的。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a2a2047350986463780786775abdf5a1529d68c664d2ac58ed3429b67e1c5786557b1ca48739b6557fbb7eca8e617101?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t4.jpg&amp;size=750">
 
