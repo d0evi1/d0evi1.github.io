@@ -75,7 +75,7 @@ $$
 
 表1 常用的surrogate function，当成AUC的indicator
 
-在本paper中，我们出于两个原因会使用pairwise exponential loss 作为surrogate。
+在本paper中，我们出于两个原因会**使用pairwise exponential loss 作为surrogate**。
 
 - 首先，【3】中已经证明，pairwise exponential loss与AUC一致。
 - 第二，我们会对比在我们的先决实验列出的surrogates，并发现pairwise exponential loss要胜过离线评估（如表4所示）
