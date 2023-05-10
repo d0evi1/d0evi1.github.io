@@ -94,7 +94,7 @@ $$
 聚焦于上面的问题，我们提出构建**难样本对**，并让模型关注于难样本对，而非所有样本对。一个难样本对指的是：**模型很难区分正/负样本labels的实例。因而，对于这样的正负样本对，输出scores是很接近的，它使得决策边界不好判断**。考虑：
 
 $$
-\overset{E}{x^+ \sim P^+, \\ x^- \sim P^-} (\phi(f(x^+)) - f(x^-)) \leq \overset{max}{x^+ \sim P^+,\\ x^- \sim P^-} ( \phi(f(x^+) - f(x^-)))
+\underset{x^+ \sim P^+ \\ x^- \sim P^-}{E} (\phi(f(x^+)) - f(x^-)) \leq \underset{x^+ \sim P^+ \\ x^- \sim P^-}{max} ( \phi(f(x^+) - f(x^-)))
 $$
 
 ...(3)
