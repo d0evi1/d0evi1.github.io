@@ -61,7 +61,7 @@ $$
 $$\lbrace x_i^+ \rbrace$$和$$\lbrace x_j^- \rbrace$$分别是postive和negative样本的集合。由于indicator function是不可微的，WMW统计不能使用gradient-based算法进行最优化。它启发我们寻找一种可微的surrogate objective function，用于替代WMW statistic。也就是说，获得surrogate function的最优解等价于最大化AUC metric。我们将使用将surrogate的objective function公式为：
 
 $$
-E_{x^+ \sim P^+, x^- \sim P^-} (\phi(f(x^+)) - f(x^-))
+\underset{E}{x^+ \sim P^+, x^- \sim P^-} (\phi(f(x^+) - f(x^-)))
 $$
 
 ...(2)
