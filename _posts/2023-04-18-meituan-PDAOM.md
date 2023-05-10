@@ -12,24 +12,28 @@ meituan在《Enhancing Personalized Ranking With Differentiable Group AUC Optimi
 
 # 抽要
 
-AUC是评估classifier效果的一个常用指标。然而，大多数分类器使用cross entropy训练，它不会直接最优化AUC metric，它会留下在training和evaluation间存在一个gap。这里提出的PDAOM loss：一个最大化violation的个性化可微AUC最优化方法（Personalized and Differentiable AUC Optimizationy method with Maximum violation）, 当训练一个二分类器时可以直接应用，并且使用gradient-based方法进行最优化。特别的，我们会使用通过user ID group在一起的sub-batches内的不同的（neg, postive）pair样本，来构建了pairwise exponential loss，目标是指导分类器关注：在独立用户视角下，在很难区分的正负样本对间的关系。对比起pairwise exponential loss的原始形式，提出的PDAOM loss不仅会提升在离线评估中的AUC和GAUC metrics，也会减少训练目标的计算复杂度。再者，在“猜你喜欢”的feed推荐上，PDAOM loss的在线评估可以获得在点击数上 1.4%的提升，在订单数上获得0.65%的提升，这在online life service推荐系统上是个显著的提升。
+AUC是评估classifier效果的一个常用指标。然而，大多数分类器使用cross entropy训练，它不会直接最优化AUC metric，这在training和evaluation间会存在一个gap。这里提出的PDAOM loss：一个**最大化violation的个性化可微AUC最优化方法（Personalized and Differentiable AUC Optimizationy method with Maximum violation）**, 当训练一个二分类器时可以直接应用，并使用gradient-based方法进行最优化。特别的，我们会使用通过user ID group在一起的sub-batches内的不同的（neg, postive）pair样本，来构建了pairwise exponential loss，目标是指导分类器关注：**在独立用户视角下，很难区分的正负样本对间的关系**。对比起pairwise exponential loss的原始形式，**提出的PDAOM loss不仅会提升在离线评估中的AUC和GAUC metrics，也会减少训练目标的计算复杂度**。再者，在“猜你喜欢”的feed推荐上，PDAOM loss的在线评估可以获得在点击数上 1.4%的提升，在订单数上获得0.65%的提升，这在online life service推荐系统上是个显著的提升。
 
 # 1.介绍
 
-二分排序(Bipartite ranking)在过去受到了大量关注，在工业应用中被广泛使用。它的目标是：学习一个模型，能够将正样本的排序高于负样本。不失一般性，我们以推荐系统为例，并详述二分排序。根据一个用户的历史行为统计，推荐系统会提供一个关于items的有序列表，其中，感兴趣的items会出现在不感兴趣的items之前。达到该目标的关键思想是：为每个item预估CTR。用户浏览过但没有点击的items会被标记为负样本，点击过的items会被标记为正样本。接着，CTR预估模型可以被训练成一个二分类器，并使用 cross entropy进行最优化。这种方式下，每个样本会被独立对待，并且在训练期间，正负样本间的限制关系不会被引入。另一个关注点是：对比起用户看过的items，clicked items只占一小部分。因而，模型的效果基本上使用AUC metric进行评估，其中数据分布是imbalanced的。AUC会measures：对于一个随机抽样的正例，它要比一个随机抽样的负例具有更高score的概率。然而，在训练期间cross entropy目标，不会完全与evaluation期间的目标完全对齐。实际上，一个常见现象是，当训练loss减少时AUC metric不会增加，在工业界推荐数据集上训练的一个示例如图1所示。它会启发我们，在训练期间直接对AUC metric进行最优化。
+二分排序(Bipartite ranking)在过去受到了大量关注，在工业应用中被广泛使用。它的目标是：**学习一个模型，使得正样本的排序高于负样本**。不失一般性，我们以推荐系统为例，并详述二分排序。根据一个用户的历史行为统计，推荐系统会提供一个关于items的有序列表，其中，感兴趣的items会出现在不感兴趣的items之前。达到该目标的关键思想是：为每个item预估CTR。用户浏览过但没有点击的items会被标记为负样本，点击过的items会被标记为正样本。接着，CTR预估模型可以被训练成一个二分类器，并使用 cross entropy进行最优化。这种方式下，每个样本会被独立对待，并且在训练期间，正负样本间的限制关系不会被引入。另一个关注点是：对比起用户看过的items，clicked items只占一小部分。因而，模型的效果基本上使用AUC metric进行评估，其中数据分布是imbalanced的。**AUC会measures：对于一个随机抽样的正例的score，它要比一个随机抽样的负例score具有更高分的概率**。然而，在训练期间cross entropy目标，不会完全与evaluation期间的目标完全对齐。实际上，一个常见现象是，当训练loss减少时AUC metric不会增加，在工业界推荐数据集上训练的一个示例如图1所示。它会启发我们，在训练期间直接对AUC metric进行最优化。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/038a25bd4c11d9f7f628fb50ee02f3fd4989fb48524db51935d213c71b73030f46ab9147663f8951cf106cf697b809f0?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
-图1
+图1 loss曲线和AUC metric随training steps的变化，其中AUC metric不总是随loss的减少而增加
 
-另一个大问题是，推荐系统经常面对“长尾”现象，例如：一小部分商品会占据着大量的销售额。图2展示了来自Meituan电商的统计数据。我们根据它们的订单质量将商品分为100 bins，并绘制出top 30 bins。我们可以看到，top 1 bin的商品贡献了37%的订单，top 20 bins的商品贡献了80%的订单。如果我们使用这样不均衡的数据来训练一个CTR预估模型，该模型会趋向于分配更高得分给热门商品，即使一些用户可能不喜欢这些items，这在个性化预估上会降低模型效果。Group AUC【19】是一个合理的metric，用于评估一个ranking model的个性化推荐能力。它会通过user ID进行分组，计算各个sets中的AUC，并每个set的结果进行平均。经验上，对比起AUC metric，离线的GAUC metric会与在线效果更一致些，进一步启发我们在训练ranking model时将GAUC metric加入到objective中。
+另一个大问题是：**推荐系统经常面对“长尾”现象，例如：一小部分商品会占据着大量的销售额**。图2展示了来自Meituan电商的统计数据。我们根据它们的订单质量将商品分为100 bins，并绘制出top 30 bins。我们可以看到，**top 1 bin的商品贡献了37%的订单，top 20 bins的商品贡献了80%的订单**。**如果我们使用这样不均衡的数据来训练一个CTR预估模型，该模型会趋向于分配更高得分给热门商品，即使一些用户可能不喜欢这些items，这在个性化预估上会降低模型效果**。Group AUC【19】是一个合理的metric，用于评估一个ranking model的个性化推荐能力。它会通过user ID进行分组，计算各个sets中的AUC，并每个set的结果进行平均。经验上，对比起AUC metric，离线的GAUC metric会与在线效果更一致些，进一步启发我们在训练ranking model时将GAUC metric加入到objective中。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/51d0bc987f73347f8be231d74b4b868d1bcdfa7dd80c9afacfa4e2046598d575f1c9e3ace472d2d390cf079e7873abd8?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 在美团电商中的长尾现象。top bins中的商品贡献了大比例的订单
 
-然而，有两个原因阻止我们直接最优化AUC metric。一方面，AUC metric会通过一个binary indicator函数的总和来计算，它是不可微的。因而，gradient-based
-optimization方法不能应用于该问题中。另一方面，AUC的公式会考虑上每个postive/negative样本对，会导致时间复杂度上升到$$O(N^+ N^-)$$，它在实际工业推荐场景中是不可接受的，通常会是数十亿阶。该问题上做了大量研究。对于前者，对于原始AUC公式，最近工作尝试替代可微替代目标函数（differentiable surrogate objective function）。【18】提出了使用它的convex surrogate（例如：hinge loss function）来替代indicator function。【2】设计了一个regression-based算法，它使用pairwise squared objective function，用于measure在不同分类的两个实例间的ranking errors。【3】研究了基于最优化pairwise surrogate objective functions的AUC一致性。对于后者，mini-batch 最优化策略可以使得处理大规模数据集。为了将AUC最大化方法应用于data-intensive场景，我们会研究以mini-batch方式最优化它。特别的，我们提出了PDAOM loss，它关注于难区分的正负样本对，而非将所有组合考虑在内。该trick不仅会提升offline效果，也会减小最优化的复杂度。
+然而，有两个原因阻止我们直接最优化AUC metric。
+
+- 一方面，AUC metric会通过一个binary indicator函数的总和来计算，它是不可微的。因而，gradient-based optimization方法不能应用于该问题中。
+- 另一方面，AUC的公式会考虑上每个postive/negative样本对，会导致时间复杂度上升到$$O(N^+ N^-)$$，它在实际工业推荐场景中是不可接受的，通常会是数十亿阶。
+
+该问题上做了大量研究。对于前者，对于原始AUC公式，最近工作尝试替代可微替代目标函数（differentiable surrogate objective function）。【18】提出了使用它的convex surrogate（例如：hinge loss function）来替代indicator function。【2】设计了一个regression-based算法，它使用pairwise squared objective function，用于measure在不同分类的两个实例间的ranking errors。【3】研究了基于最优化pairwise surrogate objective functions的AUC一致性。对于后者，mini-batch 最优化策略可以使得处理大规模数据集。为了将AUC最大化方法应用于data-intensive场景，我们会研究以mini-batch方式最优化它。特别的，我们提出了PDAOM loss，它关注于难区分的正负样本对，而非将所有组合考虑在内。该trick不仅会提升offline效果，也会减小最优化的复杂度。
 
 # 2.相关工作
 
@@ -61,6 +65,10 @@ $$
 
 - $$\phi$$是surrogate function，一些常用的示例如表1所示。
 - $$P^+, P^-$$分别表示正负样本分布
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ebe48202159d7bb9fba6a936ebee37ecc2ae4c94c3e84f7f8ef1be9c5c25422c3771a87fded7035dc121529d1e34d115?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t1.jpg&amp;size=750">
+
+表1 常用的surrogate function，当成AUC的indicator
 
 在本paper中，我们出于两个原因会使用pairwise exponential loss 作为surrogate。
 
