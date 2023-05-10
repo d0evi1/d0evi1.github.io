@@ -80,17 +80,26 @@ $$
 - 首先，【3】中已经证明，pairwise exponential loss与AUC一致。
 - 第二，我们会对比在我们的先决实验列出的surrogates，并发现pairwise exponential loss要胜过离线评估（如表4所示）
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ade73257d7c724c997c3254525432d93be0d6d63ec86a10db3c384b7550fca3b88a5f3175534fa9e5afec336ba0bbf4e?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t4.jpg&amp;size=750">
+
+表4 
+
 ## B. AUC Optimization with Maximum Violation
 
-上述提到的surrogate objective function存在两个主要缺点。一方面，这样的objective会等价地关注于每个pair，因而，分类器会花费大量精力在建模**易区分的正负样本对关系上**。另一方面，对于一个batch数据，它包含了$$N^+$$的正样本和$$N^-$$的负样本，处理每个pair的复杂度是$$O(N^+ N^-)$$，它对于一个大batch-size来说是很耗时的。聚焦于上面的问题，我们提出构建难样本对，并让模型关注于难样本对，而非所有样本对。一个难样本对指的是：模型很难区分正/负样本labels的实例。因而，对于这样的正负样本对，输出scores是很接近的，它使得决策边界不好判断。考虑：
+上述提到的surrogate objective function存在两个主要缺点：
+
+- 一方面，这样的objective会等价地关注于每个pair，因而，分类器会花费大量精力在建模**易区分的正负样本对关系上**。
+- 另一方面，对于一个batch数据，它包含了$$N^+$$的正样本和$$N^-$$的负样本，处理每个pair的复杂度是$$O(N^+ N^-)$$，它对于一个大batch-size来说是很耗时的。
+
+聚焦于上面的问题，我们提出构建**难样本对**，并让模型关注于难样本对，而非所有样本对。一个难样本对指的是：**模型很难区分正/负样本labels的实例。因而，对于这样的正负样本对，输出scores是很接近的，它使得决策边界不好判断**。考虑：
 
 $$
-E_{x^+ \sim P^+, x^- \sim P^-} (\phi(f(x^+)) - f(x^-)) \leq max_{x^+ \sim P^+, x^- \sim P^-} ( \phi(f(x^+) - f(x^-)))
+\overset{E}{x^+ \sim P^+, x^- \sim P^-} (\phi(f(x^+)) - f(x^-)) \leq \overset{max}{x^+ \sim P^+, x^- \sim P^-} ( \phi(f(x^+) - f(x^-)))
 $$
 
 ...(3)
 
-（3）的一个可行解是：设置 $$max_{x^+ \sim P^+, x^- \sim P^-}(\phi(f(x^+) - f(x^-)))$$作为objective function。计算该最大值只依赖于那些很可能有violate relation的正负样本对。在该方式下，来自easy negatives的loss累积不会影响模型的更新。尽管这样的转换会导致模型关注于确定决策边界，复杂度仍然是$$O(N^+ N^-)$$。由于$$f(x^+) - f(x^-) \in [-1, 1]$$，surrogate function $$\phi$$会在该区间内单调递减。相等的，$$$max_{x^+ \sim P^+, x^- \sim P^-} (\phi(f(x^+) - f(x^-)))$$可以简化为：
+（3）的一个可行解是：设置 $$\underset{max}{x^+ \sim P^+, x^- \sim P^-}(\phi(f(x^+) - f(x^-)))$$作为objective function。计算该最大值只依赖于那些很可能有violate relation的正负样本对。在该方式下，来自easy negatives的loss累积不会影响模型的更新。尽管这样的转换会导致模型关注于确定决策边界，复杂度仍然是$$O(N^+ N^-)$$。由于$$f(x^+) - f(x^-) \in [-1, 1]$$，surrogate function $$\phi$$会在该区间内单调递减。相等的，$$$max_{x^+ \sim P^+, x^- \sim P^-} (\phi(f(x^+) - f(x^-)))$$可以简化为：
 
 $$
 \phi (min_{x^+ \sim P^+, x^- \sim P^-}(f(x^+) - f(x^-))) = \phi( min_{x^+ \sim P^+} f(x^+) - max_{x^- \sim P^-} f(x^-))
@@ -101,7 +110,7 @@ $$
 理想的，的一个正样本的最低分期望会高于在一个batch内负样本的最高分。我们将DAOM loss定义为：
 
 $$
-L_{DAOM} = \phi( min\limits_{x^+ \sim P^+} f(x^+) - max\limits_{x^- \sim P^-} f(x^-))
+L_{DAOM} = \phi( \overset{min}{x^+ \sim P^+} f(x^+) - \overset{max}{x^- \sim P^-} f(x^-))
 $$
 
 ...(5)
