@@ -18,10 +18,13 @@ AUC是评估classifier效果的一个常用指标。然而，大多数分类器�
 
 二分排序(Bipartite ranking)在过去受到了大量关注，在工业应用中被广泛使用。它的目标是：学习一个模型，能够将正样本的排序高于负样本。不失一般性，我们以推荐系统为例，并详述二分排序。根据一个用户的历史行为统计，推荐系统会提供一个关于items的有序列表，其中，感兴趣的items会出现在不感兴趣的items之前。达到该目标的关键思想是：为每个item预估CTR。用户浏览过但没有点击的items会被标记为负样本，点击过的items会被标记为正样本。接着，CTR预估模型可以被训练成一个二分类器，并使用 cross entropy进行最优化。这种方式下，每个样本会被独立对待，并且在训练期间，正负样本间的限制关系不会被引入。另一个关注点是：对比起用户看过的items，clicked items只占一小部分。因而，模型的效果基本上使用AUC metric进行评估，其中数据分布是imbalanced的。AUC会measures：对于一个随机抽样的正例，它要比一个随机抽样的负例具有更高score的概率。然而，在训练期间cross entropy目标，不会完全与evaluation期间的目标完全对齐。实际上，一个常见现象是，当训练loss减少时AUC metric不会增加，在工业界推荐数据集上训练的一个示例如图1所示。它会启发我们，在训练期间直接对AUC metric进行最优化。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/038a25bd4c11d9f7f628fb50ee02f3fd4989fb48524db51935d213c71b73030f46ab9147663f8951cf106cf697b809f0?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
 图1
 
 另一个大问题是，推荐系统经常面对“长尾”现象，例如：一小部分商品会占据着大量的销售额。图2展示了来自Meituan电商的统计数据。我们根据它们的订单质量将商品分为100 bins，并绘制出top 30 bins。我们可以看到，top 1 bin的商品贡献了37%的订单，top 20 bins的商品贡献了80%的订单。如果我们使用这样不均衡的数据来训练一个CTR预估模型，该模型会趋向于分配更高得分给热门商品，即使一些用户可能不喜欢这些items，这在个性化预估上会降低模型效果。Group AUC【19】是一个合理的metric，用于评估一个ranking model的个性化推荐能力。它会通过user ID进行分组，计算各个sets中的AUC，并每个set的结果进行平均。经验上，对比起AUC metric，离线的GAUC metric会与在线效果更一致些，进一步启发我们在训练ranking model时将GAUC metric加入到objective中。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/51d0bc987f73347f8be231d74b4b868d1bcdfa7dd80c9afacfa4e2046598d575f1c9e3ace472d2d390cf079e7873abd8?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
 图2
 
