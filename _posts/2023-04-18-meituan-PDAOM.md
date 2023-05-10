@@ -119,7 +119,12 @@ $$
 
 ## 通过GAUC最优化来增强个性化排序
 
-以上章节详述了如何构建在一个batch内的paired samples，但它满足不了个性化推荐的需求。实际上，我们会发现，GAUC[19] metric与在线效果更一致些。相应的，一个天然的想法是，当最优化模型时，将GAUC metric添加到objective中。考虑GAUC指标的原始计算，样本会首先被分成多个groups。在本context中，groups会被通过user ID进行划分。接着，AUC metric会分别在每个group中计算，GAUC metric会通过将所有groups的AUC metrics进行加权平均得到。weight与曝光或点击次数成比例，这里我们对所有用户将weight设置为1。我们会在训练阶段模拟GAUC的计算。当准备训练数据时，我们会根据每个样本的user ID对样本进行排序，以便一个用户的样本会出现在相同的batch中。一个batch的数据可能会包含许多不同的user IDs，我们将batch划分成sub-batches，在sub-batch中的user ID是相同的。接着我们应用DAOM loss到每个sub-batch中，并将个性化DAOM loss定义为：
+以上章节详述了如何构建在一个batch内的paired samples，但它满足不了个性化推荐的需求。实际上，我们会发现，GAUC[19] metric与在线效果更一致些。**相应的，一个天然的想法是，当最优化模型时，将GAUC metric添加到objective中**。考虑GAUC指标的原始计算，样本会首先被分成多个groups。在本context中，groups会被通过user ID进行划分。接着，AUC metric会分别在每个group中计算，GAUC metric会通过将所有groups的AUC metrics进行加权平均得到。weight与曝光或点击次数成比例，这里我们对所有用户将weight设置为1。我们会在训练阶段模拟GAUC的计算：
+
+- **当准备训练数据时，我们会根据每个样本的user ID对样本进行排序，以便属于同一个用户的样本会出现在相同的batch中**
+- 一个batch的数据可能会包含许多不同的user IDs，**我们将batch划分成sub-batches，在sub-batch中的user ID是相同的**
+
+接着我们应用DAOM loss到每个sub-batch中，并将个性化DAOM loss定义为：
 
 $$
 L_{PDAOM} = \sum\limits_{u \in U} \phi( \underset{x^+ \sum P_u^+}{min} f(x^+) - \underset{x^- \sim P_u^-}{max} f(x^-))
