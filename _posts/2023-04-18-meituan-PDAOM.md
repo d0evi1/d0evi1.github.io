@@ -94,15 +94,15 @@ $$
 聚焦于上面的问题，我们提出构建**难样本对**，并让模型关注于难样本对，而非所有样本对。一个难样本对指的是：**模型很难区分正/负样本labels的实例。因而，对于这样的正负样本对，输出scores是很接近的，它使得决策边界不好判断**。考虑：
 
 $$
-\underset{x^+ \sim P^+ \\ x^- \sim P^-}{E} (\phi(f(x^+)) - f(x^-)) \leq \underset{x^+ \sim P^+ \\ x^- \sim P^-}{max} ( \phi(f(x^+) - f(x^-)))
+\underset{x^+ \sim P^+ \\ x^- \sim P^-}{E} (\phi(f(x^+) - f(x^-))) \leq \underset{x^+ \sim P^+ \\ x^- \sim P^-}{max} ( \phi(f(x^+) - f(x^-)))
 $$
 
 ...(3)
 
-（3）的一个可行解是：设置 $$\overset{max}{x^+ \sim P^+, \\ x^- \sim P^-}(\phi(f(x^+) - f(x^-)))$$作为objective function。计算该最大值只依赖于那些很可能有violate relation的正负样本对。在该方式下，来自easy negatives的loss累积不会影响模型的更新。尽管这样的转换会导致模型关注于确定决策边界，复杂度仍然是$$O(N^+ N^-)$$。由于$$f(x^+) - f(x^-) \in [-1, 1]$$，surrogate function $$\phi$$会在该区间内单调递减。相等的，$$$max_{x^+ \sim P^+, x^- \sim P^-} (\phi(f(x^+) - f(x^-)))$$可以简化为：
+（3）的一个可行解是：设置 $$\underset{x^+ \sim P^+, \\ x^- \sim P^-}{max}(\phi(f(x^+) - f(x^-)))$$作为objective function。计算该最大值只依赖于那些很可能有violate relation的正负样本对。在该方式下，来自easy negatives的loss累积不会影响模型的更新。尽管这样的转换会导致模型关注于确定决策边界，复杂度仍然是$$O(N^+ N^-)$$。由于$$f(x^+) - f(x^-) \in [-1, 1]$$，surrogate function $$\phi$$会在该区间内单调递减。相等的，$$$max_{x^+ \sim P^+, x^- \sim P^-} (\phi(f(x^+) - f(x^-)))$$可以简化为：
 
 $$
-\phi (\overset{min}{x^+ \sim P^+, \\ x^- \sim P^-}(f(x^+) - f(x^-))) = \phi( \overset{min}{x^+ \sim P^+} f(x^+) - overset{max}{x^- \sim P^-} f(x^-))
+\phi (\underset{x^+ \sim P^+, \\ x^- \sim P^-}{min}(f(x^+) - f(x^-))) = \phi( \underset{x^+ \sim P^+}{min} f(x^+) - \underset{x^- \sim P^-}{max} f(x^-))
 $$
 
 ...(4)
@@ -110,7 +110,7 @@ $$
 理想的，的一个正样本的最低分期望会高于在一个batch内负样本的最高分。我们将DAOM loss定义为：
 
 $$
-L_{DAOM} = \phi( \overset{min}{x^+ \sim P^+} f(x^+) - \overset{max}{x^- \sim P^-} f(x^-))
+L_{DAOM} = \phi( \underset{x^+ \sim P^+}{min} f(x^+) - \underset{x^- \sim P^-}{max} f(x^-))
 $$
 
 ...(5)
