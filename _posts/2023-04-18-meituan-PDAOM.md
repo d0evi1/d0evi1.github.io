@@ -102,12 +102,12 @@ $$
 （3）的一个可行解是：设置 $$\underset{x^+ \sim P^+, \\ x^- \sim P^-}{max}(\phi(f(x^+) - f(x^-)))$$作为objective function。**计算该最大值只依赖于那些很可能有violate relation的正负样本对**。在该方式下，来自easy negatives的loss累积不会影响模型的更新。尽管这样的转换会导致模型关注于确定决策边界，复杂度仍然是$$O(N^+ N^-)$$。由于$$f(x^+) - f(x^-) \in [-1, 1]$$，surrogate function $$\phi$$会在该区间内单调递减。相等的，$$\underset{x^+ \sim P^+ \\ x^- \sim P^-}{max} (\phi(f(x^+) - f(x^-)))$$可以简化为：
 
 $$
-\phi (\underset{x^+ \sim P^+, \\ x^- \sim P^-}{min}(f(x^+) - f(x^-))) = \phi( \underset{x^+ \sim P^+}{min} f(x^+) - \underset{x^- \sim P^-}{max} f(x^-))
+\phi (\underset{x^+ \sim P^+ \\ x^- \sim P^-}{min}(f(x^+) - f(x^-))) = \phi( \underset{x^+ \sim P^+}{min} f(x^+) - \underset{x^- \sim P^-}{max} f(x^-))
 $$
 
 ...(4)
 
-理想的，的一个正样本的最低分期望会高于在一个batch内负样本的最高分。我们将DAOM loss定义为：
+**理想的，一个正样本的最低分期望会高于在一个batch内负样本的最高分**。我们将DAOM loss定义为：
 
 $$
 L_{DAOM} = \phi( \underset{x^+ \sim P^+}{min} f(x^+) - \underset{x^- \sim P^-}{max} f(x^-))
@@ -119,10 +119,10 @@ $$
 
 ## 通过GAUC最优化来增强个性化排序
 
-以上章节详述了如何构建在一个batch内的paired samples，它不会满足个性化推荐的需求。实际上，我们会发现，GAUC[19] metric与在线效果更一致些。相应的，一个天然的想法是，当最优化模型时，将GAUC metric添加到objective中。考虑GAUC指标的原始计算，样本会首先被分成多个groups。在本context中，groups会被通过user ID进行划分。接着，AUC metric会分别在每个group中计算，GAUC metric会通过将所有groups的AUC metrics进行加权平均得到。weight与曝光或点击次数成比例，这里我们对所有用户将weight设置为1。我们会在训练阶段模拟GAUC的计算。当准备训练数据时，我们会根据每个样本的user ID对样本进行排序，以便一个用户的样本会出现在相同的batch中。一个batch的数据可能会包含许多不同的user IDs，我们将batch划分成sub-batches，在sub-batch中的user ID是相同的。接着我们应用DAOM loss到每个sub-batch中，并将个性化DAOM loss定义为：
+以上章节详述了如何构建在一个batch内的paired samples，但它满足不了个性化推荐的需求。实际上，我们会发现，GAUC[19] metric与在线效果更一致些。相应的，一个天然的想法是，当最优化模型时，将GAUC metric添加到objective中。考虑GAUC指标的原始计算，样本会首先被分成多个groups。在本context中，groups会被通过user ID进行划分。接着，AUC metric会分别在每个group中计算，GAUC metric会通过将所有groups的AUC metrics进行加权平均得到。weight与曝光或点击次数成比例，这里我们对所有用户将weight设置为1。我们会在训练阶段模拟GAUC的计算。当准备训练数据时，我们会根据每个样本的user ID对样本进行排序，以便一个用户的样本会出现在相同的batch中。一个batch的数据可能会包含许多不同的user IDs，我们将batch划分成sub-batches，在sub-batch中的user ID是相同的。接着我们应用DAOM loss到每个sub-batch中，并将个性化DAOM loss定义为：
 
 $$
-L_{PDAOM} = \sum\limits_{u \in U} \phi( min\limits_{x^+ \sum P_u^+} f(x^+) - max\limits_{x^- \sim P_u^-} f(x^-))
+L_{PDAOM} = \sum\limits_{u \in U} \phi( \underset{x^+ \sum P_u^+}{min} f(x^+) - \underset{x^- \sim P_u^-}{max} f(x^-))
 $$
 
 ...(6)
@@ -130,7 +130,7 @@ $$
 其中，U表示由user ID分组的sub batches。在训练一个二分类器的条件下，提出的PDAOM loss与cross entropy一起来形成最终的objective function：
 
 $$
-L = -y log(f(x)) - (1-y) log(1 - f(x)) + \lambda \sum\limits_{u \in U} \phi( min\limits_{x^+ \sim P_u^+} f(x^+) - max\limits_{x^- \sim P_u^-} f(x^-))
+L = -y log(f(x)) - (1-y) log(1 - f(x)) + \lambda \sum\limits_{u \in U} \phi( \underset{x^+ \sim P_u^+}{min} f(x^+) - \underset{x^- \sim P_u^-}{max} f(x^-))
 $$
 
 ...(7)
