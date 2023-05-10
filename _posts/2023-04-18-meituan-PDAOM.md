@@ -99,7 +99,7 @@ $$
 
 ...(3)
 
-（3）的一个可行解是：设置 $$\underset{x^+ \sim P^+, \\ x^- \sim P^-}{max}(\phi(f(x^+) - f(x^-)))$$作为objective function。计算该最大值只依赖于那些很可能有violate relation的正负样本对。在该方式下，来自easy negatives的loss累积不会影响模型的更新。尽管这样的转换会导致模型关注于确定决策边界，复杂度仍然是$$O(N^+ N^-)$$。由于$$f(x^+) - f(x^-) \in [-1, 1]$$，surrogate function $$\phi$$会在该区间内单调递减。相等的，$$$max_{x^+ \sim P^+, x^- \sim P^-} (\phi(f(x^+) - f(x^-)))$$可以简化为：
+（3）的一个可行解是：设置 $$\underset{x^+ \sim P^+, \\ x^- \sim P^-}{max}(\phi(f(x^+) - f(x^-)))$$作为objective function。**计算该最大值只依赖于那些很可能有violate relation的正负样本对**。在该方式下，来自easy negatives的loss累积不会影响模型的更新。尽管这样的转换会导致模型关注于确定决策边界，复杂度仍然是$$O(N^+ N^-)$$。由于$$f(x^+) - f(x^-) \in [-1, 1]$$，surrogate function $$\phi$$会在该区间内单调递减。相等的，$$\underset{x^+ \sim P^+ \\ x^- \sim P^-}{max} (\phi(f(x^+) - f(x^-)))$$可以简化为：
 
 $$
 \phi (\underset{x^+ \sim P^+, \\ x^- \sim P^-}{min}(f(x^+) - f(x^-))) = \phi( \underset{x^+ \sim P^+}{min} f(x^+) - \underset{x^- \sim P^-}{max} f(x^-))
