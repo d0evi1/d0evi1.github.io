@@ -1,6 +1,6 @@
 ---
 layout: post
-title: PEPNet介绍
+title: PDAOM loss介绍
 description: 
 modified: 2023-04-18
 tags: 
