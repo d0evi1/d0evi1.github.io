@@ -229,7 +229,7 @@ Facebook的一整天的广告曝光数据是海量的。注意，我们不会展
 
 训练行的均匀子抽样(uniform subsampling)是一种减少数据量的好方法，因为它可以很容易实现，生成的模型不需要修改，就可以在抽样的训练数据上以及未抽样的测试数据上直接使用。在本部门，我们会评估抽样率会指数式增加。对于每个在基础数据集上进行抽样的rate，我们分别训练了一个boosted tree模型。subsampling rate为{0.001, 0.01, 0.1, 0.5, 1}。
 
-<img src="http://pic.yupoo.com/wangdren23/GsPm2rIg/medish.jpg">
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/e601e895df14f258f1e3807d3ff4f7bc1c6e53d4a814bcdeae2a0977215b6960bd4e3edb014f316c4cda5e32a5640678?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=10.jpg&amp;size=750">
 
 图10: 数据量的实验结果。X轴表示训练实例数。y左表示calibration。y右表示NE.
 
@@ -239,7 +239,7 @@ Facebook的一整天的广告曝光数据是海量的。注意，我们不会展
 
 类别不均衡（class imbalance）问题，许多研究者都有研究，它会对学到的模型具有重大的影响。在该部分，我们探索了使用负下采样（Negative down sampling）来解决类别不均衡的问题。经验上，我们使用不同负下采样率，来测试学到模型的accuracy。相应的rate为：{0.1, 0.01, 0.001, 0.0001}。结果如图11所示。
 
-<img src="http://pic.yupoo.com/wangdren23/GsPm2Chk/medish.jpg">
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ee89c0f24e490cf125cf4ee063e8bd8249dfe21f4d9ba202bb3f2eae66daa17ef66de10e318688e298b7811f64ba0410?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=11.jpg&amp;size=750">
 
 图11: 负下采样的实验结果。X轴对应于不同的负下采样率。y左表示calibration，y右表示NE.
 
