@@ -41,7 +41,7 @@ tags:
 
 $$\mid U \mid, \mid Q \mid, \mid P \mid$$分别是users、queries、items的去重数。
 
-当一个user u提交一个query q时，我们将在matching output set中的每个item $$p_t$$与user u和query q组合成一个三元组$$(u, q, p_t)$$。preranking models会输出在每个三元组上的scores，通过会从matching的output set上根据scores选择topk个items。正式的，给定一个三元组$$(u, q, p_t)$$，ranking model会预估以下的score z：
+当一个user u提交一个query q时，我们将在matching output set中的每个item $$p_t$$与user u和query q组合成一个三元组$$(u, q, p_t)$$。preranking models会输出在每个三元组上的scores，通常会从matching的output set上根据scores选择topk个items。正式的，给定一个三元组$$(u, q, p_t)$$，ranking model会预估以下的score z：
 
 $$
 z = F(\phi(u, q), \psi(p))
@@ -59,11 +59,11 @@ $$
 
 ## 3.2 ranking stage的一致性
 
-考虑ranking系统在工业界的离线指标，AUC是最流行的。以taobao search为例，AUC会通过曝光进行计算。由于taobao search的目标是有效提升交易，ranking stage主要考虑购买作为曝光上的正向行为，并关注一个被购买item的likelihood要高于其它items的序。因此，taobao search中的items的最大数目被设置为：每次请求10个，我们使用购买AUC（Purchase AUC）at 10（PAUC@10）来衡量排序模型的能力。作为结果，PAUC@10通常也会被用在preranking中（与ranking中的相似），可以衡量在线排序系统的一致性。
+考虑ranking系统在工业界的离线指标，AUC是最流行的。以taobao search为例，AUC会通过曝光进行计算。由于taobao search的目标是有效提升交易，ranking stage主要考虑购买作为曝光上的正向行为，并关注一个被购买item的likelihood要高于其它items的序。因此，taobao search中的items的最大数目被设置为：**每次请求10个，我们使用购买AUC（Purchase AUC）at 10（PAUC@10）来衡量排序模型的能力**。作为结果，PAUC@10通常也会被用在preranking中（与ranking中的相似），可以衡量在线排序系统的一致性。
 
 ## 3.3 output set的质量
 
-最近的preranking工作很少使用任意metric来评估整个output set的质量。评估output set的一个评估指标是：hitrate@k（或：recall@k），它会被广泛用于matching stage中。hitrate@k表示：模型对target items（点击或购买）是否在candidate set的top k中。正式的，一个$$(u, q)$$ pair，它的hitrate@k被定义如下：
+最近的preranking工作很少使用任意metric来评估整个output set的质量。评估output set的一个评估指标是：hitrate@k（或：recall@k），它会被广泛用于matching stage中。hitrate@k表示：**模型对target items（点击或购买）是否在candidate set的top k中**。正式的，一个$$(u, q)$$ pair，它的hitrate@k被定义如下：
 
 $$
 hitrate@k = \frac{\sum\limits_{i=1}^k 1(p_i \in T)}{|T|}
@@ -77,11 +77,11 @@ $$
 - T：表示包含了$$\mid T \mid$$个items的target-item set
 - $$1(p_i \in T)$$：当$$p_i$$是target set T时为1，否则为0
 
-当在matching stage中使用该metric时，通常用于衡量一个matching模型的output set的质量（例如：在图1中的Matching 1，非在线的所有matching models的整个output set）。作为对比，当我们通过hitrate@k来评估pre-ranking实验时，离线metrics的结论会与在线ottl指标的结论相矛盾。在进一步分析后，我们发现，在hitrate中选择k是一个non-trivial问题。为了准确评估在preranking stage的output item set的质量，k被假设：等于preranking output set的size $$\mid R \mid$$。然而，由于在preranking output set中的items在在线serving期间可以被曝光和被购买，所有正样本（target items）应该在preranking的在线output set中。这会造成当$$k=\mid R \mid$$时，在线preranking model的$$hitrate@k \equiv 1$$。作为结果，离线hitrate@k可以只会衡量在离线模型输出集合与在线输出集合间的不同之处，而非quality。常规的preranking方法，使用$$k << \mid R \mid$$来避免以上问题。$$k << \mid R \mid$$的缺点是很明显的，因为它不能表示整个preranking output set的质量。
+当在matching stage中使用该metric时，通常用于衡量一个matching模型的output set的质量（例如：在图1中的Matching 1，非在线的所有matching models的整个output set）。作为对比，**当我们通过hitrate@k来评估pre-ranking实验时，离线metrics的结论会与在线业务指标的结论相矛盾**。在进一步分析后，我们发现，在hitrate中选择k是一个non-trivial问题。为了准确评估在preranking stage的output item set的质量，k被假设：等于preranking output set的size $$\mid R \mid$$。然而，由于在preranking output set中的items在在线serving期间可以被曝光和被购买，所有正样本（target items）都会在preranking的在线output set中。**这会造成当$$k=\mid R \mid$$时，在线preranking model的$$hitrate@k \equiv 1$$**。作为结果，离线hitrate@k可以只会衡量在离线模型输出集合与在线输出集合间的不同之处，而非quality。常规的preranking方法，使用$$k << \mid R \mid$$来避免以上问题。**$$k << \mid R \mid$$的缺点是很明显的，因为它不能表示整个preranking output set的质量**。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/5b0eb710ba51654422b83ae24641f735a1adad4bfbe21ca27bc56b1da57a933036cdfcb4f3b9bc68c164ed902eaa63b3?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
-图1 
+图1 在taobao search中的multi-stage ranking系统
 
 在本工作中，我们一个新的有效评估指标，称为ASH@k。为了创建一个真正表示preranking output set的质量的metric，我们引入来自taobao其它场景（比如：推荐、购物车、广告等）的更多正样本（例如：购买样本）。由于来自其它场景的一些正样本不会存在于preranking在线输出中，他们可以表示用户的偏好，与场景无关。在本case中，hitrate@k不会等于1，即使$$k = \mid R \mid$$。由于我们更关心taobao search的交易，我们只会使用来自非搜索场景的购买正样本。为了区分在不同正样本hitrate间的不同，我们称该只在搜索场景中出现的购买样本的hitrate@k为ISPH@k（即：In-Scenario Purchase Hitrate@k），在其它场景的购买正样本为：ASPH@k（即：All-Scenario Purchase Hitrate@k）。
 
@@ -108,7 +108,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/e3b71bc83edf2f23c462426490558f2431120066c3a61e8417c62952ad1c410bb98d23659397ea1e8ca4ff30a0d599ca?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 在taobao search中的hitrate@k。下图是对上图的放大
 
 为了进一步验证ASPH@k的效果，我们执行一个在线A/B test，它的pre-ranking output分别为2500和3000个items。如果ISPH@k的评估是有效的，那么输出3000个items的preranking的在线业务指标会更高。如果ASPH@k是有效的，那么该结论是相反的。在线结果表明，对比起3000个items的模型，输出2500的preranking具有0.3%的在线30天A/B的交易GMV提升。该实验验证了：ASPH@k是要比ISPH@k在离线评估上是一个更可靠的指标。再者，该实验也表明了preranking可以处理ranking所不能处理的能力，因为reranking output set的size并不是越大越好。相应的，一个preranking应发展它在更高质量outputs上的优点，而不是盲目模拟ranking。
 
