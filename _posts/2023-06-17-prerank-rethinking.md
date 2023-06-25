@@ -85,8 +85,8 @@ $$
 
 在本工作中，我们一个新的有效评估指标，称为ASH@k。为了创建一个真正表示preranking output set的质量的metric，我们**引入来自taobao其它场景（比如：推荐、购物车、广告等）的更多正样本（例如：购买样本）**。由于来自其它场景的一些正样本不会存在于preranking在线输出中，他们可以表示与场景无关的用户偏好。在本case中，即使$$k = \mid R \mid$$，hitrate@k也不会等于1。由于我们更关心taobao search的交易，我们只会使用来自非搜索场景的购买正样本。为了区分在不同正样本hitrate间的不同，我们称：
 
-- ISPH@k：只在搜索场景中出现的购买样本的hitrate@k为ISPH@k（即：In-Scenario Purchase Hitrate@k）
-- ASPH@k：在其它场景的购买正样本为：ASPH@k（即：All-Scenario Purchase Hitrate@k）
+- ISPH@k：In-Scenario Purchase Hitrate@k，只在**搜索场景**出现的购买样本的hitrate@k
+- ASPH@k：All-Scenario Purchase Hitrate@k，即在**其它场景**的购买正样本hitrate@k
 
 接着，我们详述了如何引入来自其它场景的正样本。在评估中的一个正样本是一个关于user, query, item的triple：$$(u_i, q_j, p_t)$$。**然而，在大多数非搜索场景（比如：推荐）不存在相应的query**。为了构建搜索的评估样本，我们需要绑定一个非搜索购买$$(u_i, p_t)$$到一个相应user发起的请求query $$u_i, q_j$$上。假设：
 
@@ -105,7 +105,7 @@ $$
 
 ## 3.4 在taobao search中的ASPH
 
-我们展示了在pre-ranking model的pre-generation、提出的pre-ranking model、以及ranking model的离线指标，如图2所示。为了公平对比在pre-ranking stage中的模型能力，所有其它模型都会在该pre-ranking candidates上进行评估。对于pre-generation pre-ranking model，会使用与ranking model的相同样本，它的模型能力会弱于ranking model，从$$10^5$$到$$10^1$$。通过对比，当k变大时，提出的preranking model在ASPH@k和ISPH@k上会极大优于ranking。该现象表明：当输出成千上万个items时，提出的preranking模型能力可以胜过ranking。
+我们展示了在pre-ranking model的pre-generation、提出的pre-ranking model、以及ranking model的离线指标，如图2所示。为了公平对比在pre-ranking stage中的模型能力，所有其它模型都会在该pre-ranking candidates上进行评估。对于pre-generation pre-ranking model，会使用与ranking model的相同样本，它的模型能力会弱于ranking model，从$$10^5$$到$$10^1$$。通过对比，**当k变大时，提出的preranking model在ASPH@k和ISPH@k上会极大优于ranking**。该现象表明：当输出成千上万个items时，提出的preranking模型能力可以胜过ranking。
 
 同时，在图2中，在ASPH@k的结果和ISPH@k的结果间存在一个巨大差异。从ISPH@k metric的视角来看，当k小于3000时，ranking model要胜过preranking model，而从ASPH@k指标的视角，当k小于2000时，它只会胜过pre-ranking model。在第3.3节所述，我们会argue：ISPH@k得分会表示在offline和online sets间的差异，没必要表示offline集合的质量。由于ranking model的得分决定了最终曝光的items，当使用ISPH@k作为评估指标时，ranking model会具有一个巨大优点。
 
