@@ -8,14 +8,14 @@ tags:
 
 # 介绍
 
-在preranking阶段除了SSB问题外，我们也假设：ranking和preranking的目标是不同的。ranking的专业是选择top items，会对preranking outputs内的顺序进行reranking，并决定最终的输出。因此，preranking阶段的主要目标是：返回一个最优的无序集合（unordered set），而非一个关于items的有序列表。基于以上分析，在taobao search上做了在线和离线实验，重新思考了preranking的角色，并重新定义了preranking的两个目标：
+在preranking阶段除了SSB问题外，我们也假设：ranking和preranking的目标是不同的。ranking的专业是选择top items，会对preranking outputs内的顺序进行reranking，并决定最终的输出。**而preranking阶段的主要目标是：返回一个最优的无序集合（unordered set），而非一个关于items的有序列表**。基于以上分析，在taobao search上做了在线和离线实验，重新思考了preranking的角色，并重新定义了preranking的两个目标：
 
-- 高质量集合（High quality set）：通过解决在preranking candidates上的SSB问题，来提升output set的质量
-- 高质量排序（High quality rank）：为了获得ranking在output set上的一致性，确保高质量items可以在ranking中获得更高得分，并被曝光给用户。
+- **高质量集合（High quality set）**：通过解决在preranking candidates上的SSB问题，来提升output set的质量
+- **高质量排序（High quality rank）**：为了获得ranking在output set上的一致性，确保高质量items可以在ranking中获得更高得分，并被曝光给用户。
 
-然而，同时最大化两个目标是不可能的。第一个目标最重要，是一个preranking模型必须要追求的目标。第二个目标，只要确保output set集合的质量不会下降就能满足它。换句话说，当模型达到帕累托边界（Pareto frontier），通常在整个output set的质量和它的内部排序（inside rank）间存在一个“Seesaw Effect”。在不涉及更多在线计算的情况下，当prerank更关注于整个set时，它的output set内的排序会变差。相似的，当拟合ranking并提升它的内部AUC时，整个output set的质量会变差。这也是为什么AUC与在线业务指标不一致的原因。我们会在第4节中详述。
+然而，同时最大化两个目标是不可能的。第一个目标最重要，是一个preranking模型必须要追求的目标。第二个目标，只要确保output set集合的质量不会下降就能满足它。换句话说，**当模型达到帕累托边界（Pareto frontier），通常在整个output set的质量和它的内部排序（inside rank）间存在一个“跷跷板效应（Seesaw Effect）”**。在不涉及更多在线计算的情况下，当prerank更关注于整个set时，它的output set内的排序会变差。相似的，当拟合ranking并提升它的内部AUC时，整个output set的质量会变差。这也是为什么AUC与在线业务指标不一致的原因。我们会在第4节中详述。
 
-已经存在的离线评估指标（比如：AUC）可以对preranking能力（第二个目标）进行measure。然而，AUC会衡量一个有序item list的质量，不适合于评估输出的无序集合的质量。没有一个metric可以有效评估第一个目标。尽管在工业界存在一些研究者，尝试提升output set的质量，他们没有提供一个可靠的离线评估metric来衡量该提升。实际上，大多数公共策略是通过在线A/B testing进行衡量效果提升。然而，在线评估开销巨大，并且时间成本高，因为它通常要花费许多周来获得一个可信的结果。在本文中，我们提出了一个新的evaluation metric，称为：全场景Hitrate（ASH：All-Scenario Hitrate），用来评估preranking模型的outputs的质量。通过对在ASH与在线业务指标间的关系进行系统分析，我们会验证该新离线指标的效果。为了达到我们的目标，我们进一步提出一个基于全场景的多目标学习框架（ASMOL：all-scenario-based multiobjective learning framework），它会显著提升ASH。令人吃惊的是，当输出上千items时，新的preranking模型效果要好于ranking model。该现象进一步验证了preranking阶段应关注于：输出更高质量集合，而不是盲目拟合ranking。在ASH上有提升，会与在线提升相一致，它会进一步验证了：ASH是一个更有效的离线指标，并在taobao search上获得一个1.2%的GMV提升。
+已经存在的离线评估指标（比如：AUC）可以对preranking能力（第二个目标）进行measure。然而，**AUC会衡量一个有序item list的质量，不适合于评估输出的无序集合的质量**。没有一个metric可以有效评估第一个目标。尽管在工业界存在一些研究者，尝试提升output set的质量，他们没有提供一个可靠的离线评估metric来衡量该提升。实际上，大多数公共策略是通过在线A/B testing进行衡量效果提升。然而，在线评估开销巨大，并且时间成本高，因为它通常要花费许多周来获得一个可信的结果。在本文中，**我们提出了一个新的evaluation metric，称为：全场景Hitrate（ASH：All-Scenario Hitrate），用来评估preranking模型的outputs的质量**。通过对在ASH与在线业务指标间的关系进行系统分析，我们会验证该新离线指标的效果。为了达到我们的目标，我们进一步**提出一个基于全场景的多目标学习框架（ASMOL：all-scenario-based multiobjective learning framework），它会显著提升ASH**。令人吃惊的是，当输出上千items时，新的preranking模型效果要好于ranking model。该现象进一步验证了preranking阶段应关注于：**输出更高质量集合，而不是盲目拟合ranking**。在ASH上有提升，会与在线提升相一致，它会进一步验证了：ASH是一个更有效的离线指标，并在taobao search上获得一个1.2%的GMV提升。
 
 总结有三：
 
@@ -36,7 +36,7 @@ tags:
 在本节中，我们首先将preranking问题和数学概念进行公式化。假设：
 
 - $$U = \lbrace u_1, \cdots, u_{\mid U \mid}\rbrace$$：表示用户与它的features一起的集合。User features主要包含了用户行为信息（比如：它的点击items、收藏items、购买items、或者加购物车的items）
-- $$Q = \lbrace q_1, \cdots, q_{\mid Q \mid}$$：表示搜索queries以及它的相应分段（segmentation）的集合。
+- $$Q = \lbrace q_1, \cdots, q_{\mid Q \mid} \rbrace$$：表示搜索queries以及它的相应分段（segmentation）的集合。
 - $$P=\lbrace p_1, \cdots, p_{\mid P \mid}\rbrace$$：表示products（items）以及它的features的集合。Item features主要包含了item ID，item统计信息，items卖家等。
 
 $$\mid U \mid, \mid Q \mid, \mid P \mid$$分别是users、queries、items的去重数。
@@ -44,7 +44,7 @@ $$\mid U \mid, \mid Q \mid, \mid P \mid$$分别是users、queries、items的去�
 当一个user u提交一个query q时，我们将在matching output set中的每个item $$p_t$$与user u和query q组合成一个三元组$$(u, q, p_t)$$。preranking models会输出在每个三元组上的scores，通过会从matching的output set上根据scores选择topk个items。正式的，给定一个三元组$$(u, q, p_t)$$，ranking model会预估以下的score z：
 
 $$
-z = F(\phi(u, q), \phi(p))
+z = F(\phi(u, q), \psi(p))
 $$
 
 ...(1)
@@ -53,7 +53,7 @@ $$
 
 - $$F(\cdot)$$是score funciton
 - $$\phi(\cdot)$$：user embedding function
-- $$\phi(\cdot)$$：item embedding function
+- $$\psi(\cdot)$$：item embedding function
 
 在本文中，我们会遵循vector-product-based的模型框架，并采用cosine相似度操作$$F(\cdot)$$。
 
