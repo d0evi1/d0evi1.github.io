@@ -79,6 +79,10 @@ $$
 
 当在matching stage中使用该metric时，通常用于衡量一个matching模型的output set的质量（例如：在图1中的Matching 1，非在线的所有matching models的整个output set）。作为对比，当我们通过hitrate@k来评估pre-ranking实验时，离线metrics的结论会与在线ottl指标的结论相矛盾。在进一步分析后，我们发现，在hitrate中选择k是一个non-trivial问题。为了准确评估在preranking stage的output item set的质量，k被假设：等于preranking output set的size $$\mid R \mid$$。然而，由于在preranking output set中的items在在线serving期间可以被曝光和被购买，所有正样本（target items）应该在preranking的在线output set中。这会造成当$$k=\mid R \mid$$时，在线preranking model的$$hitrate@k \equiv 1$$。作为结果，离线hitrate@k可以只会衡量在离线模型输出集合与在线输出集合间的不同之处，而非quality。常规的preranking方法，使用$$k << \mid R \mid$$来避免以上问题。$$k << \mid R \mid$$的缺点是很明显的，因为它不能表示整个preranking output set的质量。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/5b0eb710ba51654422b83ae24641f735a1adad4bfbe21ca27bc56b1da57a933036cdfcb4f3b9bc68c164ed902eaa63b3?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
+
+图1 
+
 在本工作中，我们一个新的有效评估指标，称为ASH@k。为了创建一个真正表示preranking output set的质量的metric，我们引入来自taobao其它场景（比如：推荐、购物车、广告等）的更多正样本（例如：购买样本）。由于来自其它场景的一些正样本不会存在于preranking在线输出中，他们可以表示用户的偏好，与场景无关。在本case中，hitrate@k不会等于1，即使$$k = \mid R \mid$$。由于我们更关心taobao search的交易，我们只会使用来自非搜索场景的购买正样本。为了区分在不同正样本hitrate间的不同，我们称该只在搜索场景中出现的购买样本的hitrate@k为ISPH@k（即：In-Scenario Purchase Hitrate@k），在其它场景的购买正样本为：ASPH@k（即：All-Scenario Purchase Hitrate@k）。
 
 接着，我们详述了如何引入来自其它场景的正样本。在评估中的一个正样本是一个关于user, query, item的triple：$$(u_i, q_j, p_t)$$。然而，在大多数非搜索场景（比如：推荐）不存在相应的query。为了构建搜索的评估样本，我们需要绑定一个非搜索购买$$(u_i, p_t)$$到一个相应user发起的请求query $$u_i, q_j$$上。假设：
@@ -101,6 +105,10 @@ $$
 我们展示了在pre-ranking model的pre-generation、提出的pre-ranking model、以及ranking model的离线指标，如图2所示。为了公平对比在pre-ranking stage中的模型能力，所有其它模型都会在该pre-ranking candidates上进行评估。对于pre-generation pre-ranking model，会使用与ranking model的相同样本，它的模型能力会弱于ranking model，从$$10^5$$到$$10^1$$。通过对比，当k变大时，提出的preranking model在ASPH@k和ISPH@k上会极大优于ranking。该现象表明：当输出成千上万个items时，提出的preranking模型能力可以胜过ranking。
 
 同时，在图2中，在ASPH@k的结果和ISPH@k的结果间存在一个巨大差异。从ISPH@k metric的视角来看，当k小于3000时，ranking model要胜过preranking model，而从ASPH@k指标的视角，当k小于2000时，它只会胜过pre-ranking model。在第3.3节所述，我们会argue：ISPH@k得分会表示在offline和online sets间的差异，没必要表示offline集合的质量。由于ranking model的得分决定了最终曝光的items，当使用ISPH@k作为评估指标时，ranking model会具有一个巨大优点。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/e3b71bc83edf2f23c462426490558f2431120066c3a61e8417c62952ad1c410bb98d23659397ea1e8ca4ff30a0d599ca?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
+
+图2
 
 为了进一步验证ASPH@k的效果，我们执行一个在线A/B test，它的pre-ranking output分别为2500和3000个items。如果ISPH@k的评估是有效的，那么输出3000个items的preranking的在线业务指标会更高。如果ASPH@k是有效的，那么该结论是相反的。在线结果表明，对比起3000个items的模型，输出2500的preranking具有0.3%的在线30天A/B的交易GMV提升。该实验验证了：ASPH@k是要比ISPH@k在离线评估上是一个更可靠的指标。再者，该实验也表明了preranking可以处理ranking所不能处理的能力，因为reranking output set的size并不是越大越好。相应的，一个preranking应发展它在更高质量outputs上的优点，而不是盲目模拟ranking。
 
