@@ -83,14 +83,17 @@ $$
 
 图1 在taobao search中的multi-stage ranking系统
 
-在本工作中，我们一个新的有效评估指标，称为ASH@k。为了创建一个真正表示preranking output set的质量的metric，我们引入来自taobao其它场景（比如：推荐、购物车、广告等）的更多正样本（例如：购买样本）。由于来自其它场景的一些正样本不会存在于preranking在线输出中，他们可以表示用户的偏好，与场景无关。在本case中，hitrate@k不会等于1，即使$$k = \mid R \mid$$。由于我们更关心taobao search的交易，我们只会使用来自非搜索场景的购买正样本。为了区分在不同正样本hitrate间的不同，我们称该只在搜索场景中出现的购买样本的hitrate@k为ISPH@k（即：In-Scenario Purchase Hitrate@k），在其它场景的购买正样本为：ASPH@k（即：All-Scenario Purchase Hitrate@k）。
+在本工作中，我们一个新的有效评估指标，称为ASH@k。为了创建一个真正表示preranking output set的质量的metric，我们**引入来自taobao其它场景（比如：推荐、购物车、广告等）的更多正样本（例如：购买样本）**。由于来自其它场景的一些正样本不会存在于preranking在线输出中，他们可以表示与场景无关的用户偏好。在本case中，即使$$k = \mid R \mid$$，hitrate@k也不会等于1。由于我们更关心taobao search的交易，我们只会使用来自非搜索场景的购买正样本。为了区分在不同正样本hitrate间的不同，我们称：
 
-接着，我们详述了如何引入来自其它场景的正样本。在评估中的一个正样本是一个关于user, query, item的triple：$$(u_i, q_j, p_t)$$。然而，在大多数非搜索场景（比如：推荐）不存在相应的query。为了构建搜索的评估样本，我们需要绑定一个非搜索购买$$(u_i, p_t)$$到一个相应user发起的请求query $$u_i, q_j$$上。假设：
+- ISPH@k：只在搜索场景中出现的购买样本的hitrate@k为ISPH@k（即：In-Scenario Purchase Hitrate@k）
+- ASPH@k：在其它场景的购买正样本为：ASPH@k（即：All-Scenario Purchase Hitrate@k）
+
+接着，我们详述了如何引入来自其它场景的正样本。在评估中的一个正样本是一个关于user, query, item的triple：$$(u_i, q_j, p_t)$$。**然而，在大多数非搜索场景（比如：推荐）不存在相应的query**。为了构建搜索的评估样本，我们需要绑定一个非搜索购买$$(u_i, p_t)$$到一个相应user发起的请求query $$u_i, q_j$$上。假设：
 
 - $$A_u^i$$：表示target-item set user $$u_i$$在taobao场景上的购买
 - $$Q_u$$：表示在taobao搜索中的所有queries user搜索
 
-一个直觉方法是：相同的user在queries和购买items间构建一个Cartesian Product，并使用所有三元组$$(u_i, q_j, p_t)$$作为正样本，其中：$$q_j \in Q_u$$以及$$p_t \in A_u^i$$。然而，它会引入一些不相关的query-item pairs。例如，一个用户可能在taobao search中搜索“iPhone”，并在其它推荐场景购买一些水果。该样本中：“iPhone”作为一个query，"apple(fruit)"作为一个item对于在taobao search中的一条正样本是不合适的。为了过滤不相关的样本，我们只能保证相关样本：它的相关分$$(q_j, p_t)$$在上面的边界。我们称$$q_k$$为对于全场景pair$$(u_i, p_t)$$的一个“相关query”；同时，$$p_t$$是一个全场景"相关item"，可以被绑定到in-scenario pair $$(u_i, q_j)$$。再者，我们也会移除重复样本。在该triple中的每个$$(u, p)$$ pair是唯一的，因此，即使$$u_i$$购买了一个$$p_t$$超过一次，我们只会对使用$$(u_i, p_t)$$的triple仅评估一次。同时，如果我们可以发现：在用户购买行为之前，超过一个相关query，则构建不同的triples，比如：$$(u_i, q_1, p_t), (u_i, q_2, p_t), (u_i, q_j, p_t)$$，我们只会保留用于评估的最新q的triple。正式的，相似于等式2，对于每个$$(u_i, q_k)$$ pair，ASPH@k被定义成：
+一个直觉方法是：相同的user在queries和购买items间构建一个Cartesian Product，并使用所有三元组$$(u_i, q_j, p_t)$$作为正样本，其中：$$q_j \in Q_u$$以及$$p_t \in A_u^i$$。然而，它会引入一些不相关的query-item pairs。例如，一个用户可能在taobao search中搜索“iPhone”，并在其它推荐场景购买一些水果。该样本中：将“iPhone”作为一个query，同时将"apple(fruit)"作为一个item，将它作为在taobao search中的一条正样本是不合适的。**为了过滤不相关的样本，我们只能保证相关样本：它的相关分$$(q_j, p_t)$$在上面的边界**。我们称$$q_k$$为对于全场景pair$$(u_i, p_t)$$的一个“相关query”；同时，$$p_t$$是一个全场景"相关item"，可以被绑定到in-scenario pair $$(u_i, q_j)$$。再者，我们也会移除重复样本。在该triple中的每个$$(u, p)$$ pair是唯一的，因此，即使$$u_i$$购买了一个$$p_t$$超过一次，我们只会对使用$$(u_i, p_t)$$的triple仅评估一次。同时，如果我们可以发现：在用户购买行为之前，超过一个相关query，则构建不同的triples，比如：$$(u_i, q_1, p_t), (u_i, q_2, p_t), (u_i, q_j, p_t)$$，我们只会保留用于评估的最新q的triple。正式的，相似于等式2，对于每个$$(u_i, q_k)$$ pair，ASPH@k被定义成：
 
 $$
 ASPH@k = \frac{\sum_{i=1}^k 1(p_i \in A_u^i)}{| A_u^i |}
