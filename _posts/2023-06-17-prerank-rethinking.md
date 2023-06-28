@@ -90,10 +90,15 @@ $$
 
 接着，我们详述了如何引入来自其它场景的正样本。在评估中的一个正样本是一个关于user, query, item的triple：$$(u_i, q_j, p_t)$$。**然而，在大多数非搜索场景（比如：推荐）不存在相应的query**。为了构建搜索的评估样本，我们需要绑定一个非搜索购买$$(u_i, p_t)$$到一个相应user发起的请求query $$u_i, q_j$$上。假设：
 
-- $$A_u^i$$：表示target-item set user $$u_i$$在taobao场景上的购买
+- $$A_u^i$$：表示user $$u_i$$在taobao场景上的购买的target-item set
 - $$Q_u$$：表示在taobao搜索中的所有queries user搜索
 
-一个直觉方法是：相同的user在queries和购买items间构建一个Cartesian Product，并使用所有三元组$$(u_i, q_j, p_t)$$作为正样本，其中：$$q_j \in Q_u$$以及$$p_t \in A_u^i$$。然而，它会引入一些不相关的query-item pairs。例如，一个用户可能在taobao search中搜索“iPhone”，并在其它推荐场景购买一些水果。该样本中：将“iPhone”作为一个query，同时将"apple(fruit)"作为一个item，将它作为在taobao search中的一条正样本是不合适的。**为了过滤不相关的样本，我们只能保证相关样本：它的相关分$$(q_j, p_t)$$在上面的边界**。我们称$$q_k$$为对于全场景pair$$(u_i, p_t)$$的一个“相关query”；同时，$$p_t$$是一个全场景"相关item"，可以被绑定到in-scenario pair $$(u_i, q_j)$$。再者，我们也会移除重复样本。在该triple中的每个$$(u, p)$$ pair是唯一的，因此，即使$$u_i$$购买了一个$$p_t$$超过一次，我们只会对使用$$(u_i, p_t)$$的triple仅评估一次。同时，如果我们可以发现：在用户购买行为之前，超过一个相关query，则构建不同的triples，比如：$$(u_i, q_1, p_t), (u_i, q_2, p_t), (u_i, q_j, p_t)$$，我们只会保留用于评估的最新q的triple。正式的，相似于等式2，对于每个$$(u_i, q_k)$$ pair，ASPH@k被定义成：
+一个直觉方法是：相同的user在queries和购买items间构建一个Cartesian Product，并使用所有三元组$$(u_i, q_j, p_t)$$作为正样本，其中：$$q_j \in Q_u$$以及$$p_t \in A_u^i$$。然而，它会引入一些不相关的query-item pairs。例如，一个用户可能在taobao search中搜索“iPhone”，并在其它推荐场景购买一些水果。该样本中：将“iPhone”作为一个query，同时将"apple(fruit)"作为一个item，将它作为在taobao search中的一条正样本是不合适的。**为了过滤不相关的样本，我们只能保证相关样本：它的相关分$$(q_j, p_t)$$在上面的边界**。我们称：
+
+- $$q_k$$为对于全场景pair$$(u_i, p_t)$$的一个“相关query”；
+- $$p_t$$是一个全场景"相关item"，可以被绑定到in-scenario pair $$(u_i, q_j)$$
+
+再者，我们也会移除重复样本。在该triple中的每个$$(u, p)$$ pair是唯一的，因此，即使$$u_i$$购买了一个$$p_t$$超过一次，我们只会对使用$$(u_i, p_t)$$的triple仅评估一次。同时，如果我们可以发现：在用户购买行为之前，超过一个相关query，则构建不同的triples，比如：$$(u_i, q_1, p_t), (u_i, q_2, p_t), (u_i, q_j, p_t)$$，我们只会保留用于评估的最新q的triple。正式的，与等式2相似，对于每个$$(u_i, q_k)$$ pair，ASPH@k被定义成：
 
 $$
 ASPH@k = \frac{\sum_{i=1}^k 1(p_i \in A_u^i)}{| A_u^i |}
@@ -105,21 +110,130 @@ $$
 
 ## 3.4 在taobao search中的ASPH
 
-我们展示了在pre-ranking model的pre-generation、提出的pre-ranking model、以及ranking model的离线指标，如图2所示。为了公平对比在pre-ranking stage中的模型能力，所有其它模型都会在该pre-ranking candidates上进行评估。对于pre-generation pre-ranking model，会使用与ranking model的相同样本，它的模型能力会弱于ranking model，从$$10^5$$到$$10^1$$。通过对比，**当k变大时，提出的preranking model在ASPH@k和ISPH@k上会极大优于ranking**。该现象表明：当输出成千上万个items时，提出的preranking模型能力可以胜过ranking。
+我们展示了在pre-ranking model的pre-generation、提出的pre-ranking model、以及ranking model的离线指标，如图2所示。**为了公平对比在pre-ranking stage中的模型能力，所有其它模型都会在该pre-ranking candidates上进行评估**。对于pre-generation pre-ranking model，它会使用与ranking model的相同样本，从图中的$$10^5$$到$$10^1$$可以看出，它的模型能力会弱于ranking model。通过对比，**当k变大时，提出的preranking model在ASPH@k和ISPH@k上会极大优于ranking**。该现象表明：当输出成千上万个items时，提出的preranking模型能力可以胜过ranking。
 
-同时，在图2中，在ASPH@k的结果和ISPH@k的结果间存在一个巨大差异。从ISPH@k metric的视角来看，当k小于3000时，ranking model要胜过preranking model，而从ASPH@k指标的视角，当k小于2000时，它只会胜过pre-ranking model。在第3.3节所述，我们会argue：ISPH@k得分会表示在offline和online sets间的差异，没必要表示offline集合的质量。由于ranking model的得分决定了最终曝光的items，当使用ISPH@k作为评估指标时，ranking model会具有一个巨大优点。
+同时，**在图2中，在ASPH@k的结果和ISPH@k的结果间存在一个巨大差异**。从ISPH@k metric的视角来看，当k小于3000时，ranking model要胜过preranking model，而从ASPH@k指标的视角，只有当k小于2000时，ranking才会胜过pre-ranking model。在第3.3节所述，我们会argue：ISPH@k得分会表示在offline和online sets间的差异，没必要表示offline集合的质量。由于ranking model的得分决定了最终曝光的items，当使用ISPH@k作为评估指标时，ranking model会具有一个巨大优点。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/e3b71bc83edf2f23c462426490558f2431120066c3a61e8417c62952ad1c410bb98d23659397ea1e8ca4ff30a0d599ca?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
 图2 在taobao search中的hitrate@k。下图是对上图的放大
 
-为了进一步验证ASPH@k的效果，我们执行一个在线A/B test，它的pre-ranking output分别为2500和3000个items。如果ISPH@k的评估是有效的，那么输出3000个items的preranking的在线业务指标会更高。如果ASPH@k是有效的，那么该结论是相反的。在线结果表明，对比起3000个items的模型，输出2500的preranking具有0.3%的在线30天A/B的交易GMV提升。该实验验证了：ASPH@k是要比ISPH@k在离线评估上是一个更可靠的指标。再者，该实验也表明了preranking可以处理ranking所不能处理的能力，因为reranking output set的size并不是越大越好。相应的，一个preranking应发展它在更高质量outputs上的优点，而不是盲目模拟ranking。
+为了进一步验证ASPH@k的效果，我们执行一个在线A/B test，它的pre-ranking output分别为2500和3000个items。如果ISPH@k的评估是有效的，那么输出3000个items的preranking的在线业务指标会更高。如果ASPH@k是有效的，那么该结论是相反的。在线结果表明，对比起3000个items的模型，输出2500的preranking具有0.3%的在线30天A/B的交易GMV提升。**该实验验证了：ASPH@k是要比ISPH@k在离线评估上是一个更可靠的指标**。再者，该实验也表明了preranking可以处理ranking所不能处理的能力，因为reranking output set的size并不是越大越好。相应的，一个preranking应发展它在更高质量outputs上的优点，而不是盲目模拟ranking。
 
 # 4.preranking的优化
 
-略
+尽管模拟ranking会使得一个preranking与ranking更一致，**但它对整体preranking的output set的质量贡献很少**。本节将讨论我们的用来达到preranking目标的最优化技术，包括训练数据构建、全场景labels、loss functions和distillation。我们首先引入ASMOL preranking，接着分析每个部分，最后通过表明它的效果。
+
+## 4.1 多目标学习的整体框架
+
+为了同时提升pre-ranking output set的质量以及与ranking的一致性，我们设计了一个新的we design a novel AllScenario-based Multi-Objective框架。一方面，我们将训练样本从曝光扩展到具有全场景label的整个空间训练样本集上，它的目标是提升pre-ranking output set的质量。另一方面，我们设计了一个distillation loss来提升在ranking stage上的一致性。图4和图3分别展示了已有存在的pre-ranking models和我们的模型。
+
+图4展示了一个传统preranking的常见架构。在传统preranking model【8】中的训练样本，饮食了一个user、一个query、以及在曝光中的一个item。CTR任务和CVR任务的labels是场景内点击（in-scenario click）和场景内购买（in-scenario purchase）。该preranking系统包含了预估CTR和CVR的两个不同模型，并且最终效果分是CTR*CVR。由于在taobao搜索中前面的generation pre-ranking model会遵循该框架，分别输出CTR score和CVR score，我们称图4中的框架为basline。
+
+作为对比，如图3所示，我们的ASMOL会在query-level训练样本上使用多个目标和多个postive items进行训练。特别的，在每个训练样本中，存在user features、query features和三种类型的items。所有的items会使用相同的可训练参数共享相同的DNN。用于处理每个user、query和item的input features和models结构如附录A所示，它与已存在的preranking models很不同。每个样本包含了在一个query请求中的所有items，以及从在线log系统中抽样得到的ranking和preranking candidates。三种训练样本间的关系如图5所示，定义如下：
+
+- 曝光（Exposures, EX, 也称为impressions）：在一次query请求中曝光的N个items，包括由用户点击或购买的items。这些曝光的items会进行排序，并在所有候选的top，最具最大的概率来满足用户。
+- Ranking候选（RC：Ranking Candidates）：由online preranking模型输出的Items，并作为ranking的候选集，它还没有被曝光给用户。我们会通过一个在线日志系统为每个query从上千个RC中抽样M个items。
+- Pre-Ranking候选（PRC：Pre-Ranking Candidates）：由preranking系统产生但没有输出的items。我们会通过一个在线日志系统从成千上万个items中抽样L条items。
+
+由于Ranking Candidates和Preranking Candidates在所有目标中都是负例（negatives）。这两种类型的负样本的目标是：在当前preranking系统中解决SSB问题。再者，受【7】的启发，preranking候选会被训练成easy样本，并且Ranking Candidates是相对hard的样本。我们在第4.2节展示了不同样本的必要性。
+
+再者，对于在一条样本中的所有items，我们也会采用三种binary labels，分别对应于三种最优化目标：
+
+- 全场景购买label（All-Scenario Purchase Label (ASPL)）：该label表示：用户是否在任意场景购买了该item。如果用户在当前query（taobao search）购买了该item，或者在其它场景购买了该item，可以被标记成与当前query的一个相关item，purchase label为1。否则，该purchase label为0。
+- 全场景点击label（All-Scenario Click Label (ASCL)）: 与ASPL相似，该label表示用户是否在任意场景点击了该item。如果用户在购买它前点击了它，但是点击和购买行为又发生在不同场景导致了冲突的labels，当ASPL为1时，我们会将item的click label设置为1。
+- Adaptive Exposure Label (AEL)：该label表示item是否在该taobao search请求中被曝光，它由ranking系统决定。对于曝光来说，该labels为1；其它items为0。另外，当ASCL为1时，我们会将item的曝光label置为1.
+
+为了达到preranking的两个目标，我们会创建一个loss function，它会组合一个ranking loss和一个distillation loss：
+
+$$
+L = L_{rank} + L_{distill}
+$$
+
+...(4)
+
+ranking loss $$L_{rank}$$会同时使用三种不同的labels。我们会创建一个具有三个任务的多目标loss function：Purchase、Click、Exposure。我们会为每个任务采用一个新的list-wise loss，并使得正样本的logit要大于负样本。我们的多目标学习框架，目标是通过最大化下面不同类型的正样本得分，来学习下面的importance序：购买items > 点击但未购买items > 未点击曝光 > ranking candidates (RC) 和 pre-ranking candidates (PRC)。我们在4.3节会演示了多目标最优化的必要性。该list-wise loss会在第4.4节讨论。
+
+再者，我们会添加一个auxiliary distillation loss $$L_{distill}$$从来自ranking model（它具有更多features和可训练参数）来学习模型。令人吃惊的是，我们发现：简单将所有训练样本进行distilling并不是最好的方案。ranking model不总是个好teacher，特别是在还没被曝光的样本上。我们会在第4.5节分析该现象。
+
+## 4.2 整个空间的训练样本
+
+如表1所示，当训练样本包含了曝光、ranking candidates、preranking candidates时，ASPH@3000和在线GMV会被提升。如果preranking模型只使用曝光作为输入，通过从在线log系统中抽样的case分析，我们会发现：它的output set的质量很糟糕。由于仅抽样曝光的（exposure-sample-only）preranking model在训练期间不会看到非曝光样本，在评估时当在preranking candidates中给出样本时它会感到困惑。在该方式下，大多数候选的得分并不令人信服，会导致在output set中出现许多低质量items。
+
+我们进一步探索了不同样本的比例的影响。一些研究者指出，通常一个不同类型负样本【7】的最优比例和一个关于负样本和正样本的最优比例【29】。在我们的多目标框架下，以click目标为例，ASCL等于1的items是正样本，其它是负样本。来自曝光的负样本、ranking candidates到preranking candidates，会变得easy。与click目标相近，购买目标只包含了三种类型的负样本。然而，对于exposure目标，所有的exposure样本是正样本，ranking candidates和pre-ranking candidates是负样本。作为结果，我们发现：即使我们移除了一定比例的非点击曝光，它也会伤害exposure目标，使得ASPH@3000极具下降。同时，从在线log系统中抽样的RC的数目和PRC的数目并不会更大更好。图6详述了：y轴表示，基于在表1中展示的实验“ASMOL w/o RC&PRC”，添加不同candidates数目的离线指标gaps。为最最大化ASPH@3000，我们设置RC的数目和PRC的数目分别为10和40。除此之外，我们可以看到，当RC和PRC小于10和40时，可以看到很明显的“Seesaw Effect”，因为该模型已经达到的Pareto frontier。
+
+另外，由于preranking会使用RC，而ranking则不会使用PRC，这使得preranking不同于ranking。如图2所示，当输出数千items，它天然使得preranking的效果要好于ranking。online A/B test结果也会展示，**当ASPH@3000和PAUC@10结论冲突时，ASPH@3000更可信，它与preranking的主要目标和在线业务指标更一致**。
+
+## 4.3 在多目标学习中的全场景labels
+
+我们会进行一个消融实验，通过在多目标中移除每个label的相关loss来进行。实验结果如表2所示。当我们移移adaptive exposure label（AEL）时，全场景点击label（ASCL）和全场景购买label(ASPL)会通过分别移除它们相应的loss，评估指标的结论表明：模型效果会急剧下降。exposure label会帮助preranking model学习下流ranking系统的ranking模式，并且我们的结果验证了它的效果。同时，ASCL和ASPL要比AEL具有更少的in-scenario bias，可以给preranking model更精准关于用户偏好的信息。实验结果表明：我们三个losses的组合是合理并且有效的，对于提升preranking models的在线和离线指标有用。
+
+我们也做了许多实验来证验ASL与ISL的对比效果，如表2所示。"->"表示label的变更。例如："ASL->ISL"表明：ASPL和ASCL同时变更为ISPL和ISCL。我们使用表2中的最后三行来对比在ASMOL间的结果，可以天然下结论：使用ASL会在ASH@k和在线业务指标上更一致。同时，AUC可能会因为“Seesaw Effect”下降。
+
+## 4.4 multi-positive label的List-wise loss
+
+我们设计了一个多目标loss来同步将exposure、click和purchase在一个模型内进行组合。这三个最优化目标可以进行jointly训练：
+
+$$
+L_{rank} = \alpha_{ex} L_{exposure} + \alpha_{cl} L_{click} + \alpha_{pur} L_{purchase}
+$$
+
+...(5)
+
+对于每个任务，我们使用list-wise ranking loss。例如，对于购买任务，ranking loss可以被公式化为：
+
+$$
+L_{purchase} = \sum\limits_{i \in D} - log \frac{exp z_i}{\sum_{j \in S} exp_{z_j}}
+$$
+
+...(6)
+
+其中：
+
+- z是logit
+- S是full training样本集合
+- D是购买任务的正样本集合，包含了exposures、RC和PRC。
+
+等式(6)对于购买任务工作良好，因为通常至多一次query只有一个购买。然而，multi-postive label在点击和曝光任务中是很常见的。等式6对于具有multiple postive样本的任务不再合适。对于一个multi-postive任务，等式（7）的 vanilla Softmax会导致最优化陷入到在多个正样本间的对比，而非正负样本间的对比。受CircleLoss的启发，对于多个postive labels的任务我们会轻微修改等式（6）：
+
+$$
+L_{exposure} = \sum\limits_{i \in \epsilon} - log \frac{exp z_i}{\sum_{j \in \lbrace S \\epsilon,i} \rbrace exp_z_j}
+$$
+
+...(7)
+
+其中，$$\epsilon$$表示exposure任务的训练样本集合。当存在只有一个正样本时，等式(7)会退化成等式（6）。我们会在附录B详述等式（7）。为了验证在等式（7）中修改的有效性，我们会开展实验对比这两个loss functions，并在table 3中展示该结果。该实验令人吃惊的表明：在所有指标上，multi-label Softmax的效果要好于vanilla Softmax。我们会根据Zheng[29]来调整为每个任务$$\alpha_{ex}, \alpha_{cl}, \alpha_{pur}$$的weights。
 
 
+表3
+
+## 4.5 ranking stage的distillation
+
+使用一个已ready的具有更多features和参数的大型ranking模型来蒸馏训练pre-ranking model是很天然的。在taobao search ranking stage中，存在两个独立模型：对应于CTR和CVR预估。在preranking stage，我们使用calibrated CTR和CVR predictions作为teachers来蒸馏我们的preranking model。为了充分利用CTR和CVR模型，preranking distillation loss会是CTR distill、CTCVR distill的组合：
+
+$$
+L_{distill} = \alpha_{cl} L_{CTR} + \alpha_{pur} L_{CTCVR}
+$$
+
+...(8)
+
+CTR distillation任务可以进行如下公式化：
+
+$$
+L_{CTR} = \sum\limits_{i \in D} - p_{CTR} log \frac{exp z_i}{\sum_{j \in D} exp z_j}
+$$
+
+...(9)
+
+其中：
+
+- z是preranking model的logit
+- D是要distilled 样本集合
+- teacher $$p_{CTR}$$是ranking CTR model的prediction
+
+相似的，CTCVR distillation的teacher是$$p_{CTR} * p_{CVR}$$。$$p_{CTR} = p(click \mid expose)$$和$$p_{CTCVR} = p(click & purchase \mid expose)$$是在给定相同条件p(expose)=1下的条件概率。由于$$p_{CVR}=p(purchase \mid click)$$不同于$$p_{CTR}$$，我们会使用$$p_{CTCVR}$$作为soft label来与$$p_{CTR}$$相一致。CTR distillation的loss weight和CTCVR distillation会分别遵循click task和purchase task的weights。
+
+再者，我们观察到，定义
 
 
 
