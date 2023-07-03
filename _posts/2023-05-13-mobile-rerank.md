@@ -15,7 +15,7 @@ kuaishou在《Real-time Short Video Recommendation on Mobile Devices》中介绍
 理想的，我们希望：发现候选集合C的最优排列P，它会导致最大化ListReward(LR)，定义成：
 
 $$
-LR(P) = \sum\limits_{i=1}^{|P|} s_i(\alpha \cdot p(effective\_view_i | c(i)) + \beta \cdot p(like_i | c(i)))
+LR(P) = \sum\limits_{i=1}^{|P|} s_i \cdot (\alpha \cdot p(effective\_view_i | c(i)) + \beta \cdot p(like_i | c(i)))
 $$
 
 ...(4)
@@ -24,15 +24,16 @@ $$
 
 $$
 s_i = \begin{cases}
-\prod\limits_{j=1}^{i-1} p(has\_next_j | c(j)), && i geq 2 \\
+\prod\limits_{j=1}^{i-1} p(has\_next_j | c(j)), && i >= 2 \\
 1, && i = 1
 \end{cases}
 $$
 
 ...(5)
 
-是累积has_next概率直到位置i，它会作为一个discounting factor来合并future reward。
+其中：
 
+- $$s_i$$：是累积has_next概率直到位置i，它会作为一个discounting factor来合并future reward
 - $$p(has\_next_i \mid c(i)), p(effective\_view_i \mid c(i)), p(like_i \mid c(i))$$：分别是在$$v_i$$上has_next、effective_view、like上的predictions
 - $$c(i)$$：在等式(1)中定义的ranking context 
 - $$\alpha$$和$$\beta$$是不同rewards的weights
