@@ -10,12 +10,12 @@ kuaishou在《Real-time Short Video Recommendation on Mobile Devices》中介绍
 
 # 5.实时triggered context-aware reranking
 
-一旦用户完成观看一个视频，并生成新的实时ranking信号，我们可以相应更新我们的client-side model predictions，并触发一个新的re-ranking process。给定更新后的model predictions，存在许多方式来决定展示给用户的视频列表。最广泛使用的是point-wise ranking，它会贪婪地通过得分递减来对视频排序，然而，point-wise ranking会忽略在候选间的相互影响，因为它不是最优的。
+一旦用户观看完一个视频，并生成新的实时ranking信号，我们可以相应更新我们的client-side model predictions，并触发一个新的re-ranking process。给定更新后的model predictions，存在许多方式来决定展示给用户的视频列表。最广泛使用的是point-wise ranking，它会贪婪地通过得分递减方式来对视频排序，然而，point-wise ranking会忽略在候选间的相互影响，因而它不是最优的。
 
 理想的，我们希望：发现候选集合C的最优排列P，它会导致最大化ListReward(LR)，定义成：
 
 $$
-LR(P) = \sum\limits_{i=1}^{|P|} s_i(\alpha p(effective\_view_i | c(i)) + \beta p(like_i | c(i)))
+LR(P) = \sum\limits_{i=1}^{|P|} s_i(\alpha \cdot p(effective\_view_i | c(i)) + \beta \cdot p(like_i | c(i)))
 $$
 
 ...(4)
@@ -23,7 +23,10 @@ $$
 其中：
 
 $$
-s_i =
+s_i = \begin{cases}
+\prod\limits_{j=1}^{i-1} p(has\_next_j | c(j)), && i geq 2 \\
+1, && i = 1
+\end{cases}
 $$
 
 ...(5)
