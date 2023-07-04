@@ -8,6 +8,31 @@ tags:
 
 google在《Fresh Content Needs More Attention: Multi-funnel Fresh Content Recommendation》中提出了multi-funnel新内容推荐：
 
+# 1.介绍
+
+推荐系统严重依赖于：在推荐平台上将用户与合适的内容进行连接。许多推荐系统会基于从推荐内容的历史用户交互中收集到的交互日志进行训练。这些交互通常是这些系统会选择将内容曝光给用户的条件，从而创建一个很强的feedback loop，导致“马太效应”。新上传内容，特别是那些具有低流行的content providers，在被这些推荐系统选中并被展示给合适用户上，面临着一个极大的障碍，因为缺少初始曝光和交互。这常被称为item的cold-start问题。
+
+我们的目标是：打破feedback loop，并创建一个健康的平台，其中高质量新内容可以浮现，并能像病毒式扩散。为了达成该目标，我们需要seed这些内容的初始曝光，并补充这些系统的缺失知识；以便他们可以推荐给合适的用户。尽管一些新兴的研究关注于cold-start推荐，如何在工业规模推荐平台上bootstrap海量新内容（例如：每分钟上传到Youtube超过500小时的内容；Soptify每1.4秒上传一个新的track）仍是未被充分探索的。
+
+更具体的，我们的目标是，构建一个pipeline来展示新和长尾内容，并在推荐平台上增加discoverable corpus。存在一个窘境：一个系统可以探索该corpus的完整spectrum，会导致提升长期用户体验【8，24】；然而，更少特定的内容会被推荐，新内容推荐通常会对短期用户体验有伤害，我们希望缓和它。
+
+为了在新内容推荐pipeline上平衡short-term和long-term用户体验，我们会在两个维度measure它的有效性：
+
+- i) coverage：检查是否该pipeline可以得到更独特的新内容曝光给用户
+- ii) relevance：检查系统是否将用户感兴趣的新内容与用户相连接
+
+设计新内容推荐stack仍然面临着许多未知：
+
+- i) 如何定位新内容推荐stack w.r.t 已存在的推荐stack？ 我们会选择构建一个专有新内容推荐stack，它与其余推荐stacks（仅关注relevance，并且更容易强化feedback loop）相独立
+- ii) 哪些components需要在该stack中？我们会设计该stack来包含一个提名系统、graduation filter、一个ranking系统来对candidates进行打分和排序
+- iii) 如何对coverage和relevance进行平衡？一个基于随机推荐新内容的系统，达到最大的coverage，代价是低relevance并影响用户体验。为了达到平衡，我们会构建一个multi-funnel提名系统，它会分流用户请求在一个具有高coverage的模型和高relevenace的模型（详见图1）；
+- iv) 如何使用少量或无先验的engagement数据来建模内容？我们会依赖一个two-tower DNN，它会使用content features来进行泛化，用于对intial分布进行bootstrap，并且一个序列模型会更新near real-time user feedback来快速寻找高质量内容的audience；
+- v) 如何对新内容推荐的好处进行measure？我们会采用一个user-corpus co-diverted实验框架来measure提出的系统在增加discoverable corpus上的效果。我们会以如下方式组织paper：
+
+- 第2节：专有multi-stage新内容推荐stack：有nomination, filtering, scoring和ranking组件，有效对cold-start items进行bootstrap；并在提升corpus coverage、discoverable corpus以及content creation上showcase它的价值；
+- 第3节：在专有新内容推荐stack上设计一个multi-funnel提名系统，它会组合高泛化能力的模型、以及一个near real-time更新的模型来有效对新内容推荐的coverage和relevance间进行平衡。
+- 第5节：基于request context，将系统扩展到分流用户请求到这些模型上，以进一步提升新内容推荐
+
 # 2.新内容推荐
 
 **Pipeline setup**
