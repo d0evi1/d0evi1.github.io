@@ -218,4 +218,4 @@ $$
 
 # 参考
 
-- 1.[https://arxiv.org/pdf/1910.05755.pdf](https://arxiv.org/pdf/1910.05755.pdf)
+- 1.[https://arxiv.org/pdf/1902.10730.pdf](https://arxiv.org/pdf/1902.10730.pdf)
