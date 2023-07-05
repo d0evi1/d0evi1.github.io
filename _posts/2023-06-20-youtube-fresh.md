@@ -27,59 +27,74 @@ google在《Fresh Content Needs More Attention: Multi-funnel Fresh Content Recom
 
 设计**新内容推荐stack**仍然面临着许多未知：
 
-- i) **如何定位(position)新内容推荐stack w.r.t 已存在的推荐stack？** 
+i) **如何定位(position)新内容推荐stack w.r.t 已存在的推荐stack？** 
 
 我们会选择构建一个专有新内容推荐stack，它与其余推荐stacks（仅关注relevance，并且更容易强化feedback loop）相独立
 
-- ii) **哪些components需要在该stack中？** 
+ii) **哪些components需要在该stack中？** 
 
 我们会设计该stack来包含一个提名系统、graduation filter、一个ranking系统来对candidates进行打分和排序
 
-- iii) **如何对coverage和relevance进行平衡？** 
+iii) **如何对coverage和relevance进行平衡？** 
 
 一个基于随机推荐新内容的系统，达到最大的coverage，代价是低relevance并影响用户体验。为了达到平衡，我们会构建一个multi-funnel提名系统，它会分流用户请求在一个具有高coverage的模型和高relevenace的模型（详见图1）；
 
-- iv) **如何使用少量或无先验的engagement数据来建模内容？** 
+iv) **如何使用少量或无先验的engagement数据来建模内容？** 
 
 我们会依赖一个two-tower DNN，它会使用content features来进行泛化，用于对intial分布进行bootstrap，并且一个序列模型会更新near real-time user feedback来快速寻找高质量内容的audience；
 
-- v) **如何对新内容推荐的收益进行measure？** 
+v) **如何对新内容推荐的收益进行measure？** 
 
 我们会采用一个user-corpus co-diverted实验框架来measure提出的系统在增加discoverable corpus上的效果。
 
 我们会以如下方式组织paper：
 
-- 第2节：专有multi-stage新内容推荐stack：有nomination, filtering, scoring和ranking组件，有效对cold-start items进行bootstrap；并在提升corpus coverage、discoverable corpus以及content creation上showcase它的价值；
-- 第3节：在专有新内容推荐stack上设计一个multi-funnel提名系统，它会组合高泛化能力的模型、以及一个near real-time更新的模型来有效对新内容推荐的coverage和relevance间进行平衡。
+- 第2节：**专有multi-stage新内容推荐stack**：有nomination, filtering, scoring和ranking组件，有效对cold-start items进行bootstrap；并在提升corpus coverage、discoverable corpus以及content creation上showcase它的价值；
+- 第3节：在专有新内容推荐stack上设计一个**multi-funnel提名系统**，它会组合高泛化能力的模型、以及一个near real-time更新的模型来有效对新内容推荐的coverage和relevance间进行平衡。
 - 第5节：基于request context，将系统扩展到分流用户请求到这些模型上，以进一步提升新内容推荐
 
 # 2.新内容推荐
 
 **Pipeline setup**
 
-我们首先介绍一个专用的新内容推荐stack，用来在大规模商业推荐系统平台上的让相对新和长尾的内容露出（surface）。生产环境的推荐系统具有多个stages，其中：
+我们首先介绍**专有新内容推荐stack**，它被用来在大规模商业推荐系统平台上的让相对新和长尾的内容露出（surface）。
+
+生产环境的推荐系统具有多个stages，其中：
 
 - 第一个stage包含了多个检索模型来推荐来自整个corpus的candidates
 - 第二个stage会对candidates进行打分和排序
-- 最后一个stage会根据多样性（diversity）和不同商业目标（）对选中的candidates进行打包（pack）
+- 最后一个stage会根据多样性（diversity）和不同商业目标对选中的candidates进行打包（pack）
+
+由于closed feedback loop，新和长尾items很难被系统发现。**为了让这些内容露出，我们会将一个不固定槽位（floating slot）给到新内容（<=X天的内容）和长尾内容（小于Y个positive用户交互的内容）。其余slots还是会使用生产系统进行填满**。该专用的新推荐系统的pipeline如图2所示：
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/4990aa4ff42a9ded82642885ee60f4b92cfbb77159a736493aacb98ccb968d6a3920dd5100d73bb34fefa141957a166e?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 一个专有新内容推荐stack
 
-由于closed feedback loop，新和长尾items很难被系统发现。为了让这些内容露出，我们会让一个floating slot给到新内容（<=X天的内容）和长尾内容（小于Y个positive用户交互的内容）。其余slots还是会使用生产系统进行填满。该专用的新推荐系统的pipeline如图2所示，每个组件的描述如下：
 
-- **新内容提名（Fresh content nominator）**
+每个组件的描述如下：
 
-在提名相对新和长尾内容中的一个关键挑战是：用户对这些数据缺少用户交互。为了克服冷启item推荐问题，我们采用一个双塔的content-based推荐模型：一个query tower被用于基于消费历史来学习user representation；一个candidate tower被用于基于item features来学习item representation。该模型被训练来预估历史数据中的postive user interactions，幸运地，通过item features，它能泛化到那些具有零或非常少用户交互的items。在serving时，我们依赖于一个多尺度量化（multiscale quantization）方法，用于快速近似最大内积搜索（MIPS），并有效检索top-50的fresh candidates
+**新内容提名器（Fresh content nominator）**
 
-- **毕业过滤（Graduation filter）**
+在提名相对新和长尾内容中的一个关键挑战是：用户对这些数据缺少用户交互。为了克服冷启item推荐问题，我们采用一个双塔的content-based推荐模型：
 
-一旦新内容会累积初始交互，他们可以轻易地通过主推荐系统选到，并在其它slots上展示给合适用户。在专有slot中持续探索这些items，相应的收益会递减，并且曝光资源可以被节省，重新分配给其它潜在的新和长尾内容。我们会采用一个graduation filter ，它会实时移除那些已经被用户消费至多n次的内容。
+- 1）一个query tower被用于基于消费历史来学习user representation；
+- 2）一个candidate tower被用于基于item features来学习item representation。
+    
+该模型被训练来预估历史数据中的postive user interactions，幸运地，通过item features，它能泛化到那些具有零或非常少用户交互的items。在serving时，我们依赖于一个多尺度量化（multiscale quantization）方法，用于快速近似最大内积搜索（MIPS），**并有效检索top-50的fresh candidates**。
 
-- **Ranking**
+**毕业过滤器（Graduation filter）**
 
-一旦nominated candidates通过filter被传入，我们会通过两个组件来进行排序：一个实时pre-scorer和与主系统共享的ranker。pre-scorer是轻量的（lightweight），可以实时反映用户的early feedback；top-10的candidates被pre-scorer选中，接着通过ranker进行传递（其中reranker是一个a high-capacity DNN，具有更好的accuracy但会有更长latency），来评判选中candidates的相关性并返回top-1。特别的，轻量级pre-scorer会实验一个实时Bernoulli multi-arm bandit，其中每个arm对应于一个内容，每个arm的reward会估计一个新内容的good CTR（例如：在一次点击后基于用户消费至少10s的点击率），并遵循一个Beta后验分布：
+一旦新内容累积了初始交互，他们可以通过主推荐系统被轻易选到，并在其它slots上展示给合适用户。**在专有slot中继续探索这些items，相应的收益会递减，并且这些曝光资源可以被节省下来重新分配给其它潜在的新和长尾内容**。我们会采用一个graduation filter ，它会**实时移除那些已经被用户消费(consume)超过n次的内容**。
+
+**Ranking组件**
+
+一旦被提名的candidates通过了filter，我们会通过两个组件来对它们进行排序：
+
+- 一个实时pre-scorer
+- 与主系统共享的ranker
+
+pre-scorer是轻量的（lightweight），可以实时反映用户的early feedback；**top-10的candidates被pre-scorer选中**，接着通过ranker（它是一个high-capacity DNN，具有更好的accuracy但会有更长latency）来评估candidates的相关性并**返回top-1**。特别的，轻量级pre-scorer实现了一个实时Bernoulli multi-arm bandit：每个arm对应于一个内容，每个arm的reward估计了一个新内容的good CTR（例如：在一次点击后基于用户消费至少10s的点击率），并遵循一个Beta后验分布：
 
 $$
 r_i \sim Beta(\alpha_0 + x_i, \beta_0 + n_i - x_i)
@@ -87,9 +102,14 @@ $$
 
 ...(1)
 
-其中，$$r_i$$是对于arm i的reward，具有一个prior Beta$$(\alpha_0, \beta_0)$$分布，其中：参数$$\alpha_0, \beta_0 \in R_{>0}$$，$$x_i$$和$$n_i$$分别表示arm i实时的交互数和曝光数. 实际上，我们会通过对至少100次曝光的新items使用极大似然估计来估计global prior $$\alpha_0$$和$$\beta_0$$。在serving时，我们会采用Thompson Sampling根据等式（1）为每个candidate来生成一个sampled reward，并返回具有最高rewards的top10内容，由ranker来决定最终candidate。
+其中：
 
-该“专用slot（dedicated slot）”能让我们measure多种新内容推荐treatments，它具有更多可控性和灵活性。对比起“full-system”的新内容推荐（例如：允许在当前推荐stackes中更多探索(exploration)，并潜在影响每个slot），对“dedicated slot”进行setup具有许多优点：
+- $$r_i$$：是对于arm i的reward，具有一个先验Beta分布$$Beta(\alpha_0, \beta_0)$$，其中：参数$$\alpha_0, \beta_0 \in R_{>0}$$，
+- $$x_i$$和$$n_i$$：分别表示arm i实时的交互数和曝光数
+
+实际上，我们会通过对**至少100次以上曝光的新items**使用极大似然估计来估计全局先验（global prior）$$\alpha_0$$和$$\beta_0$$。在serving时，我们会采用Thompson Sampling根据等式（1）为每个candidate来生成一个sampled reward，并**返回具有最高rewards的top10内容**，由ranker来决定最终candidate。
+
+该“专用slot（dedicated slot）”能让我们measure多种新内容推荐treatments，它具有更多可控性和灵活性。对比起“full-system”的新内容推荐（例如：允许在当前推荐stacks中进行更多探索(exploration)，并潜在影响每个slot），对“dedicated slot”进行setup具有许多优点：
 
 - i) 可交付（Deliverable）。对于新内容，通过在一个dedicated slot上设置，一旦被上传，它们可以更轻易达到它们的目标受众。这些内容将面对与许多头部和更流行的内容（主推荐系统中存在popularity bias）进行许多竞争。
 - ii) 可测量（Measurable）。有了一个“ dedicated slot”和一个更简单的pipeline，你可以更轻易地setup不同的treatments，并通过下面提出的user-corpus diverted实验来精准测量corpus影响。
