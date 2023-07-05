@@ -65,7 +65,7 @@ v) **如何对新内容推荐的收益进行measure？**
 - 第二个stage会对candidates进行打分和排序
 - 最后一个stage会根据多样性（diversity）和不同商业目标对选中的candidates进行打包（pack）
 
-由于closed feedback loop，新和长尾items很难被系统发现。**为了让这些内容露出，我们会将一个不固定槽位（floating slot）给到新内容（<=X天的内容）和长尾内容（小于Y个positive用户交互的内容）。其余slots还是会使用生产系统进行填满**。该专用的新推荐系统的pipeline如图2所示：
+由于closed feedback loop，新和长尾items很难被系统发现。**为了让这些内容露出，我们会将一个槽位或可浮动槽位（floating slot）给到新内容（<=X天的内容）和长尾内容（小于Y个positive用户交互的内容）。其余slots还是会使用生产系统进行填满**。该专用的新推荐系统的pipeline如图2所示：
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/4990aa4ff42a9ded82642885ee60f4b92cfbb77159a736493aacb98ccb968d6a3920dd5100d73bb34fefa141957a166e?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
@@ -111,10 +111,9 @@ $$
 
 该“专用slot（dedicated slot）”能让我们measure多种新内容推荐treatments，它具有更多可控性和灵活性。对比起“full-system”的新内容推荐（例如：允许在当前推荐stacks中进行更多探索(exploration)，并潜在影响每个slot），对“dedicated slot”进行setup具有许多优点：
 
-- i) 可交付（Deliverable）。对于新内容，通过在一个dedicated slot上设置，一旦被上传，它们可以更轻易达到它们的目标受众。这些内容将面对与许多头部和更流行的内容（主推荐系统中存在popularity bias）进行许多竞争。
-- ii) 可测量（Measurable）。有了一个“ dedicated slot”和一个更简单的pipeline，你可以更轻易地setup不同的treatments，并通过下面提出的user-corpus diverted实验来精准测量corpus影响。
-- iii) 可延长（Extensible）。新内容推荐stack可以很容易地通过扩展单个slot treatment到多个上，并允许忍受未发现的corpus增长。
-
+- i) 可触达（Deliverable）。对于新内容，通过在一个dedicated slot上设置，一旦被上传，它们可以更轻易达到它们的目标受众。否则，在主推荐系统中，由于存在popularity bias，这些内容将面临与许多头部内容和更流行的内容之间的竞争
+- ii) 可测量（Measurable）。有了一个“ dedicated slot”和一个更简单的pipeline，你可以更轻易地setup不同的treatments，并通过下面提出的user-corpus diverted实验来精准测量corpus影响
+- iii) 可扩展（Extensible）。新内容推荐stack可以很容易地进行扩充：通过将单个slot treatment扩展到多个上，并允许忍受未发现的corpus增长
 
 **user-corpus co-diverted实验**
 
