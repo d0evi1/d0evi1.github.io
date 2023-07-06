@@ -117,9 +117,9 @@ $$
 
 **user-corpus co-diverted实验**
 
-在传统的A/B testing中，我们通常会采用一个 user-diverted setup，如图3（左）所示，其中，用户会被随机分配给control和treatment groups，并接受来自整个corpus中的相应推荐。你可以对比两个arms间的用户指标：比如CTR和停留时长，并从用户视角来测量treatment的效果。然而，由于两个arms会共享相同的corpus，由于treatment组泄漏（treatment leakage），user-diverted setup不能measure在corpus上的任意treatment效果。例如，一个新item会通过在实验中的新内容推荐stack来接受曝光，它们也会出现在control arm上。
+在传统的A/B testing中，我们通常会采用一个 user-diverted setup，如图3（左）所示，其中，用户会被随机分配给control和treatment groups，并接受来自整个corpus中的相应推荐。你可以对比两个arms间的用户指标（比如CTR和停留时长），并从用户视角来测量treatment的效果。然而，两个arms会共享相同的corpus，由于treatment组泄漏（treatment leakage），user-diverted setup不能measure在corpus上的任何treatment效果。例如，在该实验中通过新内容推荐stack曝光的一个新item，它也会出现在control arm上。
 
-为了克服这样的泄漏，我们会采用一个user-corpus-dieverted A/B testing setup（如图3（右）），其中：我们会首先暂时不考虑control arm上的x% corpus；以及对于treatment arm上的非重合x% corpus。接着用户被按比例分配给不同的arms，这意味着在control arm中的用户只能接受来自control arm corpus中的contents，在treatment arm中的users只能接受来自treatment arm的内容。由于user size与corpus size成比例，例如：在实验期间，x%的users会被曝光给x%的corpus，在实验阶段treatment的效果评估，与推全部署是一致的（当100%的用户被曝光给100% corpus上）。
+为了克服这样的泄漏，我们会采用一个user-corpus-dieverted A/B testing setup（如图3（右）），其中：我们会首先挑出x% corpus给control arm；以及挑出另外的非重合x% corpus的给treatment arm。接着用户按比例被分配给不同的arms，这意味着在control arm中的用户只能接受来自control arm corpus中的内容，在treatment arm中的users只能接受来自treatment arm的内容。由于user size与corpus size成比例，例如：在实验期间，x%的corpus只会曝光给x%的users，在实验阶段中treatment的效果评估，与推全部署是一致的（当100%的用户被曝光给100% corpus上）。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/d91a92f36e8fd4a9599e4c43367fa6b5fc9aa2fb06b2e705965a435c89b8997107d6ed4db2a273cbafbf7b2c92f53f4a?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
 
