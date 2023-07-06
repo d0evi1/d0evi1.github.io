@@ -200,9 +200,9 @@ $$
 提名器非常依赖于泛化的content features，它对于具有很少用户交互的新内容的启动来说是很有用的。由于缺少记忆能力，因而**它可以快速反馈用户的intial feedback**。这样快速的响应确实是必要的，因为：
 
 - i) 我们通常没有能完整刻画该新内容、并能影响一个新内容的质量的所有features；
-- ii) 对intial user feedback做出反映，可以帮助纠正：在低质量或低相关新内容中的早期分布，减小开销，同时快速重新分发并进一步放大高质量和相关新内容给其它具有相似兴趣的受众，以便进一步增强discoverable corpus的增长，以及content provider获得奖励上传更多内容。这就需要近实时提名（near real-time nominator），它可以挖掘数据，因为新交互数据会以流式方式进来。
+- ii) 对intial user feedback做出快速反映，可以帮助在早期分布中纠正低质量或低相关新内容，减小分发代价，同时快速重新分发并进一步放大高质量和相关新内容给其它具有相似兴趣的受众，以便进一步放大discoverable corpus的增长，并让content provider获得奖励上传更多内容。
 
-为了构建这样的一个近实时提名（near real-time nominator），我提出：
+这就需要**近实时提名（near real-time nominator）**，它可以挖掘数据，因为新交互数据会以流式方式进来。为了构建这样的一个近实时提名（near real-time nominator），这里提出：
 
 - i) 使用near real-time user交互数据来训练
 - ii) 带来一个低延迟的个性化检索模型
