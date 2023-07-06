@@ -119,7 +119,7 @@ $$
 
 在传统的A/B testing中，我们通常会采用一个 user-diverted setup，如图3（左）所示，其中，用户会被随机分配给control和treatment groups，并接受来自整个corpus中的相应推荐。你可以对比两个arms间的用户指标（比如CTR和停留时长），并从用户视角来测量treatment的效果。然而，两个arms会共享相同的corpus，由于treatment组泄漏（treatment leakage），user-diverted setup不能measure在corpus上的任何treatment效果。例如，在该实验中通过新内容推荐stack曝光的一个新item，它也会出现在control arm上。
 
-为了克服这样的泄漏，我们会采用一个user-corpus-dieverted A/B testing setup（如图3（右）），其中：我们会首先挑出x% corpus给control arm；以及挑出另外的非重合x% corpus的给treatment arm。接着用户按比例被分配给不同的arms，这意味着在control arm中的用户只能接受来自control arm corpus中的内容，在treatment arm中的users只能接受来自treatment arm的内容。由于user size与corpus size成比例，例如：在实验期间，x%的corpus只会曝光给x%的users，在实验阶段中treatment的效果评估，与推全部署是一致的（当100%的用户被曝光给100% corpus上）。
+为了克服这样的泄漏，我们会采用一个user-corpus-dieverted A/B testing setup（如图3（右）），其中：**我们会首先挑出x% corpus给control arm；以及挑出另外的非重合x% corpus的给treatment arm。**接着用户按比例被分配给不同的arms，这意味着在control arm中的用户只能接受来自control arm corpus中的内容，在treatment arm中的users只能接受来自treatment arm的内容。由于user size与corpus size成比例，例如：在实验期间，x%的corpus只会曝光给x%的users，在实验阶段中treatment的效果评估，与推全部署是一致的（当100%的用户被曝光给100% corpus上）。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/d91a92f36e8fd4a9599e4c43367fa6b5fc9aa2fb06b2e705965a435c89b8997107d6ed4db2a273cbafbf7b2c92f53f4a?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
 
@@ -129,9 +129,9 @@ $$
 
 我们使用以下的corpus metrics来评估在推荐个性化新内容方面的效果评估，从覆盖率（coverage）和相关性（relevance）维度：
 
-- 每日去重独立内容数@K（DUIC@K: Daily Unique Impressed Contents）：是一个corpus metric，它会统计每天接收到K次曝光的去重独立内容数。我们集中关注在低界上：例如：相对小的K值，来验证覆盖率（coverage）变化。
-- 新内容停留时长（Fresh Content DwellTime）：用于measure用户在曝光的新内容上花费的时间。更长的停留时间表示系统能承受用户在新内容上的偏好越精准，从而达到更高的相关性（relevance）。
-- 在Y天内接收X（post bootstrapping）个正向交互的内容数（Discoverable Corpus@X,Ydays）：用于measure新内容推荐的长期收益。通过post bootstrapping，我们不会统计从专有新内容推荐stack中接收到的item的交叉。一个更大的discoverable corpus表示：系统可以发现（uncover）和培育（seed）更多有价值的内容：例如：那些可以吸引晚多交叉的内容，并在专有slot后通过自己能达到病毒式传播。
+- **每日去重曝光内容数@K（DUIC@K: Daily Unique Impressed Contents）**：是一个corpus metric，它会统计每天接收到K次曝光的去重独立内容数。我们集中关注在低界上：例如：相对小的K值，来验证覆盖率（coverage）变化。
+- **新内容停留时长（Fresh Content DwellTime）**：用于measure用户在曝光的新内容上花费的时间。更长的停留时间表示系统能承受用户在新内容上的偏好越精准，从而达到更高的相关性（relevance）。
+- **在Y天内接收X（post bootstrapping）个正向交互的内容数（Discoverable Corpus@X,Ydays）**：用于measure新内容推荐的长期收益。通过post bootstrapping，我们不会统计从专有新内容推荐stack中接收到的item的交叉。一个更大的discoverable corpus表示：系统可以发现（uncover）和培育（seed）更多有价值的内容：例如：那些可以吸引晚多交叉的内容，并在专有slot后通过自己能达到病毒式传播。
 
 同时，为了确保新引入的新内容推荐不会牺牲更多短期用户engagement，我们也会考虑user metric：它会衡量在该平台上整体用户停留时间。
 
@@ -140,6 +140,18 @@ $$
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/5ff2160d98eed2613473fb316a2ab6d90ec4f7913f9b782887d3e5d91f3fb5c0a8f474ea18049f5a1ca882ec44064b28?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=4.jpg&amp;size=750">
 
 图4
+
+我们首先会在服务数十亿用户的商业推荐平台上开展user corpus co-diverted线上实验，，并在超过一个月周期上measure建立新内容推荐stack的收益。在这些实验中，control arm的users只会被展示主推荐系统生成的推荐。在treatment arm，会保留一个delicated lost来展示来自新内容推荐stack的推荐，而其它slots则被与control arm相同的主推荐系统填充。我们会做出以下观察：
+
+- Corpus coverage会提升。图4(a)会绘制corpus coverage metric——DUIC@K。你可以观察到：不同的K值，会有4%~7.2%间的corpus coverage的一致增长。例如，在treatment arm中，由于delicated新内容推荐stack，存在超过7.2%的唯一内容每天会接受到超过1000次曝光（对比起control arm）。正如预期，在更低的K值上更能更证明增长。
+
+- 用户会探索更大的corpus。在图(b)中，我们会制了discoerable corpus指标，它会measures在Y天内接到X post bootstraaping正向交互的内容数的提升。另外，你可以在X的范围（从100到10k）、Y（从3到28天）天观察到一致提升。换句话说，有了在delicated新内容stacks中培育的initial exposure与交互，更多独特内容数目会被主推荐系统推出来，并因此被用户发现。该提升也消除了新内容推荐stack不仅能增加corpus coverage，也能bootstrap更有价值内容。有了更大的discoverable corpus，更多用户会发现围绕他们特定兴趣偏好中心的内容，从而带来最好的用户体验和一个更健康的平台。尽管一个新内容从上传到被主推荐系统选中并获得探索需要一定的时间，我们发现该数目趋向于在7天之后，即使对于那些高端X值。因而，在我们的真实实验中，我们使用discoverable corpus@X,7days作为main discoverable corpus metric。
+
+- content providers会被鼓励上传更多内容。图4(c)绘制了在使用dedicated新内容推荐stack上treatment arm上传的内容的增长，对比起control arm。通过一个月的实验周期，可以观察到一个一致的提升。另外，我们注意到随着实验继续有一个上升趋势。通过在dedicated slot关于新内容推荐，content providers会被鼓励上传更多内容作为他们的新上传items，获得更多曝光和收益。
+
+- 用户会消费更多新内容，并在短期用户engagement上具有一个最小影响。图5(a)演示了一个新内容数在7天正向交互上获得了+2.52%的极大增长。在图5(b)上，我们发现，平台上的整体用户停留时间会发生-0.12%的下降。然而，如图5(c)所示，对于小的content providers（少于多少订阅），用户停留时间会获得5.5%的增长。该trade-off会考虑上关于一个更大discoverable corpus、以及更多活跃content providers的long-term收益，如上所示。
+
+对于treatment的dedicated slot和user corpus co-diverted实验框架的建立，我们会进一步解决新内容推荐stack的效率增长。
 
 # 3.多通道（Multi-funnel）新内容推荐
 
