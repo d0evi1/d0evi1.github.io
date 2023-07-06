@@ -181,7 +181,15 @@ $$
 
 换句话说，在popular和新上传内容间，在item tower中只有meta features可以泛化。
 
-我们会开展一个在线A/B testing来measure上述变化对于提升新内容推荐的coverage和relevance上的影响。control arm会运行一个双塔结构的提名模型，如第2节所解释，包括在item tower中与一个item相关的所有的meta features。treatment arm会运行完全相同的模型，但会在item tower上排除item ID和popularity features。我们发现，通过移除item ID embeddings和item popularity features，corpus coverage指标：例如：DUIC@1000上涨3.3%，95%置信区间为[3.0%, 3.7%]。新内容停留时长也会增加2.6%。control model可以依赖item/content ID embeddings，以便从流行和确定的内容中记住交互labels，但它对新上传内容效果较差。treatment model则依赖于content features作为刻画用户在其它流行和确定内容上的偏好，从而学习到具有相似features的新内容，从而提升对于新内容推荐的相关性。
+**我们会开展一个在线A/B testing来measure上述变化对于提升新内容推荐的coverage和relevance上的影响**。
+
+- control arm会运行一个双塔结构的提名模型，如第2节所解释，包括在item tower中与一个item相关的所有的meta features。
+- treatment arm会运行完全相同的模型，但会在item tower上排除item ID和popularity features。
+
+我们发现，通过移除item ID embeddings和item popularity features，corpus coverage指标：例如：DUIC@1000上涨3.3%，95%置信区间为[3.0%, 3.7%]。新内容停留时长也会增加2.6%。
+
+- control model可以依赖item/content ID embeddings，以便从流行和确定的内容中记住交互labels，但它对新上传内容效果较差。
+- treatment model则依赖于content features作为刻画用户在其它流行和确定内容上的偏好，从而学习到具有相似features的新内容，从而提升对于新内容推荐的相关性。
 
 **在使用的Content Features**
 
@@ -189,10 +197,10 @@ $$
 
 ## 3.2 Real-Time learning
 
-一个提名器非常依赖于泛化的content featuers，它对于具有很少用户交互的新内容的启动来说是很有用的，它缺少记忆能力，因而可以快速反馈用户的intial feedback。这样快速的响应确实是必要的，因为：
+提名器非常依赖于泛化的content features，它对于具有很少用户交互的新内容的启动来说是很有用的。由于缺少记忆能力，因而**它可以快速反馈用户的intial feedback**。这样快速的响应确实是必要的，因为：
 
-- i) 我们通常不会有需要完全描述该内容并影响一个新上传内容的质量的所有的features；
-- ii) 对于intial user feedback的提示反映，可以帮助纠正：在低质量或低相关新内容中的早期分布，减小开销，同时快速重新分发并进一步放大高质量和相关新内容给其它具有相似兴趣的受众，以便进一步增强discoverable corpus的增长，以及content provider获得奖励上传更多内容。这就需要近实时提名（near real-time nominator），它可以挖掘数据，因为新交互数据会以流式方式进来。
+- i) 我们通常没有能完整刻画该新内容、并能影响一个新内容的质量的所有features；
+- ii) 对intial user feedback做出反映，可以帮助纠正：在低质量或低相关新内容中的早期分布，减小开销，同时快速重新分发并进一步放大高质量和相关新内容给其它具有相似兴趣的受众，以便进一步增强discoverable corpus的增长，以及content provider获得奖励上传更多内容。这就需要近实时提名（near real-time nominator），它可以挖掘数据，因为新交互数据会以流式方式进来。
 
 为了构建这样的一个近实时提名（near real-time nominator），我提出：
 
