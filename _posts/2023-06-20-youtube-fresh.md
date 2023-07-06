@@ -207,13 +207,13 @@ $$
 - i) 使用near real-time user交互数据来训练
 - ii) 带来一个低延迟的个性化检索模型
 
-我们开始最小化在构建该nominator中不同组件的runtime，例如：数据生成、模型训练、模型pushing，以便在一个用户交互发生时，和在被用于serving的模型（具有该交互更新）之间的端到端延迟是数小时内。注意，对比起在主推荐stack中的已存在推荐模型（它的端到端延迟通常会是18-24小时或数天），这是个巨大的时延提升。数据生成job会收集在新和长尾内容上最近15分钟的用户交互，它会被当成是labels用来训练retrieval模型。
+我们尝试让组成该nominator中的**不同组件runtime（例如：数据生成、模型训练、模型pushing）进行最小化**，以便从一个用户交互发生时，到该交互更新被用于serving模型之间的端到端延迟是**数小时内**。注意，对比起在主推荐stack中的已存在推荐模型（它的端到端延迟通常会是18-24小时或数天），这是个巨大的时延提升。数据生成job会收集在**新和长尾内容上最近15分钟的用户交互**，它会被当成是labels用来训练retrieval模型。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/3f3f7d95f7a897fbb197158112986cf42dfb53e38663b11044ae1494a274f0d463af578f94160c7731823c17085574ed?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=6.jpg&amp;size=750">
 
-图6
+图6  用于推荐的Real-Time Sequence Model
 
-retrieval模型被训练的目标是：在给定在该平台上的历史交互后，用于预估用户会交互的下一个item。该架构会再次使用一个双塔结构，其中：user/query tower会编码用户的交互序列，item tower会使用简单的ID embeddings以及categorical features，如图6所示。为了减少训练时间，我们会设计一个简单架构的模型。user state会被表示成用户最近交互的content IDs的embeddings的weighted sum，它会与user query features进行concatenated。特别的，我们会使用attention[41]来提升user state representation。对于一个具有最近n个消费内容$$[V_1, V_2, V_i, \cdots, V_n]$$的给定用户，我们会采用对最近n次交互进行weighted sum形式来获得user representation U:
+**retrieval模型被训练的目标是：在给定用户在该平台上的历史交互后，预估用户会交互的下一个item**。该架构会再次使用一个双塔结构，其中：user/query tower会编码用户的交互序列，item tower会使用简单的ID embeddings以及categorical features，如图6所示。为了减少训练时间，我们会设计一个简单架构的模型。user state会被表示成用户最近交互的content IDs的embeddings的weighted sum，它会与user query features进行concatenated。特别的，我们会使用attention[41]来提升user state representation。对于一个具有最近n个消费内容$$[V_1, V_2, V_i, \cdots, V_n]$$的给定用户，我们会采用对最近n次交互进行weighted sum形式来获得user representation U:
 
 $$
 U = \sum\limits_{i=1}^n w_i * Embedding(V_i)
