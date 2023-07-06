@@ -163,18 +163,18 @@ $$
 
 不同于主推荐系统，专有新内容推荐stack会聚焦于新items，它们没有累积足够多的交互信息。在本节中，我们会描述：如何在该stack中扩展新内容提名，以便达到在提名新内容时的高覆盖和高相关。该技术可以轻易地泛化到pipeline的其它组件上。我们会围绕以下问题讨论：
 
-- 1） RQ1: 那些没有交互或少交互的新内容，如何有效infer它们与用户间的相关度，并将这些内容进行bootstrap？
-- 2） RQ2: 在累积了一些初始交互feedback后，如何快速利用有限的实时用户反馈来放大有价值内容？
+- 1） RQ1: 那些**没有交互或少交互的新内容**，如何有效infer它们与用户间的相关度，并将这些内容进行bootstrap？
+- 2） RQ2: 在**累积了一些初始交互feedback后**，如何快速利用有限的实时用户反馈来放大有价值内容？
 - 3） RQ3: 如何在内容泛化和实时学习间进行平衡，并减小新内容的用户开销，以便我们在推荐新内容时，可以达到高coverage和高releance？
 
 ## 3.1 内容泛化
 
 大多数CF-based推荐模型依赖于一个因子分解的backbone，来通过历史用户交互或ratings行为获得user embeddings和content/item ID embeddings。学到的embeddings接着会被用于infer用户在任意内容上的偏好。由于items存在长尾分布，对于那些新上传的内容来说缺少足够的用户消费labels（engagement labels）来学习一个有信息的ID embedding。实际上，没有合适的treatment，来自新和长尾内容的少量labels通常会被模型忽略，变为训练噪声。这些内容因此很少能曝光给合适的用户。
 
-主要挑战是：在用户与这些新上传内容间的交互labels缺失。一种解法是，使用一个content provider-aware推荐系统，它可以bootstrap由用户熟悉并且订阅的provider生产的新上传内容。为了克服交互labels缺少的问题，我们依赖 content-based features来描述新上传内容如【28等】。这些content features允许模型去泛化：将来自流行内容的充足engagement labels泛化到与这些内容相似的新上传内容上。
+主要挑战是：在用户与这些新上传内容间的交互labels缺失。一种解法是：使用一个content provider-aware推荐系统，它可以bootstrap由用户熟悉并且订阅的provider生产的新上传内容。**为了克服交互labels缺少的问题，我们依赖content-based features来描述新上传内容如【28等】**。这些content features允许模型去泛化：将来自流行内容的充足engagement labels泛化到与这些内容相似的新上传内容上。
 
 
-该模型结构会遵循双塔结构（如【51】），它会使用一个user和一个item/content tower，为了分别编码来自users和items的信息。在这些双塔间的dot product被学习用来预估在一个user和一个item间的历史偏好。模型本身仍会遵循popularity bias。为了模型适应新内容推荐，我们做出以下变化：
+该模型结构会遵循**双塔结构**（如【51】），它会使用一个user和一个item/content tower，为了分别编码来自users和items的信息。在这些双塔间的dot product被学习用来预估在一个user和一个item间的历史偏好。模型本身仍会遵循popularity bias。**为了模型适应新内容推荐，我们做出以下变化**：
 
 - 1）我们会在item tower上完全丢掉item ID，以阻止模型记住在单独items上的历史偏好
 - 2）我们会排除关于一个item的历史流行度的任意features（例如：曝光数、正向engagements），以减少在item tower上的流行度bias
