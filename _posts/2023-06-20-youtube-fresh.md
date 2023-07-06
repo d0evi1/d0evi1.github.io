@@ -232,7 +232,7 @@ $$
 - dwelltime会捕捉用户在item $$V_i$$上的用户消费时间
 - timegap会捕捉在交互发生以及当前请求时间之间的time gap。
 
-这些features会被量化，并被编码成离线embeddings。对于在item $$V_i$$上的历史交互，f接着学习将这些embeddings进行mapping到一个scalar上，得到最终weight $$w_i$$。当聚合历史交互时，这样的一个weighted score $$w_i$$会强调内容更接近于具有更长dwelltime的当前request。在我们的实验中，我们发现，变更前面的简单attention设计，使用更复杂的序列模型（比如：RNNs）不会提升效果，出于最小模型复杂度，我们接着保持简单的weighted embedding。模型会从前一checkpoint进行warm-start，并在最近的15分钟日志上进行训练，每个训练round大概一小时。之后在发布到服务器的不同数据中心上提供真实服务。在serving time时，我们再次依赖一个多尺度量化方法，用于快速近似MIPS，并有效检索top-50的新候选内容。
+这些features会被量化，并被编码成离线embeddings。**对于在item $$V_i$$上的历史交互，f接着学习将这些embeddings进行mapping到一个scalar上，得到最终weight $$w_i$$**。当聚合历史交互时，这样的一个weighted score $$w_i$$会强调内容更接近于具有更长dwelltime的当前request。在我们的实验中，我们发现，变更前面的简单attention设计，使用更复杂的序列模型（比如：RNNs）不会提升效果，出于最小模型复杂度，我们接着保持简单的weighted embedding。**模型会从前一checkpoint进行warm-start，并在最近的15分钟日志上进行训练，每个训练round大概一小时**。之后在发布到服务器的不同数据中心上提供真实服务。在serving time时，我们再次依赖一个多尺度量化方法，用于快速近似MIPS，并有效检索top-50的新候选内容。
 
 **Category-centric Reweighting**
 
