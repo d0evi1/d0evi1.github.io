@@ -131,7 +131,7 @@ $$
 
 - **每日去重曝光内容数@K（DUIC@K: Daily Unique Impressed Contents）**：是一个corpus metric，它会统计每天接收到K次曝光的去重独立内容数。我们集中关注在低界上：例如：相对小的K值，来验证覆盖率（coverage）变化。
 - **新内容停留时长（Fresh Content DwellTime）**：用于measure用户在曝光的新内容上花费的时间。更长的停留时间表示系统能承受用户在新内容上的偏好越精准，从而达到更高的相关性（relevance）。
-- **在Y天内接收X（post bootstrapping）个正向交互的内容数（Discoverable Corpus@X,Ydays）**：用于measure新内容推荐的长期收益。通过post bootstrapping，我们不会统计从专有新内容推荐stack中接收到的item的交叉。一个更大的discoverable corpus表示：系统可以发现（uncover）和培育（seed）更多有价值的内容：例如：那些可以吸引晚多交叉的内容，并在专有slot后通过自己能达到病毒式传播。
+- **在Y天内接收具有X（post bootstrapping）次正向交互的内容数（Discoverable Corpus@X,Ydays）**：用于measure新内容推荐的长期收益。通过post bootstrapping，我们不会统计从专有新内容推荐stack中接收到的items的交互数。一个更大的discoverable corpus表示：系统可以发现（uncover）和培育（seed）更多有价值的内容：例如：在存在于专有slot之后，那些可以吸引到正向交互的内容，并通过自身能达到病毒式传播。
 
 同时，为了确保新引入的新内容推荐不会牺牲更多短期用户engagement，我们也会考虑user metric：它会衡量在该平台上整体用户停留时间。
 
