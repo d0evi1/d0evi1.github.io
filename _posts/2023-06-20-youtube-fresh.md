@@ -169,7 +169,7 @@ $$
 
 ## 3.1 内容泛化
 
-大多数CF-based推荐模型依赖于一个因子分解的backbone，来通过历史用户交互或ratings行为获得user embeddings和content/item ID embeddings。学到的embeddings接着会被用于infer用户在任意内容上的偏好。由于items存在长尾分布，对于那些新上传的内容来说缺少足够的用户消费labels（engagement labels）来学习一个有信息的ID embedding。实际上，没有合适的treatment，来自新和长尾内容的少量labels通常会被模型忽略，变为训练噪声。这些内容因此很少能曝光给合适的用户。
+大多数CF-based推荐模型依赖于一个因子分解的backbone，来通过历史用户交互或ratings行为获得user embeddings和content/item ID embeddings。学到的embeddings接着会被用于infer用户在任意内容上的偏好。**由于items存在长尾分布，对于那些新上传的内容来说缺少足够的用户消费labels（engagement labels）来学习一个有信息的ID embedding**。实际上，没有合适的treatment，来自新和长尾内容的少量labels通常会被模型忽略，变为训练噪声。这些内容因此很少能曝光给合适的用户。
 
 主要挑战是：在用户与这些新上传内容间的交互labels缺失。一种解法是：使用一个content provider-aware推荐系统，它可以bootstrap由用户熟悉并且订阅的provider生产的新上传内容。**为了克服交互labels缺少的问题，我们依赖content-based features来描述新上传内容如【28等】**。这些content features允许模型去泛化：将来自流行内容的充足engagement labels泛化到与这些内容相似的新上传内容上。
 
