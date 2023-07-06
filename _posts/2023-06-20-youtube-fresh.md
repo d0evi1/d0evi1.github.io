@@ -139,7 +139,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/5ff2160d98eed2613473fb316a2ab6d90ec4f7913f9b782887d3e5d91f3fb5c0a8f474ea18049f5a1ca882ec44064b28?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=4.jpg&amp;size=750">
 
-图4
+图4 有了新内容推荐的dedicated slot，我们会展示：a) 不同曝光阈值下DUIC的提升 b) 在延后毕业Y天内，收到X次延后毕业点击数的提升 c) dedicated新内容推荐系统会从content providers上鼓励更多上传，随实验开展会有一个上升趋势
 
 我们首先会在服务数十亿用户的商业推荐平台上开展user corpus co-diverted线上实验，，并在超过一个月周期上measure建立新内容推荐stack的收益。在这些实验中，control arm的users只会被展示主推荐系统生成的推荐。在treatment arm，会保留一个delicated lost来展示来自新内容推荐stack的推荐，而其它slots则被与control arm相同的主推荐系统填充。我们会做出以下观察：
 
