@@ -131,7 +131,7 @@ $$
 
 - **每日去重曝光内容数@K（DUIC@K: Daily Unique Impressed Contents）**：是一个corpus metric，它会统计每天接收到K次曝光的去重独立内容数。我们集中关注在低界上：例如：相对小的K值，来验证覆盖率（coverage）变化。
 - **新内容停留时长（Fresh Content DwellTime）**：用于measure用户在曝光的新内容上花费的时间。更长的停留时间表示系统能承受用户在新内容上的偏好越精准，从而达到更高的相关性（relevance）。
-- **在Y天内接收具有X（post bootstrapping）次正向交互的内容数（Discoverable Corpus@X,Ydays）**：用于measure新内容推荐的长期收益。通过post bootstrapping，我们不会统计从专有新内容推荐stack中接收到的items的交互数。一个更大的discoverable corpus表示：系统可以发现（uncover）和培育（seed）更多有价值的内容：例如：在存在于专有slot之后，那些可以吸引到正向交互的内容，并通过自身能达到病毒式传播。
+- **在Y天内接收具有X（post bootstrapping）次正向交互的内容数（Discoverable Corpus@X,Ydays）**：用于measure新内容推荐的长期收益。通过post bootstrapping，我们不会统计从专有新内容推荐stack中接收到的items的交互数。一个更大的discoverable corpus表示：系统可以发现（uncover）和扶持（seed）更多有价值的内容：例如：在存在于专有slot之后，那些可以吸引到正向交互的内容，并通过自身能达到病毒式传播。
 
 同时，为了确保新引入的新内容推荐不会牺牲更多短期用户engagement，我们也会考虑user metric：它会衡量在该平台上整体用户停留时间。
 
@@ -141,15 +141,21 @@ $$
 
 图4 有了新内容推荐的dedicated slot，我们会展示：a) 不同曝光阈值下DUIC的提升 b) 在延后毕业Y天内，收到X次延后毕业点击数的提升 c) dedicated新内容推荐系统会从content providers上鼓励更多上传，随实验开展会有一个上升趋势
 
-我们首先会在服务数十亿用户的商业推荐平台上开展user corpus co-diverted线上实验，，并在超过一个月周期上measure建立新内容推荐stack的收益。在这些实验中，control arm的users只会被展示主推荐系统生成的推荐。在treatment arm，会保留一个delicated lost来展示来自新内容推荐stack的推荐，而其它slots则被与control arm相同的主推荐系统填充。我们会做出以下观察：
+我们首先会在服务数十亿用户的商业推荐平台上开展user corpus co-diverted线上实验，并在超过一个月周期上measure建立新内容推荐stack的收益。**在这些实验中，control arm的users只会被展示主推荐系统生成的推荐。在treatment arm，会保留一个delicated slot来展示来自新内容推荐stack的推荐，而其它slots则被与control arm相同的主推荐系统推出的内容填充**。我们会做出以下观察：
 
-- Corpus coverage会提升。图4(a)会绘制corpus coverage metric——DUIC@K。你可以观察到：不同的K值，会有4%~7.2%间的corpus coverage的一致增长。例如，在treatment arm中，由于delicated新内容推荐stack，存在超过7.2%的唯一内容每天会接受到超过1000次曝光（对比起control arm）。正如预期，在更低的K值上更能更证明增长。
+- **Corpus coverage会提升**。图4(a)会绘制corpus coverage metric——DUIC@K。你可以观察到：不同的K值，会有4%~7.2%间的corpus coverage的一致增长。例如，在treatment arm中，由于delicated新内容推荐stack，存在超过7.2%的独特内容每天会接受到超过1000次曝光（对比起control arm）。正如预期，在更低的K值上更能更证明增长。
 
-- 用户会探索更大的corpus。在图(b)中，我们会制了discoerable corpus指标，它会measures在Y天内接到X post bootstraaping正向交互的内容数的提升。另外，你可以在X的范围（从100到10k）、Y（从3到28天）天观察到一致提升。换句话说，有了在delicated新内容stacks中培育的initial exposure与交互，更多独特内容数目会被主推荐系统推出来，并因此被用户发现。该提升也消除了新内容推荐stack不仅能增加corpus coverage，也能bootstrap更有价值内容。有了更大的discoverable corpus，更多用户会发现围绕他们特定兴趣偏好中心的内容，从而带来最好的用户体验和一个更健康的平台。尽管一个新内容从上传到被主推荐系统选中并获得探索需要一定的时间，我们发现该数目趋向于在7天之后，即使对于那些高端X值。因而，在我们的真实实验中，我们使用discoverable corpus@X,7days作为main discoverable corpus metric。
+- **用户会探索更大的corpus**。在图(b)中，我们会制了discoverable corpus指标，它会measures在Y天内接到X post bootstraping正向交互的内容数的提升。另外，你可以在X的范围（从100到10k）、Y（从3到28天）天观察到一致提升。换句话说，有了在delicated新内容stacks中扶持的initial exposure与交互，更多数目的独特内容会被主推荐系统推出来，并因此被用户发现。**该提升也消除了新内容推荐stack不仅能增加corpus coverage，也能bootstrap更有价值内容**。有了更大的discoverable corpus，更多用户会发现围绕他们特定兴趣偏好中心的内容，从而带来最好的用户体验和一个更健康的平台。尽管一个新内容从上传到被主推荐系统选中并获得探索需要一定的时间，我们发现该数目趋向于在7天之后，即使对于那些高端X值。因而，在我们的真实实验中，我们使用discoverable corpus@X,7days作为main discoverable corpus metric。
 
-- content providers会被鼓励上传更多内容。图4(c)绘制了在使用dedicated新内容推荐stack上treatment arm上传的内容的增长，对比起control arm。通过一个月的实验周期，可以观察到一个一致的提升。另外，我们注意到随着实验继续有一个上升趋势。通过在dedicated slot关于新内容推荐，content providers会被鼓励上传更多内容作为他们的新上传items，获得更多曝光和收益。
+- **content providers也会被鼓励从而上传更多内容**。图4(c)绘制了在使用dedicated新内容推荐stack上treatment arm上传的内容的增长，对比起control arm。通过一个月的实验周期，可以观察到一个一致的提升。另外，我们注意到随着实验继续有一个上升趋势。通过在dedicated slot关于新内容推荐，content providers会被鼓励上传更多内容作为他们的新上传items，获得更多曝光和收益。
 
-- 用户会消费更多新内容，并在短期用户engagement上具有一个最小影响。图5(a)演示了一个新内容数在7天正向交互上获得了+2.52%的极大增长。在图5(b)上，我们发现，平台上的整体用户停留时间会发生-0.12%的下降。然而，如图5(c)所示，对于小的content providers（少于多少订阅），用户停留时间会获得5.5%的增长。该trade-off会考虑上关于一个更大discoverable corpus、以及更多活跃content providers的long-term收益，如上所示。
+- **用户会消费更多新内容，并在短期用户engagement上具有一个最小影响**。图5(a)演示了一个新内容数在7天正向交互上获得了+2.52%的极大增长。在图5(b)上，我们发现，平台上的整体用户停留时间会发生-0.12%的下降。然而，如图5(c)所示，对于小的content providers（少于多少订阅），用户停留时间会获得5.5%的增长。该trade-off会考虑上关于一个更大discoverable corpus、以及更多活跃content providers的long-term收益，如上所示。
+
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c8773da3faec1b7f8c60df5e09fb9ec1e78702fc007ec245c011b2da276a37051d7c70d6193925c4c013cfe3c6990026?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=5.jpg&amp;size=750">
+
+图5 a) 新内容7天的正向交互数变化(% change) b) 平台上整体用户停留时长（% change） c) 小content provider的用户停留时长（% change）
+
 
 对于treatment的dedicated slot和user corpus co-diverted实验框架的建立，我们会进一步解决新内容推荐stack的效率增长。
 
@@ -167,10 +173,6 @@ $$
 
 主要挑战是：在用户与这些新上传内容间的交互labels缺失。一种解法是，使用一个content provider-aware推荐系统，它可以bootstrap由用户熟悉并且订阅的provider生产的新上传内容。为了克服交互labels缺少的问题，我们依赖 content-based features来描述新上传内容如【28等】。这些content features允许模型去泛化：将来自流行内容的充足engagement labels泛化到与这些内容相似的新上传内容上。
 
-
-<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c8773da3faec1b7f8c60df5e09fb9ec1e78702fc007ec245c011b2da276a37051d7c70d6193925c4c013cfe3c6990026?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=5.jpg&amp;size=750">
-
-图5
 
 该模型结构会遵循双塔结构（如【51】），它会使用一个user和一个item/content tower，为了分别编码来自users和items的信息。在这些双塔间的dot product被学习用来预估在一个user和一个item间的历史偏好。模型本身仍会遵循popularity bias。为了模型适应新内容推荐，我们做出以下变化：
 
