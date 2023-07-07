@@ -236,7 +236,18 @@ $$
 
 **Category-centric Reweighting**
 
-为了确保快速记住在这些新内容上的早期用户反馈（early user feedback），我们会在realtime nominator的item tower中包含item ID embeddings。在新内容上传时，交互数据在模式上区别很大：一些会在几分钟内累积上千次交互数据，而其它一些则只会在15分钟log上看到少量交互。由于不均衡的交互数据，只依赖于ID embeddings的模型在新上传内容的"头部（head）"内容上会有运行over-indexing的风险。为了克服该问题，我们也会包括一些第3.1节提到的content features来刻画这些items。然而，许多categorical features会落入长尾分布。一些categorical features会很普遍，被应用到大量items上，比如：“music”，而其它更专业和有信息量的，比如：“Lady Gaga Enigma+Jazz&Piano”。我们会通过在整个item corpus上的流行度进行inverse，我们会引入IDF-weighting来调权一个feature，为了泛化同时忽略那些普通存在的features，因此模型会更关注于学习这些更专业的content features。
+为了确保快速记住在这些新内容上的早期用户反馈（early user feedback），我们会在realtime nominator的item tower中包含item ID embeddings。在新内容上传时，交互数据在模式上区别很大：
+
+- 一些会在几分钟内累积上千次交互数据
+- 其它一些则只会在15分钟log上看到少量交互
+
+**由于不均衡的交互数据，只依赖于ID embeddings的模型在新上传内容的"头部（head）"内容上会有over-indexing的风险**。为了克服该问题，我们也会包括一些第3.1节提到的content features来刻画这些items。然而：
+
+- 许多categorical features会落入长尾分布
+- 而另一些categorical features则会很普遍，被应用到大量items上，比如：“music”，
+- 其它一些更专业和有信息量的，比如：“Lady Gaga Enigma+Jazz&Piano”
+
+我们会通过在整个item corpus上的流行度进行inverse，我们会引入**IDF-weighting来调权一个feature**，为了泛化同时忽略那些普通存在的features，因此模型会更关注于学习这些更专业的content features。
 
 ## 3.3 低通道（Low-funnel） vs. 中通道（Middle-funnel）内容
 
@@ -245,11 +256,16 @@ $$
 - i) low-funnel内容：具有非常有限或者零交互
 - ii) middle-funnel内容：会通过内容泛化收集到少量初始交互反馈
 
-对于low-funnel内容，实时学习框架会丢掉它的预测能力，泛化这些内容是急需。另一方面，对于middle-funnel内容，早期feedback可以控制real-time nomination系统的训练，允许更好的个性化和相关性。作为尝试使用单个nominator来达到好的泛化和实时学习的替代，我们会为不同通道(funnels)部署不同的nominators来解耦任务（如图7所示）：一个具有好的泛化效果的nominator，定向目标是low-mid funnel；另一个nominator则关注于快速适应用户反馈，定向目标是mid-funnel（具有合理量级的用户反馈来启动）。我们采用服务两或多个推荐系统的思想来同步获得更好的效果，同时具有更少的缺点。另外，我们也会讨论在这样的混合系统中如何决定何时来将一个low-funnel content转移到middle-funel中。
+对于low-funnel内容，实时学习框架会丢掉它的预测能力，泛化这些内容是急需。另一方面，对于middle-funnel内容，更快的feedback可以控制real-time nomination系统的训练，允许更好的个性化和相关性。作为使用单个nominator来同时达到好的泛化和实时学习的尝试替代，我们会为不同通道(funnels)部署不同的nominators来解耦任务（如图7所示）：
+
+- 一个具有好的泛化效果的nominator，目标针对low-mid funnel；
+- 另一个nominator则关注于快速适应用户反馈，目标针对mid-funnel（具有合理量级的用户反馈来启动）
+
+我们采用serving两或多个推荐系统的思想来同时获得更好的效果，并具有更少的缺点。另外，**我们也会讨论在这样的混合系统中如何决定何时来将一个low-funnel content转移到middle-funel中**。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/6e74b6a393c75c2afe6bbcd3006b5a64e9ec531178601d9c7d023e639a479ebf07d564664d60cf7499005fbfe01f2b1f?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=7.jpg&amp;size=750">
 
-图7
+图7 一个多通道提名系统
 
 **Multi-funnel Nomination的query division**
 
