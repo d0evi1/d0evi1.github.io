@@ -269,6 +269,28 @@ $$
 
 **Multi-funnel Nomination的query division**
 
-一个naive策略，将两个nominators进行组合，并分别询问提名候选，接着依赖于graduaiton filter、prescorer、ranker来为dedicated slot来选择最终内容。但我们观察到，middle-funnel contents会终止提名slot，因为在ranker中的popularity bias。对于单个用户请求共同激活两个nominators也会有更高的serving开销。为了缓和该问题，我们提出了query division multiplexing：用来随进选择two-tower DNN：具有概率p%来检索每个query的low-funnel candidates（或者real-time nominator具有(100-p)%的概率来检索middle-funnel candidates）。我们在第4.2节中在corpus和user metrics间的tradeoff值开展不同的p值实验。
+一个naive策略，将两个nominators进行组合，并分别询问提名候选，接着依赖于graduaiton filter、prescorer、ranker来为dedicated slot来选择最终内容。但我们观察到，由于在ranker中的popularity bias，最终middle-funnel contents会以主宰slot。对于单个用户请求共同激活两个nominators也会有更高的serving开销。
+
+为了缓和该问题，我们提出了query division multiplexing：用来随机选择two-tower DNN：具有概率p%来检索每个query的low-funnel candidates，或者具有(100-p)%的概率来检索来自middle-funnel的real-time nominator的candidates。我们在第4.2节中在corpus和user metrics间的tradeoff值开展不同的p值实验。
+
+# 4.实验
+
+在本节中，我们通过线上真实流量实验研究了在专有新内容推荐stack上的multi-funnel设计的效果提升。
+
+## 4.1 Setup
+
+我们测试了在第2节中介绍的专有新内容推荐stack的multi-funnel设计。特别的，我们对比了dedicated新内容推荐的以下方法：
+
+- i) single-funnel提名器：使用单个推荐模型来提名新内容candidates。我们将single-funnel提名系统表示成S-two-tower，另一个使用real-time sequence model的称为S-real-time；
+- ii) Multi-funnel提名器：会采用
+
+# 5.contextual流量分配
+
+新内容推荐对于长期用户体验是有益的，它会造成短期用户engagement变得不那么popular或推荐不熟悉的内容。来到在线平台的用户通常在活跃级别上是不同的，会随着消费消息兴趣上的不同而非常不同。通常存在着一批核心用户（core users），它们会定期有规律的访问平台，其它则是临时用户（casual user），或新用户（emerging users），或者倾向于偶尔访问平台的用户。活跃级别的不同可能导致在用户分组上不同的内容消费模型。并且将用户进行grouping的方式可以在【9】中找到。
+
+在初始探索（initial exploraition）中，我们会采用good CTR，基于用户在该点击后至少花费了10s钟，作为直接用户指标来评估推荐系统的短期效果。在图11中，我们发现，不同用户group的good CTR在由不同模型推荐出的候选上非常不同。例如，对比起real-time nominator，low-funnel模型（two-tower DNN）对于casual users来说会达到相似CTR，而对于core user则具有很大的gap。这意味着这些模型不仅在item corpus上具有不同的strength，（例如：low-funnel vs. middle-funnel），他们在处理不同user groups上也具有不同的strength。
+
+该分析会激发一个潜在方法，可以进一步提升对于multi-funnel的query multiplexing的效果。对于core users来说，在泛化模型上的relevance loss对比起更低活跃级别的用户要更大。我们不会在相同概率下使用不同活跃级别来multiplexing用户，我们会进一步基于users/queries来将contextualize流量分配。我们会随机选择q%的核心用户，并使用来自real-time nominator、并利用它的短期用户engagement增益产生的nominations进行服务。其它用户则总是使用two-tower DNN来最大化corpus覆盖的nominations进行服务。如表3所示，通过使用real-time nominator以及使用不同的概率来服务核心用户，我们可以使用context-aware hybrid来进一步提升推荐效率。例如，当我们使用real-time nominator来服务40%的核心用户时，我们可以获得极大的dwell time以及good CTR提升，并在corpus coverage上有中立变更。更多综合的multiplexing策略在以后会再研究。
+
 
 - 1.[https://arxiv.org/pdf/2306.01720.pdf](https://arxiv.org/pdf/2306.01720.pdf)
