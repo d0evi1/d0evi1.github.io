@@ -282,7 +282,31 @@ $$
 我们测试了在第2节中介绍的专有新内容推荐stack的multi-funnel设计。特别的，我们对比了dedicated新内容推荐的以下方法：
 
 - i) single-funnel提名器：使用单个推荐模型来提名新内容candidates。我们将single-funnel提名系统表示成S-two-tower，另一个使用real-time sequence model的称为S-real-time；
-- ii) Multi-funnel提名器：会采用
+- ii) Multi-funnel提名器：会采用two-tower DNN来推荐那些低于$$n_{low}$$次正向用户交互的low-funnel content，real-time model则推荐那些在graduation threshold阈值下的middle-funnel content。这两个nominators会通过qeruy multiplexing进行组合，其中：two-tower DNN被用于p%随机用户请求，而real-time model则被用于剩余的(100-p)%.
+
+我们设置：p为80，$$n_{low}$$为200，如第4.2节。我们会跑1%的在线user diverted实验来measure用户指标，5%的user corpus co-diverted实验来measure相应的corpus影响。
+
+## 4.2 效果与分析
+
+**multi-funnel nomination的影响**
+
+对比multi-funnel nomination vs. single-funnel nomination在corpus以及user metrics，我们会做出以下观测：
+
+- DUIC. 在图8(左)中，我们发现：对比起S-two-tower，S-real-time在low end上具有更低的DUIC。它在1000次曝光阈值上展示了1.79%的降级，这意味着：real-time nominator在推荐较少交互数据的low-funnel contents上要比two-tower DNN模型效率低。通过组合two-tower DNN、real-time nominaor，如图8(右)所示，我们观察到，low end上的DUIC会在multi-funnel nomination setup中得到极大提升，在DUIC@1000上有0.65%的提升。这意味着，对比起single-funnel setup，multi-funnel推荐可以提升新内容覆盖。
+
+- Discoverable Corpus。
+
+
+- user metrics。
+
+**funnel transition cap的影响**
+
+为了决定当一个新内容从low-funnel转移到middle-funnel时，我们要评估在不同的interaciton caps下two-tower DNN的泛化性的corpus效果。注意，当我们设置interaction cap为100时，它意味着，我们会限制该模型能index的corpus只会是那些具有最大100次交互的新内容。由于low-funnel推荐的主要目的是：提升corpus voerage，我们会主要关注不同caps的DUIC, 如表2所示。当cap设置为200时，DUIC@1000会达到它的最大值。设置该cap为100会达到相似的效果，但进一步降低cap会导致更差的指标。我们分析得到：当cap太低时，更多低质量内容会被强制提名，并在之后的ranking stage中由于更低的relevance而被过滤。事实上，我们会观察到，当cap从400降到100时，接收到非零曝光的unique contents的数目会有2.9%的下降。同时，需要满足来自low-funnel nominator的初始交互的特定量级之后，才能给real-time model提供学习信号。这意味着一个未来方向是：在middle funnel nominator和主推荐系统（比如：ranker）两者均需要提升泛化性，以便multi-funnel transition可以朝着low-funnel的方向移去。
+
+**不同mix概率p%的影响** 
+
+我们测试了不同的multi-plexing概率：p%
+
 
 # 5.contextual流量分配
 
@@ -292,5 +316,7 @@ $$
 
 该分析会激发一个潜在方法，可以进一步提升对于multi-funnel的query multiplexing的效果。对于core users来说，在泛化模型上的relevance loss对比起更低活跃级别的用户要更大。我们不会在相同概率下使用不同活跃级别来multiplexing用户，我们会进一步基于users/queries来将contextualize流量分配。我们会随机选择q%的核心用户，并使用来自real-time nominator、并利用它的短期用户engagement增益产生的nominations进行服务。其它用户则总是使用two-tower DNN来最大化corpus覆盖的nominations进行服务。如表3所示，通过使用real-time nominator以及使用不同的概率来服务核心用户，我们可以使用context-aware hybrid来进一步提升推荐效率。例如，当我们使用real-time nominator来服务40%的核心用户时，我们可以获得极大的dwell time以及good CTR提升，并在corpus coverage上有中立变更。更多综合的multiplexing策略在以后会再研究。
 
+
+# 
 
 - 1.[https://arxiv.org/pdf/2306.01720.pdf](https://arxiv.org/pdf/2306.01720.pdf)
