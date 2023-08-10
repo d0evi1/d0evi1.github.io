@@ -20,10 +20,10 @@ PRP通常被解释成一个新检索算法：估计每个文档的相关度概�
 
 假设：
 
-- q是一个query. 该query是隐式（implicit）并且是确定的（fixed）。
-- u为一个想根据q获取信息的用户
-- d为一个与u交互可能相关/不相关的 document
-- R是一个关于相关性的二元随机变量
+- q：是一个query. 该query是隐式（implicit）并且是确定的（fixed）。
+- u：为一个想根据q获取信息的用户
+- d：为一个与u交互可能相关/不相关的 document
+- R：是一个关于相关性的二元随机变量
 
 为了应用PRP，我们估计：
 
@@ -31,19 +31,27 @@ $$
 P(R=1 | u, d)
 $$
 
-在归纳和问答社区常指到“信息点（information nuggets）”。我们将用户信息建模成一个nuggets集合$$u \subseteq N$$, 其中$$N = \lbrace n_1, \cdots, n_m \rbrace$$表示可能的nuggets空间。相似的，一个文档中出现的信息会被建模成一个 nuggets集合$$d \subseteq N$$。
+在归纳和问答社区常指到“信息点（information nuggets）”。我们：
+
+- 将**用户信息**建模成一个nuggets集合$$u \subseteq N$$, 其中$$N = \lbrace n_1, \cdots, n_m \rbrace$$表示可能的nuggets空间。
+- 将**一个文档中出现的信息**会被建模成一个 nuggets集合：$$d \subseteq N$$。
 
 我们解释了一个nugget的概念，将它的通用含义扩展到包含关于一个document的任意二元属性。由于在归纳和问答中很常用，一个nugget可以表示一个信息片段。在QA示例中，一个nugget可以表示成一个答案。然而，一个nugget可以表示其它二元属性，比如：主题。我们也使用nugget来表示某特殊网站一部分的一个页面、一个关于不间断电力供应的特定事实、一个跟踪包裹的表格、或大学主页等。
 
-如果一个特定document它包含了用户所需信息的至少一个nugget，那么则是相关的:
+**如果一个特定document它包含了用户所需信息的至少一个nugget，那么则是相关的**:
 
 $$
-P(R = 1|u, d) = P(\exists n_i \ such \ that \ n_i \in u \cup )
+P(R = 1|u, d) = P(\exists n_i \ such \ that \ n_i \in u \cup d)
 $$
 
-对于一个特定的nugget $$n_i$$, $$P(n_i \in u)$$表示用户信息包含$$n_i$$的概率，并且$$P(n_i \in d)$$表示document包含了$$n_i$$的概率。
+对于一个特定的nugget $$n_i$$：
 
+- $$P(n_i \in u)$$表示用户信息包含$$n_i$$的概率，
+- $$P(n_i \in d)$$表示document包含了$$n_i$$的概率
 
+这些概率会被估计，用户信息需要独立于文档，文档需要独立于用户信息。相互间唯一的连接是：nuggets集合。
+
+传统上，对于u和d的特定样本，相应的概率会被估计为0或1；也就是说：$$P(n_i \in u) = 1$$表示：$$n_i$$满足u的认知；否则不满足。相似的，$$P(n_i \in d) = 1$$表示：$$n_i$$可以在d中找到，否则不是。这种传统建模过分强调了这些待评估质量的确定性。采用一个更宽松的视角，可以更好建模真实情况。人工评估者在judgements上有可能是不一致的。来自隐式user feedback的要关评估可能不总是精准的。如果一个分类器被应用到人工羊honr，我们可以利分分类器本身提供的概率。
 
 # 5.  CUMULATIVE GAIN MEASURES
 
