@@ -11,7 +11,7 @@ Recommendation》中提出了Non-invasive Self-attention的方法：
 
 # 抽要
 
-Sequential recommender systems的目标是：根据用户历史行为建模用户的兴趣演进。对比起传统的模型，DNN等已经达到了较高的水准。最近BERT框架的出现，受益于它的self-attention机制，在处理序列数据上非常合适。然而，原始的BERT框架只考虑在自然语言tokens中的一个输入源。在BERT框架下如何利用众多不同类型的information仍是一个开放的问题。尽管如此，它直接上看起来可以利用其它的side information，比如：item category或者tag，来进行更综合的描述与更好的推荐。在我们的实验中，我们发现naive方法（直接将不同side information的types进行融合到item embeddings中）通常会带来非常少或负向的效果。因此，提出了NOninVasive self-Attention机制 (NOVA) 来在BERT框架下有效利用side information。NOVA会利用side informaiton来生成更好的attention分布，而非直接更改item embeddings，它会造成信息压倒性（information overwhelming）。我们验证了NOVA-BERT模型，并能达成SOTA效果，计算开销很小。
+Sequential recommender systems的目标是：根据用户历史行为建模用户的兴趣演进。对比起传统的模型，DNN等已经达到了较高的水准。最近BERT框架的出现，受益于它的self-attention机制，在处理序列数据上非常合适。然而，**original BERT框架只考虑单一输入源：在自然语言中的tokens**。在BERT框架下如何利用众多不同类型的information仍是一个开放的问题。尽管如此，它看起来可以直接利用其它的side information，比如：item category或者tag，来进行更综合的描述与更好的推荐。**在我们的实验中，我们发现naive方法（直接将不同side information的types进行融合到item embeddings中）通常会带来非常少或负向的效果**。因此，提出了NOninVasive self-Attention机制 (NOVA) 来在BERT框架下有效利用side information。NOVA会利用side informaiton来生成更好的attention分布，而非直接更改item embeddings，它会造成信息压倒性（information overwhelming）。我们验证了NOVA-BERT模型，并能达成SOTA效果，计算开销很小。
 
 。。。
 
@@ -19,7 +19,7 @@ Sequential recommender systems的目标是：根据用户历史行为建模用�
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/927a5e2ec7c88da955a65dd92c33d0a4ddc9ec4184279a1963b86f210d49a3dc2ae8ee4691e82e795a2294fa35352226?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
-图1
+图1 invasive和non-invasive方法的一个图示。invasive方法会以不可逆的方式来融合所有类型的信息，接着将它们feed到sequential models上。而对于non-invasive方法，side information只会参与attention matrix计算，item information会保存在一个独立的vector space中
 
 ## 3.1 问题设定
 
@@ -100,7 +100,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/aab9f80c5bf844b75c43c3ca4e94c58b0d8f303cb6820e5eb6c283e54b297e4f3a0ce869978988b9ad41e5fefc0204ec?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 BERT4Rec。Item IDs和positions会被分别编码成vectors，接着添加在一起作为integrated item representations. 在训练期间，item IDs会被随机mask掉（表示成[M]），以便让模型来进行恢复
 
 BERT4Rec(Sun. 2019)是首个利用BERT框架进行sequential推荐并达到SOTA效果的任务。如图2所示，在BERT框架中，items被表示成vectors（embeddings）。在训练期间，一些items会被随机mask，BERT模型会使用multi-head self-attention机制来尝试恢复它们的vector表示以及item IDs：
 
@@ -216,6 +216,6 @@ NOVA-BERT会遵循original BERT的结构，除了将self-attention layers替换�
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/5d4f72a9c7320b13091309c147aa02f2f8d218c28c64e0f7e331e890143c8873341c550f99a3109ce16c1714ede717c4?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=4.jpg&amp;size=750">
 
-图4
+图4 NOVA-BERT。每个NOVA layer会采用两个inputs：item representations和side information
 
 - 1.[https://arxiv.org/pdf/2103.03578.pdf](https://arxiv.org/pdf/2103.03578.pdf)
