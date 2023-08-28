@@ -58,7 +58,7 @@ $$
 
 $$
 I_{pred} = ID^{(\hat{k})} \\
-\hat{k} =\underset{k}{argmax} P(v_u^{(n+1)} = ID^{(k)} | S_u)
+\hat{k} =\underset{k}{argmax} \ \ P(v_u^{(n+1)} = ID^{(k)} | S_u)
 $$
 
 ## 3.2 Side Information
@@ -80,8 +80,9 @@ $$
 
 其中：
 
-- $$b_{u,j}^{(\cdot)}$$表示一个由user u做出的第j个interaction的behavior-related side information。
-- $$I^{(\cdot)}$$表示一个item，包含了一个ID和一些item-related side information $$f_k^{(\cdot)}$$。
+- $$b_{u,j}^{(\cdot)}$$：表示一个由user u做出的第j个interaction的behavior-related side information。共有q个该类型的side information
+- $$I^{(\cdot)}$$：表示一个item，包含了一个ID和一些item-related side information $$f_k^{(\cdot)}$$。共有p个该类型的side information
+- 
 
 Item-related side information是静态的，并存储了每个特定item的内在features。因而，vocabulary可以被重写成：
 
