@@ -167,7 +167,7 @@ R_u^{(ID)} = (E_{u,1}^{(ID)}, E_{u,2}^{(ID)}, \cdots, E_{u,n}^{(ID)}) \\
 R_u = (E_{u,1}, E_{u,2}, \cdots, E_{u,n})
 $$
 
-NOVA会计算来自 integrated embeddings R的Q、K，以及来自item ID embeddings $$E^{(ID)}$$的V。在实际中，我们会以tensor形式处理整个序列（。。。）。NOVA可以公式化为：
+NOVA会计算来自 integrated embeddings R的Q、K，以及来自item ID embeddings $$E^{(ID)}$$的V。在实际中，我们会以tensor形式处理整个序列（例如：R和$$R^{(ID)} \in R^{B \times L \times h}$$，其中B是batch size，L是sequence length，h是embedding vectors的size）。NOVA可以公式化为：
 
 $$
 NOVA(R,R^{(ID)}) = \sigma(\frac{QK^T}{\sqrt d_k}) V
