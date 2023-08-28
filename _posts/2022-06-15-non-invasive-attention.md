@@ -82,7 +82,6 @@ $$
 
 - $$b_{u,j}^{(\cdot)}$$：表示一个由user u做出的第j个interaction的behavior-related side information。共有q个该类型的side information
 - $$I^{(\cdot)}$$：表示一个item，包含了一个ID和一些item-related side information $$f_k^{(\cdot)}$$。共有p个该类型的side information
-- 
 
 Item-related side information是静态的，并存储了每个特定item的内在features。因而，vocabulary可以被重写成：
 
@@ -94,7 +93,7 @@ $$
 
 $$
 I_{pred} = ID^{(\hat{k})} \\
-\hat{k} = argmax_k P(v_u^{(n+1)} = (I^{(k)}, b_1, b_2, \cdots, b_q) | S_u)
+\hat{k} = \underset{k}{argmax} P(v_u^{(n+1)} = (I^{(k)}, b_1, b_2, \cdots, b_q) | S_u)
 $$
 
 其中：
@@ -110,7 +109,7 @@ $$
 BERT4Rec(Sun. 2019)是首个利用BERT框架进行sequential推荐并达到SOTA效果的任务。如图2所示，在BERT框架中，items被表示成vectors（embeddings）。在训练期间，一些items会被随机mask，BERT模型会使用multi-head self-attention机制来尝试恢复它们的vector表示以及item IDs：
 
 $$
-SA(Q,K,V) = \sigma(\frac{QK^T}{\sqrt{d_k}}) V
+SA(Q,K,V) = \sigma(\frac{QK^T}{\sqrt{d_{k}}}) V
 $$
 
 其中：
@@ -121,7 +120,7 @@ $$
 
 BERT会遵循一个encoder-decoder的设计，来为在input序列中的每个item生成一个contextual representation。BERT会采用一个embedding layer来保存m个vectors，每个对应于在vocabulary中的一个item。
 
-为了利用side information，像conventional方法会使用独立的embedding layers来将side information编码到vectors中，接着使用一个fusion function F将它们fuse到ID embeddings中。这种invasive类型的方法会将side information注入到原始embeddings中，来生成一个mixed representation：
+为了利用side information，像conventional方法会使用独立的embedding layers来将side information编码到vectors中，接着**使用一个fusion function F将它们融合到ID embeddings中**。这种invasive类型的方法会将side information注入到原始embeddings中，来生成一个mixed representation：
 
 $$
 E_{u,j} = F(\epsilon_{id}(ID), \\
@@ -132,7 +131,7 @@ $$
 其中：
 
 - $$E_{u,j}$$：是user u对第j个interaction的integrated embedding
-- $$\epsilon$$是将objects编码成vectors的embedding layer
+- $$\epsilon$$：是将objects编码成vectors的embedding layer
 
 该integrated embeddings的序列会被feed到模型中作为user history的input。
 
@@ -143,15 +142,19 @@ R_{i+1} = BERT\_Layer(R_i) \\
 R_1 = (E_{u,1}, E_{u,2}, \cdots, E_{u,n})
 $$
 
-在原始BERT和Transformer中，self-attention操作是一个位置不变函数（positional invariant funciton）。因此，一个position embedding会被添加到每个item embedding中来显式编码position信息。position mebeddings也可以被看成是一种behavior-related side information（例如：一个interaction的顺序）。从该视角看，original BERT也可以将positional information看成是唯一的side information，使用加法作为fusion function F。
-
-图2 BERT4Rec
+在原始BERT和Transformer中，self-attention操作是一个位置不变函数（positional invariant funciton）。因此，一个position embedding会被添加到每个item embedding中来显式编码position信息。**position embeddings也可以被看成是一种behavior-related side information（例如：一个interaction的顺序）**。从该视角看，original BERT也可以将positional information看成是唯一的side information，使用加法作为fusion function F。
 
 ## 3.4 Non-invasive Self-attention (NOVA)
 
-如果我们考虑end-to-end的BERT框架，它是一个具有stacked self-attention layers的auto-encoder。该identical embedding map会被用于encoding item IDs和decoding restored vector representations两者之上。因此，我们会讨论：invasive方法在混合embedding空间的缺点，因为item IDs会使用其它side information进行不可逆的混合。将来自IDs的信息与其它side information进行混合，使得对于模型编码item IDs来说带来不必要的困难。
+如果我们考虑end-to-end的BERT框架，它是一个具有stacked self-attention layers的auto-encoder。该identical embedding map会被用于encoding item IDs和decoding restored vector representations两者之上。因此，我们会讨论：**invasive方法存在着对embedding空间混合的缺点，因为item IDs会使用其它side information进行不可逆的混合**。将来自IDs的信息与其它side information进行混合，使得对于模型编码item IDs来说带来不必要的困难。
 
-相应的，我们提出了一种新的方法，称为noninvasive self-attention (NOVA)，来维持embedding space的一致性，从而利用side information建模sequences会更有效。该思想会修改self-attention机制，并仔细控制着self-attention组件(称为：query Q、key K、value V)的信息源。在在3.3节中定义的integrated embedding E之外，NOVA也会为pure ID embeddings保留一个分枝：
+相应的，我们提出了一种新的方法：**称为noninvasive self-attention (NOVA)，来维持embedding space的一致性，从而利用side information建模sequences会更有效**。该思想会修改self-attention机制，并仔细控制着self-attention组件(称为：query Q、key K、value V)的信息源。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/8468e8813b98fa3fb2e831003b0309f03125c186ecd1e6bd6790aad1370c73db78797390c47f088d04ae8887e7d864cb?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
+
+图3 invasive和non-invasive self-attention方式下的特征融合（feature fusion）。invasive方式会将item related和behavior-related side information使用一个fusion funciton进行直接融合；而**NOVA只会在Query&Key中对它们进行融合**
+
+在在3.3节中定义的integrated embedding E之外，NOVA也会为pure ID embeddings保留一个分枝：
 
 $$
 E_{u,j}^{(ID)} = \epsilon_{id}(ID)
@@ -177,10 +180,6 @@ Q = RW_Q, K = RW_K, V=R^{(ID)} W_V
 $$
 
 对于side information fusing，NOVA与invasive方式间的对比如图3所示。layer by layer，在NOVA layers上的prepresentations会被保存到一个一致的vector space中，它完全由item IDs的context构成，$$E^{(ID)}$$。
-
-<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/8468e8813b98fa3fb2e831003b0309f03125c186ecd1e6bd6790aad1370c73db78797390c47f088d04ae8887e7d864cb?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
-
-图3
 
 ## 3.5 Fusion操作
 
