@@ -183,21 +183,21 @@ $$
 
 ## 3.5 Fusion操作
 
-NOVA会利用不同于invasive方法的side information，将它看成是一个auxiliary，并将side information进行fuse到具有fusion function F的Keys和Queries中。在本研究中，我们也研究了不同类型的fusion functions和它们的效果。
+NOVA会利用不同于invasive方法的side information，将它看成是一个auxiliary，并将side information进行fuse到具有fusion function F的Keys和Queries中。在本研究中，我们也研究了**不同类型的fusion functions**和它们的效果。
 
-如上所示，position information也是一种behavior-related side information，并且original BERT会使用直接的addition操作来利用它：
+如上所示，position information也是一种behavior-related side information，并且original BERT会使用**直接的addition操作**来利用它：
 
 $$
 F_{add}(f_1, \cdots, f_m) = \sum\limits_{i=1}^m f_i
 $$
 
-再者，我们定义了“concat” fusor来将所有side information进行拼接，后接一个fully connected layer来对维度进行uniform：
+再者，我们定义了**concat fusor**来将所有side information进行拼接，后接一个fully connected layer来对维度进行uniform：
 
 $$
 F_{concat}(f_1, \cdots, f_m) = FC(f_1 \odot \cdots \odot f_m)
 $$
 
-受(Lei 2019)的启发，我们设计了一个具有可训练参数的gating fusor：
+受(Lei 2019)的启发，我们设计了一个具有可训练参数的**gating fusor**：
 
 $$
 F_{gating}(f_1, \cdots, f_m) = \sum\limits_{i=1}^m G^{(i)} f_i \\
@@ -209,6 +209,11 @@ $$
 - F是所有features $$[f_1, \cdots, f_m] \in R^{m \times h}$$的矩阵形式
 - $$W^F$$是一个可训练参数$$R^{h \times 1}$$
 - h是要融合的feature vectors的维度 $$f_i \in R^h$$
+
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/733ce2a436f1d8b3f7685051359c039dc93b23c5cbee75d0d8b92b5e1c9766d08a1349839377bf90d0dade0c9e6860ef?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t1.jpg&amp;size=750">
+
+表1: 对比效果
 
 ## 3.6 NOVA-BERT
 
