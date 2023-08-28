@@ -19,11 +19,13 @@ Sequential recommender systems的目标是：根据用户历史行为建模用�
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/927a5e2ec7c88da955a65dd92c33d0a4ddc9ec4184279a1963b86f210d49a3dc2ae8ee4691e82e795a2294fa35352226?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
-图1 invasive和non-invasive方法的一个图示。invasive方法会以不可逆的方式来融合所有类型的信息，接着将它们feed到sequential models上。而对于non-invasive方法，side information只会参与attention matrix计算，item information会保存在一个独立的vector space中
+图1 invasive和non-invasive方法的一个图示。invasive方法会以不可逆的方式来融合所有类型的信息，接着将它们feed到sequential models上。而**对于non-invasive方法，side information只会参与attention matrix计算，item information会保存在一个独立的vector space中**
 
 ## 3.1 问题设定
 
-给定一个用户与系统的历史交互，顺序推荐任务会询问：下一个要交互哪个item？ 假设：u表示一个用户，它的历史交互可以被表示成一个按时间顺序的序列：
+**给定一个用户与系统的历史交互，顺序推荐（sequential recommendation）任务会询问：下一个要交互哪个item？ **
+
+假设：u表示一个用户，它的**历史交互**可以被表示成一个按时间顺序的序列：
 
 $$
 S_u = [v_u^{(1)}, v_u^{(2)}, \cdots, v_u^{(n)}]
@@ -31,7 +33,7 @@ $$
 
 其中：
 
-- 项$$v_u^{(j)}$$表示用户做出的第j个交互行为
+- $$v_u^{(j)}$$：表示用户u做出的第j个交互行为
 
 当只有一种类型的actions、并且没有side information时，每个interaction可以被简单表示成一个item ID：
 
@@ -39,7 +41,9 @@ $$
 v_u^{(j)} = ID^{(k)}
 $$
 
-其中：$$ID^{(k)} \in I$$，表示第k个item ID。
+其中：
+
+- $$ID^{(k)} \in I$$，表示第k个item ID。
 
 $$
 I = \lbrace ID^{(1)}, ID^{(2)}, \cdots, ID^{(m)} \rbrace
@@ -50,22 +54,22 @@ $$
 - I是所有items的vocabulary。
 - m是vocabulary size，表示在问题domain中的item总数
 
-给定一个user $$S_u$$的历史，系统会预估用户最可能交互的下一个item：
+**给定一个user $$S_u$$的历史，系统会预估用户最可能交互的下一个item**：
 
 $$
 I_{pred} = ID^{(\hat{k})} \\
-\hat{k} =argmax_k P(v_u^{(n+1)} = ID^{(k)} | S_u)
+\hat{k} =\underset{k}{argmax} P(v_u^{(n+1)} = ID^{(k)} | S_u)
 $$
 
 ## 3.2 Side Information
 
 Side information可以是任意提供额外有用信息的东西，它可以被分类成两种类型：item-related或behavior-related。
 
-- Item-related side information是固有的，可以描述item本身，除了item IDs（例如：价格、生产日期、生产商）。 
-- Behavior-related side information是由一个user初始化的一个interaction，例如：action的类型（购买、评分）
+- **Item-related side information**：是固有的，可以描述item本身，除了item IDs（例如：价格、生产日期、生产商）。 
+- **Behavior-related side information**：是由一个user初始化的一个interaction，例如：action的类型（购买、评分）
 、发生时间、用户反馈打分。
 
-每个交互的顺序（例如：原始BERT中的position IDs）可以被看成是一种behavior-related side information。
+**每个交互的顺序（例如：原始BERT中的position IDs）可以被看成是一种behavior-related side information**。
 
 如果side information引入进来，那么一个interaction就是：
 
