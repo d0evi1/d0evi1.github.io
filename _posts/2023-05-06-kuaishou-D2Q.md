@@ -22,7 +22,15 @@ kuaishou在《Deconfounding Duration Bias in Watch-time Prediction for Video Rec
 - $$D \rightarrow W$$：会捕获在watch time上的duration effect，它会建议：当两个视频与用户兴趣相匹配时，更长的视频会接受到更长的watch time
 - $$D \rightarrow V$$：表示duration会影响视频的曝光。推荐系统经常会对具有更长duration的视频有不平等的偏好；这样的bias会通过feedback loop会放大，如图3所示。另外，duration会影响模型训练，因为：i) sample size随duration的不同而不同，具有长在uration的视频通常具有更大的sample size，这意味着 prediction模型具有更好的performance； ii) 在标准模型（比如：WLR）中，具有不同duraiton的videos会接受到不同sample weights，（它会影响在模型训练时的梯度分配）。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/6dec8ff2f8a99cdd0a4c4b63e552d0fe2930b4757a9ee367024a3e1f0899cd6f76196df58a1647cc674aa1aa0327c5af?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
+
+图3
+
 明显地，在图4(a)中的causal graph表明：duration是一个会通过两条路径（$$D \rightarrow W, D \rightarrow V \rightarrow W$$）影响watch-time的混淆因子。第一条path会建议：duration具有一个与watch time的直接因果关系，它可以通过watch-time prediction被捕获，因为用户趋向于花费更多时间在长视频（对比起短视频）上。然而，第二条path会暗示着：video exposure不希望被它的duration所影响，因而，视频分布会偏向于长视频；如果没有缓解，由于推荐系统的feedback loop，predictions会面临着bias amplification的风险。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/e25509291ef28f0ce491abd8dcd1149b636e14733fbb4a8eaac0b213279b26f5b75d01bab9101400bb63055145123144?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=4.jpg&amp;size=750">
+
+图4
 
 # 4.Duration Bias的后门调整（backdoor adujstment）
 
@@ -33,7 +41,11 @@ kuaishou在《Deconfounding Duration Bias in Watch-time Prediction for Video Rec
 
 我们将我们的training和inference过程分别归纳在算法1和算法2中。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/57dce8a85043b8a497d335ec6f5dbe709e617ca6e1f5f92ee8f6d6cb3ce208574dbad8e0f4d4ac6971d5ad1a355be51e?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=a1.jpg&amp;size=750">
+
 算法1
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/859749bfde7c9b608d508dd518c4c4fc189d26e631d4ab0da5f6d57c36660f6a1c1c8fd936ac928c37074c2ce59a1c92?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=a2.jpg&amp;size=750">
 
 算法2
 
@@ -64,6 +76,10 @@ $$
 ...(2)
 
 这里我们提供了一个关于“为什么这样的基于duration的数据划分过程，可以解缓图4(a)中边D->V的bias问题”的直觉解释。在标准的watch-time预估模型（如：WLR）中，具有长watch-time weights的样本会在梯度更新中采样更多，因而预估模型经常在短watch-time的样本上表现很差。Watch-time是与duration高度与duration相关的，如图2所示。通过基于duration进行数据划分，并将模型以group-wise方式拟合，我们可以在模型训练期间，缓和那些具有长watch-time的样本、以及具有短watch-time的样本的interference。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/3d37cd784136be40da62045d7a83f6289f84ef1468209a5631948dd77067b2ea4cac9afcb5538d984295c9f579b36ef6?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
+
+图2
 
 然而，这样的data-splitting方法会抛出另一个问题。如果对于每个duration group $$D_k$$我们拟合一个单独的watch-time prediction模型$$f_k$$（如图5(a)所示），model size会变得更大，这在真实生产系统中是不实际的。但如果我们允许在duration groups间进行参数共享，使用原始watch-time labels进行拟合等价于没有data-splitting的学习，这在duration deconfounding上会失败。下面部分会解释：如何通过将原始watch-time labels转换成duration-dependent watch-time labels来解决该窘境，并允许我们同时移险duration bias，并维持模型参数的单个集合来获得可扩展性。
 
@@ -100,6 +116,10 @@ $$
 你可以应用任意现成的regression模型来拟合分位数预估模型h，并维护在所有duration groups间单个模型参数集。接着，在inference阶段，当一个新的user-video pair $$(u_0, v_0)$$到达时，模型会首先发现：视频$$v_0$$会属于哪个duration group $$D_{k_0}$$，接着将watch-time  quantile预估$$h(u_0, v_0)$$映射到watch-time值$$\hat{\phi_{k_0}^{-1}}(h(u_0, v_0))$$上。我们会在算法1和算法2上总结learning和inference过程。
 
 在该方式下，D2Q会拟合那些是duration-dependent的labels。我们注意到：video duration会是model input的一部分，会将来自不同duration groups的不同样本进行输入，如图5(b)所示。另外，来自不同duration groups的样本会共享关于watch-time quantile的相同的label，但具有不同的特性——一个模型在跨groups学习watch-time quantile时会失败。为了完全利用duration information，你可以在模型结构中额外包含一个duration adjustment tower（比如：ResNet），我们在图5(c)中将它称为Res-D2Q。第5节演示了Res-D2Q会在D2Q之上进一步提升watch-time prediction accuracy。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ae269d16eae3cb49eed1137bb4f04b905d548e9324c33ebb811d25d7097f983a1ddbe4267deb35009ecbb45a01e22027?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=5.jpg&amp;size=750">
+
+图5
 
 对应于duration的watch-time labels的转换，允许在跨duration groups间同时进行 deconfounding duration bias和 parameter sharing。然而，随着duration groups的数目增加，group sample size会抖动，每个duration group的watch-time的期望累计分布（he empirical cumulative distributio）也会逐渐偏离它的真实分布。因此，由于 deconfounding duration的好处，模型效果应首先使用duration-based data-spliting来进行提升；接着，随着f duration groups数目的增长，
 empirical watch-time distribution的estimation error会主宰着模型效果，使它变得很糟。第5节会经验性地使用一系列实验来调整效果变化。
