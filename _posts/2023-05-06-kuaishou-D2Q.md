@@ -98,28 +98,34 @@ $$
 
 然而，这样的data-splitting方法会抛出另一个问题。如果对于每个duration group $$D_k$$我们拟合一个单独的watch-time prediction模型$$f_k$$（如图5(a)所示），model size会变得更大，这在真实生产系统中是不实际的。但如果我们允许在duration groups间进行参数共享，使用原始watch-time labels进行拟合等价于没有data-splitting的学习，这在duration deconfounding上会失败。下面部分会解释：如何通过将原始watch-time labels转换成duration-dependent watch-time labels来解决该窘境，并允许我们同时移险duration bias，并维持模型参数的单个集合来获得可扩展性。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ae269d16eae3cb49eed1137bb4f04b905d548e9324c33ebb811d25d7097f983a1ddbe4267deb35009ecbb45a01e22027?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=5.jpg&amp;size=750">
+
+图5 
+
 ## 4.3 每个Duration Group估计Watch-time
 
-接着，我们描述了，如何使用来自所有duration groups的数据来拟合单个watch-time prediction模型。回顾下我们的设计有二部分：
+接着，我们描述了，如何使用来自所有duration groups的数据来拟合单个watch-time prediction模型。回顾下我们的设计有两部分：
 
 - i) duration debiasing
 - ii) 参数共享
 
-问题的关键是：将watch-time label转换成duration-dependent，通过根据不同duration group拟合watch-time分位数来实现，而非原始values。我们会引入Duration-Deconfounded
+问题的关键是：**将watch-time label转换成duration-dependent，通过根据不同duration group拟合watch-time分位数来实现，而非原始values**。我们会引入Duration-Deconfounded
 Quantile-based (D2Q) watch time预估框架。
 
-$$\hat{\phi}_k (w)$$表示在duration group $$D_k$$中关于watch-time的期望累计分布（empirical cumulative distribution）。给定一个user-video pair (u,v)，D2Q方法会在相应的duration group中预估它的watch-time分位数，接着使用$$\hat{\phi_k}$$将它映射到watch time的值域中（value domain）。也就是说：
+$${\hat{\phi}}_k (w)$$：表示在duration group $$D_k$$中关于watch-time的期望累计分布（empirical cumulative distribution）。
+
+给定一个user-video pair (u,v)，D2Q方法会在相应的duration group中预估它的watch-time分位数，接着使用$$\hat{\phi_k}$$将它映射到watch time的值域中（value domain）。也就是说：
 
 $$
-f_k(u, v) = \hat{\phi_k^{-1}} (h(u, v))
+f_k(u, v) = {\hat{\phi}}_k^{-1} (h(u, v))
 $$
 
 ...(3)
 
-其中，h是一个watch-time分位数预估模型，它会拟合在所有duraiton groups上的数据：
+其中：h是一个watch-time分位数预估模型，它会拟合在所有duraiton groups上的数据：
 
 $$
-h = underset{h'}{argmin} \sum\limits_{\lbrace (u_i, v_i, w_i)\rbrace_{i=1}^n} (h'(u_i, v_i) - \hat{\phi}_{k_i}(w_i))^2
+h = \underset{h'}{argmin} \sum\limits_{\lbrace (u_i, v_i, w_i)\rbrace_{i=1}^n} (h'(u_i, v_i) - {\hat{\phi}}_{k_i}(w_i))^2
 $$
 
 ...(4)
@@ -131,10 +137,6 @@ $$
 你可以应用任意现成的regression模型来拟合分位数预估模型h，并维护在所有duration groups间单个模型参数集。接着，在inference阶段，当一个新的user-video pair $$(u_0, v_0)$$到达时，模型会首先发现：视频$$v_0$$会属于哪个duration group $$D_{k_0}$$，接着将watch-time  quantile预估$$h(u_0, v_0)$$映射到watch-time值$$\hat{\phi_{k_0}^{-1}}(h(u_0, v_0))$$上。我们会在算法1和算法2上总结learning和inference过程。
 
 在该方式下，D2Q会拟合那些是duration-dependent的labels。我们注意到：video duration会是model input的一部分，会将来自不同duration groups的不同样本进行输入，如图5(b)所示。另外，来自不同duration groups的样本会共享关于watch-time quantile的相同的label，但具有不同的特性——一个模型在跨groups学习watch-time quantile时会失败。为了完全利用duration information，你可以在模型结构中额外包含一个duration adjustment tower（比如：ResNet），我们在图5(c)中将它称为Res-D2Q。第5节演示了Res-D2Q会在D2Q之上进一步提升watch-time prediction accuracy。
-
-<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ae269d16eae3cb49eed1137bb4f04b905d548e9324c33ebb811d25d7097f983a1ddbe4267deb35009ecbb45a01e22027?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=5.jpg&amp;size=750">
-
-图5
 
 对应于duration的watch-time labels的转换，允许在跨duration groups间同时进行 deconfounding duration bias和 parameter sharing。然而，随着duration groups的数目增加，group sample size会抖动，每个duration group的watch-time的期望累计分布（he empirical cumulative distributio）也会逐渐偏离它的真实分布。因此，由于 deconfounding duration的好处，模型效果应首先使用duration-based data-spliting来进行提升；接着，随着f duration groups数目的增长，
 empirical watch-time distribution的estimation error会主宰着模型效果，使它变得很糟。第5节会经验性地使用一系列实验来调整效果变化。
