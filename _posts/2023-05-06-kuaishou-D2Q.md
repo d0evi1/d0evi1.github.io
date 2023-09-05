@@ -56,9 +56,9 @@ kuaishou在《Deconfounding Duration Bias in Watch-time Prediction for Video Rec
 根据do计算，通过移除edge：D -> V，我们会block掉在视频曝光上的duration effect，如图4(b)所示。我们将watch-time prediction模型看成是 $$E[W \mid do(U,V)]$$，并且有：
 
 $$
-E[W \mid do(U,V)] & = E_{G_1} [W | U,V] \\
-& = \sum\limits_d P_{G_1} (D = d | U, V) E_{G_1} [W | U,V,D = d] \\
-& = \sum\limits_d P(D=d) E[W| U,V,D = d]
+E[W \mid do(U,V)] & overset{i}{=} E_{G_1} [W | U,V] \\
+& overset{ii}{=} \sum\limits_d P_{G_1} (D = d | U, V) E_{G_1} [W | U,V,D = d] \\
+& overset{iii}{=} \sum\limits_d P(D=d) E[W| U,V,D = d]
 $$
 
 ...(1)
