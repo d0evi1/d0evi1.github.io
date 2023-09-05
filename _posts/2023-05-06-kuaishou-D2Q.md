@@ -56,9 +56,11 @@ kuaishou在《Deconfounding Duration Bias in Watch-time Prediction for Video Rec
 根据do计算，通过移除edge：D -> V，我们会block掉在视频曝光上的duration effect，如图4(b)所示。我们将watch-time prediction模型看成是 $$E[W \mid do(U,V)]$$，并且有：
 
 $$
+\begin{align}
 E[W \mid do(U,V)] & \overset{i}{=} E_{G_1} [W | U,V] \\
 & \overset{ii}{=} \sum\limits_d P_{G_1} (D = d | U, V) E_{G_1} [W | U,V,D = d] \\
 & \overset{iii}{=} \sum\limits_d P(D=d) E[W| U,V,D = d]
+\end{align}
 $$
 
 ...(1)
@@ -78,6 +80,8 @@ $$
 特别的，为了阻止 边D -> V，我们基于duration分位数将训练样本进行划分成M个相等的部分，它可以将分布P(D)离散化成不相交的部分。假设：$$\lbrace D_k \rbrace_{k=1}^M$$是这些duration groups。继续(1)中的派生，我们通过下面近似来估计deconfounded model $$E[W \mid do(U,V)]$$：
 
 $$
+
+
 E[W \mid do(U,V)] = \sum\limits_d P(D = d) E[W | U,V,D = d] \approx \sum\limits_{k=1}^M 1 \lbrace d\in D_k \rbrace E[W | U,V,D \in D_k] = \sum\limits_{k=1}^M 1\lbrace d \in D_k \rbrace f_k (U, V)
 $$
 
