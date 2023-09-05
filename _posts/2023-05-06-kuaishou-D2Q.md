@@ -117,7 +117,7 @@ $${\hat{\phi}}_k (w)$$：表示在duration group $$D_k$$中关于watch-time的�
 给定一个user-video pair (u,v)，D2Q方法会在相应的duration group中预估它的watch-time分位数，接着使用$$\hat{\phi_k}$$将它映射到watch time的值域中（value domain）。也就是说：
 
 $$
-f_k(u, v) = {\hat{\phi}}_k^{-1} (h(u, v))
+f_k(u, v) = \hat{\phi}_k^{-1} (h(u, v))
 $$
 
 ...(3)
@@ -125,7 +125,7 @@ $$
 其中：h是一个watch-time分位数预估模型，它会拟合在所有duraiton groups上的数据：
 
 $$
-h = \underset{h'}{argmin} \sum\limits_{\lbrace (u_i, v_i, w_i)\rbrace_{i=1}^n} (h'(u_i, v_i) - {\hat{\phi}}_{k_i}(w_i))^2
+h = \underset{h'}{argmin} \sum\limits_{\lbrace (u_i, v_i, w_i)\rbrace_{i=1}^n} (h'(u_i, v_i) - \hat{\phi}_{k_i}(w_i))^2
 $$
 
 ...(4)
