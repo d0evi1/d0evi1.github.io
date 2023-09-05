@@ -71,18 +71,21 @@ $$
 - (ii)是因为D独立于$$\lbrace U,V \rbrace$$，干预会移除在graph $$G_1$$中的边$$D \rightarrow V$$；
 - (iii)是因为：这样的干预不会改变W在条件{U,V,D}上的W分布，D的间隔分布仍会相同
 
-等式（1）阐明了deconfound duration的设计：你可以独立估计$$P(D)$$和$$E[W \mid U,V,D]$$，接着将他们组合在一起来构建最终的estimation。在本paper中，我们提出将duration分布P(D)离散化成不相交的groups，并拟合group-wise watch-time预估模型$$E[W \mid U,V,D]$$来完成估计。
+等式（1）阐明了deconfound duration的设计：**你可以独立估计$$P(D)$$和$$E[W \mid U,V,D]$$，接着将他们组合在一起来构建最终的estimation**。在本paper中，我们提出**将duration分布P(D)离散化成不相交的groups**，并拟合group-wise watch-time预估模型$$E[W \mid U,V,D]$$来完成估计。
 
 ## 4.2 基于Duration分位数的Data-Splitting
 
-我们现在呈现出一个通用框架使用duration deconfounded来估计watch-time，如图4(b)所描述。更高层的思路是：将数据基于duration进行划分，并构建group-wise watch-time estimation以便在视频曝光上对duration进行debiase。
+我们现在会展示一个使用duration deconfounded来估计watch-time的通用框架，如图4(b)所描述。更高层的思路是：**将数据基于duration进行划分，并构建group-wise watch-time estimation以便在视频曝光上对duration进行debiase**。
 
 特别的，为了阻止 边D -> V，我们基于duration分位数将训练样本进行划分成M个相等的部分，它可以将分布P(D)离散化成不相交的部分。假设：$$\lbrace D_k \rbrace_{k=1}^M$$是这些duration groups。继续(1)中的派生，我们通过下面近似来估计deconfounded model $$E[W \mid do(U,V)]$$：
 
 $$
 
-
-E[W \mid do(U,V)] = \sum\limits_d P(D = d) E[W | U,V,D = d] \approx \sum\limits_{k=1}^M 1 \lbrace d\in D_k \rbrace E[W | U,V,D \in D_k] = \sum\limits_{k=1}^M 1\lbrace d \in D_k \rbrace f_k (U, V)
+\begin{align}
+E[W \mid do(U,V)] & = \sum\limits_d P(D = d) E[W | U,V,D = d] 
+& \approx \sum\limits_{k=1}^M 1 \lbrace d\in D_k \rbrace E[W | U,V,D \in D_k] 
+& = \sum\limits_{k=1}^M 1\lbrace d \in D_k \rbrace f_k (U, V)
+\end{align}
 $$
 
 ...(2)
