@@ -82,8 +82,8 @@ $$
 $$
 
 \begin{align}
-E[W \mid do(U,V)] & = \sum\limits_d P(D = d) E[W | U,V,D = d] 
-& \approx \sum\limits_{k=1}^M 1 \lbrace d\in D_k \rbrace E[W | U,V,D \in D_k] 
+E[W \mid do(U,V)] & = \sum\limits_d P(D = d) E[W | U,V,D = d] \\
+& \approx \sum\limits_{k=1}^M 1 \lbrace d\in D_k \rbrace E[W | U,V,D \in D_k] \\
 & = \sum\limits_{k=1}^M 1\lbrace d \in D_k \rbrace f_k (U, V)
 \end{align}
 $$
