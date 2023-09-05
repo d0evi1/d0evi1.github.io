@@ -56,14 +56,18 @@ kuaishou在《Deconfounding Duration Bias in Watch-time Prediction for Video Rec
 根据do计算，通过移除edge：D -> V，我们会block掉在视频曝光上的duration effect，如图4(b)所示。我们将watch-time prediction模型看成是 $$E[W \mid do(U,V)]$$，并且有：
 
 $$
-E[W \mid do(U,V)] & overset{i}{=} E_{G_1} [W | U,V] \\
-& overset{ii}{=} \sum\limits_d P_{G_1} (D = d | U, V) E_{G_1} [W | U,V,D = d] \\
-& overset{iii}{=} \sum\limits_d P(D=d) E[W| U,V,D = d]
+E[W \mid do(U,V)] & \overset{i}{=} E_{G_1} [W | U,V] \\
+& \overset{ii}{=} \sum\limits_d P_{G_1} (D = d | U, V) E_{G_1} [W | U,V,D = d] \\
+& \overset{iii}{=} \sum\limits_d P(D=d) E[W| U,V,D = d]
 $$
 
 ...(1)
 
-其中(i)是总期望；(ii)是因为D独立于$$\lbrace U,V \rbrace$$，干预会移除在graph $$G_1$$中的边$$D \rightarrow V$$；(iii)是因为：这样的干预不会改变W在条件{U,V,D}上的W分布，D的间隔分布仍会相同。
+其中：
+
+- (i)是总期望；
+- (ii)是因为D独立于$$\lbrace U,V \rbrace$$，干预会移除在graph $$G_1$$中的边$$D \rightarrow V$$；
+- (iii)是因为：这样的干预不会改变W在条件{U,V,D}上的W分布，D的间隔分布仍会相同
 
 等式（1）阐明了deconfound duration的设计：你可以独立估计$$P(D)$$和$$E[W \mid U,V,D]$$，接着将他们组合在一起来构建最终的estimation。在本paper中，我们提出将duration分布P(D)离散化成不相交的groups，并拟合group-wise watch-time预估模型$$E[W \mid U,V,D]$$来完成估计。
 
