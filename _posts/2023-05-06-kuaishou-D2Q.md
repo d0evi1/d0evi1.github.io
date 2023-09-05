@@ -12,12 +12,12 @@ kuaishou在《Deconfounding Duration Bias in Watch-time Prediction for Video Rec
 
 # Watch-Time prediction的因果模型
 
-我们的目标是：当推荐一个视频给某用户时，预估该用户在的watch time。我们会通过一个因果图（以ausal graph）进行公式化：它会将user、video、duration、watch-time、以及推荐系统在watch-time prediction和视频曝光上关于duration的混淆效应，如图4(a)所示：
+我们的目标是：当推荐一个视频给某用户时，预估该用户在的watch time。我们会通过一个因果关系图（causal graph）进行公式化：它会将user、video、duration、watch-time、以及推荐系统在watch-time prediction和视频曝光上关于duration的混杂效应（confounding effect），如图4(a)所示：
 
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/e25509291ef28f0ce491abd8dcd1149b636e14733fbb4a8eaac0b213279b26f5b75d01bab9101400bb63055145123144?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=4.jpg&amp;size=750">
 
-图4 
+图4 watch-time prediction的因果关系图：U-user、V-video、D-duration、W-watch time。图(a)建模了在视频曝光和watch-time prediction上的confounding effect。图(b)使用backdoor adjustment来 deconfound duration，并移除它在视频上的effect。
 
 - U：表示user representation，包含了：用户人口统计学（user demographics）、即时上下文（instantaneous context）、历史交互等
 - V：表示video representation，包含了：video topics等
