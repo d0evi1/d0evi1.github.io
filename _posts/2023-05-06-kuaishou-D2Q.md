@@ -90,11 +90,11 @@ $$
 
 ...(2)
 
-这里我们提供了一个关于“为什么这样的基于duration的数据划分过程，可以解缓图4(a)中边D->V的bias问题”的直觉解释。在标准的watch-time预估模型（如：WLR）中，具有长watch-time weights的样本会在梯度更新中采样更多，因而预估模型经常在短watch-time的样本上表现很差。Watch-time是与duration高度与duration相关的，如图2所示。通过基于duration进行数据划分，并将模型以group-wise方式拟合，我们可以在模型训练期间，缓和那些具有长watch-time的样本、以及具有短watch-time的样本的interference。
+这里我们提供了一个关于“为什么这样的基于duration的数据划分过程，可以解缓图4(a)中边D->V的bias问题”的直觉解释。**在标准的watch-time预估模型（如：WLR）中，具有长watch-time weights的样本会在梯度更新中采样更多，因而预估模型经常在短watch-time的样本上表现很差**。Watch-time是与duration高度与duration相关的，如图2所示。通过基于duration进行数据划分，并将模型以group-wise方式拟合，我们可以在模型训练期间，缓和那些具有长watch-time的样本、以及具有短watch-time的样本的interference。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/3d37cd784136be40da62045d7a83f6289f84ef1468209a5631948dd77067b2ea4cac9afcb5538d984295c9f579b36ef6?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 根据duration在视频上的60分位的watch time。阴影区（spanned area）表示watch-time的99.99%置信区间
 
 然而，这样的data-splitting方法会抛出另一个问题。如果对于每个duration group $$D_k$$我们拟合一个单独的watch-time prediction模型$$f_k$$（如图5(a)所示），model size会变得更大，这在真实生产系统中是不实际的。但如果我们允许在duration groups间进行参数共享，使用原始watch-time labels进行拟合等价于没有data-splitting的学习，这在duration deconfounding上会失败。下面部分会解释：如何通过将原始watch-time labels转换成duration-dependent watch-time labels来解决该窘境，并允许我们同时移险duration bias，并维持模型参数的单个集合来获得可扩展性。
 
