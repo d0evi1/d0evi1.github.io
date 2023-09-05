@@ -20,7 +20,18 @@ tags:
 
 ## 2.1 问题声明
 
-我们考虑一个推荐系统，它具有一个query set $$\lbrace u_i \rbrace_{i=1}^N$$以及一个item set $$\lbrace v_j \rbrace_{j=1}^M$$，其中：N是users数目，M是items数目。这里，$$u_i, v_j$$是许多features（例如：IDs和content features）的concatenations，由于稀疏性它可以是非常高维的。query-item feedback可以通过一个matrix $$R \in R^{N \times M}$$进行表示，其中：
+我们考虑一个推荐系统，它具有：
+
+- 一个query set：$$\lbrace u_i \rbrace_{i=1}^N$$
+- 一个item set $$\lbrace v_j \rbrace_{j=1}^M$$
+
+其中：
+
+- N是users数目，M是items数目。
+
+这里，$$u_i, v_j$$是许多features（例如：IDs和content features）的concatenations，由于稀疏性它可以是非常高维的。
+
+query-item feedback可以通过一个matrix $$R \in R^{N \times M}$$进行表示，其中：
 
 - 当query i 给出在item j上的一个postive feedback时，$$R_{ij}=1$$；
 - 否则为$$R_{ij}=0$$。
