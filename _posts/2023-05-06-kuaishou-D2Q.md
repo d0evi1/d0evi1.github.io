@@ -90,17 +90,17 @@ $$
 
 ...(2)
 
-这里我们提供了一个关于“为什么这样的基于duration的数据划分过程，可以解缓图4(a)中边D->V的bias问题”的直觉解释。**在标准的watch-time预估模型（如：WLR）中，具有长watch-time weights的样本会在梯度更新中采样更多，因而预估模型经常在短watch-time的样本上表现很差**。Watch-time是与duration高度与duration相关的，如图2所示。通过基于duration进行数据划分，并将模型以group-wise方式拟合，我们可以在模型训练期间，缓和那些具有长watch-time的样本、以及具有短watch-time的样本的interference。
+这里我们提供了一个关于“为什么这样的基于duration的数据划分过程，可以解缓图4(a)中边D->V的bias问题”的直觉解释。**在标准的watch-time预估模型（如：WLR）中，具有长watch-time weights的样本会在梯度更新中采样更多，因而预估模型经常在短watch-time的样本上表现很差**。Watch-time是与duration高度相关的，如图2所示。通过基于duration进行数据划分，并将模型以group-wise方式拟合，我们可以在模型训练期间，缓和那些具有长watch-time的样本、以及具有短watch-time的样本的inference。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/3d37cd784136be40da62045d7a83f6289f84ef1468209a5631948dd77067b2ea4cac9afcb5538d984295c9f579b36ef6?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
 图2 根据duration在视频上的60分位的watch time。阴影区（spanned area）表示watch-time的99.99%置信区间
 
-然而，这样的data-splitting方法会抛出另一个问题。如果对于每个duration group $$D_k$$我们拟合一个单独的watch-time prediction模型$$f_k$$（如图5(a)所示），model size会变得更大，这在真实生产系统中是不实际的。但如果我们允许在duration groups间进行参数共享，使用原始watch-time labels进行拟合等价于没有data-splitting的学习，这在duration deconfounding上会失败。下面部分会解释：如何通过将原始watch-time labels转换成duration-dependent watch-time labels来解决该窘境，并允许我们同时移险duration bias，并维持模型参数的单个集合来获得可扩展性。
+然而，这样的data-splitting方法会抛出另一个问题。如果对于每个duration group $$D_k$$我们拟合一个单独的watch-time prediction模型$$f_k$$（如图5(a)所示），model size会变得更大，这在真实生产系统中是不实际的。但如果我们允许在duration groups间进行参数共享，使用原始watch-time labels进行拟合等价于没有data-splitting的学习，这在duration deconfounding上会失败。下面部分会解释：如何通过**将原始watch-time labels转换成duration-dependent watch-time labels来解决该窘境**，并允许我们同时移险duration bias，并维持模型参数的单个集合来获得可扩展性。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ae269d16eae3cb49eed1137bb4f04b905d548e9324c33ebb811d25d7097f983a1ddbe4267deb35009ecbb45a01e22027?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=5.jpg&amp;size=750">
 
-图5 
+图5 对于在每个duration group预计watch-time的不同模型结构，例如：$$\hat{\phi}_k(h(u,v))$$。图(a)会拟合独立的模型来预估每个duration group的watch time。“dense input”指的是：视频历史统计数（例如：historical show count, empirical watchtime）等。“ID input”指的是ID features（例如：user id, video id）和categorical features（例如：video类目、用户性别）。图(b)会拟合跨所有duration groups的单一模型，其中watch-time分位数的labels会通过在相应的duration group中的watch-time empirical distribution计算得到；图(c)会进一步使用网络结构中的duration信息，并相应地提升watch-time estimation
 
 ## 4.3 每个Duration Group估计Watch-time
 
