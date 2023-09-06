@@ -100,7 +100,11 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ae269d16eae3cb49eed1137bb4f04b905d548e9324c33ebb811d25d7097f983a1ddbe4267deb35009ecbb45a01e22027?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=5.jpg&amp;size=750">
 
-图5 对于在每个duration group预计watch-time的不同模型结构，例如：$$\hat{\phi}_k(h(u,v))$$。图(a)会拟合独立的模型来预估每个duration group的watch time。“dense input”指的是：视频历史统计数（例如：historical show count, empirical watchtime）等。“ID input”指的是ID features（例如：user id, video id）和categorical features（例如：video类目、用户性别）。图(b)会拟合跨所有duration groups的单一模型，其中watch-time分位数的labels会通过在相应的duration group中的watch-time empirical distribution计算得到；图(c)会进一步使用网络结构中的duration信息，并相应地提升watch-time estimation
+图5 对于在每个duration group预计watch-time的不同模型结构，例如：$$\hat{\phi}_k(h(u,v))$$。
+
+- 图(a)会拟合独立的模型来预估每个duration group的watch time。“dense input”指的是：视频历史统计数（例如：historical show count, empirical watchtime）等。“ID input”指的是ID features（例如：user id, video id）和categorical features（例如：video类目、用户性别）
+- 图(b)会拟合跨所有duration groups的单一模型，其中watch-time分位数的labels会通过在相应的duration group中的watch-time empirical distribution计算得到
+- 图(c)会进一步使用网络结构中的duration信息，并相应地提升watch-time estimation
 
 ## 4.3 每个Duration Group估计Watch-time
 
