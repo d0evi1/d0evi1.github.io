@@ -10,19 +10,19 @@ tags:
 
 工作界推荐系统通常会存在高度倾斜的长尾item分布，一小部分的items会接受到大量的用户反馈。这种倾斜会伤害推荐系统质量，特别是：那些具有较少用户反馈的item。学术界的许多研究，很难部署到真实生产环境中，并且提升很小。这些方法的一个挑战是：通常伤害整体效果；另外，训练和服务通常是复杂和昂贵的。
 
-在本工作中，我们的目标是：提升长尾item推荐，并维持整体效果具有更少的训练和服务开销。我们首先发现：用户偏好的预估在长尾分布下会是有偏的。这种bias来自于training和serving数据间的两个差异：
+在本工作中，我们的目标是：提升长尾item推荐，并维持整体效果具有更少的训练和服务开销。我们首先发现：**用户偏好的预估在长尾分布下会是有偏的**。这种bias来自于training和serving数据间的两个差异：
 
 - 1）item分布
 - 2）用户对于某一给定item的偏好
 
-大多数已经存在的方法，主要尝试减少来自item分布角度上的bias，忽略了对于给定某一item的用户偏好差异。这会导致一个严重的遗忘问题，并导致次优的效果。
+大多数已经存在的方法，主要尝试减少来自item分布角度上的bias，忽略了对于给定某一item的用户偏好差异。这会导致一个严重的遗忘问题（forgetting issues），并导致次优的效果。
 
 为了解决该问题，我们设计了一个新的CDN（Cross Decoupling Network）来减少这两个不同点。特别的，CDN会：
 
 - (i) 通过一个MoE结构（mixture-of-expert）来解耦记忆（memorization）和泛化（generalization）的学习过程
 - （ii）通过一个正则双边分支网络（regularized bilateral branch network）来解耦来自不同分布的用户样本
 
-最终，一个新的adapter会被引入进来对decoupled vectors进行聚合，并且将training attention进行柔和的转移到长尾items上。大量实验结果表明：CDN要好于SOTA方法。我们也展示了在google大规模推荐系统中的有效性。
+最终，一个新的adapter会被引入进来对decoupled vectors进行聚合，并且将training attention柔和地转移到长尾items上。大量实验结果表明：CDN要好于SOTA方法。我们也展示了在google大规模推荐系统中的有效性。
 
 # 1.介绍
 
@@ -35,6 +35,10 @@ tags:
 # 3.CDN（Cross Decoupling Network）
 
 基于上述分析，我们提出了一个可扩展的cross decoupling network（CDN）来解决在item和user侧的两个差异。主要结构如图2所示。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/6689790a233478be2bb2610dbb73e776d96084b5832fc102f72a3c2f1e3f85d0755af7fa28d6bd0e0ab50a0d615e1133?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
+
+图2
 
 - 在item侧，我们提出：对头部item和长尾item的represation learning的memorization和generalization进行解耦。为了这么做，我们会使用一个gated MoE结构。在我们的MoE版本中，我们会将memorization相关的features输入到expert子网络中来关注memorization。相似的，我们会将content相关的features输入到expert子网络中来关注generalization。一个gate（通常：是一个learnable function）会被引入进来描述：该模型需要放置多少weight到一个item representation的memorization和generalization上。增强的item representation learning可以将item分布差异进行融合。
 
@@ -66,10 +70,6 @@ Memorization features.
 ### 3.1.2 Item representation learning
 
 我们采用带有一个frequency-based gating的MoE结构来解耦memorization features和generation features。该结图如图2的左侧所示。
-
-<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/6689790a233478be2bb2610dbb73e776d96084b5832fc102f72a3c2f1e3f85d0755af7fa28d6bd0e0ab50a0d615e1133?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
-
-图2
 
 也就是说，对于一个训练样本(u, i)，item embedding可以表示成：
 
