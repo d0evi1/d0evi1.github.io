@@ -38,11 +38,11 @@ tags:
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/6689790a233478be2bb2610dbb73e776d96084b5832fc102f72a3c2f1e3f85d0755af7fa28d6bd0e0ab50a0d615e1133?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 Cross Decoupling Network (CDN)
 
-- 在item侧，我们提出：对头部item和长尾item的represation learning的memorization和generalization进行解耦。为了这么做，我们会使用一个gated MoE结构。在我们的MoE版本中，我们会将memorization相关的features输入到expert子网络中来关注memorization。相似的，我们会将content相关的features输入到expert子网络中来关注generalization。一个gate（通常：是一个learnable function）会被引入进来描述：该模型需要放置多少weight到一个item representation的memorization和generalization上。增强的item representation learning可以将item分布差异进行融合。
+- 在item侧，我们提出：对头部item和长尾item的represation learning的memorization和generalization进行解耦。为了这么做，我们会使用一个**gated MoE结构**。在我们的MoE版本中，我们会将memorization相关的features输入到expert子网络中来关注memorization。相似的，我们会将content相关的features输入到expert子网络中来关注generalization。一个gate（通常：是一个learnable function）会被引入进来描述：该模型需要放置多少weight到一个item representation的memorization和generalization上。增强的item representation learning可以将item分布差异进行融合。
 
-- 在user侧，我们可以通过一个regularized bilateral branch network来将user sampling策略进行解耦，来减少用户偏好差异。该网络包含了：一个主分支用于通用的用户偏好学习，一个正则分支来补偿在长尾items上的用户反馈的稀疏性。在两个branch间的一个共享塔会用来扩展到生产环境中。
+- 在user侧，我们可以通过一个regularized bilateral branch network来将user sampling策略进行解耦，来减少用户偏好差异。该网络包含了：**一个主分支用于通用的用户偏好学习，一个正则分支来补偿在长尾items上的用户反馈的稀疏性**。在两个branch间的一个共享塔会用来扩展到生产环境中。
 
 最终，我们会将user和item learning进行交叉组合，使用一个$$\gamma$$-adapter来学习用户在长尾分布中的头部和尾部items上的多样偏好。
 
@@ -54,18 +54,21 @@ tags:
 
 工业界推荐系统通常会考虑成百上千个features作为model inputs。除了使用相同方式编码这些features之外，我们考虑将这些features进行划分成两组：memorization features和generalization features。
 
-Memorization features.
+**Memorization features**
 
-他们会帮助记住在训练数据中user和item间的交叉（协同信号），比如：item ID。正式的，这些features通常是categorical features，满足：
+这些features（比如：item ID）会帮助**记住在训练数据中user和item间的交叉（协同信号）**。正式的，这些features通常是categorical features，满足：
 
-- 唯一性（Uniqueness）：对于它的feature space V，存在 $$ f_{in}$$满足 $$ f_{in}$$是一个injective function，并且有：$$f_{in}: I \rightarrow V$$
-- 独立性（Independence）：对于$$\forall v_1, v_2 \in V$$，$$v_1$$的变化不会影响到$$v_2$$
+- **唯一性（Uniqueness）**：对于它的feature space V，存在 $$\exists f_{in}$$满足 $$ f_{in}$$是一个injective function，并且有：$$f_{in}: I \rightarrow V$$
+- **独立性（Independence）**：对于$$\forall v_1, v_2 \in V$$，$$v_1$$的变化不会影响到$$v_2$$
 
-在生产环境推荐系统中，这些features通常由embeddings表示。这些embedding参数可能只会通过对应的item来被更新（唯一性），并且不会与其它items的任何信息共享（独立性）。因而，它们只会记住对于一个特定item的信息，不会泛化到其它已经存在或未见过的items上。同时，由于唯一性，这些features也展示了一个长尾分布。因此，对于那些对应于头部items的features来说，它们的embedding更新通常会生成一个显著的记忆效果。而对于那些尾部items的features，它们的embeddings可能会有噪音，因为缺少梯度更新。
+在生产环境推荐系统中，这些features通常由embeddings表示。这些embedding参数可能只会通过对应的item来被更新（唯一性），并且**不会与其它items的任何信息共享（独立性）**。因而，**它们只会记住对于一个特定item的信息，不会泛化到其它已经存在或未见过的items上**。同时，由于唯一性，这些features也展示了一个长尾分布。因此：
+
+- 对于那些对应于头部items的features来说，它们的embedding更新通常会生成一个显著的记忆效果
+- 而**对于那些尾部items的features，它们的embeddings可能会有噪音，因为缺少梯度更新**
 
 **Generalization features**
 
-泛化features，可以学到在user偏好与item features间的相关性，并且可以泛化到其它items上。这些features即可以跨多个不同items共享（例如：item类别、标签等），或者是continuous features。因而，可以泛化到其它已存在或未见过的items上，对于提升尾部item的representation learning来说很重要。
+泛化features可以学到在user偏好与item features间的相关性，并且可以泛化到其它items上。这些features即可以跨多个不同items共享（例如：item类别、标签等），或者是continuous features。因而，可以泛化到其它已存在或未见过的items上，对于提升尾部item的representation learning来说很重要。
 
 ### 3.1.2 Item representation learning
 
@@ -74,7 +77,7 @@ Memorization features.
 也就是说，对于一个训练样本(u, i)，item embedding可以表示成：
 
 $$
-y = \sum\limits_{k=1}^{n_1} G(i)_i E_k^{mm} (i_{mm}) + \sum\limits_{k=n_1 + 1}^{n_1 + n_2} G(i)_k E_k^{gen}(i_{gen})
+y = \sum\limits_{k=1}^{n_1} G(i)_k E_k^{mm} (i_{mm}) + \sum\limits_{k=n_1 + 1}^{n_1 + n_2} G(i)_k E_k^{gen}(i_{gen})
 $$
 
 ...(3)
@@ -85,7 +88,7 @@ $$
 - $$E_k^{gen}(\cdot)$$：表示generalization-focused expert，它会将所有generalization features $$i_{gen}$$（例如：item类别）的embeddings进行concat作为input
 - $$G(\cdot)$$：是gating function，其中：$$G(i)_k$$表示第k个element，$$\sum\limits_{k=1}^{n_1+n_2} G(i)=1$$
 
-这里的gating很重要，可以对头部items和尾部items的memorization和generalization进行动态平衡。直觉上，gate可以将item frequency作为input，并且通过一个non-linear layer对它进行transform：$$g(i) = softmax(W_i_{freq}$$，其中，W是一个可学习的weight matrix。它可以将来自其它features作为input，我们发现：item popularity作为输入效果很好。
+这里的gating很重要，可以对头部items和尾部items的memorization和generalization进行动态平衡。**直觉上，gate可以将item frequency作为input，并且通过一个non-linear layer对它进行transform：$$g(i) = softmax(W_i_{freq})$$**，其中，W是一个可学习的weight matrix。它也可以将来自其它features作为input，我们发现：**item popularity作为输入效果很好**。
 
 这种机制可以以一个简单、优雅的方式来发现长尾分布的items间的差异，用来增强item representation learning。通过将memorization和generalization进行解耦，头部items可以达到更好的memorization能力、尾部items也可以同时得到更多的泛化。如【12】所示，增强的item representation可以补偿在$$P(u \mid i)$$和$$\hat{p}(u \mid i)$$间的条件分布的一致性。另外，通过使用 frequency-based gates的experts对memorization和generazation进行解耦，当learning attention偏向于尾部items时，我们可以缓和遗忘问题（forgetting issue）。也就是说，有了decoupling，当training attention偏向于尾部items，来自尾部items的gradients（知识）会主要更新在generalization-focused expert中的模型参数，从而保持着来自 head items的well-learned
 memorization expert。
