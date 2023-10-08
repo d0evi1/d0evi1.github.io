@@ -88,9 +88,9 @@ $$
 - $$E_k^{gen}(\cdot)$$：表示generalization-focused expert，它会将所有generalization features $$i_{gen}$$（例如：item类别）的embeddings进行concat作为input
 - $$G(\cdot)$$：是gating function，其中：$$G(i)_k$$表示第k个element，$$\sum\limits_{k=1}^{n_1+n_2} G(i)=1$$
 
-这里的gating很重要，可以对头部items和尾部items的memorization和generalization进行动态平衡。**直觉上，gate可以将item frequency作为input，并且通过一个non-linear layer对它进行transform：$$g(i) = softmax(W_i_{freq})$$**，其中，W是一个可学习的weight matrix。它也可以将来自其它features作为input，我们发现：**item popularity作为输入效果很好**。
+这里的gating很重要，可以对头部items和尾部items的memorization和generalization进行动态平衡。**直觉上，gate可以将item frequency作为input，并且通过一个non-linear layer对它进行transform：$$g(i) = softmax(W_{i}_{freq})$$**，其中，W是一个可学习的weight matrix。它也可以将来自其它features作为input，我们发现：**item popularity作为输入效果很好**。
 
-这种机制可以以一个简单、优雅的方式来发现长尾分布的items间的差异，用来增强item representation learning。通过将memorization和generalization进行解耦，头部items可以达到更好的memorization能力、尾部items也可以同时得到更多的泛化。如【12】所示，增强的item representation可以补偿在$$P(u \mid i)$$和$$\hat{p}(u \mid i)$$间的条件分布的一致性。另外，通过使用 frequency-based gates的experts对memorization和generazation进行解耦，当learning attention偏向于尾部items时，我们可以缓和遗忘问题（forgetting issue）。也就是说，有了decoupling，当training attention偏向于尾部items，来自尾部items的gradients（知识）会主要更新在generalization-focused expert中的模型参数，从而保持着来自 head items的well-learned
+这种机制可以以一个简单、优雅的方式来发现长尾分布的items间的差异，用来增强item representation learning。通过将memorization和generalization进行解耦，头部items可以达到更好的memorization能力、尾部items也可以同时得到更多的泛化。如【12】所示，增强的item representation可以补偿在$$P(u \mid i)$$和$$\hat{p}(u \mid i)$$间的条件分布的一致性。另外，**通过使用 frequency-based gates的experts对memorization和generazation进行解耦，当learning attention偏向于尾部items时，我们可以缓和遗忘问题（forgetting issue）**。也就是说，有了decoupling，当training attention偏向于尾部items，来自尾部items的gradients（知识）会主要更新在generalization-focused expert中的模型参数，从而保持着来自 head items的well-learned
 memorization expert。
 
 ## 3.2 User Sample Decoupling
@@ -100,7 +100,7 @@ memorization expert。
 - “main” branch：它会在原始的高度倾斜的长尾分布$$\Omiga_m$$上进行训练；
 - “regularizer” branch：它会在一个相对平衡的数据分布$$\Omiga_r$$上进行训练
 
-$$\Omiga_m$$包含了来自头部items和尾部items的所有user feedback，$$\Omiga_r$$则包含了对于尾部items的所有user feedback
+$$\Omega_m$$包含了来自头部items和尾部items的所有user feedback，$$\Omega_r$$则包含了对于尾部items的所有user feedback
 
 其中，对头部items的user feedback进行down-sampling，以使得它与最流行的尾部items一样的频次。在两个branch间会使用一个共享的tower来增加扩展性（scalability）。该方法可以温和地对尾部items的用户偏好的学习进行上加权（up-weight）。因此，这会纠正对尾部items的用户偏好的欠估计（under-estimation），并能缓和用户偏好估计的popularity bias。
 
