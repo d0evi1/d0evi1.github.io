@@ -6,6 +6,8 @@ modified: 2023-09-20
 tags: 
 ---
 
+google在《Learning from Negative User Feedback and Measuring Responsiveness for Sequential Recommenders》提出了一种将负反馈用于召回的方法。我们来看下相关实现：
+
 # 2.negative user feedback的训练目标
 
 以下我们描述了将negative user feedback纳入sequential recommenders的训练目标中的方法，特别是针对在大型语料库中预测下一个推荐items set的检索任务。
