@@ -25,18 +25,18 @@ Yixuan Su等人在《A Contrastive Framework for Neural Text Generation》中提
 
 图1 (a) GPT的token余弦相似度矩阵  (b)SimCTG的余弦相似度矩阵（详见颜色）
 
-在本工作中，我们认为神经语言模型的退化源于token representations的非各向同性分布（anisotropic distribution），即它们的representations存在于整个空间的一个狭窄子集中[10，9，44]。在图1（a）中，我们展示了GPT-2生成的token表示（来自Transformer的输出层）的余弦相似度矩阵。我们看到，**句子内token之间的余弦相似度超过0.95，这意味着这些表示彼此接近**。这种高相似性是不可取的，因为它可能会自然地导致模型在不同步骤生成重复token。在理想情况下，token representations应该遵循各向同性分布，即token相似性矩阵应该是稀疏的，并且不同token的representations应该具有区分性，如图1（b）所示。此外，在解码过程中，生成的文本的标记相似性矩阵的稀疏性应该被保留以避免模型退化。
+在本工作中，我们认为神经语言模型的退化源于token representations的非各向同性分布（anisotropic distribution），即它们的representations存在于整个空间的一个狭窄子集中[10，9，44]。在图1（a）中，我们展示了GPT-2生成的token表示（来自Transformer的输出层）的余弦相似度矩阵。我们看到，**句子内token之间的余弦相似度超过0.95，这意味着这些表示彼此接近**。这种高相似性是不可取的，因为它可能会自然地导致模型在不同步骤生成重复token。在理想情况下，token representations应该遵循各向同性分布：**即token相似性矩阵应该是稀疏的，并且不同token的representations应该具有区分性**，如图1（b）所示。此外，在解码过程中，生成的文本的标记相似性矩阵的稀疏性应该被保留以避免模型退化。
 
 基于上述动机，我们提出了SimCTG（神经文本生成的简单对比框架），以鼓励模型学习具有区分性和各向同性的token表示。我们还提出了一种新的解码策略，以补充SimCTG，即对比搜索（contrastive search）。对比搜索（contrastive search）的核心意图是：
 
-- （i）在每个解码步骤中，应该从模型预测的最可能候选集合中选择output，以更好地保持生成文本与人类编写的前缀之间的语义连贯性；
+- （i）在每个解码步骤中，应该从模型预测的最可能候选集合中选择output，以更好地保持生成文本与人类编写的**前缀之间的语义连贯性**；
 - （ii）应该**保留生成文本的token相似性矩阵的稀疏性**以避免退化。
 
 我们在三个广泛使用的基准测试上进行了全面的实验。我们展示了我们的方法适用于不同的任务和不同的语言（§4和§5），以及不同的模型大小（§4.3和附录D）。具体而言，实验结果验证了SimCTG通过困惑度(perplexity)和token预测准确性的评估来提高语言模型的内在质量（§4.2和附录D）。此外，我们证明了所提出的对比搜索(contrastive search)在人工和自动评估中都要优于SOTA的解码方法（§4和§5）。此外，我们提供了深入的分析，以更好地了解我们提出的方法的内部运作机制（§6）。
 
 # 2.背景
 
-语言建模的目标是学习一个变长文本序列 $ x = \leftbrace x1，…，x_{\mid x \mid} \rightbrace$ 上的概率分布$p_{\theta}(x)$，其中$\theta$表示模型参数。通常，使用极大似然估计（MLE）目标来训练语言模型，该目标定义为：
+语言建模的目标是：学习一个变长文本序列 $ x = \lbrace x1，…，x_{\mid x \mid} \rbrace$ 上的概率分布$p_{\theta}(x)$，其中$\theta$表示模型参数。通常，使用极大似然估计（MLE）目标来训练语言模型，该目标定义为：
 
 $$
 L_{MLE} = − \frac{1}{|x|} \sum\limits_{i=1}^{|x|} log p_{\theta}(x_i | x_{<i})
@@ -48,7 +48,7 @@ $$
 
 ## 2.2 开放式文本生成（Open-ended Text Generation）
 
-在本工作中，我们专注于研究开放式文本生成任务，因为它在各种应用中具有广泛的适用性，例如故事生成[11，43]、上下文文本补全[36]、诗歌生成[23]和对话系统[48]。形式上，给定人类编写的前缀（即context）x，该任务是从语言模型中解码出一个连续的$\hat{x}$，生成的文本为：
+在本工作中，我们专注于研究开放式文本生成任务，因为它在各种应用中具有广泛的适用性，例如故事生成[11，43]、上下文文本补全[36]、诗歌生成[23]和对话系统[48]。形式上，**给定人类编写的前缀（即context）x**，该任务是从语言模型中解码出一个连续的$\hat{x}$，生成的文本为：
 
 $$
 {x1，..，x_{|x|}，\hat{x}_{|x|+1}，\cdots，\hat{x}_{|x|+|\hat{x}|}}
@@ -57,7 +57,7 @@ $$
 通常，有两类方法用于解码，即（1）确定性方法（Deteriminstic methods）和（2）随机方法（Stochastic methods）。
 
 - **Deteriminstic方法**。两种广泛使用的Deteriminstic方法是贪心搜索(greedy search)和束搜索(beam search)，旨在基于模型的概率分布$p_θ$选择具有最高概率的文本延续(text continuation)。然而，**仅仅最大化输出概率往往会导致生成的文本变得乏味[22]并且出现退化问题[11，14]**。
-- **Stochastic方法**：为了解决Deteriminstic解码的问题，已经提出了几种从$p_θ$中进行采样的方法。为了避免从分布的不可靠尾部进行采样，Fan等人[11]提出了top-k采样，该方法从最大化$\sum_{v \in V^{(k)}} p_θ(v\mid x)$的词汇子集V(k)中抽取样本。这里，$\mid V(k) \mid=k$，x是前缀上下文。与之不同的是，当前SOTA的核心采样(nucleus sampling)[14]从具有总概率大于阈值$p \in [0，1]$的最小词汇子集U中抽取样本；即，U是最小的词汇子集，使得$\sum_{v \in U} p_θ(v \mid x)≥p$。虽然采样方法有助于缓解模型退化，但这些方法中的内在随机性可能会导致采样文本的语义含义与人类编写的前缀发生分歧甚至矛盾[3]。
+- **Stochastic方法**：为了解决Deteriminstic解码的问题，已经提出了几种从$p_θ$中进行采样的方法。为了避免从分布的不可靠尾部进行采样，Fan等人[11]提出了top-k采样，该方法从最大化$\sum_{v \in V^{(k)}} p_θ(v\mid x)$的词汇子集V(k)中抽取样本。这里，$\mid V(k) \mid=k$，x是前缀上下文。与之不同的是，**当前SOTA的核心采样(nucleus sampling)[14]从具有总概率大于阈值$p \in [0，1]$的最小词汇子集U中抽取样本；即，U是最小的词汇子集，使得$\sum_{v \in U} p_θ(v \mid x)≥p$**。虽然采样方法有助于缓解模型退化，但这些方法中的内在随机性可能会导致采样文本的语义含义与人类编写的前缀发生分歧甚至矛盾[3]。
 
 
 # 3.方法
@@ -86,7 +86,7 @@ $$
 
 ...(3)
 
-直观地说，通过使用$L_{CL}$进行训练，模型学习将不同token的表示之间的距离拉开。因此，可以获得具有区分性和各向同性的模型表示空间。总体训练目标$L_{SimCTG}$定义为: 
+直观地说，**通过使用$L_{CL}$进行训练，模型学习将不同token的表示之间的距离拉开**。因此，可以获得具有区分性和各向同性的模型表示空间。**总体训练目标$L_{SimCTG}$定义为**: 
 
 $$
 L_{SimCTG} = L_{MLE} + L_{CL}
@@ -94,7 +94,11 @@ $$
 
 ...(4)
 
-其中，最大似然估计（MLE）目标$L_{MLE}$的定义如公式（1）所示。请注意，当$L_{CL}$中的边界ρ等于0时，$L_{SimCTG}$会退化为普通的MLE目标$L_{MLE}$。
+其中：
+
+- 最大似然估计（MLE）目标$L_{MLE}$的定义如公式（1）所示。
+
+请注意，当$L_{CL}$中的边界ρ等于0时，$L_{SimCTG}$会退化为普通的MLE目标$L_{MLE}$。
 
 ## 3.2 Contrastive Search
 
@@ -106,14 +110,14 @@ $$
 形式上，给定在timestep t时的上文 $x_{<t}$，输出$x_t$的选择遵循以下过程：
 
 $$
-x_t = \underset{v \in V^{(k)}}{argmax} \lbrace (1-\alpha) \times \underbrace{p_{\theta}(v | x_{<t>})}_{model \ confidence} - alpha \times \underbrace{(max \lbrace s(h_v, h_{x_j}): 1 \leq j \leq t-1 \rbrace)}_{degeneration \ penalty} \rbrace
+x_t = \underset{v \in V^{(k)}}{argmax} \lbrace (1-\alpha) \times \underbrace{p_{\theta}(v | x_{<t})}_{model \ confidence} - \alpha \times \underbrace{(max \lbrace s(h_v, h_{x_j}): 1 \leq j \leq t-1 \rbrace)}_{degeneration \ penalty} \rbrace
 $$
 
 ...(5)
 
 其中：
 
-- $V(k)$是模型的概率分布$p_\theta(\cdot \mid x_{<t})$中前k个预测的集合，k通常设置为3∼10。
+- $V(k)$是模型的概率分布$p_\theta(\cdot \mid x_{<t})$中top-k个预测的集合，k通常设置为3∼10。
 
 在公式（5）中, 
 
