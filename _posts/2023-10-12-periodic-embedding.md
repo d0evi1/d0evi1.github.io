@@ -12,8 +12,8 @@ Yandex在《On Embeddings for Numerical Features in Tabular Deep Learning》中�
 
 最近，类似Transformer的深度架构在表格数据（tabular data）问题上表现出强大的性能。与传统模型（如MLP）不同，**这些架构将数值特征（numerical features）的标量值映射到高维embedding中，然后将它们混合在主网络（backbone）中**。在该工作中，我们认为数值特征的embedding在tabular DL中没有被充分探索，可以构建更强大的DL模型，并在一些对GBDT友好的基准测试中与GBDT竞争（即，在这些基准测试中，GBDT优于传统的DL模型）。我们首先描述了两种概念上不同的构建embedding模块的方法：
 
-- 第一种基于标量值的分段线性编码（piecewise linear encoding）
-- 第二种利用周期性激活（periodic activations）
+- 第一种**基于标量值的分段线性编码（piecewise linear encoding）**
+- 第二种使用**周期性激活（periodic activations）**
 
 然后，我们通过实验证明，与基于传统blocks（如线性层和ReLU激活）的embedding相比，这两种方法可以显著提高性能。重要的是，我们还表明，嵌入数值特征对许多主网络都有好处，不仅仅是对于Transformer。具体而言，在适当的嵌入后，简单的类MLP模型可以与attention-based的架构相媲美。总体而言，我们强调数值特征的embedding是一个重要的设计方向，在tabular DL中具有进一步改进的良好潜力。源代码可在https://github.com/yandex-research/tabular-dl-num-embeddings获得。
 
@@ -78,13 +78,17 @@ embedding的后续使用取决于模型主网络（backbone）。对于类似 ML
 
 虽然vanilla MLP 被认为是通用逼近器（universal approximator） [9, 16]，但在实践中，由于optimization的特殊性，它在学习能力方面有限制 [34]。然而，Tancik 等人最近的工作 [42] 发现了一种case，即**改变输入空间**可以缓解上述问题。这个观察结果启发我们检查**改变数值特征的原始标量值的representations是否能够提高表格 DL 模型的学习能力**。
 
-此时，我们尝试从简单的“经典”机器学习技术入手。具体而言，我们从one-hot encoding算法中获得灵感，该算法被广泛且成功地用于表示表格数据问题中的类别特征或NLP中的tokens等离散实体。我们注意到，从参数效率和表达能力之间的权衡角度来看，one-hot表示可以看作是scalar表示的反向解决方案。为了检查one-hot encoding类似方法是否有助于表格DL模型，我们设计了一种连续的替代方法来代替one-hot编码（因为普通的one-hot编码几乎不适用于数值特征）。
+此时，我们尝试从简单的“经典”机器学习技术入手。具体而言，我们从one-hot encoding算法中获得灵感，该算法被广泛且成功地用于表示表格数据问题中的类别特征或NLP中的tokens等离散实体。**我们注意到，从参数效率和表达能力之间的权衡角度来看，one-hot表示可以看作是scalar表示的反向解决方案**。为了检查one-hot encoding类似方法是否有助于表格DL模型，我们设计了一种**连续的替代方法**来代替one-hot编码（因为普通的one-hot编码几乎不适用于数值特征）。
 
 形式化地，对于第i个数值特征，我们将其值域分成不相交的$T_i$个区间 $B_i^1, \cdots, B_T^i$，我们称之为箱子：$B_t^i = [b_{t-1}^i, b_t^i)$。分割算法是一个重要的实现细节，我们稍后会讨论。从现在开始，为简单起见，我们省略特征索引i。一旦确定了bins，我们按照以下公式定义encoding scheme，详见公式1：
 
 $$
 PLE(x) = [e_1, \cdots, e_T] \in R^T \\
-e_t = 
+e_t = \begin{case}
+0, \\
+1, \\
+\frac{x-b_t-1}{b_t - b_{t-1}}
+\end{case}
 $$
 
 ...(1)
@@ -99,12 +103,12 @@ $$
 
 - PLE为数值特征生成可替代的初始表示（representations），可以被看作是一种预处理策略。这些representations仅计算一次，然后在主要optimization过程中使用，代替原始的标量值。
 - 当 T=1 时，PLE表示实际上等效于scalar表示。
-- 与分类特征不同，数值特征是有序的；通过将对应于右边界小于给定feature value的bin的分量设置为1，我们来表示这一点（这种方法类似于如何在序数回归问题中编码标签）
-- 方案1也包括了 ($x < b_0$) 和 ($x ≥ b_T$)的case，它们分别导致 ($e_1 ≤ 0$) 和 ($e_T ≥ 1$)。
-- 将representation进行分段线性化（piecewise linear）的选择本身就是一个值得讨论的问题。我们在第 5.2 小节中分析了一些替代方案。
+- **与分类特征不同，数值特征是有序的**；通过将对应于右边界小于给定feature value的bin的分量设置为1，我们来表示这一点（这种方法类似于如何在序数回归问题中编码标签）
+- 方案1也包括了 ($x < b_0$) 和 ($x ≥ b_T$)的case，它们分别产生 ($e_1 ≤ 0$) 和 ($e_T ≥ 1$)。
+- 将representation进行**分段线性化（piecewise linear）**的选择本身就是一个值得讨论的问题。我们在第 5.2 小节中分析了一些替代方案。
 - PLE 可以看作是特征预处理，这在第 5.3 小节中另外进行了讨论。
 
-关于attention-based的模型的说明。虽然所描述的PLE表示可以直接传递给类似MLP的模型，但attention-based的模型本质上是不受 input embeddings顺序影响的，因此需要一个额外的步骤：在所获得的encodings中添加关于特征indices的信息。从技术上讲，我们观察到：只需要在PLE之后放置一个linear layer（不共享特征之间的权重）即可。然而，从概念上讲，该解决方案具有明确的语义解释。也就是说，它等价于为每个bin $B_t$分配一个trainable embedding $v_t \in R_d$，并通过以 $e_t$ 为权重将它的bins的embedding进行聚合、并再加上偏移$v_0$，来获得最终feature embedding。具体地：
+关于attention-based的模型的说明。虽然所描述的PLE表示可以直接传递给类似MLP的模型，但attention-based的模型本质上是不受 input embeddings顺序影响的，因此需要一个额外的步骤：**在所获得的encodings中添加关于特征indices的信息**。从技术上讲，我们观察到：只需要在PLE之后放置一个linear layer（不共享特征之间的权重）即可。然而，从概念上讲，该解决方案具有明确的语义解释。也就是说，它等价于：**为每个bin $B_t$分配一个trainable embedding $v_t \in R_d$，并通过以 $e_t$ 为权重将它的bins的embedding进行聚合、并再加上偏移$v_0$，来获得最终feature embedding**。具体地：
 
 $$
 f_i(x) = v_0 + \sum\limits_{t=1}^T e_t \cdot v_t = Linear(PLE(x))
