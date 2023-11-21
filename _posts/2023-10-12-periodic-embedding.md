@@ -51,7 +51,7 @@ $\lbrace(x^j, y^j)\rbrace_{j=1}^n$
 其中：
 
 - $y_j \in Y$：表示目标（object）的label
-- $x_j = (x^{j(num)}, x^{j(cat)}) \in X$：表示目标（object）的features（数值型和类别型）
+- $x_j = (x^{j(num)}, x^{j(cat)}) \in X$：表示目标（object）的features（num：数值型特征，cat：类别型特征）
 - $x_i^{j(num)}$：则表示第 j 个目标（object）的第 i 个数值特征
 
 根据上下文，可以省略 j 索引。数据集被分成三个不相交的部分：$\overline{1, n} = J_{train} \cup J_{val} \cup J_{test}$，其中：“train”部分用于训练，“validation”部分用于early stopping和hyperparameter tuning，“test”部分用于最终评估。
@@ -61,7 +61,7 @@ $\lbrace(x^j, y^j)\rbrace_{j=1}^n$
 我们将“数值特征embedding”概念形式化为：
 
 $$
-z_i = f_i((x_i^{(num)}) \in R^{d_i}
+z_i = f_i(x_i^{(num)}) \in R^{d_i}
 $$
 
 其中：
@@ -70,7 +70,7 @@ $$
 - $z_i$：是第i个数值特征的embedding
 - $d_i$：是embedding的维度
 
-重要的是，所提出的框架意味着所有特征的embedding都是独立计算的。请注意，函数 $f_i$ 可以依赖于作为整个模型的一部分或以其他方式训练的参数（例如，在主要优化之前）。在本工作中，我们仅考虑embedding方案，其中所有特征的embedding函数具有相同的函数形式。我们**不共享**不同特征的嵌入函数的参数。
+重要的是，所提出的框架意味着所有特征的embedding都是独立计算的。请注意，函数 $f_i$ 可以依赖于作为整个模型的一部分或以其他方式训练的参数（例如，在主要优化之前）。在本工作中，我们仅考虑embedding方案，其中：**所有特征的embedding函数具有相同的函数形式。我们【不共享】不同特征的嵌入函数的参数**。
 
 embedding的后续使用取决于模型主网络（backbone）。对于类似 MLP 的架构，它们被拼接（concatenated）成一个flat向量（有关说明，请参见附录 A）。对于基于Transformer的结构，不会执行额外的步骤，embedding会直接传递，因此使用方式通过原始结构来定义。
 
