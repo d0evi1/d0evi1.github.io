@@ -84,11 +84,11 @@ embedding的后续使用取决于模型主网络（backbone）。对于类似 ML
 
 $$
 PLE(x) = [e_1, \cdots, e_T] \in R^T \\
-e_t = \begin{case}
-0, \\
-1, \\
+e_t = \begin{cases}
+0, & \text{$x < b_{t-1}$ AND $t>1$} \\
+1, & \text{$x \geq b_t$ AND $t<T$} \\
 \frac{x-b_t-1}{b_t - b_{t-1}}
-\end{case}
+\end{cases}
 $$
 
 ...(1)
