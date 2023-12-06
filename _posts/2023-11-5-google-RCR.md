@@ -10,8 +10,8 @@ google在《Regression Compatible Listwise Objectives for Calibrated Ranking wit
 
 # 摘要
 
-由于学习排序（ Learning-to-Rank：LTR）方法主要旨在提高ranking质量，因此它们的输出分数在设计上并没有进行比例校准（ scale-calibrated）。这从根本上限制了LTR在**分数敏感应用（score-sensitive applications）**中的使用。虽然一个会结合了回归（regression）和排名目标（ranking objective）的简单多目标方法，可以有效地学习**比例校准分数（scale-calibrated scores）**，但我们认为这两个目标不一定兼容，这使得它们之间的权衡不够理想。在本文中，我们提出了一种实用的**回归兼容排名（RCR：regression
-compatible ranking）方法**，实现了更好的权衡，其中排名和回归组件被证明是相互对齐的。虽然同样的思想适用于具有二元（binary）和分级相关性（graded relevance）的排序，但我们在本文中主要关注binary label。我们在几个公共LTR基准测试上评估了所提出的方法，并表明它在回归和排名指标方面始终实现了最佳或有竞争力的结果，并在多目标优化的背景下显著改进了帕累托边界（Pareto frontiers）。此外，我们在YouTube搜索上评估了所提出的方法，并发现它不仅提高了生产环境pCTR模型的ranking质量，还提高了点击预测的准确性。所提出的方法已成功部署在YouTube生产系统中。
+由于LTR（Learning-to-Rank）方法主要旨在提高ranking质量，因此它们的输出分数在设计上并没有进行**比例校准（ scale-calibrated）**。这从根本上限制了LTR在**分数敏感应用（score-sensitive applications）**中的使用。虽然有些结合了回归（regression）和排序目标（ranking objective）的简单多目标方法，可以有效地学习**比例校准分数（scale-calibrated scores）**，但我们认为**这两个目标不一定兼容**，这使得它们之间的权衡不够理想。在本文中，我们提出了一种实用的**回归兼容排序（RCR：regression
+compatible ranking）方法**，实现了更好的权衡，其中ranking和regression组件被证明是相互对齐（align）的。虽然同样的思想适用于具有二元（binary）和分级相关性（graded relevance）的排序，但我们&&在本文中主要关注binary label**。我们在几个公共LTR基准测试上评估了所提出的方法，并表明它在回归和排名指标方面始终实现了最佳或有竞争力的结果，并在多目标优化的背景下显著改进了帕累托边界（Pareto frontiers）。此外，我们在YouTube搜索上评估了所提出的方法，并发现它不仅提高了生产环境pCTR模型的ranking质量，还提高了点击预测的准确性。所提出的方法已成功部署在YouTube生产系统中。
 
 # 1.介绍
 
