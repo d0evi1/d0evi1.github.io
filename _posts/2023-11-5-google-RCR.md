@@ -6,12 +6,12 @@ modified: 2023-11-5
 tags: 
 ---
 
-google在《Regression Compatible Listwise Objectives for Calibrated Ranking with Binary Relevance》中提出了一种RCR方法。
+google youtube搜索团队在《Regression Compatible Listwise Objectives for Calibrated Ranking with Binary Relevance》中提出了一种RCR方法。
 
 # 摘要
 
 由于LTR（Learning-to-Rank）方法主要旨在提高ranking质量，因此它们的输出分数在设计上并没有进行**比例校准（ scale-calibrated）**。这从根本上限制了LTR在**分数敏感应用（score-sensitive applications）**中的使用。虽然有些结合了回归（regression）和排序目标（ranking objective）的简单多目标方法，可以有效地学习**比例校准分数（scale-calibrated scores）**，但我们认为**这两个目标不一定兼容**，这使得它们之间的权衡不够理想。在本文中，我们提出了一种实用的**回归兼容排序（RCR：regression
-compatible ranking）方法**，实现了更好的权衡，其中ranking和regression组件被证明是相互对齐（align）的。虽然同样的思想适用于具有二元（binary）和分级相关性（graded relevance）的排序，但我们&&在本文中主要关注binary label**。我们在几个公共LTR基准测试上评估了所提出的方法，并表明它在回归和排名指标方面始终实现了最佳或有竞争力的结果，并在多目标优化的背景下显著改进了帕累托边界（Pareto frontiers）。此外，我们在YouTube搜索上评估了所提出的方法，并发现它不仅提高了生产环境pCTR模型的ranking质量，还提高了点击预测的准确性。所提出的方法已成功部署在YouTube生产系统中。
+compatible ranking）方法**，实现了更好的权衡，其中ranking和regression组件被证明是相互对齐（align）的。虽然同样的思想适用于具有二元（binary）和分级相关性（graded relevance）的排序，但我们**在本文中主要关注binary label**。我们在几个公共LTR基准测试上评估了所提出的方法，并表明它在回归和排名指标方面始终实现了最佳或有竞争力的结果，并在多目标优化的背景下显著改进了帕累托边界（Pareto frontiers）。此外，我们在YouTube搜索上评估了所提出的方法，并发现它不仅提高了生产环境pCTR模型的ranking质量，还提高了点击预测的准确性。所提出的方法已成功部署在YouTube生产系统中。
 
 # 1.介绍
 
@@ -19,15 +19,25 @@ LTR（Learning-to-Rank）旨在从训练数据中构建一个排序器（ranker�
 
 另一方面，这些应用中的现代系统具有多个阶段，**下游阶段会消费前面阶段的预测结果。通常希望ranking分数得到很好的校准，并且分布保持稳定**。以在线广告为例，需要对pCTR（预测点击率）模型进行良好的校准，因为它会影响下游拍卖和定价模型[6、16、30]，尽管广告的最终排序对效果来说最为重要。这表明我们希望ranker不仅在排序指标上表现良好，而且在回归指标上也能够将ranker输出分数校准到某个外部尺度上。流行的回归指标：包括用于分级相关性标签（graded relevance labels）的MSE、和用于二元相关性标签（binary relevance labels）的LogLoss。
 
-毫不奇怪，能力强的ranking方法在regression metrics上会表现差些，因为它们的loss函数对于**保序（rank-preserving）的分数变换**是不变的，并且倾向于学习未经比例校准的回归目标。此外，这些方法在训练过程中容易出现不稳定，因为所学习的分数可能在连续训练或重新训练中无限发散[30]。这些因素严重限制了它们在分数敏感应用中的使用。因此，我们别无选择，只能退回到regression-only的方法，即使它们在面向用户的排序指标方面不是最优的。
+毫不奇怪，能力强的ranking方法在regression metrics上会表现差些。因为：
 
-已经证明，标准的多目标方法可以有效地学习用于ranking的比例校准分数（scale-calibrated scores）[16、25、30、31]。然而，我们认为在这种标准的多目标设置中，regression和ranking目标本质上是相互冲突的，因此最佳权衡可能对其中之一都不理想。**在本文中，我们提出了一种实用的回归兼容排序（RCR： regression compatible ranking）方法，其中ranking和regression组件被证明是可以相互对齐的**。虽然同样的思想适用于具有二元排序和分级相关性排序，但我们在本文中主要关注二元标签（binary label）。在实证方面，我们在几个公共LTR数据集上进行了实验，并表明所提出的方法在regression和ranking指标方面实现了最佳或竞争结果，并在多目标优化的背景下显著改进了帕累托边界。此外，我们在YouTube搜索上评估了所提出的方法，并发现它不仅提高了生产pCTR模型的ranking能力，还提高了点击预测的准确性。所提出的方法已经在YouTube生产系统中得到了完全部署。
+- 它们的loss函数对于**保序（rank-preserving）的分数变换**是不变的，并且倾向于学习未经比例校准的回归目标。
+- 这些方法**在训练过程中容易出现不稳定**，因为所学习的分数可能在连续训练或重新训练中无限发散[30]。
+
+这些因素严重限制了它们在分数敏感应用中的使用。因此，我们别无选择，只能退回到regression-only的方法，即使它们在面向用户的排序指标方面不是最优的。
+
+已经证明，标准的多目标方法可以有效地学习用于ranking的比例校准分数（scale-calibrated scores）[16、25、30、31]。然而，我们认为在这种标准的多目标设置中，**regression和ranking目标本质上是相互冲突的**，因此最佳权衡可能对其中之一都不理想。**在本文中，我们提出了一种实用的回归兼容排序（RCR： regression compatible ranking）方法，其中ranking和regression组件被证明是可以相互对齐的**。虽然同样的思想适用于具有二元排序和分级相关性排序，但我们在本文中主要关注二元标签（binary label）。在实证方面，我们在几个公共LTR数据集上进行了实验，并表明所提出的方法在regression和ranking指标方面实现了最佳或竞争结果，并在多目标优化的背景下显著改进了帕累托边界。此外，我们在**YouTube搜索**上评估了所提出的方法，并发现它不仅提高了生产pCTR模型的ranking能力，还提高了点击预测的准确性。所提出的方法已经在YouTube生产系统中得到了完全部署。
 
 # 3.背景
 
 学习排序（LTR）关注的问题是：给定一个上下文，学习一个模型来对一个对象列表进行排序。在本文中，我们使用“query”表示上下文，“document”表示对象。在所谓的**“打分并排序(score-and-sort)”环境**中，学习一个ranker来为每个doc评分，并通过根据分数对docs进行排序来形成最终的ranked list。
 
-更正式地说，设 $𝑞 \in 𝑄$ 为一个query，$𝑥 \in X$ 为一个doc，则打分函数（score function）定义为：
+更正式地说，假设：
+
+- $𝑞 \in 𝑄$ 为一个query
+- $𝑥 \in X$ 为一个doc
+
+则打分函数（score function）定义为：
 
 $$
 𝑠(𝑞, 𝑥; \theta) : 𝑄 \times X → R
