@@ -56,7 +56,7 @@ attention函数可以被描述成：将一个query和一个key-value pairs集合
 
 ### 3.2.1  归一化点乘Attention（Scaled Dot-Product Attention）
 
-我们将这种特别的attention称为"Scaled Dot-Product Attention"（图2）。输入包含：querys、维度为$$d_k$$的keys、以及维度为$$d_v$$的values。我们会计算query和所有keys的点乘（dot products），每个除以$$\sqrt{d_k}$$，并使用一个softmax函数来获取在values上的weights。
+我们将这种特别的attention称为"Scaled Dot-Product Attention"（图2）。输入包含：querys、维度为$$d_k$$的keys、以及维度为$$d_v$$的values。**我们会计算query和所有keys的点乘（dot products）**，每个点积都会除以$$\sqrt{d_k}$$，并使用一个softmax函数来获取在values上的weights。
 
 实际上，我们会同时在一个queries集合上计算attention函数，并将它们打包成一个矩阵Q。keys和values也一起被加包成矩阵K和V。我们会计算矩阵的outputs：
 
@@ -68,7 +68,7 @@ $$
 
 两种最常用的attention函数是：additive attention[2]，dot-product（multiplicative） attention。**dot-product attention等同于我们的算法，除了缩放因子$$\frac{1}{\sqrt{d_k}}$$**。additive attention会使用一个单hidden layer的前馈网络来计算兼容函数。两者在理论复杂度上很相似，**dot-product attention更快，空间效率更高，因为它使用高度优化的矩阵乘法代码来实现**。
 
-**如果$$d_k$$值比较小，两种机制效果相似; 如果$$d_k$$值很大，additive attention效果要好于dot-product attention**。对于$$d_k$$的大值我们表示怀疑，dot-product在幅度上增长更大，在具有极小梯度值的区域上使用softmax函数。为了消除该影响，我们将dot-product缩放至$$\frac{1}{\sqrt{d_k}}$$。
+**如果$$d_k$$值比较小，两种机制效果相似; 如果$$d_k$$值很大，additive attention效果要好于未经缩放的dot-product attention**。我们怀疑：对于具有较大的$$d_k$$值，dot-product会更大，从而将softmax函数推到具有极小梯度值的区域上。为了消除该影响，我们将dot-product缩放至$$\frac{1}{\sqrt{d_k}}$$。
 
 
 ### 3.2.2 Multi-Head Attention
@@ -121,7 +121,7 @@ $$
 
 ## 3.5 Positional Encoding
 
-由于我们的模型不包含recurrence和convolution，为了利用序列的顺序，我们必须注意一些与相关性(relative)或tokens在序列中的绝对位置有关的信息。我们添加"positional encoding"到在encoder和decoder stacks的底部的input embeddings中。该positional encodings与该embeddings具有相同的维度$$d_{model}$$，因而两者可以求和。positinal encodings有许多选择，可以采用学到（learned）或者固定（fixed）。
+由于我们的模型不包含循环（recurrence）和和卷积（convolution），为了让模型利用序列的顺序，我我们必须注入一些关于tokens在序列中的相对或绝对位置的信息。为此，我们在编码器(encoder)和解码器(decoder)栈底部添加“位置编码(positional encoding)”到input embedding中。该positional encodings与input embeddings具有相同的维度$$d_{model}$$，因而两者可以求和。positinal encodings有许多选择，可以采用可学习（learned）或者固定（fixed）。
 
 在本工作中，我们使用不同频率的sin和cosine函数：
 
@@ -130,7 +130,11 @@ PE_{(pos, 2i)} = sin(pos / 10000 ^{2i/d_{model}}) \\
 PE_{(pos, 2i+1)} = cos(pos / 10000 ^{2i/d_{model}})
 $$
 
-其中，**pos是position，i是维度**。也就是说：**positional encoding的每个维度对应于一个正弦曲线（sinusoid）**。波长(wavelengths)形成了一个从$$2 \pi$$到$$10000 \cdot 2\pi$$的几何过程。我们选择该函数是因为：我们假设它允许该模型可以很容易学到通过相对位置来进行关注（attend），因为对于任意固定offset k，$$PE_{pos+k}$$可以被表示成一个关于$$PE_{pos}$$的线性函数。
+其中：
+
+- **pos是position，i是维度**
+
+也就是说：**positional encoding的每个维度对应于一个正弦曲线（sinusoid）**。波长(wavelengths)形成了一个从$$2 \pi$$到$$10000 \cdot 2\pi$$的几何过程。我们选择该函数是因为：我们假设它允许该模型可以很容易学到通过相对位置来进行关注（attend），因为对于任意固定offset k，$$PE_{pos+k}$$可以被表示成一个关于$$PE_{pos}$$的线性函数。
 
 我们也使用学到的positional embeddings进行实验，发现两者版本几乎生成相同的结果（见表3 第E行）。我们选择正弦曲线版本，是因为它可以允许模型对序列长度长于训练期遇到的长度进行推导。
 
