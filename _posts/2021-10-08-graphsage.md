@@ -40,6 +40,14 @@ standford在《Inductive Representation Learning on Large Graphs》中提出了G
 
 在本节中，我们描述了embedding生成，或者forward propagation算法（算法1），它会假设：模型已经被训练过，并且参数是固定的。特别的，我们会假设：我们已经学到了关于K个aggregator functions的参数（表示为：$$AGGREGATE_k, \forall k \in \lbrace 1,\cdots,K\rbrace$$），它会被用于在模型的不同layers间、或者“搜索深度”上传播信息。第3.2节描述了我们是如何训练这些参数的。
 
+- $G(V, E)$：图
+- $\lbrace x_v, \forall v \in V \rbrace$：输入特征
+- K：深度
+- $W^k, \forall k \in \lbrace 1, \cdots, K \rbrace$： 权重矩阵
+- $\sigma$：非线性激活
+- $AGGREGATE_k, \forall k \in \lbrace 1,\cdots, K \rbrace$：可微聚合函数
+- $N: v \rightarrow 2^v$：邻居函数（neighborhood function）
+
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/8d3afb65037d1c67dbf3b89b4b1973f9bd322ac43ccc7e320432466ac6238e5d442763915778694c09baaedb6594c8a7?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=a1.jpg&amp;size=750">
 
 算法1
