@@ -8,15 +8,16 @@ tags:
 
 Vaclav Kosar在《Cross-Attention in Transformer Architecture》这篇文章里提出了一种cross attention方法。其实在很多地方有在用。
 
-# 
+# 介绍
 
 交叉注意力（Cross attention）是：
 
 - 一种在Transformer架构中的attention机制，可以将两种不同embedding序列进行混合
 - 这两个序列必须具有相同的维度
 - 这两个序列可以是不同的模态（例如文本、图像、声音）
-- 其中一个序列作为查询输入，定义了输出长度。 另一个序列则产生键和值输入，用于注意力计算
-- 交叉注意力机制使得模型能够关注来自两个序列的相关信息，这在图像字幕或多模式机器翻译等任务中非常有用
+- 其中一个序列作为Query输入，定义了输出长度。另一个序列则产生Key和Value输入，用于attention计算
+
+交叉注意力机制使得模型能够关注来自两个序列的相关信息，这在图像字幕或多模式机器翻译等任务中非常有用。
 
 # Cross-attention应用
 
