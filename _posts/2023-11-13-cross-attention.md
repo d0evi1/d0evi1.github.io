@@ -72,7 +72,7 @@ class CrossAttention(nn.Module):
         bias (`bool`, *optional*, defaults to False):
             Set to `True` for the query, key, and value linear layers to contain a bias parameter.
     """
-{% end highlight%}
+{% endhighlight %}
 
 特别是在这部分中，您可以看到查询（query）、键（key）和值（value）是如何相互作用的。这是编码器-解码器架构，因此query是从encoder的hidden states中创建得到的。
 
@@ -88,7 +88,7 @@ class CrossAttention(nn.Module):
 
         attention_probs = attn.get_attention_scores(query, key, attention_mask)
         hidden_states = torch.bmm(attention_probs, value)
-{% end highlight%}
+{% endhighlight %}
 
 # 流行结构中的cross-attention
 
