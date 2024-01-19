@@ -151,9 +151,9 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/4cbaccfe3beff0ff92385f421ca28fdcc3c4637ba175fb24caf23ffcaa8fa0b957f6b394ec6d4c71c33bec05adfd93e2?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 注意力嵌入模型（AEM）和零注意力模型（ZAM）的结构。$I_u$表示用户u的购买历史，i表示query q的候选项，$w_q$和$w_i$分别表示q的单词和与i相关的文本（Ti）。
 
-与AEM类似，ZAM基于相关单词来学习item embeddings，并使用query embeddings和user embeddings进行检索。ZAM和AEM之间的主要区别在于，**ZAM允许attention网络关注(attend)一个零向量（Zero Vector），而不仅仅是关注用户以前的购买记录，这被称为零注意策略**。形式上，$0 \in R_α$为零向量，其中每个元素都为0。然后，在ZAM中，用户u的嵌入表示计算为：
+与AEM类似，ZAM基于相关单词来学习item embeddings，并使用query embeddings和user embeddings进行检索。ZAM和AEM之间的主要区别在于，**ZAM允许attention网络关注(attend)一个零向量（Zero Vector），而不仅仅是关注用户以前的购买记录，这被称为零注意力策略**。形式上，$0 \in R_α$为零向量，其中每个元素都为0。然后，在ZAM中，用户u的嵌入表示计算为：
 
 $$
 u = \sum\limits_{i \in I_u} \frac{exp(f(q,i))} {exp(f(q, 0)) + \sum\limits_{i' \in I_u} exp(f(q,i′))} i
