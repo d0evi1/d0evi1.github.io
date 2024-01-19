@@ -10,7 +10,7 @@ Amazon search在《A Zero Attention Model for Personalized Product Search》中�
 
 # 摘要
 
-商品搜索（Product search）是人们在电子商务网站上发现和购买产品的最受欢迎的方法之一。由于个人偏好往往对每个客户的购买决策有重要影响，因此直觉上个性化（personalization）应该对商品搜索引擎非常有益。尽管以前的研究中人工实验显示：**购买历史（purchase histories）对于识别每个商品搜索会话（session）的个体意图是有用的，但个性化对于实际产品搜索的影响仍然大多未知**。在本文中，我们会将个性化商品搜索问题进行公式化，并从电商搜索引擎的搜索日志中进行了大规模实验。初步分析的结果表明，个性化的潜力取决于query特征(characteristics)、查询之间的交互（interactions）、以及用户购买历史（histories）。基于这些观察，我们提出了一个零注意力模型(Zero Attention Model)，用于商品搜索，通过一种新的注意力机制来自动确定何时以及如何对用户-查询对（user-query pair）进行个性化。商品搜索日志上的实证结果表明，所提出的模型不仅显著优于最先进的个性化商品搜索模型，而且提供了有关每个商品搜索会话中个性化潜力的重要信息。
+商品搜索（Product search）是人们在电子商务网站上发现和购买产品的最受欢迎的方法之一。由于个人偏好往往对每个客户的购买决策有重要影响，因此直觉上个性化（personalization）应该对商品搜索引擎非常有益。尽管以前的研究中人工实验显示：**购买历史（purchase histories）对于识别每个商品搜索会话（session）的个体意图是有用的，但个性化对于实际产品搜索的影响仍然大多未知**。在本文中，我们会将个性化商品搜索问题进行公式化，并从电商搜索引擎的搜索日志中进行了大规模实验。初步分析的结果表明，**个性化的潜力取决于query特征(characteristics)、查询之间的交互（interactions）、以及用户购买历史（histories）**。基于这些观察，我们提出了一个**零注意力模型(Zero Attention Model)**，用于商品搜索，通过一种新的注意力机制来**自动确定何时以及如何对用户-查询对（user-query pair）进行个性化**。商品搜索日志上的实证结果表明，所提出的模型不仅显著优于最先进的个性化商品搜索模型，而且提供了有关每个商品搜索会话中个性化潜力的重要信息。
 
 # 4.ZERO ATTENTION模型
 
@@ -22,20 +22,21 @@ Amazon search在《A Zero Attention Model for Personalized Product Search》中�
 
 假设：
 
-- q为用户u提交的query
-- i为query q的候选项集$I_q$中的一个item
-- $\alpha$为embedding向量的大小
+- q：为用户u提交的query
+- i：为query q的候选项集$I_q$中的一个item
+- $\alpha$：为embedding向量的大小
 
 在基于embedding的生成框架[22, 26]中，给定query q，用户u是否购买i的概率可以建模为：
 
 $$
-P(i|u,q) = \frac{exp(i · M_{uq})}{ Σ_{i' \in I_q} exp(i' \cdot M_{uq}) }
+P(i|u,q) = \frac{exp(i · M_{uq})}{ \sum\limits_{i' \in I_q} exp(i' \cdot M_{uq}) }
 $$
+
 ... (3) 
 
 其中:
 
-- $i \in R^{\alpha} $是i的嵌入表示
+- $i \in R^{\alpha} $是i的embedding表示
 - $M_{uq}$ 是user-query pair (u,q)的联合模型（joint model）
 
 商品会根据$P(i \mid u,q)$进行排序，以便最大化每个搜索会话（session）中用户购买的概率。根据$M_{uq}$的定义，我们可以有多种基于embedding的商品搜索检索模型。在这里，我们介绍两个代表性模型：查询嵌入模型（ Query Embedding Model）、分层嵌入模型（Hierarchical Embedding Model）。
@@ -52,26 +53,26 @@ $$
 
 其中：
 
-- $q \in R_{\alpha}$是查询q的embedding表示
+- $q \in R_{\alpha}$是query q的embedding表示
 
-由于查询通常事先不知道，在请求时必须在商品搜索中计算q。以前的研究[2, 39]探索了几种直接从查询词构建query embedding的方法。其中一种最先进的范例是使用非线性投影函数$\phi$对查询词进行编码来计算query embedding，定义为:
+由于query通常事先不知道，在请求时必须在商品搜索中计算q。以前的研究[2, 39]探索了几种直接从查询词构建query embedding的方法。其中一种最先进的范例是使用非线性投影函数$\phi$对查询词进行编码来计算query embedding，定义为:
 
 $$
-q = \phi (\lbrace w_q |w_q \in q \rbrace) = tanh(W_ϕ · \frac{Σ_{w_q \in q} w_q}{|q|}+ b_{\phi})
+q = \phi (\lbrace w_q |w_q \in q \rbrace) = tanh(W_ϕ · \frac{\sum\limits_{w_q \in q} w_q}{|q|}+ b_{\phi})
 $$
 
 ... (5) 
 
 其中：
 
-- $w_q \in R_{\alpha}$：是q中单词$w_q$的embeding
-- |q|是查询的长度，
+- $w_q \in R_{\alpha}$：是q中单词$w_q$的embedding
+- $\mid q \mid$是查询的长度，
 - $W_{\phi} \in R^{\alpha × \alpha}$和$b_{\phi} \in R^{\alpha}$是在训练过程中学习的两个参数
 
 在QEM中，item embedding是从它们关联的文本数据中学习的。假设：$T_i$是与item i相关联的单词集合（例如标题）。Ai等人[2]提出通过优化观察到i时观察到$T_i$的似然来学习i，其中i的embedding表示为:
 
 $$
-P(T_i|i) = \prod_{w \in T_i} \frac{exp(w \cdot i)}{ \sum_{w' \in V} exp(w' \cdot i)}
+P(T_i|i) = \prod_{w \in T_i} \frac{exp(w \cdot i)}{ \sum\limits_{w' \in V} exp(w' \cdot i)}
 $$
 
 ... (6) 
@@ -88,21 +89,21 @@ $$
 与QEM类似，HEM [2]也使用encoding函数$\phi$计算query embedding，并使用相关文本$T_i$计算item embedding。然而，与QEM不同的是，HEM将$M_{uq}$在公式（3）中定义为：
 
 $$
-Muq = q + u
+M_{uq} = q + u
 $$
 
 ... (7) 
 
 其中：
 
-- u是用户u的嵌入表示
+- u是用户u的embedding表示
 
-这样，HEM在产品搜索的项目排名中考虑了query意图和用户偏好。
+这样，HEM在产品搜索的item ranking中**考虑了query意图和用户偏好**。
 
 在HEM中，用户u的embedding表示是通过优化观察到的用户文本$T_u$的似然$P(T_u \mid u)$获得的:
 
 $$
-P(T_u |u) = \prod_{w \in T_u} \frac{exp(w \cdot u)}{ \sum_{w' \in V} exp(w' \cdot u)}
+P(T_u |u) = \prod_{w \in T_u} \frac{exp(w \cdot u)}{ \sum\limits_{w' \in V} exp(w' \cdot u)}
 $$
 
 ...(8)
@@ -110,24 +111,24 @@ $$
 
 其中:
 
-- $T_u$可以是任何由用户u编写或输入相关的文本，例如产品评论或用户购买的项目描述。
+- $T_u$：可以是任何由用户u编写或输入相关的文本，例如产品评论或用户购买的项目描述。
 
 ## 4.2 Attention-based Personalization
 
-正如Ai等人[2]所讨论的那样，HEM是基于用户偏好与查询意图在搜索中是独立的假设构建的。然而，在实践中，这并不是真实的情况。例如，**喜欢Johnson的婴儿产品的客户在搜索“男士洗发水”时可能不想购买Johnson的婴儿洗发水**。为了解决这个问题，产品搜索中更好的个性化范例是考虑查询和用户购买历史之间的关系。具体而言，我们在用户购买历史记录上应用一个attention函数来构建用于商品搜索的用户embedding。设$I_u$是用户u在查询q之前购买的项目集合，则我们可以计算u的embedding表示为（attention对应的Q: q, K: i, V: i）：
+正如Ai等人[2]所讨论的那样，HEM是基于用户偏好与查询意图在搜索中是独立的假设构建的。然而，在实践中，这并不是真实的情况。例如，**喜欢Johnson的婴儿产品的客户在搜索“男士洗发水”时可能不想购买Johnson的婴儿洗发水**。为了解决这个问题，产品搜索中更好的个性化范例是**考虑查询和用户购买历史之间的关系**。具体而言，我们在用户购买历史记录上应用一个attention函数来构建用于商品搜索的用户embedding。设$I_u$是用户u在query q之前购买的商品集合，则我们可以计算u的embedding表示为（attention对应的Q: q, K: i, V: i）：
 
 $$
-u = \prod_{i \in I_u} \frac{exp(f(q,i))} { \sum_{i' \in I_u}  exp(f(q,i'))} i 
+u = \prod_{i \in I_u} \frac{exp(f(q,i))} { \sum\limits_{i' \in I_u}  exp(f(q,i'))} i 
 $$
 
 ... (9) 
  
 其中:
 
-- f(q,i)是一个attenion函数，用于确定每个item i相对于当前query q的注意力权重。类似于attention模型的先前研究[8, 41]，我们将f(q,i)定义为:
+- f(q,i)是一个attention函数，用于确定每个item i相对于当前query q的注意力权重。类似于attention模型的先前研究[8, 41]，我们将f(q,i)定义为:
 
 $$
-f(q,i) = i · tanh(W_f · q + bf) ·Wh
+f(q,i) = i · tanh(W_f · q + b_f) ·W_h
 $$
 
 ...(10) 
@@ -136,25 +137,26 @@ $$
 
 - $W_h \in R_{\beta}，W_f \in R_{\alpha \times \beta \times \alpha}，b_f \in R_{α \times β} $，β是一个超参数，用于控制注意网络中隐藏单元的数量。
 
-给定基于注意力的用户嵌入u，我们可以使用公式（3）和公式（7）中描述的相同方法进一步进行个性化产品搜索。我们将这个模型称为基于注意力的嵌入模型（AEM）。
+给定基于注意力的用户embedding u，我们可以使用公式（3）和公式（7）中描述的相同方法进一步进行个性化产品搜索。我们将这个模型称为基于注意力的嵌入模型（AEM）。
 
-与HEM不同，AEM通过查询相关的用户个人资料进行个性化。每个用户的嵌入表示是根据他们的查询构建的，以便模型能够更好地捕捉当前搜索环境中相关的用户偏好。这在用户购买了许多与当前查询无关的产品时尤其有益。Guo等人[15]提出了另一个基于注意力的产品搜索模型，其思想与AEM类似。不幸的是，**对于注意力权重的计算，他们的模型假设用户购买历史记录中的每个项目都应与用户提交的至少一个搜索查询相关联，而这在我们的数据集中并不正确**。因此，在本文中我们忽略了它。
+与HEM不同，AEM通过查询相关的用户个人资料进行个性化。每个用户的embedding表示是根据他们的query构建的，以便模型能够更好地捕捉当前搜索环境中相关的用户偏好。**这在用户购买了许多与当前查询无关的产品时尤其有益**。Guo等人[15]提出了另一个基于注意力的产品搜索模型，其思想与AEM类似。不幸的是，**对于注意力权重的计算，他们的模型假设用户购买历史记录中的每个项目都应与用户提交的至少一个搜索查询相关联，而这在我们的数据集中并不正确**。因此，在本文中我们忽略了它。
 
-然而，有一个重要的问题限制了HEM和AEM的能力。如第3节所示，**不同的查询具有不同的个性化潜力**。尽管在查询相关的用户个人资料方面做出了努力，但在公式（9）中的注意机制要求AEM至少关注用户购买历史记录中的一个项目，这意味着它总是进行个性化。Ai等人[2]探索了一种朴素的解决方案，即在公式（7）中添加一个超参数来控制$M_{uq}$中用户嵌入u的权重，但这仅仅是在一些查询上进行个性化的收益与在其他查询上的损失之间进行权衡。**为了真正解决这个问题，我们需要一个模型，在产品搜索中可以自动确定何时以及如何进行个性化**。
+然而，有一个重要的问题限制了HEM和AEM的能力。如第3节所示，**不同的查询具有不同的个性化潜力**。尽管在查询相关的用户个人资料方面做出了努力，**但在公式（9）中的注意机制要求AEM至少关注用户购买历史记录中的一个item，这意味着它总是进行个性化**。Ai等人[2]探索了一种朴素的解决方案，即在公式（7）中添加一个超参数来控制$M_{uq}$中用户嵌入u的权重，但这仅仅是在一些查询上进行个性化的收益与在其他查询上的损失之间进行权衡。为了真正解决这个问题，我们需要一个模型，在产品搜索中可以**自动确定何时以及如何进行个性化**。
 
 ## 4.3  Zero Attention Strategy
 
-个性化的实用性取决于查询和用户的购买历史。例如，钓鱼查询通常会导致：无论是什么样的客户偏好，都会购买同一件物品。**同样，第一次在某个特定类别购物的客户，可能没有相关历史可供个性化基础**。
+个性化的实用性取决于查询和用户的购买历史。例如，钓鱼查询（spear-fishing queries）通常会导致：无论是什么样的客户偏好，都会购买同一件物品。**同样，第一次在某个特定类别购物的客户，可能没有相关历史可供个性化基础**。
 
 为解决这个问题，我们提出了一种零注意策略，**通过在注意过程中引入一个零向量（a Zero Vector）来放松现有注意机制的约束**。因此，我们提出了一种零注意模型（ZAM），它根据搜索查询和用户的购买历史在产品搜索中进行差异化个性化。图2显示了ZAM的结构。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/4cbaccfe3beff0ff92385f421ca28fdcc3c4637ba175fb24caf23ffcaa8fa0b957f6b394ec6d4c71c33bec05adfd93e2?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
 图2
 
 与AEM类似，ZAM基于相关单词来学习item embeddings，并使用query embeddings和user embeddings进行检索。ZAM和AEM之间的主要区别在于，**ZAM允许attention网络关注(attend)一个零向量（Zero Vector），而不仅仅是关注用户以前的购买记录，这被称为零注意策略**。形式上，$0 \in R_α$为零向量，其中每个元素都为0。然后，在ZAM中，用户u的嵌入表示计算为：
 
 $$
- u = \sum\limits_{i \in I_u} \frac{exp(f(q,i))} {exp(f(q, 0)) + \sum\limits_{i' \in I_u} exp(f(q,i′))} i
+u = \sum\limits_{i \in I_u} \frac{exp(f(q,i))} {exp(f(q, 0)) + \sum\limits_{i' \in I_u} exp(f(q,i′))} i
 $$
 
 ...(11)
