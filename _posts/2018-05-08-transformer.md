@@ -121,7 +121,7 @@ $$
 
 ## 3.5 Positional Encoding
 
-由于我们的模型不包含循环（recurrence）和和卷积（convolution），为了让模型利用序列的顺序，我我们必须注入一些关于tokens在序列中的相对或绝对位置的信息。为此，我们在编码器(encoder)和解码器(decoder)栈底部添加“位置编码(positional encoding)”到input embedding中。该positional encodings与input embeddings具有相同的维度$$d_{model}$$，因而两者可以求和。positinal encodings有许多选择，可以采用可学习（learned）或者固定（fixed）。
+由于我们的模型不包含循环（recurrence）和卷积（convolution），为了让模型利用序列的顺序，我们必须注入一些关于tokens在序列中的相对或绝对位置的信息。为此，我们在编码器(encoder)和解码器(decoder)栈底部添加“位置编码(positional encoding)”到input embedding中。该positional encodings与input embeddings具有相同的维度$$d_{model}$$，因而两者可以求和。positinal encodings有许多选择，可以采用可学习（learned）或者固定（fixed）。
 
 在本工作中，我们使用不同频率的sin和cosine函数：
 
@@ -134,9 +134,9 @@ $$
 
 - **pos是position，i是维度**
 
-也就是说：**positional encoding的每个维度对应于一个正弦曲线（sinusoid）**。波长(wavelengths)形成了一个从$$2 \pi$$到$$10000 \cdot 2\pi$$的几何过程。我们选择该函数是因为：我们假设它允许该模型可以很容易学到通过相对位置来进行关注（attend），因为对于任意固定offset k，$$PE_{pos+k}$$可以被表示成一个关于$$PE_{pos}$$的线性函数。
+也就是说：**positional encoding的每个维度对应于一个正弦曲线（sinusoid）**。波长(wavelengths)形成了一个从$$2 \pi$$到$$10000 \cdot 2\pi$$的等比数列（也称几何级数：geometric progression）。我们选择该函数的原因是：假设它允许该模型可以很容易学到通过相对位置来进行关注（attend），因为对于任意固定offset k，$$PE_{pos+k}$$可以被表示成一个关于$$PE_{pos}$$的线性函数。
 
-我们也使用学到的positional embeddings进行实验，发现两者版本几乎生成相同的结果（见表3 第E行）。我们选择正弦曲线版本，是因为它可以允许模型对序列长度长于训练期遇到的长度进行推导。
+我们也使用学到的positional embeddings进行实验，发现两者版本几乎生成相同的结果（见表3 第E行）。**我们选择正弦曲线版本**，是因为它可以允许模型对序列长度长于训练期遇到的长度进行推导。
 
 # 4.为什么用self-attention
 
