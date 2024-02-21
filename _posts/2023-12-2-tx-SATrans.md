@@ -6,7 +6,7 @@ modified: 2024-12-2
 tags: 
 ---
 
-weixin在《Scenario-Adaptive Feature Interaction for Click-Through Rate Prediction》提出了一种在序列建模中考虑场景信息的方法：SATrans。
+weixin在《Scenario-Adaptive Feature Interaction for Click-Through Rate Prediction》提出了一种在特征交叉建模中考虑场景信息的方法：SATrans。
 
 # 一、摘要
 
@@ -78,10 +78,10 @@ $𝑥_𝑖^s$中的场景相关特征可以是：**业务ID或展示位置ID**�
 
 图1 SATrans的总体框架。左侧是场景编码器，使用场景相关特征作为输入生成固定大小的嵌入。右侧是由多个SAI层组成的骨干网络。场景编码器和SAI层的实现细节分别在第4.2节和第4.3节中详细说明。
 
-如图1所示，SATrans将基于自注意力的交互层堆叠作为backbone，并由两个场景相关组件（ scenario-specific components）：
+如图1所示，SATrans将基于自注意力的交叉层堆叠作为backbone，并由两个场景相关组件（scenario-specific components）：
 
-- (1) 场景编码器（Scenario Encoder）：将特定场景特征转换为固定长度的embedding向量
-- (2) 场景自适应交互层（Scenario-Adaptive Interaction: SAI layers）：通过场景自适应自注意机制进行高阶特征交叉。
+- (1) **场景编码器（Scenario Encoder）**：将特定场景特征转换为固定长度的embedding向量
+- (2) **场景自适应交叉层（Scenario-Adaptive Interaction: SAI layers）**：通过场景自适应自注意机制进行高阶特征交叉。
 
 给定输入特征集${𝑥_𝑖^s，𝑥_𝑖^a}$，我们首先将其转换为稀疏特征向量：
 
@@ -96,7 +96,7 @@ $$
 - 𝑀是场景相关特征（scenario-specific features）的数量
 - 𝑁是所有特征的数量
 
-之后，我们首先将场景相关特征$x^s$输入到场景编码器（scenario encoder）中以获取场景embedding s，然后使用embedding layer将所有特征x投影到相同的低维空间，并获得dense embedding $e = [e_1; \cdots; e_𝑁]$，接着进行多个场景自适应交互层（scenario-adaptive interacting layers），其中在场景embedding的指导下，通过自注意机制将高阶特征组合在一起。通过堆叠𝑙个交叉层，可以建模多达（𝑙+1）阶的场景自适应特征交叉。最终交叉层的输出被连接，然后经过线性层和sigmoid函数来估计CTR。SATrans的关键在于如何设计有效的场景编码器和场景自适应交互模块。在接下来的部分中，我们将介绍我们提出的方法的详细信息。
+之后，我们首先将场景相关特征$x^s$输入到场景编码器（scenario encoder）中以获取场景embedding s，然后使用embedding layer将所有特征x投影到相同的低维空间，并获得dense embedding $e = [e_1; \cdots; e_𝑁]$，接着进行多个场景自适应交叉层（scenario-adaptive interacting layers），其中**在场景embedding的指导下，通过自注意机制将高阶特征组合在一起**。通过堆叠𝑙个交叉层，可以建模多达（𝑙+1）阶的场景自适应特征交叉。最终交叉层的输出被连接，然后经过线性层和sigmoid函数来估计CTR。SATrans的关键在于如何设计有效的场景编码器和场景自适应交互模块。在接下来的部分中，我们将介绍我们提出的方法的详细信息。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/0b17d9b211999b7913a52ffa37fe930bc3c4607b43082c7b1a7ef3ca7dea7a063db2146c1b07b0b791e3202469c3e0e3?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
