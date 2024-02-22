@@ -193,11 +193,12 @@ $$
 
 图3 计算scenario-adaptive self-attention的三种策略
 
-SA-Gate（按位）：一种直接使用按位转换来引入场景嵌入的策略是门控机制。具体而言，我们基于场景嵌入生成门控模块，以过滤特征嵌入： 
+- **SA-Gate（Bit-wise）**：一种直接使用**按位转换(bitwise transform)**来引入场景embedding的策略是门控机制。具体而言，我们基于场景嵌入生成门控模块，以过滤特征嵌入： 
 
 $$
 𝜙_{𝑠𝑎}^{(ℎ)}(h_𝑖,h_𝑗,s_Q^{(ℎ)}, s_K^{(h)})=⟨\sigma(s_Q^{(h)}) \odot (W_Q^{(h)} h_𝑖), \sigma(s_K^{(h)}) \odot (W_K^{(h)} h_𝑗)⟩
 $$
+
 ...(7) 
 
 其中:
@@ -258,14 +259,14 @@ $$
 根据公式5，我们会更新在attention head h下的第𝑖个特征的representation为$\widehat{h}_𝑖^h$，然后将不同子空间的特征聚合如下： 
 
 $$
-\widehat{h}_𝑖 = \widehat{h}_i^1 \oplus \widehat{h}_2^h \cdots \oplus \widehat{h}_𝐻^h
+\widehat{h}_𝑖 = \widehat{h}_i^1 \circ \widehat{h}_2^h \cdots \circ \widehat{h}_𝐻^h
 $$
 
 ... (12) 
 
 其中：
 
-- $\oplus$是concatenation运算符。
+- $\circ$是concatenation运算符。
 
 接下来，我们使用投影矩阵$W_Agg$将学习到的特征进行转换，并添加标准的残差连接(residual connections)以保留以前学习到的组合特征(combinatorial
 features)，包括原始的个体特征（即一阶特征），接着是一个层归一化层。形式上，第𝑖个特征的输出表示为： 
@@ -275,7 +276,7 @@ h_𝑖^O=LN(W_A \widehat{h}_𝑖 + h_𝑖)
 $$
 ...(13) 
 
-**通过这样一个interacting layer，每个特征表示会被更新到一个新的特征空间中，具有在场景信息的指导下来自其他字段的信息聚合**。我们可以堆叠多个这样的层来模拟任意阶的组合特征。我们将最后一层的输出embedding串联起来以获得$h^{Out}=h_1^{Out} \oplus h_2^{Out} ... \oplus h_𝑁^{Out}$，并使用带有Sigmoid函数𝜎的线性层来获得最终预测：
+**通过这样一个interacting layer，每个特征表示会被更新到一个新的特征空间中，具有在场景信息的指导下来自其他字段的信息聚合**。我们可以堆叠多个这样的层来模拟任意阶的组合特征。我们将最后一层的输出embedding串联起来以获得$h^{Out}=h_1^{Out} \circ h_2^{Out} ... \circ h_𝑁^{Out}$，并使用带有Sigmoid函数𝜎的线性层来获得最终预测：
 
 $$
 pCTR=\sigma(W_O h^{Out} +b_O)
