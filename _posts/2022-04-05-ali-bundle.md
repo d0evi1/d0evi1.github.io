@@ -84,7 +84,7 @@ $$
 因此，个性化bundle list推荐问题可以形式化为一个结构化预测问题[3]，试图找到满足以下条件的bundle list $\widehat{y}$：
 
 $$
-\widehat{y} = \underset{y \in Y}{argmax}  P(\widehat{y} = {b_1, b_2, \cdots,b_K }|C_u) 
+\widehat{y} = \underset{y \in Y}{argmax}  \widehat{P}(y = {b_1, b_2, \cdots,b_K }|C_u) 
 $$
 
 ... (1) 
