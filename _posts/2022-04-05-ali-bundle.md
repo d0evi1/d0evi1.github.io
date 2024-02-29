@@ -79,17 +79,17 @@ $$
 **问题公式化**。假设：
 
 - $\widehat{P}(\cdot, \cdot): Y \times {C_u} \rightarrow R^+$为一个通用的兼容性函数，用于衡量bundle list y和用户上下文$C_u$之间的得分（兼容性），
-- $\widehat{P}(y \mid C_u)$：表示为给定$C_u$时y的非标准化条件概率
+- $\widehat{P}(y \mid C_u)$ ：表示为给定$C_u$时y的非标准化条件概率
 
 因此，个性化bundle list推荐问题可以形式化为一个结构化预测问题[3]，试图找到满足以下条件的bundle list $\widehat{y}$：
 
 $$
-\widehat{y} = argmax y \in Y P(\widehat{y} = {b_1, b_2, \cdots,b_K }|C_u) 
+\widehat{y} = \underset{y \in Y}{argmax}  P(\widehat{y} = {b_1, b_2, \cdots,b_K }|C_u) 
 $$
 
 ... (1) 
 
-- $P(y|C_u)$：为$\widehat{P}$关于y的归一化条件概率。$P(y|C_u)$实际上是对N的双指数级数量的分布进行建模，因此在给定$C_u$的情况下，有 ∏ T t=1 ( N t ) K 种可能的y结构，这带来了极大的计算挑战。
+- $P(y \mid C_u)$：为$\widehat{P}$关于y的归一化条件概率。$P(y \mid C_u)$实际上是对N的双指数级数量的分布进行建模，因此在给定$C_u$的情况下，有 $\binom{(\sum\limits_{t=1}^T \binom{N}{t}}{K}$ 种可能的y结构，这带来了极大的计算挑战。
 
 在本文中，我们考虑与质量和多样性相关的$\widehat{p}$兼容性函数。 bundle list推荐是单个bundle list推荐问题和单个item list推荐问题的一般化。当给定用户上下文时，每个bundle是独立的，我们有：
 
@@ -148,7 +148,7 @@ $$
 该分解平衡了质量和多样性。然后，个性化bundle list推荐的优化准则是找到一个最大化给定用户上下文$C_u$时$P(y \mid C_u;\theta)$的 bundle list y：
 
 $$
-\underset{argmax}{y} det(S_y) \cdot \prod\limits_{b \in y} q^2 (b|C_u; \theta) 
+\underset{y}{argmax} det(S_y) \cdot \prod\limits_{b \in y} q^2 (b|C_u; \theta) 
 $$
 
 ...(5) 
@@ -269,8 +269,8 @@ $$
 图2(a)显示了BGN的整体推理过程。我们使用文本-CNN的输出来初始化h0，然后通过在每个步骤扩展生成的捆绑前缀来生成捆绑列表。图2(b)显示了捆绑列表yt在每个生成步骤中如何扩展。每个小形状图标表示一个项目，矩形块的每一行是一个生成的捆绑前缀，t表示生成的捆绑前缀的对齐大小。在每个生成步骤中，我们使用束搜索生成K * N个候选捆绑。束搜索[30]是一种启发式搜索算法，通过在有限集中扩展最有希望的项来探索搜索空间，广泛应用于序列生成方法中[26]。在这里，我们使用束搜索将低质量的捆绑修剪到宽度为M的ycand，这对于效率至关重要。DPPs的子模假设[16]在实际应用中广泛使用，包括推荐系统[6,10]，可以在多项式时间内找到解决方案。根据等式（5），我们从ycand中选择一个捆绑b，一次最大化P(y ∪ {b})，如下所示：
 
 $$
-\underset{argmax}{b \in y_{cand}} log det S_{y \cup \lbrace b \rbrace} + \sum\limits_{\beta \in y \union \lbrace b \rbrace} log q^2(\beta|C_u)\\
-<=> \underset{argmax}{b \in y_{cand}} logp(b|C_u) + \lambda log det S_{y \cup \lbrace b \rbrace}
+\underset{b \in y_{cand}}{argmax} log det S_{y \cup \lbrace b \rbrace} + \sum\limits_{\beta \in y \union \lbrace b \rbrace} log q^2(\beta|C_u)\\
+<=> \underset{b \in y_{cand}}{argmax} logp(b|C_u) + \lambda log det S_{y \cup \lbrace b \rbrace}
 $$
 
 ...(15)
