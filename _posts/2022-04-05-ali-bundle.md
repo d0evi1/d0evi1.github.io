@@ -240,7 +240,7 @@ $$
 
 ...(12)
 
-我们使用共同购买的数据$D = {b,C_u }_{1:\mid D \mid}$来指导学习过程。loss可以定义为每个步骤softmax层的平均交叉熵，这保证了与等式（9）相同的形式，模型的目标是最大化单个捆绑销售的似然性。
+我们使用共同购买的数据$D = {b,C_u }_{1:\mid D \mid}$来指导学习过程。loss可以定义为每个步骤softmax层的平均交叉熵，这保证了与等式（9）相同的形式，模型的目标是最大化单个bundle的似然性。
 
 $$
 L_{MLE}= −\frac{1}{T} \sum\limits_{t=1}^T logp(i_t | i_1, \cdots, i_{t−1}, C_u; θ) 
@@ -268,16 +268,17 @@ $$
 
 因此，具有一个负样本的特征感知softmax相当于在每个时间步长优化方程（14）中的平均BPR。
 
-## 4.4 捆绑生成过程概述
+## 4.4 bundle生成过程概述
 
-捆绑列表推荐的目标是通过生成高质量和多样化的捆绑列表 y 来最大化等式（5）中的 $p(y \mid C_u)$。在本小节中，我们将整合并总结捆绑生成的整体过程。
+bundle list推荐的目标是通过生成高质量和多样化的bundle list y 来最大化等式（5）中的 $p(y \mid C_u)$。在本小节中，我们将整合并总结捆绑生成的整体过程。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/9df0f78b7d335ed318571873f8ce2028d2d048b2164828b8a7e91474a6560e963f6b911ad7198f8ebdce9fcd7214c592?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
-图2(a)显示了BGN的整体推理过程。我们使用文本-CNN的输出来初始化h0，然后通过在每个步骤扩展生成的捆绑前缀来生成捆绑列表。图2(b)显示了捆绑列表yt在每个生成步骤中如何扩展。每个小形状图标表示一个项目，矩形块的每一行是一个生成的捆绑前缀，t表示生成的捆绑前缀的对齐大小。在每个生成步骤中，我们使用束搜索生成K * N个候选捆绑。束搜索[30]是一种启发式搜索算法，通过在有限集中扩展最有希望的项来探索搜索空间，广泛应用于序列生成方法中[26]。在这里，我们使用束搜索将低质量的捆绑修剪到宽度为M的ycand，这对于效率至关重要。DPPs的子模假设[16]在实际应用中广泛使用，包括推荐系统[6,10]，可以在多项式时间内找到解决方案。根据等式（5），我们从ycand中选择一个捆绑b，一次最大化P(y ∪ {b})，如下所示：
+- 图2(a)显示了BGN的整体推理过程。我们使用文本-CNN的输出来初始化h0，然后**通过在每个步骤扩展生成的bundle前缀来生成bundle列表**。
+- 图2(b)显示了bundle list $y_t$在每个生成步骤中如何扩展。每个小形状图标表示一个item，矩形块的每一行是一个生成的bundle前缀，t表示生成的bundle前缀的对齐大小。在每个生成步骤中，我们使用beam search生成K * N个候选bundle。beam search[30]是一种启发式搜索算法，通过在有限集中扩展最有希望的item来探索搜索空间，广泛应用于序列生成方法中[26]。在这里，我们使用beam search将低质量的bundle修剪到宽度为M的$y_{cand}$，这对于效率至关重要。DPPs的子模假设[16]在实际应用中广泛使用，包括推荐系统[6,10]，可以在多项式时间内找到解决方案。根据等式（5），我们从$y_{cand}$中选择一个bundle b，一次最大化$P(y \cup \lbrace b \rbrace)$，如下所示：
 
 $$
-\underset{b \in y_{cand}}{argmax} log det S_{y \cup \lbrace b \rbrace} + \sum\limits_{\beta \in y \union \lbrace b \rbrace} log q^2(\beta|C_u)\\
+\underset{b \in y_{cand}}{argmax} log det S_{y \cup \lbrace b \rbrace} + \sum\limits_{\beta \in y \cup \lbrace b \rbrace} log q^2(\beta|C_u)\\
 <=> \underset{b \in y_{cand}}{argmax} logp(b|C_u) + \lambda log det S_{y \cup \lbrace b \rbrace}
 $$
 
