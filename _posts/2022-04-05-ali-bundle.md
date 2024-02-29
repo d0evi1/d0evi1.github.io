@@ -15,7 +15,7 @@ tags:
 
 # 1.介绍
 
-一个捆绑包(bundle)是一组作为整体出售的产品或服务，而捆绑包列表(bundle list)推荐则是推荐一个个性化的捆绑包列表。在传统商业领域，如通信服务、线下零售商和超市等，都将捆绑销售视为关键的市场营销策略，并且他们通常通过人工洞察或**非个性化的挖掘方法**来制作捆绑包[2]。在现代电子商务网站和在线服务业务中，如亚马逊、淘宝、Steam和Netflix等，也部署了新的应用[22,32]，这些应用推荐和销售捆绑包列表而非单个商品。
+一个**捆绑包(bundle)**是一组作为整体出售的产品或服务，而**捆绑包列表(bundle list)推荐**则是推荐一个个性化的捆绑包列表。在传统商业领域，如通信服务、线下零售商和超市等，都将捆绑销售视为关键的市场营销策略，并且他们通常通过人工洞察或**非个性化的挖掘方法**来制作捆绑包[2]。在现代电子商务网站和在线服务业务中，如亚马逊、淘宝、Steam和Netflix等，也部署了新的应用[22,32]，这些应用推荐和销售捆绑包列表而非单个商品。
 
 客户、卖家以及推荐平台都可以从**个性化的捆绑包推荐服务**中受益。对于客户来说，高质量的捆绑包可以拓宽用户兴趣，并在购买后的最短路径上直接显示互补产品。经典营销研究表明，**精心设计的捆绑包可以带来相互促进的效果**：
 
@@ -50,8 +50,10 @@ tags:
 
 - I为可供选择的所有商品集合，
 - $\mid N \mid$为所有商品的数量。
+- b：一个bundle ，是由I中的商品组成的任意组合
+- T：表示bundle中商品的数量
 
-一个bundle b是由I中的商品组成的任意组合，T表示bundle中商品的数量。在bundle中，商品的顺序是无序的。当将bundle视为一个序列时，通常按照商品价格从高到低的顺序对捆绑销售中的商品进行排序，因为价格较低的商品更容易被替换为bundle中的其他商品，同时在序列生成模型中更容易受到曝光偏差（exposure bias）的影响。假设：B为所有可能的bundle集合，$\mid B \mid$等于 ：
+在bundle中，商品的顺序是无序的。当将bundle视为一个序列时，通常按照商品价格从高到低的顺序对捆绑销售中的商品进行排序，因为价格较低的商品更容易被替换为bundle中的其他商品，同时在序列生成模型中更容易受到曝光偏差（exposure bias）的影响。假设：B为所有可能的bundle集合，$\mid B \mid$等于 ：
 
 $$
 \sum_{t=1}^T \binom{N}{t}
@@ -68,17 +70,21 @@ B = {b = \lbrace i_1,i_2, \cdots, i_T \rbrace | i \in I}，|b|=T，|B|=\sum\limi
 Y = {y = \lbrace b_1,b_2, \cdots, b_K \rbrace | b \in B}，|y|=K，|Y|=|B|^K
 $$
 
-在这里，K是推荐捆绑销售列表y的大小。然而，我们认为在bundle list中的顺序并不重要。设Y为所有可能的bundle list集合。用户上下文$C_u$通常表示他/她在历史记录中点击/购买的商品序列。 
+在这里：
+
+- K：是推荐bundle list y的大小。然而，我们认为在bundle list中的顺序并不重要。
+- Y：为所有可能的bundle list集合。
+- $C_u$：用户上下文，通常表示他/她在历史记录中点击/购买的商品序列。 
 
 **问题公式化**。假设：
 
 - $\widehat{P}(\cdot, \cdot): Y \times {C_u} \rightarrow R^+$为一个通用的兼容性函数，用于衡量bundle list y和用户上下文$C_u$之间的得分（兼容性），
-- $\widehat{P}(y|C_u)$：表示为给定$C_u$时y的非标准化条件概率
+- $\widehat{P}(y \mid C_u)$：表示为给定$C_u$时y的非标准化条件概率
 
 因此，个性化bundle list推荐问题可以形式化为一个结构化预测问题[3]，试图找到满足以下条件的bundle list $\widehat{y}$：
 
 $$
-\widehat{y} = argmax y \in Y P(˜ y = {b1,b2, . . . ,bK }|Cu ) 
+\widehat{y} = argmax y \in Y P(\widehat{y} = {b_1, b_2, \cdots,b_K }|C_u) 
 $$
 
 ... (1) 
@@ -176,7 +182,7 @@ $$
  在这里, $s_{a,b} (i, j)$测量的是物品而不是bundle的相似性，这与用户上下文无关。相似度函数通常应与根据领域知识预定义的多样性度量一致。例如，在我们的实验中，$s_{a,b}(i, j)$由bundle的Jaccard相似度给出： 
  
  $$
- s_{a,b}(i, j) = \frac{1}{|a ∪ b|} δ(i = j) 
+ s_{a,b}(i, j) = \frac{1}{|a \cup b|} δ(i = j) 
  $$
 
  ...(8) 
@@ -242,7 +248,7 @@ $$
 $$
 L_{sample-1}= −\frac{1}{T} \sum_{t=1}^T log \frac{exp(h_t^T e_{i_t})} {exp(h_t^T e_{i_t}) + exp(h_t^T e_{s_t})} + λ_θ ||θ||^2 \\
 = −\frac{1}{T} \sum\limits_{t=1}^T log σ(h_t^T(e_{i_t} − e_{s_t})) + λ_θ||θ||^2 \\
-= −\frac{1}{T} \sum\limits_{t=1}^T logp(θ | ≥t,C_u)=\frac{1}{T} \sum\limits_{t=1}^T L_{BPR}(t)
+= −\frac{1}{T} \sum\limits_{t=1}^T logp(θ |≥t,C_u)=\frac{1}{T} \sum\limits_{t=1}^T L_{BPR}(t)
 $$
 
 ...(14) 
@@ -263,7 +269,8 @@ $$
 图2(a)显示了BGN的整体推理过程。我们使用文本-CNN的输出来初始化h0，然后通过在每个步骤扩展生成的捆绑前缀来生成捆绑列表。图2(b)显示了捆绑列表yt在每个生成步骤中如何扩展。每个小形状图标表示一个项目，矩形块的每一行是一个生成的捆绑前缀，t表示生成的捆绑前缀的对齐大小。在每个生成步骤中，我们使用束搜索生成K * N个候选捆绑。束搜索[30]是一种启发式搜索算法，通过在有限集中扩展最有希望的项来探索搜索空间，广泛应用于序列生成方法中[26]。在这里，我们使用束搜索将低质量的捆绑修剪到宽度为M的ycand，这对于效率至关重要。DPPs的子模假设[16]在实际应用中广泛使用，包括推荐系统[6,10]，可以在多项式时间内找到解决方案。根据等式（5），我们从ycand中选择一个捆绑b，一次最大化P(y ∪ {b})，如下所示：
 
 $$
-arg max b ∈ycand log det Sy∪{b } + Õ β ∈y∪{b } logq 2 (β |Cu ) ⇔arg max b ∈ycand logp(b|Cu ) + λ log det Sy∪{b }
+\underset{argmax}{b \in y_{cand}} log det S_{y \cup \lbrace b \rbrace} + \sum\limits_{\beta \in y \union \lbrace b \rbrace} log q^2(\beta|C_u)\\
+<=> \underset{argmax}{b \in y_{cand}} logp(b|C_u) + \lambda log det S_{y \cup \lbrace b \rbrace}
 $$
 
 ...(15)
