@@ -66,7 +66,7 @@ ali在《AutoDebias: Learning to Debias for Recommendation》提出了一种auto
 
 - 𝑢（或𝑖）：表示U（或I）中的用户（或item）
 - $r \in R$: 表示用户对item给出的反馈（如评分值、点击量和停留时间）
-- $D_T$：收集到的历史行为数据，可以表示为一个由未知分布$𝑝_𝑇(𝑢,𝑖,𝑟)$在user-item-label空间$U×I×R$上生成的三元组集合$\lbrace (𝑢_𝑘, 𝑖_𝑘,𝑟_𝑘) \rbrace \mid 1≤𝑘 ≤|𝐷_𝑇|$。
+- $D_T$：收集到的历史行为数据，可以表示为一个由未知分布$𝑝_T(u,i,r)$在user-item-label空间 $U×I×R$ 上生成的三元组集合$\lbrace (𝑢_𝑘, 𝑖_𝑘,𝑟_𝑘) \rbrace \mid 1≤𝑘 ≤ \mid 𝐷_𝑇 \mid$。
 
 推荐系统的任务可以表述如下：从$𝐷_𝑇$中学习一个推荐模型，使其能够捕捉用户偏好并做出高质量的推荐。形式上，设：
 
