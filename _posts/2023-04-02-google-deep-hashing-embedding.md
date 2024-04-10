@@ -142,11 +142,12 @@ $$
 
 与现有仅限于几个哈希函数的hashing方法不同，我们选择了一个**相对较大的k来满足高维度属性（在我们的实验中k=1024，尽管它比n显著小）**。我们从经验上发现，与现有哈希方法相比，我们的方法从更大的k中显著受益。此外，所提出的密集哈希编码也满足其他三个属性。更多分析可以在附录中找到。
 
-<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/13650d290ad2dcc01b603f7d70496fa43e60873f5638a13c87e42163cd773b4da81a4514c20873af0c8e3810833f50dd?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=a2.jpg&amp;size=750">
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/77427bad2b7e3717640d99812814b12ac2d31257dc511f249d769a34351705c628cb55c6451282d4a7f362c9a8dcef8b?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=a3.jpg&amp;size=750">
+
 
 请注意，整个编码过程不需要任何存储，因为所有的计算都可以即时完成。这也是使用多重哈希的一个优良属性，因为我们获得了一个更易于区分的高维编码，而没有存储开销。从计算角度来看，时间复杂度是𝑂(𝑘)，每个哈希的计算是独立的，因此适合并行化和硬件如GPU和TPU。例如，我们使用整数的通用哈希[4]作为底层哈希，并在附录中的算法2中描述了编码过程。其他通用哈希（例如针对字符串的）也可以采用来处理不同的特征类型。
 
-<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c33a59afb5a6a4dac8e5492a0247a99c7990ed632d02b0908a73b77b57cdf32b22e254d8eeee17c754cd01d4e2ae86b1?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=a1.jpg&amp;size=750">
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/13650d290ad2dcc01b603f7d70496fa43e60873f5638a13c87e42163cd773b4da81a4514c20873af0c8e3810833f50dd?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=a2.jpg&amp;size=750">
 
 ## 3.3 深度嵌入网络
 
