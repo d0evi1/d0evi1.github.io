@@ -25,11 +25,11 @@ kuaishou在《Deconfounding Duration Bias in Watch-time Prediction for Video Rec
 - W：表示用户花费在观看视频上的时间
 - $$\lbrace U, V \rbrace \rightarrow W$$：会捕获在watch-time上的interest effect，它可以衡量用户对该视频有多感兴趣
 - $$D \rightarrow W$$：会**捕获在watch time上的duration effect**，它会建议：当两个视频与用户兴趣相匹配时，**更长的视频会接受到更长的watch time**
-- $$D \rightarrow V$$：表示**duration会影响视频的曝光**。推荐系统经常会对具有更长duration的视频有不平等的偏好；这样的bias会通过feedback loop会放大，如图3所示。另外，duration会影响模型训练，因为：i) sample size随duration的不同而不同，具有长在uration的视频通常具有更大的sample size，这意味着 prediction模型具有更好的performance； ii) 在标准模型（比如：WLR）中，具有不同duraiton的videos会接受到不同sample weights，（它会影响在模型训练时的梯度分配）。
+- $$D \rightarrow V$$：表示**duration会影响视频的曝光**。推荐系统经常会对具有更长duration的视频有不平等的偏好；这样的bias会通过feedback loop会放大，如图3所示。另外，duration会影响模型训练，因为：i) sample size随duration的不同而不同，具有长duration的视频通常**具有更大的sample size**，这意味着 prediction模型具有更好的performance； ii) **在标准模型（比如：WLR）中，具有不同duraiton的videos会接受到不同sample weights，（它会影响在模型训练时的梯度分配）**。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/6dec8ff2f8a99cdd0a4c4b63e552d0fe2930b4757a9ee367024a3e1f0899cd6f76196df58a1647cc674aa1aa0327c5af?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
 
-图3 在11个月上，kuaishou APP每个video durtion相应的视频曝光变化。bins以duration的升序进行排序。bin的高度表示在该周期内曝光的差异。出于置信原因，绝对值会被忽略。平台的目标是提升watch time，**曝光会偏向于那些具有长duration的视频**。
+图3 在11个月上，kuaishou APP每个video duration相应的视频曝光变化。bins以duration的升序进行排序。bin的高度表示在该周期内曝光的差异。出于置信原因，绝对值会被忽略。平台的目标是提升watch time，**曝光会偏向于那些具有长duration的视频**。
 
 明显地，在图4(a)中的causal graph表明：duration是一个会通过两条路径（$$D \rightarrow W, D \rightarrow V \rightarrow W$$）影响watch-time的混淆因子。第一条path会建议：duration具有一个与watch time的直接因果关系，它可以通过watch-time prediction被捕获，因为用户趋向于花费更多时间在长视频（对比起短视频）上。**然而，第二条path会暗示着：video exposure不希望被它的duration所影响，因而，视频分布会偏向于长视频；如果没有缓解，由于推荐系统的feedback loop，predictions会面临着bias amplification的风险**。
 
@@ -126,7 +126,7 @@ $$
 
 ...(3)
 
-其中：h是一个watch-time分位数预估模型，它会拟合在所有duraiton groups上的数据：
+其中：h是一个watch-time分位数预估模型，它会拟合在所有duration groups上的数据：
 
 $$
 h = \underset{h'}{argmin} \sum\limits_{\lbrace (u_i, v_i, w_i)\rbrace_{i=1}^n} (h'(u_i, v_i) - \hat{\phi}_{k_i}(w_i))^2
