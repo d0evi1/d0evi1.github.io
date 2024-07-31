@@ -162,13 +162,13 @@ $$
 
 [图4]: Online Learning Data/Model Flows
 
-不具有完整的点击覆盖，意味着实时训练集是有偏的(bias)：经验CTR(empirical CTR)会比ground truth要低。这是因为：一部分被标注为未点击（no-clicked）的曝光（impressions），如果等待时间足够长，会有可能会被标注成点击数据。实际上，我们会发现，**在内存可控范围内，随着等待窗口的size的变大，很容易减小bias到小数范围内**。另外，这种小的bias是可衡量和可纠正的。关于window size的研究可以见[6]。
+**不具有完整的点击覆盖，意味着实时训练集是有偏的(bias)：经验CTR(empirical CTR)会比ground truth要低**。这是因为：一部分被标注为未点击（no-clicked）的曝光（impressions），如果等待时间足够长，会有可能会被标注成点击数据。实际上，我们会发现，**在内存可控范围内，随着等待窗口的size的变大，很容易减小bias到小数范围内**。另外，这种小的bias是可衡量和可纠正的。关于window size的研究可以见[6]。
 
 online joiner被设计成执行一个在ad impressions和ad clicks之间的分布式stream-to-stream join，使用一个请求ID(request ID)作为join的主键。**每一时刻当一个用户在Facebook上执行一个动作时，都会生成一个请求ID，会触发新鲜的内容曝光给他们。**图4展示了online joiner和online learning的数据和模型流。当用户访问Facebook时，会生成初始的数据流，会发起一个请求给ranker对候选广告进行排序。广告会被传给用户设备，并行的，每个广告、以及和它相关的用于ranking的features，会并行地添加到曝光流（impression stream）中。如果用户选择点击该广告， 那么该点击(click)会被添加到点击流中（click stream）。**为了完成stream-to-stream join，系统会使用一个HashQueue，它包含了一个先入先出的队列（FIFO queue）作为一个缓存窗口；以及一个hashmap用于快速随机访问label曝光**。一个HashQueue通常在kv-pair上具有三种类型的操作：enqueue, dequeue和lookup。例如，为了enqueue一个item，我们添加该item到一个队列的前面，并在hashmap中创建一个key，对应的值指向队列中的item。**只有在完整的join窗口超期后(expired)，会触发一个有标签的曝光(labeled impression)给训练流。如果没有点击join，它会触发一个negative的标注样本**。
 
 在该实验设置中，训练器(trainer)会从训练流中进行持续学习，并周期性发布新模型给排序器(Ranker)。这对于机器学习来说，最终会形成一个紧的闭环，特征分布的变更，或者模型表现的变更都能被捕获，学到，并在后续得到修正。
 
-一个重要的考虑是，当使用实时训练数据生成系统进行试验时，需要构建保护机制来处理在线学习系统崩溃时引发的异常。给一个简单示例。由于某些数据基础设施的原因，点击流（click stream）过期了，那么online joiner将产生这样的数据：它具有非常小或近乎0的经验CTR（empirical CTR）。作为结果，该实时训练器会开始以非常低、或近乎0的点击概率来进行错误的预测。一个广告的期望值会自然的决策于估计的点击概率，不正确预测成非常低的CTR的一个结果是，系统会降低广告曝光数。异常检测机制在这里就很有用。例如，如果实时训练数据分布突然发生变更，你可以从online joiner上自动断开online trainer。
+一个重要的考虑是，**当使用实时训练数据生成系统进行试验时，需要构建保护机制来处理在线学习系统崩溃时引发的异常**。例如：由于某些数据基础设施的原因，点击流（click stream）过期了，那么online joiner将产生这样的数据：它具有非常小或近乎0的经验CTR（empirical CTR）。作为结果，该实时训练器会开始以非常低、或近乎0的点击概率来进行错误的预测。一个广告的期望值会自然的决策于估计的点击概率，不正确预测成非常低的CTR的一个结果是，系统会降低广告曝光数。**异常检测机制在这里就很有用。例如，如果实时训练数据分布突然发生变更，你可以从online joiner上自动断开online trainer**。
 
 # 5.内存与延迟
 
