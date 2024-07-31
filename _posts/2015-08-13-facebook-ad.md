@@ -151,15 +151,20 @@ $$
 
 前面的部分确定了训练数据中新鲜度会增加预测accuracy。同时也介绍了一个简单的模型架构，其中的线性分类器这一层是在线方式训练的。
 
-本部分介绍一个实验系统，它生成实时训练数据，通过online learning来训练线性分类器。我们将该系统看成是"online joiner"，因为它的临界操作(critical operation)是将labels(click/no-click)和训练输入(ad impressions)以在线方式join起来。相同的基础设施可以用于流式学习（stream learning），例如Google Advertising System[1]。该online joiner会输出一个实时的训练数据流到一个称为“Scribe”的基础设施上[10]。而positive labels(clicks)是定义良好的，它没有提供给用户"no click"按钮。出于该原因，如果用户看到该广告后，在一个确定的，足够长的时间周期上没有点击该广告，那么这次曝光(impression)可以认为是具有一个negative的no-click label。等待的时间窗口需要小心调节。
+本部分介绍一个实验系统，它生成实时训练数据，通过online learning来训练线性分类器。我们将该系统看成是"online joiner"，因为它的临界操作(critical operation)是将labels(click/no-click)和训练输入(ad impressions)以在线方式join起来。相同的基础设施可以用于流式学习（stream learning），例如Google Advertising System[1]。该online joiner会输出一个实时的训练数据流到一个称为“Scribe”的基础设施上[10]。而positive labels(clicks)是定义良好的，它没有提供给用户"no click"按钮。出于该原因，**如果用户看到该广告后，在一个确定、足够长的时间周期上没有点击该广告，那么这次曝光(impression)可以认为是具有一个negative的no-click label**。等待的时间窗口需要小心调节。
 
-使用太长的时间窗口(time window)，会延迟实时训练数据，并增加内存分配开销来缓存要等待点击信号的impressions。一个过短时间的时间窗口，会造成一些点击丢失，因为相应的impression可以会被冲掉，并当成no-clicked label来对待。这种负面影响称为"点击覆盖（click coverage）"，它是一个关于所有成功的clicks与impressions相join的一个分数。作为结果，online joiner系统必须在最新性（recency）和点击覆盖(click coverage)间做出一个平衡。
+- 太长的时间窗口(time window)：实时训练数据会延迟，并增加额外内存分配开销来缓存要等待点击信号的impressions。
+- 过短时间的时间窗口：会造成一些点击丢失，因为相应的impression可以会被冲掉，并当成no-clicked label来对待。这种负面影响称为"点击覆盖（click coverage）"，它是一个关于所有成功的clicks与impressions相join的一个分数。
+
+作为结果，online joiner系统必须在**最新性（recency）和点击覆盖(click coverage)**间做出一个平衡。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/2690e1913bdd887045dd1f8421526eab53a50a88e728362c8db884b52414804e85840142f49189e69f86501eda8f0af1?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;uin=402636034&amp;fname=4.jpg&amp;size=750">
 
 [图4]: Online Learning Data/Model Flows
 
-不具有完整的点击覆盖，意味着实时训练集是有偏差的(bias)：经验CTR(empirical CTR)会比ground truth要低。这是因为，一部分被标注为未点击（no-clicked）的曝光（impressions），如果等待时间足够长，会有可能会被标注成点击数据。实际上，我们会发现，在内存可控范围内，随着等待窗口的size的变大，很容易减小bias到小数范围内。另外，这种小的bias是可衡量和可纠正的。关于window size的研究可以见[6]。online joiner被设计成执行一个在ad impressions和ad clicks之间的分布式stream-to-stream join，使用一个请求ID(request ID)作为join的主键。每一时刻当一个用户在Facebook上执行一个动作时，都会生成一个请求ID，会触发新鲜的内容曝光给他们。图4展示了online joiner和online learning的数据和模型流。当用户访问Facebook时，会生成初始的数据流，会发起一个请求给ranker对候选广告进行排序。广告会被传给用户设备，并行的，每个广告、以及和它相关的用于ranking的features，会并行地添加到曝光流（impression stream）中。如果用户选择点击该广告， 那么该点击(click)会被添加到点击流中（click stream）。为了完成stream-to-stream join，系统会使用一个HashQueue，它包含了一个先入先出的队列（FIFO queue）作为一个缓存窗口；以及一个hashmap用于快速随机访问label曝光。一个HashQueue通常在kv-pair上具有三种类型的操作：enqueue, dequeue和lookup。例如，为了enqueue一个item，我们添加该item到一个队列的前面，并在hashmap中创建一个key，对应的值指向队列中的item。只有在完整的join窗口超期后(expired)，会触发一个标注的曝光(labelled impression)给训练流。如果没有点击join，它会触发一个negative的标注样本。
+不具有完整的点击覆盖，意味着实时训练集是有偏的(bias)：经验CTR(empirical CTR)会比ground truth要低。这是因为：一部分被标注为未点击（no-clicked）的曝光（impressions），如果等待时间足够长，会有可能会被标注成点击数据。实际上，我们会发现，**在内存可控范围内，随着等待窗口的size的变大，很容易减小bias到小数范围内**。另外，这种小的bias是可衡量和可纠正的。关于window size的研究可以见[6]。
+
+online joiner被设计成执行一个在ad impressions和ad clicks之间的分布式stream-to-stream join，使用一个请求ID(request ID)作为join的主键。**每一时刻当一个用户在Facebook上执行一个动作时，都会生成一个请求ID，会触发新鲜的内容曝光给他们。**图4展示了online joiner和online learning的数据和模型流。当用户访问Facebook时，会生成初始的数据流，会发起一个请求给ranker对候选广告进行排序。广告会被传给用户设备，并行的，每个广告、以及和它相关的用于ranking的features，会并行地添加到曝光流（impression stream）中。如果用户选择点击该广告， 那么该点击(click)会被添加到点击流中（click stream）。**为了完成stream-to-stream join，系统会使用一个HashQueue，它包含了一个先入先出的队列（FIFO queue）作为一个缓存窗口；以及一个hashmap用于快速随机访问label曝光**。一个HashQueue通常在kv-pair上具有三种类型的操作：enqueue, dequeue和lookup。例如，为了enqueue一个item，我们添加该item到一个队列的前面，并在hashmap中创建一个key，对应的值指向队列中的item。**只有在完整的join窗口超期后(expired)，会触发一个有标签的曝光(labeled impression)给训练流。如果没有点击join，它会触发一个negative的标注样本**。
 
 在该实验设置中，训练器(trainer)会从训练流中进行持续学习，并周期性发布新模型给排序器(Ranker)。这对于机器学习来说，最终会形成一个紧的闭环，特征分布的变更，或者模型表现的变更都能被捕获，学到，并在后续得到修正。
 
@@ -223,7 +228,7 @@ Boosting模型中使用的特征可以归类为两类：上下文型特征（con
 
 # 6.大规模训练数据
 
-Facebook的一整天的广告曝光数据是海量的。注意，我们不会展示实际数量。但一天的一定比例的数据可以有几百万的实例。一个常用的技术来控制训练开销是，减少训练数据的量。在本节中，我们评估了两种方法用于下采样：均均子抽样（uniform subsampling）和负下采样(negative down sampling)。在每个case上，我们会训练一个使用600棵树的boosted tree模型的集合，然后使用calibration和NE进行评估。
+Facebook的一整天的广告曝光数据是海量的。注意，我们不会展示实际数量。但一天的一定比例的数据可以有几百万的实例。一个控制训练开销的常用技术是：减少训练数据的量。在本节中，我们评估了两种方法用于下采样：**均匀子抽样（uniform subsampling）和负下采样(negative down sampling)**。在每个case上，我们会训练一个使用600棵树的boosted tree模型的集合，然后使用calibration和NE进行评估。
 
 ## 6.1 均匀子抽样
 
@@ -233,7 +238,7 @@ Facebook的一整天的广告曝光数据是海量的。注意，我们不会展
 
 图10: 数据量的实验结果。X轴表示训练实例数。y左表示calibration。y右表示NE.
 
-数据量及结果如图10. 它与我们的直觉相一致，越多的数据会导致更好的表现。再者，数据量展示了预测accuracy的回报会越来越少。通过使用10%的数据，NE只有在表现上，相较于整个训练数据集只有1%的减少。在该sampling rate上calibration几乎没有减少。
+数据量及结果如图10. 它与我们的直觉相一致，**越多的数据会导致更好的表现**。再者，数据量展示了预测accuracy的回报会越来越少。通过使用10%的数据，NE只有在表现上，相较于整个训练数据集只有1%的减少。在该sampling rate上calibration几乎没有减少。
 
 ## 6.2 负下采样
 
@@ -243,7 +248,7 @@ Facebook的一整天的广告曝光数据是海量的。注意，我们不会展
 
 图11: 负下采样的实验结果。X轴对应于不同的负下采样率。y左表示calibration，y右表示NE.
 
-从结果上看，我们可知，负下采样率在训练模型的表现上具有极大的提升。当负下采样率设置在0.025时具有最好的表现。
+从结果上看，我们可知，**负下采样率在训练模型的表现上具有极大的提升。当负下采样率设置在0.025时具有最好的表现**。
 
 ## 6.3 模型Re-Calibration
 
