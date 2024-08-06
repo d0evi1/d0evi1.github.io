@@ -143,6 +143,8 @@ $$
 
 为了清晰概述我们的CQE方法，我们在算法1中展示了算法伪代码。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/eebfd84416549ed41c86b7fe891157b0587925c2816d15cd194c62425af2577e41d443f1f760446d9741b35a9c50eb50?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=a1.jpg&amp;size=750">
+
 算法1
 
 **CQE模型的计算复杂度与传统的点估计方法相当**，仅因估计多个分位数而略有增加。在大规模推荐系统中，去重用户（unique user）和item的数量经常达到数亿甚至数十亿。这些用户和item通常由高维嵌入表示，这些嵌入使用它们各自的ID检索。相比之下，**有效估计所需的分位数数量通常在100左右**。因此，CQE的额外计算成本与处理大量特征所需的大量计算相比可以忽略不计。
