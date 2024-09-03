@@ -2,7 +2,7 @@
 layout: post
 title: google NLG Diversity & Quality介绍
 description: 
-modified: 2024-4-12
+modified: 2023-4-12
 tags: 
 ---
 
@@ -227,17 +227,15 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/95e5d362f86190e9d1407864e347d7d3d0b866d69b299d4cd0325ef3ceacd6c26116c19d365908d2b1fe155d9217a7e1?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=6.jpg&amp;size=750">
 
-图6
+图6 成对样本等对数似然度的人类判断分数。95%自举置信区间。虚线代表随机判断。对于所有解码策略，可以看出多样性的减少往往会导致被判断为更高质量的输出。
 
 其次，我们考虑固定提示条件下样本对数似然的分布，如图7所示。根据提示的不同，对数似然的分布也会有所不同。在选择性采样中，我们选择了一个单一的全局最大似然常数 $ \alpha $。对于某些提示，这几乎没有影响——几乎所有样本的似然度都低于截止值。对于其他提示，这可能消除了近一半的样本，只剩下质量较低的样本。这表明，对于所有提示使用固定的截止 $ \alpha $ 可能不是理想的。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/dd4362cee3abcc0b070471fb106fd388e9f8a1133f88ffa565d7bb4ab2b474444979234723a39b1e3495eb23f144e473?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=7.jpg&amp;size=750">
 
-图7
+图7 五个不同提示条件下样本对数似然度的分布。虚线表示实验中使用的截止值 $ \alpha $。
 
 基于先前的实验，我们发现解码算法及其超参数的选择对样本质量和多样性有显著影响。此外，我们发现样本质量和多样性可以相互交换，而且解码算法的优点需要在同等多样性水平上与其他算法进行比较。我们还提供了证据表明，自回归解码算法引入了超出促进高联合似然样本的额外偏好；这是一种有益的偏好，选择性采样并不共享。
-
-
 
 
 
