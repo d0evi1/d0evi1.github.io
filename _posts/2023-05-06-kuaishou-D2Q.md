@@ -137,7 +137,7 @@ $$
 
 ## 4.3 每个Duration Group估计Watch-time
 
-接着，我们描述了，如何使用来自所有duration groups的数据来拟合单个watch-time prediction模型。回顾下我们的设计有两部分：
+接着，我们描述了如何使用来自所有duration groups的数据来拟合单个watch-time prediction模型。回顾下我们的设计有两部分：
 
 - i) duration debiasing
 - ii) 参数共享
@@ -239,4 +239,4 @@ $$
 
 # 
 
-- 1.[https://arxiv.org/pdf/2306.01720.pdf](https://arxiv.org/pdf/2306.01720.pdf)
+- 1.[https://arxiv.org/pdf/2206.06003](https://arxiv.org/pdf/2206.06003)
