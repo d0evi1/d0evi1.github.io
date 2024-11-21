@@ -222,7 +222,7 @@ TPM的目标函数由三个部分组成：
 最终的目标函数是三个部分的加权和：
 
 $$ 
-\max.L = \alpha_1 \log(𝑝(𝑇ˆ ∈ 𝑙𝑘(𝑇)|𝑋, T)) - \alpha_2 \text{Var}(𝑇ˆ|𝑋, T)^{0.5} - \alpha_3 \|\mathbb{E}(𝑇ˆ) - 𝑇\|^2 \quad (5) 
+\max.L = \alpha_1 \log(𝑝( \hat{𝑇} ∈ 𝑙𝑘(𝑇)|𝑋, T)) - \alpha_2 \text{Var}( \hat{𝑇} |𝑋, T)^{0.5} - \alpha_3 \|\mathbb{E}(\hat{𝑇}) - 𝑇\|^2 \quad (5) 
 $$
 
 训练过程在算法1中有说明。
