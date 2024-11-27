@@ -8,11 +8,12 @@ tags:
 
 # 介绍
 
-facebook在2019在《Deep Learning Recommendation Model for Personalization and Recommendation Systems》提出了DLRM，之后在2022《Software-Hardware Co-design for Fast and Scalable Training of Deep Learning Recommendation Models》又给出了DLRM的工程实现。我们来看一下：
+字节在《Monolith: Real Time Recommendation System With Collisionless Embedding Table》提出了它们的embedding table实现。
 
 # 摘要
 
-深度学习推荐模型（DLRMs）在Meta的许多关键业务服务中得到应用，并且是其数据中心基础设施需求方面最大的AI应用。在本文中，我们介绍了Neo，这是一个软硬件共同设计的系统，用于大规模DLRMs的高性能分布式训练。Neo采用了一种新颖的4D并行策略，它结合了表格级（table-wise）、行级（row-wise）、列级（column-wise）和数据并行化（data parallelism），用于训练DLRMs中的大规模嵌入操作（massive embedding operators）。此外，Neo通过包括混合内核融合、软件管理缓存和质量保持压缩在内的多种关键系统优化，实现了极高性能和内存效率的嵌入计算。最后，Neo与ZionEX配对，ZionEX是一个新的硬件平台，与Neo的4D并行策略共同设计，用于优化大规模DLRM训练的通信。我们在128个GPU上使用16个ZionEX节点的评估表明，Neo在训练已部署生产的12万亿参数DLRM模型方面，性能超过了现有系统高达40倍。
+对于许多依赖于时间敏感客户反馈的业务来说，构建一个可扩展且实时的推荐系统至关重要，例如短视频排名或在线广告。尽管像TensorFlow或PyTorch这样的生产规模深度学习框架被广泛采用，但这些通用框架在推荐场景中的业务需求方面存在多种不足：一方面，基于静态参数和密集计算调整系统对于具有动态和稀疏特征的推荐是不利的；另一方面，这些框架设计时将批量训练阶段和服务阶段完全分离，阻止了模型与客户反馈实时互动。这些问题促使我们重新审视传统方法并探索根本不同的设计选择。在本文中，我们介绍了Monolith1，一个为在线训练量身定制的系统。我们的设计理念受到了我们的应用工作负载和生产环境的观察，这与其他推荐系统有明显的不同。我们的贡献是多方面的：首先，我们制作了一个无冲突的嵌入表，并进行了诸如可过期嵌入和频率过滤等优化以减少其内存占用；其次，我们提供了一个具有高容错性的生产就绪在线训练架构；最后，我们证明了系统可靠性可以与实时学习进行权衡。Monolith已成功应用于BytePlus Recommend2产品中。
+
 
 # 1 引言
 
@@ -255,5 +256,4 @@ Monolith构建了无缝切换批量训练和在线训练的能力。这是通过
 
 # 参考
 
-- 1.[Software-Hardware Co-design for Fast and Scalable Training of
-Deep Learning Recommendation Models](https://arxiv.org/pdf/2104.05158)
+- 1.[https://arxiv.org/pdf/2209.07663](https://arxiv.org/pdf/2209.07663)
