@@ -1,8 +1,8 @@
 ---
 layout: post
-title: facebook DLRM介绍
+title: meta DLRM工程实现介绍
 description: 
-modified: 2019-11-01
+modified: 2023-11-01
 tags: 
 ---
 
