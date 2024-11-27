@@ -1,6 +1,6 @@
 ---
 layout: post
-title: meta DLRM工程实现介绍
+title: 字节Monolith embedding table介绍
 description: 
 modified: 2023-11-01
 tags: 
