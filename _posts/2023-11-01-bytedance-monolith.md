@@ -195,7 +195,9 @@ training PS中更新的参数将根据参数同步计划推送到serving PS。
 - 嵌入表的原始ID空间是$2^{48}$。在我们的基线中，我们应用了一种哈希技巧，通过分解来限制嵌入表的大小。具体来说，我们使用两个较小的嵌入表而不是一个巨大的表来为每个ID生成一个唯一的嵌入，通过向量组合：
 
 $$ 
-\mathbf{E}_{\text{lr}} = \mathbf{E}_{\text{l}} + \mathbf{E}_{\text{q}},
+ID_r = ID\  \% \ 2^{24} \\
+ID_q = ID\ / \ 2^{24} \\
+E = \mathbf{E}_{\text{l}} + \mathbf{E}_{\text{q}}
 $$
 
 其中：
@@ -239,9 +241,9 @@ $$
 
 ### 3.2.2 在线训练：
 
-实时性与可靠性的权衡。我们发现，更高的参数同步频率总是有助于提高在线服务AUC，并且在线服务模型对PS（Parameter Server）部分数据丢失的容忍度超出我们的预期。
+实时性与可靠性的权衡。我们发现，**更高的参数同步频率总是有助于提高在线服务AUC**，并且在线服务模型对PS（Parameter Server）部分数据丢失的容忍度超出我们的预期。
 
-（1）参数同步频率的影响。在我们使用Criteo Display Ads Challenge数据集进行的在线流式训练实验中，模型质量随着参数同步频率的增加而持续提高，这可以从两个角度明显看出：
+（1）**参数同步频率的影响**。在我们使用Criteo Display Ads Challenge数据集进行的在线流式训练实验中，模型质量随着参数同步频率的增加而持续提高，这可以从两个角度明显看出：
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/8a8de4bcdcc20988a5757fd257702ccd48e5268b49b3f96a82a2366041991144d7e949dfbb1004f9d8295e292c9356a0?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=9.jpg&amp;size=750">
 
