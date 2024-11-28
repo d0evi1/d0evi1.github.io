@@ -192,7 +192,7 @@ training PS中更新的参数将根据参数同步计划推送到serving PS。
 (2) 内部推荐数据集。我们还在生产环境中的推荐模型上进行了实验。这个模型通常遵循**多塔架构**，每个塔负责学习预测一种专门的用户行为。
 
 - 每个模型大约有1000个嵌入表，嵌入表的大小分布非常不均匀；
-- 嵌入表的原始ID空间是2^48。在我们的基线中，我们应用了一种哈希技巧，通过分解来限制嵌入表的大小。具体来说，我们使用两个较小的嵌入表而不是一个巨大的表来为每个ID生成一个唯一的嵌入，通过向量组合：
+- 嵌入表的原始ID空间是$2^{48}$。在我们的基线中，我们应用了一种哈希技巧，通过分解来限制嵌入表的大小。具体来说，我们使用两个较小的嵌入表而不是一个巨大的表来为每个ID生成一个唯一的嵌入，通过向量组合：
 
 $$ 
 \mathbf{E}_{\text{lr}} = \mathbf{E}_{\text{l}} + \mathbf{E}_{\text{q}},
@@ -200,7 +200,7 @@ $$
 
 其中：
 
-- $\mathbf{E}_{\text{l}}$, $\mathbf{E}_{\text{q}}$ ：分别对应于 $\mathbf{I}_{\text{l}}$, $\mathbf{I}_{\text{q}}$ 的嵌入。
+- $E_l$, $E_q$ ：分别对应于 $I_l$, $I_q$ 的嵌入。
 
 这有效地将嵌入表的大小从$2^{48}$减少到$2^{25}$；
 
@@ -224,7 +224,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/9072c4912073aba1d51d3be90bac30aceff58887ba854d12dcc565508cf918b6f6bd2a92995788305cabea92a7922326?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=7.jpg&amp;size=750">
 
-图7
+图7 DeepFM模型在MovieLens数据集上的embedding冲突的效果
 
 （1）无冲突哈希表的模型始终优于有冲突的模型。这一结论无论在以下情况下都成立：
 
@@ -233,7 +233,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/8857c27fbfb4e18713a26a652eda2e1443eb782d643613eed6b40182b3f8fc5f4237770133225b8ea7472cc5e028e8c9?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=8.jpg&amp;size=750">
 
-图8
+图8 在生产环境下推荐模型的embedding冲突效果
 
 （2）由无冲突嵌入表引起的数据稀疏性不会导致模型过拟合。如图7所示，无冲突嵌入表的模型在收敛后不会过拟合。
 
@@ -245,14 +245,14 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/8a8de4bcdcc20988a5757fd257702ccd48e5268b49b3f96a82a2366041991144d7e949dfbb1004f9d8295e292c9356a0?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=9.jpg&amp;size=750">
 
-图9
+图9 在Criteo数据集上Online training vs. Batch training，蓝线：online training模型的AUC；黄线：batch training模型的AUC
 
 - 进行在线训练的模型比没有进行在线训练的模型表现更好。图9a、9b、9c比较了在线训练模型按后续数据片段评估的AUC与批量训练模型按每个数据片段评估的AUC；
 - 参数同步间隔较小的模型比间隔较大的模型表现更好。图10和表2比较了同步间隔为5小时、1小时和30分钟的模型的在线服务AUC。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a32e94682ea7e4bc861d95d7ef8ab3ee378b8945eca9d2fe3b7ac531ceb27f70edb882f38ebb427d7fc0e5ed1fa2d1f9?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=10.jpg&amp;size=750">
 
-图10
+图10 online training中不同同步间隔的比较
 
 在生产环境中，在线训练与批量训练的实时A/B实验也显示在线服务AUC有显著提升（表3）。
 
