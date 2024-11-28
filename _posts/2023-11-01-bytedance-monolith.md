@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 字节Monolith embedding table介绍
+title: 字节Monolith介绍
 description: 
 modified: 2023-11-01
 tags: 
