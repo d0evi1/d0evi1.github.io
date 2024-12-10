@@ -89,13 +89,20 @@ Recommendation at Pinterest》提出了它们的排序模型。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/4d43f7e4c6a42696407e6f715e0e52a5e62b187b5776fe95fcb15e57010aab015a11bc9d66bf80d24ffa30ebbfb064ae?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 Pinterest Homefeed ranking model (Pinnability)
 
-每个训练样本是 $ (x, y) $，其中 $ x $ 表示一组特征，$ y \in \{0, 1\}^{|H|} $。$ y $ 中的每个条目对应于 $ H $ 中动作头的标签。Pinnability的损失函数是一个加权交叉熵损失，旨在优化多标签分类任务。我们将损失函数公式化为：
+每个训练样本是 (x, y)，其中:
+
+- x 表示一组特征，
+- $ y \in \{0, 1\}^{ \mid H \mid} $，y中的每个条目对应于H中动作头的label。
+
+Pinnability的loss函数是一个加权交叉熵损失，旨在优化多标签分类任务。我们将损失函数公式化为：
 
 $$ 
 L = w_u \sum_{h \in H} \left\{ -w_h [y_h \log f(x)_h + (1 - y_h) (1 - \log f(x)_h)] \right\} 
 $$
+
+...(1)
 
 其中：
 
