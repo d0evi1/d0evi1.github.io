@@ -88,28 +88,40 @@ CREAD框架，如图2 所示，包括三个模块，即离散化、分类和恢�
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c48655d9ecaa8c8f872bd5e2a22df327b7e12793713228fdd3b641b47c5fe6d026b4fe3987dca0a6ba09de3d6dd4d3c9?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 CREAD框架
 
-离散化 这个模块是一个独立的预处理模块，与训练和评估过程无关。它根据数据分布获得阈值 $\{t_m\}_{m=1}^{M-1}$，并将目标域 $Y$ 分割成 $M$ 个不重叠的桶 $D \equiv \{d_m = [t_{m-1}, t_m)\}^M_{m=1}$。这些桶用于将观看时间 $y$ 转换为 $m$ 个离散标签：
+**离散化（Discretization）** 
+
+这个模块是一个独立的预处理模块，与训练和评估过程无关。它根据数据分布获得阈值 $\{t_m\}_{m=1}^{M-1}$，并将目标域 $Y$ 分割成 $M$ 个不重叠的桶 $D \equiv \{d_m = [t_{m-1}, t_m)\}^M_{m=1}$。这些桶用于将观看时间 $y$ 转换为 $m$ 个离散标签：
 
 $$ 
 y_m = 1(y > t_m). \quad (1) 
 $$
 
-离散化策略对预测精度至关重要，我们将在第 4.3 节详细讨论。
+**离散化策略对预测精度至关重要**，我们将在第 4.3 节详细讨论。
 
-分类 训练 $M$ 个分类器来预测观看时间 $y$ 是否大于第 $m$ 个阈值 $t_m$，即方程 (1) 中的 $y_m$，并输出一系列概率：
+**分类（Classification）** 
+
+训练 $M$ 个分类器来**预测观看时间 $y$ 是否大于第 $m$ 个阈值 $t_m$**，即方程 (1) 中的 $y_m$，并输出一系列概率：
 
 $$ 
-\hat{\phi}_m(x_i; \Theta_m) = P(y > t_m | x_i), \quad 1 \leq i \leq N. \quad (2) 
+\widehat{\phi}_m(x_i; \Theta_m) = P(y > t_m | x_i), \quad 1 \leq i \leq N. \quad (2) 
 $$
 
 分类器是具有可学习参数 $\Theta_m$ 的神经网络。我们在第 3.2 节介绍如何训练这些模型。
 
-恢复 给定 $\{\hat{\phi}_m\}^M_{m=1}$，我们能够恢复预测的观看时间。恢复基于以下期望的事实：
+**恢复（Restoration）** 
+
+给定 $\lbrace \widehat{\phi}_m \rbrace^M_{m=1}$，我们能够恢复预测的观看时间。恢复基于以下期望的事实：
 
 $$ 
-E(y | x_i) = \int_{t=0}^{t_M} tP(y = t | x_i)dt = \int_{t=0}^{t_M} P(y > t | x_i)dt \approx \sum_{m=1}^M P(y > t_m | x_i) (t_m - t_{m-1}). \quad (3) 
+\begin{align}
+E(y | x_i) & = \int_{t=0}^{t_M} tP(y = t | x_i)dt \\
+& = \int_{t=0}^{t_M} P(y > t | x_i)dt \\
+& \approx \sum_{m=1}^M P(y > t_m | x_i) (t_m - t_{m-1}).
+\end{align} 
+
+\quad (3) 
 $$
 
 根据方程 (2) 中的 $\hat{\phi}_m$ 的定义，我们可以从这些离散预测 $\hat{\phi}_m$ 重建预测的观看时间：
