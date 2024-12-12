@@ -187,13 +187,18 @@ $$
 
 ## 4.1 离散化误差的分解
 
-假设：训练数据集 $\lbrace (x_i, y_i)\rbrace^N_{i=1} \sim \mu(x, y) = \mu(x)\mu(y|x)$ 是独立同分布的。设：
+假设：训练数据集 $\lbrace (x_i, y_i)\rbrace^N_{i=1} \sim \mu(x, y) = \mu(x)\mu(y \mid x)$ 是独立同分布的。设：
 
 - $p_m(x) = P(y \in d_m \mid x)$： 表示标签 $y$ 属于第 $m$ 个桶 $d_m$ 给定 $x$ 的概率。
 - $v_m(x) = E(y \mid x, y \in d_m)$： 是样本 $x$ 的观看时间的期望值，假设它属于第 $m$ 个桶。
 - $w_m = E_{x \sim \mu(x)}v_m(x)$： 表示区间 $d_m$ 中观看时间的期望值
 
-我们添加帽子上标来表示预测值，例如，$\widehat{p}_m(x)$ 作为 $p_m(x)$ 的预测，$\widehat{w}_m$ 作为 $w_m$ 的预测。然后我们可以将观看时间表示为：
+我们添加帽子上标来表示预测值，例如：
+
+- $\widehat{p}_m(x)$ 作为 $p_m(x)$ 的预测
+- $\widehat{w}_m$ 作为 $w_m$ 的预测。
+
+然后我们可以将观看时间表示为：
 
 $$ 
 \widehat{y} = \sum_m \widehat{p}_m(x) \widehat{w}_m. 
