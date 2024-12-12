@@ -204,26 +204,37 @@ $$
 \widehat{y} = \sum_m \widehat{p}_m(x) \widehat{w}_m. 
 $$
 
-注意，这种形式等同于方程 (4) 中的累积形式，其中 $\widehat{p}_m = \widehat{\phi}_m - \widehat{\phi}_{m-1}$。
+注意，这种形式等同于方程 (4) 中的累积形式，其中：
 
-现在我们的目标是估计预测观看时间 $\widehat{y}$ 和真实值 $y$ 之间的误差界限。为了实现这一点，我们首先提供一个误差分解：
+$$
+\widehat{p}_m = \widehat{\phi}_m - \widehat{\phi}_{m-1}
+$$
+
+现在我们的目标是：估计预测观看时间 $\widehat{y}$ 和真实值 $y$ 之间的误差界限。为了实现这一点，我们首先提供一个误差分解：
 
 引理 4.1。假设 $\widehat{p}_m(x)$ 和 $\widehat{w}_m$ 分别是 $p_m(x)$ 和 $w_m$ 的无偏估计，我们有：
 
 $$ 
-E(\widehat{y} - y)^2 = V_p + V_w + V_b + V_y, 
+E(\widehat{y} - y)^2 = V_p + V_w + V_b + V_y,
 $$
+...（9）
+
 
 其中:
 
-$$ V_p = \text{Ex}[\text{Ep}^{\widehat{}}\widehat{E}_w^{\widehat{}}\sum_m (\widehat{p}_m(x) - p_m(x)) \widehat{w}_m]^2, $$
+$$ V_p = E_x[E_{\widehat{p}}E_{\widehat{w}}\sum_m (\widehat{p}_m(x) - p_m(x)) \widehat{w}_m]^2, $$
 
-$$ V_w = \text{Ex}[\text{Ew}^{\widehat{}}\sum_m p_m(x) (\widehat{w}_m - w_m)]^2, $$
+$$ V_w = E_x[E_{\widehat{w}}\sum_m p_m(x) (\widehat{w}_m - w_m)]^2, $$
 
-$$ V_b = \text{Ex}[\sum_m p_m(x) (w_m - v_m(x))^2], $$
-$$ V_y = \text{Ex},y[\sum_m p_m(x)v_m(x) - y]^2. $$
+$$ V_b = E_x[\sum_m p_m(x) (w_m - v_m(x))^2], $$
+$$ V_y = E_{x,y}[\sum_m p_m(x)v_m(x) - y]^2. $$
 
-详细证明请参见附录 A。直观上，$V_p$ 由学习误差决定，即 $y$ 落入每个桶的概率 $p_m(x)$。$V_w$ 描述了学习误差对代表性值 $\widehat{w}_m$ 的影响，$V_b$ 是由离散化重建观看时间引起的误差，$V_y$ 是观看时间 $y$ 的内在方差。
+详细证明请参见附录 A。直观上，
+
+- $V_p$ 由学习误差决定，即 $y$ 落入每个桶的概率 $p_m(x)$。
+- $V_w$ 描述了学习误差对代表性值 $\widehat{w}_m$ 的影响，
+- $V_b$ 是由离散化重建观看时间引起的误差，
+- $V_y$ 是观看时间 $y$ 的内在方差。
 
 两个预测误差 $V_p$ 和 $V_w$ 受到学习算法误差的影响。因此，这两个误差项对应于学习误差。相比之下，$V_b$ 对应于与具体学习算法无关的恢复误差。最后，$V_y$ 与学习或离散化过程无关，后续不再讨论。
 
@@ -233,19 +244,19 @@ $$ V_y = \text{Ex},y[\sum_m p_m(x)v_m(x) - y]^2. $$
 
 定理 4.2。假设输入 $x$ 从有限集合 $X$ 中采样。此外，假设 $\widehat{p}_m(x)$，$x \in X$ 和 $\widehat{w}_m$ 从最大似然估计中获得。此外，假设 $\mu(x, y)$ 具有有界的二阶偏导数。那么我们有：
 
-$$ V_p \leq V_p \equiv C_p |X|/N \cdot A_p(D), $$
-$$ V_w \leq V_w \equiv C_w/N \cdot A_w(D), $$
-$$ V_b \leq V_b \equiv C_b \cdot A_b(D), $$
+$$ V_p \leq V_p \triangleq \frac{C_p |X|}{N} \cdot A_p(D), $$
+$$ V_w \leq V_w \triangleq \frac{C_w}{N} \cdot A_w(D), $$
+$$ V_b \leq V_b \triangleq C_b \cdot A_b(D), $$
 
 其中 $C_p$，$C_w$ 和 $C_b$ 是与离散化 $D$ 无关的常数，$A_p$，$A_w$，$A_b$ 是 $D$ 的函数：
 
-$$ A_p(D) = ME_y^{\Psi}(y^2), $$
-$$ A_w(D) = \sum_{m \in M} [\Psi(t_m) - \Psi(t_{m-1})]^2 \cdot \frac{\sum_{m \in M} (t_m - t_{m-1})^2}{\Psi(t_m) - \Psi(t_{m-1})}, $$
-$$ A_b(D) = \sum_{m \in M} [\Psi(t_m) - \Psi(t_{m-1})]^2 \cdot \frac{\sum_{m \in M} (t_m - t_{m-1})^2}{1}, $$
+$$ A_p(D) = M E_{y \sim {\Psi}} y^2, $$
+$$ A_w(D) = \sum_{m \in M} [\Psi(t_m) - \Psi(t_{m-1})]^2 \cdot \sum_{m \in M} \frac{(t_m - t_{m-1})^2}{\Psi(t_m) - \Psi(t_{m-1})}, $$
+$$ A_b(D) = \sum_{m \in M} [\Psi(t_m) - \Psi(t_{m-1})]^2 \cdot \sum_{m \in M} (t_m - t_{m-1})^2, $$
 
 其中 $\Psi$ 是观看时间 $y$ 的累积分布函数（CDF）：
 
-$$ \Psi(t) \equiv P\{y \leq t\} = \text{Ex} \int_0^t \mu(y|x)dy. $$
+$$ \Psi(t) \triangleq P\{y \leq t\} = E_x \int_0^t \mu(y|x)dy. $$
 
 证明。见附录 B。
 
