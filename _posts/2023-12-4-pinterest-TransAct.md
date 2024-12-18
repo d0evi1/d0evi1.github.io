@@ -167,7 +167,7 @@ $$
 - append：将候选Pin的PinSage embedding附加到用户行为序列作为序列的最后一项，类似于BST[4]。**使用零向量作为候选Pin的虚拟动作类型**。
 - concat：对于用户行为序列中的每个动作，将候选Pin的PinSage embedding与用户行为特征连接起来。
 
-我们根据离线实验结果选择concat作为我们的早期融合方法。早期融合的结果序列特征是：一个2维矩阵 $ U \in \mathbb{R}^{\mid S \mid \times d} $，其中 $ d = (d_{action} + 2d_{PinSage}) $。
+我们根据离线实验结果**选择concat作为我们的早期融合方法**。早期融合的结果序列特征是：一个2维矩阵 $ U \in \mathbb{R}^{\mid S \mid \times d} $，其中 $ d = (d_{action} + 2d_{PinSage}) $。
 
 ### 3.3.3 序列聚合模型
 
