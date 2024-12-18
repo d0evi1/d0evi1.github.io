@@ -158,17 +158,19 @@ $$
 
 为了纳入这一重要信息，我们使用可训练的嵌入表将行动类型投影到低维向量。用户行为类型序列随后被投影到用户行为嵌入矩阵 $ W_{\text{actions}} \in \mathbb{R}^{\mid S \mid \times d_{\text{action}}} $，其中 $ d_{\text{action}} $ 是行动类型嵌入的维度。
 
-如前所述，用户行为序列中的Pin内容由PinSage嵌入[38]表示。因此，用户行为序列中所有Pin的内容是一个矩阵 $ W_{\text{pins}} \in \mathbb{R}^{\mid S \mid \times d_{\text{PinSage}}} $。最终编码的用户行为序列特征是$CONCAT (W_{actions}, W_{pins}) \in \mathbb{R}^{\mid S \mid \times (d_{PinSage} + d_{action}}) $。
+如前所述，用户行为序列中的Pin内容由PinSage嵌入[38]表示。因此，用户行为序列中所有Pin的内容是一个矩阵 $ W_{\text{pins}} \in \mathbb{R}^{\mid S \mid \times d_{\text{PinSage}}} $。最终编码的用户行为序列特征是$CONCAT (W_{actions} \ , W_{pins}) \in \mathbb{R}^{\mid S \mid \times (d_{PinSage} + d_{action})} $。
 
-### 3.3.2 早期融合
+### 3.3.2 早期融合（early fusion）
 
-直接在排序模型中使用用户行为序列特征的一个独特优势是，我们可以显式地建模候选Pin和用户参与的Pin之间的交互。早期融合在推荐任务中指的是在推荐模型的早期阶段合并用户和物品特征。通过实验，我们发现早期融合是提高排序性能的重要因素。评估了两种早期融合方法：
-- append：将候选Pin的PinSage嵌入附加到用户行为序列作为序列的最后一项，类似于BST[4]。使用零向量作为候选Pin的虚拟动作类型。
-- concat：对于用户行为序列中的每个动作，将候选Pin的PinSage嵌入与用户行为特征连接起来。
+直接在排序模型中使用用户行为序列特征的一个独特优势是，我们可以**显式地建模候选Pin和用户参与的Pin之间的交叉**。早期融合（early fusion）在推荐任务中指的是在推荐模型的早期阶段合并用户和物品特征。通过实验，我们发现早期融合是提高排序性能的重要因素。评估了两种早期融合方法：
 
-我们根据离线实验结果选择concat作为我们的早期融合方法。早期融合的结果序列特征是一个2维矩阵 $ U \in \mathbb{R}^{|S| \times d} $，其中 $ d = (d_{\text{action}} + 2d_{\text{PinSage}}) $。
+- append：将候选Pin的PinSage embedding附加到用户行为序列作为序列的最后一项，类似于BST[4]。**使用零向量作为候选Pin的虚拟动作类型**。
+- concat：对于用户行为序列中的每个动作，将候选Pin的PinSage embedding与用户行为特征连接起来。
+
+我们根据离线实验结果选择concat作为我们的早期融合方法。早期融合的结果序列特征是：一个2维矩阵 $ U \in \mathbb{R}^{\mid S \mid \times d} $，其中 $ d = (d_{action} + 2d_{PinSage}) $。
 
 ### 3.3.3 序列聚合模型
+
 准备好用户行为序列特征 $ U $ 后，下一个挑战是有效地聚合用户行为序列中的所有信息以表示用户的短期偏好。工业中用于序列建模的一些流行模型架构包括CNN[40]、RNN[25]和最近的transformer[33]等。我们尝试了不同的序列聚合架构，并选择了基于transformer的架构。我们采用了标准transformer编码器，有2个编码器层和一个头。前馈网络的隐藏维度表示为 $ d_{\text{hidden}} $。这里不使用位置编码，因为我们的离线实验表明位置信息是无效的。
 
 ### 3.3.4 随机时间窗口掩码
