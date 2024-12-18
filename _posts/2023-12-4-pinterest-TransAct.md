@@ -179,7 +179,7 @@ $$
 
 ### 3.3.5 transformer输出压缩
 
-transformer编码器的输出是一个矩阵：$ O = (o_0 : o_{\mid S \mid -1}) \in \mathbb{R}^{|S| \times d} $。我们只取前K列（$ o_0 : o_{K-1} $），将它们与最大池化向量 $ \text{MAXPOOL}(O) \in \mathbb{R}^d $ 连接起来，然后将其展平为一个向量 $ \mathbf{z} \in \mathbb{R}^{(K+1) \times d} $。前 $ K $ 列输出捕获了用户最近的兴趣，而 $ \text{MAXPOOL}(O) $ 表示用户对 $ S(u) $ 的长期偏好。由于输出足够紧凑，它可以很容易地使用DCN v2[35]特征交叉层集成到Pinnability框架中。
+transformer编码器的输出是一个矩阵：$ O = (o_0 : o_{\mid S \mid -1}) \in \mathbb{R}^{\mid S \mid \times d} $。我们只取前K列（$ o_0 : o_{K-1} $），将它们与最大池化向量 $ \text{MAXPOOL}(O) \in \mathbb{R}^d $ 连接起来，然后将其展平为一个向量 $ \mathbf{z} \in \mathbb{R}^{(K+1) \times d} $。前 $ K $ 列输出捕获了用户最近的兴趣，而 $ \text{MAXPOOL}(O) $ 表示用户对 $ S(u) $ 的长期偏好。由于输出足够紧凑，它可以很容易地使用DCN v2[35]特征交叉层集成到Pinnability框架中。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/1142f09da6e3bdb2d8497ad46297b72a030c4de4c8f28bde2f850680483ca0f08393b6ccfbb29f7b69e60d7f7f3725b9?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
 
