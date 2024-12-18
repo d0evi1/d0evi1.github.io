@@ -167,23 +167,23 @@ $$
 - append：将候选Pin的PinSage embedding附加到用户行为序列作为序列的最后一项，类似于BST[4]。**使用零向量作为候选Pin的虚拟动作类型**。
 - concat：对于用户行为序列中的每个动作，将候选Pin的PinSage embedding与用户行为特征连接起来。
 
-我们根据离线实验结果**选择concat作为我们的早期融合方法**。早期融合的结果序列特征是：一个2维矩阵 $ U \in \mathbb{R}^{\mid S \mid \times d} $，其中 $ d = (d_{action} + 2d_{PinSage}) $。
+我们根据离线实验结果**选择concat作为我们的早期融合方法**。早期融合的结果序列特征是：一个2维矩阵 $ U \in \mathbb{R}^{\mid S \mid \times d} $，其中 $ d = (d_{\ action} \ + 2d_{\ PinSage}) $。
 
 ### 3.3.3 序列聚合模型
 
-准备好用户行为序列特征 $ U $ 后，下一个挑战是有效地聚合用户行为序列中的所有信息以表示用户的短期偏好。工业中用于序列建模的一些流行模型架构包括CNN[40]、RNN[25]和最近的transformer[33]等。我们尝试了不同的序列聚合架构，并选择了基于transformer的架构。我们采用了标准transformer编码器，有2个编码器层和一个头。前馈网络的隐藏维度表示为 $ d_{\text{hidden}} $。这里不使用位置编码，因为我们的离线实验表明位置信息是无效的。
+准备好用户行为序列特征 $ U $ 后，下一个挑战是：**有效地聚合用户行为序列中的所有信息以表示用户的短期偏好**。工业中用于序列建模的一些流行模型架构包括CNN[40]、RNN[25]和最近的transformer[33]等。我们尝试了不同的序列聚合架构，并选择了基于transformer的架构。我们采用了标准transformer编码器，有2个编码器层和一个头。前馈网络的隐藏维度表示为 $ d_{\text{hidden}} $。这里不使用位置编码，因为我们的离线实验表明位置信息是无效的。
 
 ### 3.3.4 随机时间窗口掩码
 
-在用户的所有最近行为上训练可能会导致兔子洞效应，即模型推荐与用户最近参与内容相似的内容。这会损害用户Homefeed的多样性，对长期用户留存有害。为了解决这个问题，我们使用用户行为序列的时间戳构建transformer编码器的时间窗口掩码。该掩码在自注意力机制应用之前过滤掉输入序列中的某些位置。在每次前向传递中，从0到24小时均匀采样一个随机时间窗口 $ T $。在 $ (t_{\text{request}} - T, t_{\text{request}}) $ 内的所有行为都被掩码，其中 $ t_{\text{request}} $ 代表接收排序请求的时间戳。重要的是要注意，随机时间窗口掩码仅在训练期间应用，而在推理时不使用掩码。
+在用户的所有最近行为上训练可能会导致**兔子洞效应（rabbit hole effect）**，即模型推荐与用户最近参与内容相似的内容。这会损害用户Homefeed的多样性，对长期用户留存有害。为了解决这个问题，我们使用用户行为序列的时间戳构建transformer编码器的时间窗口掩码。该掩码在自注意力机制应用之前过滤掉输入序列中的某些位置。在每次前向传递中，从0到24小时均匀采样一个随机时间窗口 $ T $。**在 $ (t_{\text{request}} - T, t_{\text{request}}) $ 内的所有行为都被掩码，其中 $ t_{\text{request}} $ 代表接收排序请求的时间戳**。重要的是要注意，随机时间窗口掩码仅在训练期间应用，而在推理时不使用掩码。
 
 ### 3.3.5 transformer输出压缩
 
-transformer编码器的输出是一个矩阵 $ O = (o_0 : o_{|S|-1}) \in \mathbb{R}^{|S| \times d} $。我们只取前 $ K $ 列（$ o_0 : o_{K-1} $），将它们与最大池化向量 $ \text{MAXPOOL}(O) \in \mathbb{R}^d $ 连接起来，然后将其展平为一个向量 $ \mathbf{z} \in \mathbb{R}^{(K+1) \times d} $。前 $ K $ 列输出捕获了用户最近的兴趣，而 $ \text{MAXPOOL}(O) $ 表示用户对 $ S(u) $ 的长期偏好。由于输出足够紧凑，它可以很容易地使用DCN v2[35]特征交叉层集成到Pinnability框架中。
+transformer编码器的输出是一个矩阵：$ O = (o_0 : o_{\mid S \mid -1}) \in \mathbb{R}^{|S| \times d} $。我们只取前K列（$ o_0 : o_{K-1} $），将它们与最大池化向量 $ \text{MAXPOOL}(O) \in \mathbb{R}^d $ 连接起来，然后将其展平为一个向量 $ \mathbf{z} \in \mathbb{R}^{(K+1) \times d} $。前 $ K $ 列输出捕获了用户最近的兴趣，而 $ \text{MAXPOOL}(O) $ 表示用户对 $ S(u) $ 的长期偏好。由于输出足够紧凑，它可以很容易地使用DCN v2[35]特征交叉层集成到Pinnability框架中。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/1142f09da6e3bdb2d8497ad46297b72a030c4de4c8f28bde2f850680483ca0f08393b6ccfbb29f7b69e60d7f7f3725b9?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
 
-图3
+图3 TransAct架构是一种可以插入到任何类似架构中的子模块，比如Pinnability。
 
 ## 3.4 模型产品化
 
