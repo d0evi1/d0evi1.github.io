@@ -79,12 +79,15 @@ $$
 
 对于所有的 $t$，汤普森采样以近似后验分布 $P_t(\rho \in \cdot)$ 和之前的观察 $O_t$ 作为输入，并产生动作 $A_t$。回想一下，$\rho$ 是决定我们上下文bandit环境中观察的概率度量。以下伪代码抽象地描述了汤普森采样：
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/81067ed5e01fadfdd722d16b50aecd9026ffd32b2e36aa3b2db9e6b0fed43ec43ae1debd986efdf571b78e113e5f073e?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t1.jpg&amp;size=750">
+
+算法1
+
 因此，近似汤普森采样方法在以下两个方面有所不同：
 
 1) 如何指定近似先验分布 $P_0(\cdot)$；
 2) 如何近似贝叶斯更新。虽然简化假设，如独立的Beta先验/后验分布，可能允许精确的贝叶斯更新，但它们在无法考虑用户上下文 $\theta_t$ 和item特征 $V_t$ 中存在的信息方面受到极大的限制。
 
-```markdown
 # 5 使用Epinet的近似汤普森采样
 
 在本节中，我们介绍了我们的方法，该方法利用Epinet[22]在近似汤普森采样算法中模拟认知不确定性。我们首先介绍认知神经网络的背景，这是一类包含Epinet的近似后验方法。
