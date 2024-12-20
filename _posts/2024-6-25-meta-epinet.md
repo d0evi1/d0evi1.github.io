@@ -49,7 +49,7 @@ meta在《Epinet for Content Cold Start》提出了一种内容冷启方法：Ep
 
 - (1) 动作空间：我们取 $A$ 为固定集合 $\lbrace 1, 2, \ldots, N \rbrace$，其中 $N$ 表示可供选择的item数量。在推荐的检索阶段，算法每个timestep可以提出 M 个item。因此，对于所有 t，我们让随机变量 $A_t: \Omega \rightarrow A^M$ 表示我们的算法在时间 t 采取的动作。
 
-- (2) 非稳态item池：我们取 $ (V_t_{t \in N}) $ 作为代表变化item池的随机过程。对于所有t，$ V_t = (\phi_{t,1}, \phi_{t,2}, \cdots, \phi_{t,N}) \in V $ 其中： $\phi_{t,i}$ 表示与时间 t 的item i 相关联的原始特征，V 表示 $V_t$ 的范围。由于我们专注于内容冷启动，**item池不断通过添加新创建的内容和移除成熟内容来刷新**。
+- (2) 非稳态item池：我们取 $\( V_t \)_{t \in N}$ 作为代表变化item池的随机过程。对于所有t，$ V_t = (\phi_{t,1}, \phi_{t,2}, \cdots, \phi_{t,N}) \in V $， 其中： $\phi_{t,i}$ 表示与时间 t 的item i 相关联的原始特征，V 表示 $V_t$ 的范围。由于我们专注于内容冷启动，**item池不断通过添加新创建的内容和移除成熟内容来刷新**。
 
 - (3) 上下文：我们取 $(\theta_t)_{t \in N}$ 作为代表每个timestep用户上下文的随机过程。对于所有 $t$，$\theta_t \in \Psi$ 由与我们提供推荐的用户提供的原始特征组成。
 
