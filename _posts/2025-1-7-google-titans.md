@@ -122,7 +122,7 @@ $$
 
 其中：
 
--  $ \mathbf{W}_Q, \mathbf{W}_K, \mathbf{W}_V \in \mathbb{R}^{d_{\text{in}} \times d_{\text{in}}} $ 是可学习参数
+-  $ W_Q, W_K, W_V \in R^{d_{in} \times d_{in}} $ 是可学习参数
 
 尽管 Transformers 在召回能力上表现出色，但它们至少需要 $ N \times d $ 次操作来计算输出，导致内存消耗较大且对较长序列的吞吐量较低。
 
