@@ -110,7 +110,11 @@ Transformers，一种纯基于注意力机制的架构（Vaswani 等人，2017�
 
 ### 2.1 背景
 
-**注意力机制**。Transformers（Vaswani 等人，2017）作为许多深度学习模型的实际骨干，基于注意力机制。给定输入 $ x \in \mathbb{R}^{N \times d_{\text{in}}} $，因果注意力机制基于输入依赖的键、值和查询矩阵计算输出 $ y \in \mathbb{R}^{N \times d_{\text{in}}} $：
+**注意力机制**。Transformers（Vaswani 等人，2017）作为许多深度学习模型的实际骨干，基于注意力机制。给定：
+
+- 输入 $ x \in \mathbb{R}^{N \times d_{\text{in}}} $
+
+因果注意力机制基于输入依赖的key、value和query矩阵计算输出 $ y \in \mathbb{R}^{N \times d_{\text{in}}} $：
 
 $$
 \mathbf{Q} = x \mathbf{W}_Q, \quad \mathbf{K} = x \mathbf{W}_K, \quad \mathbf{V} = x \mathbf{W}_V, \quad (1)
@@ -132,7 +136,11 @@ $$
 y_i = \frac{\sum_{j=1}^i \phi(\mathbf{Q}_i^\top \mathbf{K}_j) \mathbf{V}_j}{\sum_{\ell=1}^i \phi(\mathbf{Q}_i^\top \mathbf{K}_\ell)} = \frac{\phi(\mathbf{Q}_i)^\top \sum_{j=1}^i \phi(\mathbf{K}_j) \mathbf{V}_j}{\phi(\mathbf{Q}_i)^\top \sum_{\ell=1}^i \phi(\mathbf{K}_\ell)}, \quad (3)
 $$
 
-由于项 $ \sum_{j=1}^i \phi(\mathbf{K}_j) $ 和 $ \sum_{\ell=1}^i \phi(\mathbf{K}_\ell) $ 在每一步中重复使用，因此吞吐量更高。当选择核函数为单位矩阵时（Yutao Sun 等人，2023），上述公式可以写成递归形式：
+由于：
+
+- 项 $ \sum_{j=1}^i \phi(K_j), \sum_{\ell=1}^i \phi(K_\ell) $ 在每一步中重复使用，因此吞吐量更高。
+
+当选择核函数为单位矩阵时（Yutao Sun 等人，2023），上述公式可以写成递归形式：
 
 $$
 \mathbf{M}_t = \mathbf{M}_{t-1} + \mathbf{K}_t^\top \mathbf{V}_t, \quad (4)
