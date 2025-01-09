@@ -80,11 +80,33 @@ Transformers，一种纯基于注意力机制的架构（Vaswani 等人，2017�
 - （iii）一个门控分支（gated branch）
 
 ### 实验结果（§5）
-我们在语言建模、常识推理、记忆密集型任务、“大海捞针”任务、时间序列预测和 DNA 建模任务上进行了实验评估。我们观察到，Titans 架构在所有现代循环模型及其混合变体（结合滑动窗口注意力机制）的综合基准测试中均表现优异。此外，Titans 在相同上下文窗口下优于 Transformers，并在使用整个上下文的 Transformers 中表现出竞争力。这些结果是在 Titans 能够扩展到超过 200 万上下文窗口大小的情况下实现的，而 Transformers 则无法做到这一点。
+我们在语言建模、常识推理、记忆密集型任务、“大海捞针”任务、时间序列预测和 DNA 建模任务上进行了实验评估。我们观察到，Titans 架构在所有现代循环模型及其混合变体（结合滑动窗口注意力机制）的综合基准测试中均表现优异。此外，**Titans 在相同上下文窗口下优于 Transformers，并在使用整个上下文的 Transformers 中表现出竞争力。这些结果是在 Titans 能够扩展到超过 200 万上下文窗口大小的情况下实现的，而 Transformers 则无法做到这一点**。
 
 ## 2 预备知识
 
-在本节中，我们将讨论本文中使用的符号和一些背景概念。我们令 $ x \in \mathbb{R}^{N \times d_{\text{in}}} $ 表示输入，$ \mathbf{M} $ 表示神经网络（神经记忆模块），$ \mathbf{Q} $、$ \mathbf{K} $、$ \mathbf{V} $ 分别表示注意力机制中的查询、键和值，$ \mathbf{M} $ 表示注意力掩码。在对序列进行分段时，我们使用 $ S^{(i)} $ 表示第 $ i $ 段。在本文中，我们简化符号并使用下标来指代矩阵、向量或段中的特定元素。例如，我们令 $ S^{(i)}_j $ 表示第 $ i $ 段中的第 $ j $ 个 token。唯一的例外是下标为 $ t $ 的情况，我们保留它来表示时间上的递归或神经网络在时间 $ t $ 的状态。给定神经网络 $ \mathbf{N} $ 和数据样本 $ x $，我们使用 $ \mathbf{N}(x) $（或 $ \mathbf{N}^*(x) $）表示带权重调整（或不带权重调整）的前向传播。此外，我们简化符号并使用 $ \mathbf{N}^{(k)} $ 表示神经网络的第 $ k $ 层。接下来，我们首先讨论注意力机制及其高效变体的背景，然后回顾现代线性 RNN，最后讨论这些架构的记忆视角，这促使我们设计了 Titans。
+在本节中，我们将讨论本文中使用的符号和一些背景概念。我们令：
+
+- $ x \in \mathbb{R}^{N \times d_{\text{in}}} $ 表示输入
+- $ \mathbf{M} $ 表示神经网络（神经记忆模块：neural memory）
+- $ \mathbf{Q} $、$ \mathbf{K} $、$ \mathbf{V} $ 分别表示注意力机制中的query、key和value
+- $ M $ 表示注意力掩码（attention mask）
+-  $ S^{(i)} $ 表示：在对序列进行分段时，使用第 $ i $ 段。
+
+在本文中，我们简化符号并使用下标来指代矩阵、向量或段中的特定元素。例如，我们令：
+
+-  $ S^{(i)}_j $ 表示第 $ i $ 段中的第 $ j $ 个 token。
+
+唯一的例外是下标为 $ t $ 的情况，我们保留它来表示时间上的递归或神经网络在时间 $ t $ 的状态。
+
+给定：神经网络 $ \mathbf{N} $ 和数据样本 $ x $，我们使用：
+
+- $ \mathbf{N}(x) $（或 $ \mathbf{N}^*(x) $）表示带权重调整（或不带权重调整）的前向传播
+
+此外，我们简化符号并使用：
+
+- $ \mathbf{N}^{(k)} $ 表示神经网络的第 $ k $ 层
+
+接下来，我们首先讨论注意力机制及其高效变体的背景，然后回顾现代线性 RNN，最后讨论这些架构的记忆视角，这促使我们设计了 Titans。
 
 ### 2.1 背景
 
@@ -98,7 +120,11 @@ $$
 y_i = \frac{\sum_{j=1}^i \exp\left(\frac{\mathbf{Q}_i^\top \mathbf{K}_j}{\sqrt{d_{\text{in}}}}\right) \mathbf{V}_j}{\sum_{\ell=1}^i \exp\left(\frac{\mathbf{Q}_i^\top \mathbf{K}_\ell}{\sqrt{d_{\text{in}}}}\right)}, \quad (2)
 $$
 
-其中 $ \mathbf{W}_Q $、$ \mathbf{W}_K $ 和 $ \mathbf{W}_V \in \mathbb{R}^{d_{\text{in}} \times d_{\text{in}}} $ 是可学习参数。尽管 Transformers 在召回能力上表现出色，但它们至少需要 $ N \times d $ 次操作来计算输出，导致内存消耗较大且对较长序列的吞吐量较低。
+其中：
+
+-  $ \mathbf{W}_Q, \mathbf{W}_K, \mathbf{W}_V \in \mathbb{R}^{d_{\text{in}} \times d_{\text{in}}} $ 是可学习参数
+
+尽管 Transformers 在召回能力上表现出色，但它们至少需要 $ N \times d $ 次操作来计算输出，导致内存消耗较大且对较长序列的吞吐量较低。
 
 **高效注意力机制**。为了提高软注意力机制在长序列上的内存消耗和吞吐量，许多研究集中在注意力机制的 I/O 感知实现（Dao 2024；Dao, D. Fu 等人，2022），通过稀疏化注意力矩阵（B. Chen 等人，2021；Choromanski 等人，2021；Dai 等人，2019）、近似 softmax（Arora 等人，2024）或开发基于核的（线性）注意力机制（Aksenov 等人，2024；Kacham, Mirrokni 和 P. Zhong，2024；Schlag, Irie 和 Jürgen Schmidhuber，2021；S. Yang, B. Wang, Shen 等人，2024）来设计更高效的注意力机制。在本部分，我们重点关注后者，即线性注意力机制，其中标准注意力中的 softmax 被替换为替代核函数 $ \phi(\cdot, \cdot) $，使得 $ \phi(x, y) = \phi(x) \phi(y) $。因此，注意力可以写成：
 
