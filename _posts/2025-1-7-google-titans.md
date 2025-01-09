@@ -152,7 +152,13 @@ $$
 
 这使得线性注意力机制能够高效推理。
 
-**现代线性模型及其记忆视角**。如前所述，可以将学习定义为获取有效且有用记忆的过程。基于此，可以将循环神经网络（RNN）的隐藏状态视为记忆单元，模型旨在将信息压缩到其中。因此，在一般形式的循环神经网络中，隐藏状态可以被视为记忆单元，递归过程可以分为记忆单元的读和写操作。即，令 $ x \in \mathbb{R}^{N \times d_{\text{in}}} $ 为输入，$ \mathbf{M} \in \mathbb{R}^d $ 为记忆单元，$ y \in \mathbb{R}^{d_{\text{in}}} $ 为输出，则循环神经网络的一般形式定义为：
+**现代线性模型及其记忆视角**。如前所述，可以将学习定义为获取有效且有用记忆的过程。基于此，可以将循环神经网络（RNN）的hidden state视为记忆单元，模型旨在将信息压缩到其中。因此，在一般形式的循环神经网络中，hidden state可以被视为记忆单元，递归过程可以分为记忆单元的读和写操作。即，令：
+
+- $ x \in \mathbb{R}^{N \times d_{\text{in}}} $ 为输入
+- $ \mathbf{M} \in \mathbb{R}^d $ 为记忆单元
+- $ y \in \mathbb{R}^{d_{\text{in}}} $ 为输出
+
+则循环神经网络的一般形式定义为：
 
 $$
 \mathbf{M}_t = f(\mathbf{M}_{t-1}, x_t), \quad \text{写操作} \quad (6)
@@ -162,9 +168,17 @@ $$
 y_t = g(\mathbf{M}_t, x_t), \quad \text{读操作} \quad (7)
 $$
 
-其中 $ f(\cdot, \cdot) $ 是读操作，$ g(\cdot, \cdot) $ 是写操作。注意，这里的 $ \mathbf{M}_t $ 下标表示记忆在时间 $ t $ 的状态。
+其中：
 
-从这一视角来看，线性 Transformers 的递归公式（见公式 4）等同于将键和值 $ (\mathbf{K}_t, \mathbf{V}_t) $ 加性地压缩并写入矩阵值记忆单元 $ \mathbf{M}_t $ 中。因此，在处理长上下文数据时，这种加性特性会导致内存溢出，显著损害模型性能。为了解决这一问题，研究集中在两个有前景的方向上：（1）**添加遗忘机制**：一些研究提出了线性模型的自适应（数据依赖）遗忘门机制，可以在需要时擦除记忆。例如，GLA（S. Yang, B. Wang, Shen 等人，2024）、LRU（Orvieto 等人，2023）、Griffin（De 等人，2024）、xLSTM（Beck 等人，2024）和 Mamba2（Dao 和 Gu，2024）等模型，后者还与离散化的传统状态空间模型（Gu 和 Dao，2024）相关联。（2）**改进写操作**：为了克服传统循环模型中记忆写操作的加性特性，Widrow 和 Hoff（1988）提出了 Delta 规则，在添加记忆（即键值对）之前，模型首先移除其过去的值。为了增强可并行化训练和扩展性，S. Yang, B. Wang, Yu Zhang 等人（2024）提出了一种快速并行化算法。最后，最近 S. Yang, Kautz 和 Hatamizadeh（2024）通过添加遗忘门改进了 DeltaNets。
+- $ f(\cdot, \cdot) $ 是读操作，
+- $ g(\cdot, \cdot) $ 是写操作。
+
+注意，这里的 $ \mathbf{M}_t $ 下标表示记忆在时间 $ t $ 的状态。
+
+从这一视角来看，线性 Transformers 的递归公式（见公式 4）等同于将键和值 $ (\mathbf{K}_t, \mathbf{V}_t) $ 加性地压缩并写入矩阵值记忆单元 $ \mathbf{M}_t $ 中。因此，**在处理长上下文数据时，这种加性特性会导致内存溢出，显著损害模型性能**。为了解决这一问题，研究集中在两个有前景的方向上：
+
+- （1）**添加遗忘机制**：一些研究提出了线性模型的自适应（数据依赖）遗忘门机制，可以在需要时擦除记忆。例如，GLA（S. Yang, B. Wang, Shen 等人，2024）、LRU（Orvieto 等人，2023）、Griffin（De 等人，2024）、xLSTM（Beck 等人，2024）和 Mamba2（Dao 和 Gu，2024）等模型，后者还与离散化的传统状态空间模型（Gu 和 Dao，2024）相关联。
+- （2）**改进写操作**：为了克服传统循环模型中记忆写操作的加性特性，Widrow 和 Hoff（1988）提出了 Delta 规则，在添加记忆（即键值对）之前，模型首先移除其过去的值。为了增强可并行化训练和扩展性，S. Yang, B. Wang, Yu Zhang 等人（2024）提出了一种快速并行化算法。最后，最近 S. Yang, Kautz 和 Hatamizadeh（2024）通过添加遗忘门改进了 DeltaNets。
 
 **记忆模块**。记忆一直是神经网络设计的核心部分之一（Graves, Wayne 和 Danihelka，2014；JH Schmidhuber，1992；Jürgen Schmidhuber 和 Hochreiter，1997；J. Zhang 等人，2024）。将线性层视为键值（关联）记忆系统的思想可以追溯到快速权重程序，其中动态快速程序被纳入循环神经网络中作为可写记忆（JH Schmidhuber，1992）。Hebbian（Hebb，2005）和 delta（Prados 和 Kak，1989）学习规则是快速权重程序中最流行的学习规则，已在各种研究中广泛探索（Irie, Schlag 等人，2021；Munkhdalai, Sordoni 等人，2019；Munkhdalai 和 H. Yu，2017；Schlag, Irie 和 Jürgen Schmidhuber，2021；JH Schmidhuber，1992；S. Yang, Kautz 和 Hatamizadeh，2024；S. Yang, B. Wang, Yu Zhang 等人，2024）。然而，所有这些模型都基于瞬时惊讶度，忽略了序列中的 token 流（见第 3.1 节），并且大多数模型缺乏遗忘门，导致内存管理不佳。
 
