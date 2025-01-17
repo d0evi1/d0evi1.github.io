@@ -48,6 +48,10 @@ meta Ins在《QuickUpdate: a Real-Time Personalization System for Large-Scale Re
 #### 2.1 深度学习推荐模型（DLRM）
 通常，深度学习推荐模型由稀疏层和稠密层组成，如图 1 所示 [5, 10, 26]。稀疏层实际上是嵌入表，其中每个嵌入表表示一个分类特征，表的每一行表示一个特定的 ID（例如用户 ID 或视频 ID）。嵌入表将每个 ID 转换为一个固定大小的浮点值向量，这些向量是可训练的。模型中其余可训练的部分称为稠密层。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/af28bd2797fc4158b839c51416b6abf0de3f90492ad5b75aaa3906243447904cd8ab72675f1a03cf5649a6f4cddfd03a?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
+
+图 1
+
 图 1 展示了数据在 DLRM 中的流动方式。稀疏特征通过嵌入表进行转换；稠密特征通过底部的稠密层进行转换。转换后的特征随后被连接起来，并在顶部的稠密层中进一步转换，以计算输入数据的可能性。
 
 ##### 2.1.1 训练 DLRM
@@ -88,6 +92,10 @@ meta Ins在《QuickUpdate: a Real-Time Personalization System for Large-Scale Re
 
 推理剪枝是为了在将完整模型快照发布到服务平台时减少模型的大小。剪枝特别针对查找嵌入表实施，并显著减少其大小（例如减少 50%）。由于查找表占 DLRM 大小的 99% 以上，剪枝可以在不影响准确性的情况下显著减少模型的大小。减少模型大小有助于消耗更少的带宽来发布模型更新；因此，更新可以以更短的延迟发布到数百个地理分布的集群中。此外，它还有助于更快地执行推理，因为计算中涉及的行数更少。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/498251faf1b946739688273acba850db568bcb273e9b7eaa3f2d072a47c7f5ec99103f462a1f47771514d02012985117?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
+
+图 2
+
 图 2 展示了一个查找表的示例，其中包含索引和对应的行。每个索引代表分配给用户、视频等的唯一 ID。每一行可以被视为一个由可训练的浮点值组成的向量，模型使用这些向量为用户生成个性化推荐。
 
 直观上，推理剪枝算法识别出代表不活跃实体或无法提供训练信号以提高准确性的行。从数学上讲，这是通过使用优化器状态向量来实现的。具体来说，训练器可以为每一行提供一个优化器状态向量。优化器状态向量中的每个元素表示该行中对应元素的梯度动量。优化器状态向量中元素的平均值用于量化行的重要性值。如果行的重要性值接近零，则意味着该行的元素在训练过程中实际上没有被更新；因此，该行可以被剪枝。
@@ -102,6 +110,8 @@ meta Ins在《QuickUpdate: a Real-Time Personalization System for Large-Scale Re
 #### 准确性增益
 更新完整的服务模型是一个耗时的过程，可能需要数小时。因此，用户的最新行为和兴趣（例如发布新动态或与特定内容互动）在几小时内不会反映在服务模型中，这可能会降低模型的准确性。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/802058de17ff93acb0e9a9e8eba12ab82332cdb307461ca3e902946e5ac3adabe9a9f6796bba8b831de35682147568ee?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
+
 图 3 展示了在 Meta 的一个大规模模型中，随着模型更新延迟（1 到 7 小时），准确性如何下降。它将陈旧服务模型的准确性损失与完全新鲜模型进行了比较。结果显示，当模型更新延迟时，准确性损失显著增加，7 小时后损失超过 0.6%。
 
 减少更新规模有助于加速模型更新并提高服务模型的准确性。
@@ -114,8 +124,17 @@ meta Ins在《QuickUpdate: a Real-Time Personalization System for Large-Scale Re
 #### 无损模型更新
 为了更好地理解模型随时间变化的比例，我们监控了更新的嵌入行，并据此计算了模型中被修改的平均比例。图 4 显示了模型随时间更新的百分比。很明显，模型的大部分在短时间内被更新。例如，在短短 10 分钟的时间间隔内，58% 的模型被更新。更新 58% 的模型是资源密集型的，需要比每小时更新完整模型更多的基础设施。这促使我们探索一种优先更新的方法，以显著减少更新规模。
 
-### 4 系统概述
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/2bdbec885640470f2ce94f66ddc2218378214c7afc03092e02475fd329e7156d74838b6b1df9eeaecd0c7aba67149209?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=4.jpg&amp;size=750">
+
+图 4
+
+# 4 系统概述
+
 图 5 提供了 QuickUpdate 架构的概览。DLRM 系统由训练节点、服务节点和用于保存模型快照的远程存储组成。QuickUpdate 的发布逻辑主要在 **UpdateSelector** 和 **UpdatePatcher** 代理中实现，这两个代理分别部署在训练节点和服务节点中。UpdateSelector 负责决定模型的哪一部分应该更新，并在保存到远程存储之前对其进行量化。UpdatePatcher 根据执行的更新类型实现不同的修补策略。以下部分提供了更多详细信息。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/62a9a98fe754fc6c9725eeb3bcd92f04aa63b9ac6611cf9b41d8ea0cfadfcb1a62379283658aa24b8b611c6dfa9565ac?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=5.jpg&amp;size=750">
+
+图 5
 
 #### 4.1 更新什么
 QuickUpdate 专注于对嵌入表执行部分更新，这些表通常占深度学习推荐模型的绝大部分（在我们的工作负载中超过 99%）。在这些模型中，每个表表示一个分类特征（例如用户、视频），表中的每一行对应于与该特征相关的特定 ID。
@@ -140,8 +159,13 @@ UpdateSelector 使用优化器状态对 CPU 中的模型副本执行以下两项
 ### 4.3 UpdatePatcher
 **UpdatePatcher** 负责加载发布的快照并更新服务模型。它对部分和完整模型更新都采用了一种高效的**非原子更新**方法。在非原子更新过程中，多个线程可以访问模型参数，并逐步将参数修补到服务器中。这种方法允许多个线程并发修补参数，而无需锁定服务器或模型。因此，服务器可以在应用更新的同时继续对传入流量进行推理。这种方法确保了在更新过程中实时流量的高效且不间断的服务。
 
-#### 4.4 工作流程
+## 4.4 工作流程
+
 图 6 展示了 QuickUpdate 的工作流程。为简化说明，我们仅展示了训练器、UpdateSelector 和一个服务节点中的时间尺度。模型的演化是一个可重复的模式，因此我们专注于一个周期，该周期进一步分为多个间隔。在周期 \( c \) 的每个间隔 \( i \) 开始时，UpdateSelector 可以访问完整模型 \( F_{c,i} \) 以确定模型的哪一部分应该更新。具体来说，首先会发布一个完整快照（即 \( F_{c,1} \)）并加载到服务器中，然后连续的部分更新（\( P_{c,i} \) 其中 \( i > 1 \)）会被发布并修补到完整快照中，以创建服务快照 \( S_{c,i} \)。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/7d66f0feb82b7c5733a6ee207163b78b2251196b0085c6abc798f12985fc86885907df5a45aaf609027f0e1d34094b99?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=6.jpg&amp;size=750">
+
+图 6
 
 将更多部分更新与服务模型合并可能会导致服务模型 \( S_{c,i} \) 与当前训练器状态 \( F_{c,i} \) 之间的偏差增大。这种偏差可能会导致准确性下降。因此，另一个完整的新鲜快照（即 \( F_{c+1,1} \)）将被发布到服务集群，标志着当前周期的结束。服务端的模型演化可以表示如下：
 
@@ -219,6 +243,10 @@ S_{c,i} = M(S_{c,i-1}, P_{c,i}) \quad \text{对于} \quad 1 < i \leq I
    
 2. **固定剪枝比例（见图 7b）**：在此策略中，每次完整更新时从嵌入表中剪枝固定比例的行。当 QuickUpdate 执行优先参数选择时，它最多选择 \( X \) 个索引进行更新，其中 \( X \) 是服务平台上给定表中的总行数。这确保了表中的行数保持一致。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/dcab4acc1c5eb2e805303c6f2264417d964c1a225c9f27f33012684955866191a0aa93f4ef71f866783a116a284201e3?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=7.jpg&amp;size=750">
+
+图 7
+
 第一种策略避免了重新调整，因为只会进行行更新操作，而不会向嵌入表中插入新行。第二种策略通过使用行更新和索引重映射操作来避免重新调整。由于嵌入表的大小在第二种策略中不会改变，因此也避免了在 GPU 之间重新分片嵌入表的需要。
 
 为了评估这两种剪枝策略，我们考虑了三种训练场景：1-无剪枝，2-固定剪枝索引，3-每个表固定剪枝比例。
@@ -234,11 +262,23 @@ S_{c,i} = M(S_{c,i-1}, P_{c,i}) \quad \text{对于} \quad 1 < i \leq I
 ##### 6.1.1 与过时模型相比的 NE 增益
 我们首先比较 QuickUpdate 与过时模型的准确性，以量化准确性增益并验证在完整快照之上应用部分更新不会对准确性产生负面影响。这里的过时模型指的是最初发布的完整快照。图 8 显示了不同更新粒度（且无间歇性完整模型更新）相对于过时模型的 NE 增益。所有更新规模的 NE 增益均高于过时模型，并且 NE 增益随时间增加。5% 和 10% 的更新提供了非常相似的 NE 增益，但 1% 的更新返回的 NE 增益较少，表明一些重要的行未包含在 1% 的更新中。总体而言，这些趋势表明，即使在应用部分更新超过 10 小时后，也没有负面影响，并且与过时模型相比，准确性提高了 0.7%。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/39f71f99bff8ff7f06e5e75a6086396aa4a4b519b9c3ae7828f01cc706d8702a7025937efe435dea6cd75c4cf8233463?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=8.jpg&amp;size=750">
+
+图 8
+
 ##### 6.1.2 与完全新鲜模型相比的 NE 损失
 在本节中，我们研究了使用部分更新发布的 QuickUpdate 模型的 NE 损失，与理想的完全新鲜服务模式进行比较。图 9 中的结果显示，使用 10% 更新时，NE 损失在整个 10 小时内低于 0.005%。使用 5% 更新时，NE 损失始终高于 10% 更新，但在超过 6 小时内仍低于 0.01%。随着训练周期的增加，NE 损失增加，因为服务模型与相应训练模型之间的差异增加。结果还展示了采用不同更新粒度对完整模型发布延迟的影响，同时确保 NE 损失保持在可接受的 0.01% 阈值以下。通过采用 10% 的粒度，我们可以有效地将完整模型发布的需求延迟超过 10 小时。同样，当使用 5% 的粒度时，我们可以将完整模型发布延迟 6 小时，同时仍将 NE 损失保持在可接受范围内。这突显了 5% 粒度下部分更新在捕获重要更新并在相当长的时间内保持模型准确性和新鲜度方面的有效性。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/56a0d5ac7c9a6948559c82c2ca92c5dbd739e445dedf7e8dec18b7b1a268064e10287ecc4e985693ddac0f359f86a96b?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=9.jpg&amp;size=750">
+
+图 9
+
 ##### 6.1.3 短期内的 NE 损失
 为了分析短期内的 NE 损失，我们进行了一项评估，涉及四个连续的 10 分钟更新。检查的更新粒度为 5%、3% 和 1%。每次更新后，使用未见过的数据测量与完全新鲜模型相比的 NE 损失。图 10 显示了不同 10 分钟间隔内的变化，强调了流数据的波动性。然而，当在多个短时间间隔内平均时，NE 损失趋于稳定。正如预期的那样，结果显示，随着粒度的增加，NE 损失减少。最后一列显示的平均 NE 损失证实，5% 的粒度在我们的工作负载中会返回可接受的 NE 损失（平均而言）。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/5318ae567d2197992feeee75368aae7f06b86b08566940149cf55d4f672c3ca38cb1daf58331234ff3b3bc9bd399deab?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=10.jpg&amp;size=750">
+
+图 10
 
 ##### 6.1.4 结论
 准确性结果证明了 QuickUpdate 在采用 5% 更新粒度长达 6 小时的有效性，同时保持与完全新鲜模型相当的准确性水平，并确保 NE 损失低于 0.01% 的阈值。
@@ -256,10 +296,18 @@ S_{c,i} = M(S_{c,i-1}, P_{c,i}) \quad \text{对于} \quad 1 < i \leq I
 
 图 11 显示了在 6 小时训练后，不同大小的单次更新与完全新鲜模型相比的 NE 损失。可以看出，单次 5% 的部分更新不足以将 NE 损失降低到可接受的 0.01% 阈值以下。然而，10% 的部分更新证明足以将 NE 损失降低到可接受的水平。这表明排名前 10% 的嵌入行是此时间窗口内重要行的良好代理。
 
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a1d0f7d9f1c4eb9702abd0564dcf9ec100bce7742e04006960815c8ba7507e7c3f5774829d7f679652264ce6fd1e7843?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=11.jpg&amp;size=750">
+
+图 11
+
 为了了解这些重要行中有多少百分比被多个较小的 5% 更新覆盖，我们运行了 QuickUpdate 6 小时，并使用多个 5% 粒度的部分更新。在将所有这些更新合并为一个联合集后，我们观察到该集合涵盖了上述重要行的 70%，并总体覆盖了模型中所有行的 7.3%。因此，大部分重要行被连续的较小部分更新所覆盖。
 
 ### 6.3 带宽使用
 在 QuickUpdate 中，更新大小是带宽使用的代理。带宽使用量取决于粒度、更新间隔和间歇性完整模型更新的频率。通常，这些参数是可配置的，并可能根据 DLRM 的类型和所需的准确性而变化。在本节中，我们评估了基于发布模型百分比的不同策略的带宽使用情况。详细信息如下并在图 12 中展示：
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/09dea6532d8aa98a78d90859430b36553147673315e8194fe7cd2ec2ada2ce31249f573cc316716d5b18b7dcf6cfd5b5?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=12.jpg&amp;size=750">
+
+图 12
 
 1. **基线 1**：每小时发布一次完整模型。
 2. **基线 2**：每 10 分钟发布一次完整模型（未在图中显示）。
@@ -274,6 +322,10 @@ S_{c,i} = M(S_{c,i-1}, P_{c,i}) \quad \text{对于} \quad 1 < i \leq I
 传统上，服务模型以原子方式更新以保持一致的推理。这涉及将所有模型权重加载到缓冲节点中，这些节点随后成为计算推理的服务节点。然而，这种方法由于使用缓冲节点而资源密集。为了解决这个问题，QuickUpdate 放宽了一致性要求，并在执行推理查询的同时直接在服务节点中更新参数。
 
 我们评估了在 QuickUpdate 中间歇性完整模型更新期间的 NE 恢复（与完全新鲜模型相比），作为已更新权重百分比的函数。如图 13 所示，放宽一致性可以在加载期间提高生产中的准确性。随着更多参数的加载，NE 恢复增加。我们的数据显示，通过修补 30% 的参数，我们可以捕获约 54% 的 NE 恢复。在修补仅 70% 的参数后，NE 恢复达到约 94%。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/7b54cb8fa45861f8e16a1fbfb23a56e7b93abb0e1b4184670b5ffd25a3fc9baf384b16ca7e9eb287a94f13f96054faf4?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=13.jpg&amp;size=750">
+
+图 13
 
 宽松一致性允许早期服务新鲜行（而不是等待整个模型更新），从而整体提高准确性。尽管在加载期间表的视图不一致（意味着不同的行可能属于不同的状态），服务一部分新鲜行已经导致准确性增加。NE 恢复随着时间的推移继续增长，直到整个模型更新完毕。
 
