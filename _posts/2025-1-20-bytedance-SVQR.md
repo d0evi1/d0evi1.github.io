@@ -6,7 +6,7 @@ modified: 2025-1-20
 tags: 
 ---
 
-字节在《Real-time Indexing for Large-scale Recommendation by Streaming Vector Quantization Retriever》提出了区别于Transformer的的一种新架构:Titans。我们来看一下它的实现，是否有前景：
+字节在《Real-time Indexing for Large-scale Recommendation by Streaming Vector Quantization Retriever》提出了流式向量量化检索器。我们来看一下它的实现：
 
 # 摘要
 
