@@ -144,9 +144,9 @@ kuaishou在《HoME: Hierarchy of Multi-Gate Experts for Multi-Task Learning at K
 
 $$
 \begin{aligned}
-\hat{y}^{ctr} &= \text{Tower}_{ctr}\left(\text{Sum}\left(\text{Gate}_{ctr}(\mathbf{v}), \{\text{Experts}_{\{shared,ctr\}}(\mathbf{v})\}\right)\right), \\
-\hat{y}^{evtr} &= \text{Tower}_{evtr}\left(\text{Sum}\left(\text{Gate}_{evtr}(\mathbf{v}), \{\text{Experts}_{\{shared,evtr\}}(\mathbf{v})\}\right)\right), \\
-\hat{y}^{ltr} &= \text{Tower}_{ltr}\left(\text{Sum}\left(\text{Gate}_{ltr}(\mathbf{v}), \{\text{Experts}_{\{shared,ltr\}}(\mathbf{v})\}\right)\right),
+\widehat{y}^{ctr} &= \text{Tower}^{ctr}\left(\text{Sum}\left(\text{Gate}^{ctr}(\mathbf{v}), \{\text{Experts}^{\{shared,ctr\}}(\mathbf{v})\}\right)\right), \\
+\widehat{y}^{evtr} &= \text{Tower}^{evtr}\left(\text{Sum}\left(\text{Gate}^{evtr}(\mathbf{v}), \{\text{Experts}^{\{shared,evtr\}}(\mathbf{v})\}\right)\right), \\
+\widehat{y}^{ltr} &= \text{Tower}^{ltr}\left(\text{Sum}\left(\text{Gate}^{ltr}(\mathbf{v}), \{\text{Experts}^{\{shared,ltr\}}(\mathbf{v})\}\right)\right),
 \end{aligned}
 $$
 
@@ -164,12 +164,12 @@ $$
 
 其中：
 
-- $\text{Expert}_{shared}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^D$ 和 $\text{Expert}_{xtr}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^D$ 分别是ReLU激活的共享和特定专家网络，
-- $\text{Gate}_{xtr}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^N$ 是对应任务的Softmax激活的门网络，
+- $\text{Expert}^{shared}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^D$ 和 $\text{Expert}_{xtr}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^D$ 分别是ReLU激活的共享和特定专家网络，
+- $\text{Gate}^{xtr}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^N$ 是对应任务的Softmax激活的门网络，
 - $N$ 是相关共享和特定专家的数量，$\text{Sum}$ 用于根据门生成的权重聚合 $N$ 个专家的输出，
-- $\text{Tower}_{xtr}: \mathbb{R}^D \rightarrow \mathbb{R}$ 是Sigmoid激活的任务特定网络，用于衡量相应的交互概率 $\hat{y}$。
+- $\text{Tower}^{xtr}: \mathbb{R}^D \rightarrow \mathbb{R}$ 是Sigmoid激活的任务特定网络，用于衡量相应的交互概率 $\hat{y}$。
 
-在获得所有估计分数 $\hat{y}_{ctr}, \dots$ 和真实标签 $y_{ctr}, \dots$ 后，我们直接最小化交叉熵二元分类损失来训练多任务学习模型：
+在获得所有估计分数 $\widehat{y}^{ctr}, \dots$ 和真实标签 $y^{ctr}, \dots$ 后，我们直接最小化交叉熵二元分类损失来训练多任务学习模型：
 
 $$
 \mathcal{L} = -\sum_{xtr \in \{ctr, \dots\}} \left( y_{xtr} \log(\hat{y}_{xtr}) + (1 - y_{xtr}) \log(1 - \hat{y}_{xtr}) \right),
