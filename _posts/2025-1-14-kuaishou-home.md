@@ -51,11 +51,11 @@ kuaishou在《HoME: Hierarchy of Multi-Gate Experts for Multi-Task Learning at K
 
 图3 在CGC中的专家退化问题，其中两个共享专家几乎被task2和task7所垄断，分别以特定的风格工作。
 
-**专家欠拟合**：在我们进一步解决了专家退化问题并增强了共享专家对所有任务的效率后，我们发现一些特定专家被分配了较小的门值，使得相应任务仅依赖于共享知识，较少使用特定参数。实际上，我们的模型需要同时预测数十个不同的任务，它们的密度（即正样本率）也差异很大，而密集任务可能是稀疏任务的100倍，例如点击与收藏。与可以从多个密集任务接收多个梯度更新的共享专家相比，特定专家容易陷入欠拟合，进一步导致稀疏任务更多地依赖共享专家，而忽略其特定专家，使得特定参数被浪费。如图4所示，任务6的门控网络向共享专家分配了较大的值，但忽略了其特定专家。
+**专家欠拟合**：在我们进一步解决了专家退化问题并增强了共享专家对所有任务的效率后，我们发现**一些特定专家被分配了较小的门值，使得相应任务仅依赖于共享知识，较少使用特定参数**。实际上，我们的模型需要同时预测数十个不同的任务，它们的密度（即正样本率）也差异很大，而密集任务可能是稀疏任务的100倍，例如点击与收藏。与可以从多个密集任务接收多个梯度更新的共享专家相比，**特定专家（specific-experts）容易陷入欠拟合，进一步导致稀疏任务更多地依赖共享专家，而忽略其特定专家，使得特定参数被浪费**。如图4所示，任务6的门控网络向共享专家分配了较大的值，但忽略了其特定专家。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ea01754b325f0b6060299d8a7d6e3ad039283d40d51c748a8a67a2a5a1a4c21606e029b7beff5eda7db008b22ee2cb5b?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=4.jpg&amp;size=750">
 
-图4
+图4 专家欠拟合问题，其中task1和task6几乎只依赖共享专家，而忽略了自己的特定专家，较少利用特定专家网络。
 
 为了解决这些异常现象并提高MoE范式模型的稳定性，我们提出了一种简单、高效且平衡的神经网络架构用于多任务学习：多重门控专家层次模型，简称HoME。具体而言，我们从三个角度提供了有见地和深入的解决方案：公平专家权重的值分布对齐，重新组装任务的层次元专家结构，以及增强稀疏任务专家和深层多层MMoE训练的门控网络：
 
@@ -63,11 +63,16 @@ kuaishou在《HoME: Hierarchy of Multi-Gate Experts for Multi-Task Learning at K
 
 ### 层次掩码机制
 
-为了减少专家占用问题并避免专家退化（也称为任务冲突跷跷板问题），本文提出了一种简单而有效的级联层次掩码机制来缓解这种冲突。具体而言，我们插入了一个预排序元专家网络来将不同任务分组，以扩展标准化的MoE系统。如图1所示，我们的短视频行为任务可以根据其先验相关性手动分为两个元类别：（1）被动观看时间任务，例如长观看；（2）主动互动任务，例如评论。因此，我们可以预先建模粗粒度的元类别专家，然后支持每个任务的以下想法：每个任务不仅应具有完全共享的全局专家，还应具有部分共享的类别内专家。
+为了减少专家占用问题并避免专家退化（也称为任务冲突跷跷板问题），本文提出了一种简单而有效的**级联层次掩码机制（Hierarchy mask）**来缓解这种冲突。具体而言，我们插入了一个预排序元专家网络来将不同任务分组，以扩展标准化的MoE系统。如图1所示，我们的短视频行为任务可以根据其**先验相关性**手动分为两个元类别：
+
+- （1）被动的**观看时间任务**，例如长观看；
+- （2）主动的**互动任务**，例如评论。
+
+因此，我们可以预先建模粗粒度的元类别专家，然后支持每个任务的以下想法：每个任务不仅应具有完全共享的全局专家，还应具有部分共享的类别内专家。
 
 ### 特征门控和自门控机制
 
-为了增强稀疏任务专家的训练，我们提出了两种门控机制，以确保它们能够获得适当的梯度以最大化其有效性：特征门控和自门控机制。考虑到同一层的专家总是共享相同的输入特征，但不同的专家将接收不同的梯度。因此，相同的特征输入可能会导致多个专家参数优化的梯度冲突的潜在风险。为此，我们首先提出了特征门控机制，以私有化灵活的专家输入，以保护稀疏任务专家的训练。此外，最新的MMoE研究表明，更深的堆叠专家网络可以带来更强大的预测能力。然而，在我们的实验中，我们发现原始门控网络容易逐层稀释梯度，这对稀疏任务专家的训练不友好。为了确保顶层梯度能够有效地传递到底层并稳定更深层的MMoE系统训练，我们进一步设计了自门控机制，以残差方式连接相邻的相关专家。
+为了增强稀疏任务专家的训练，我们提出了两种门控机制，以确保它们能够获得适当的梯度以最大化其有效性：特征门控（Feature-gate）和自门控（Self-gate）机制。考虑到**同一层的专家总是共享相同的输入特征，但不同的专家将接收不同的梯度**。因此，**相同的特征输入可能会导致多个专家参数优化的梯度冲突的潜在风险**。为此，我们首先提出了特征门控机制，以私有化灵活的专家输入，以保护稀疏任务专家的训练。此外，最新的MMoE研究表明，更深的堆叠专家网络可以带来更强大的预测能力。然而，在我们的实验中，我们发现**原始门控网络容易逐层稀释梯度，这对稀疏任务专家的训练不友好**。为了确保顶层梯度能够有效地传递到底层并稳定更深层的MMoE系统训练，我们进一步设计了自门控机制，以残差方式连接相邻的相关专家。
 
 ### 主要贡献
 
@@ -90,7 +95,7 @@ kuaishou在《HoME: Hierarchy of Multi-Gate Experts for Multi-Task Learning at K
 
 ## 后续发展
 
-随后，提出了**交叉拼接网络（Cross-Stitch Network）[[25]]**和**水闸网络（Sluice Network）[[29]]**，以构建深度专家信息融合网络，生成任务特定的输入，从而实现**软专家知识共享**。
+随后，提出了**交叉拼接网络（Cross-Stitch Network）[[25]]**和**闸门网络（Sluice Network）[[29]]**，以构建深度专家信息融合网络，生成任务特定的输入，从而实现**软专家知识共享**。
 
 除了复杂的纵向深度专家交叉外，**横向专家权重估计**是另一种定制任务特定塔输入的方法。近年来提出的**多门混合专家模型（Multi-Gate Mixture-of-Expert, MMoE）[[23]]**通过多门机制为不同的专家分配不同的权重，以平衡不同的任务。
 
@@ -102,7 +107,7 @@ kuaishou在《HoME: Hierarchy of Multi-Gate Experts for Multi-Task Learning at K
 
 在本节中，我们简要回顾了多任务学习的演进轨迹。多任务学习在赋能模型感知多种信号方面发挥着越来越重要的作用，广泛应用于推荐系统 [2, 9, 37]、自然语言处理 [6, 8, 30]、计算机视觉 [12, 18, 26] 和普适计算 [13, 22] 等领域。
 
-在早期，一些工作利用硬专家共享架构，通过多个任务特定的塔（tower）接收相同的专家输出，构建了最简单的多任务学习系统，包括共享底层（shared-bottom）[3] 和专家混合（Mixture-of-Experts, MoE）[17]。随后，提出了交叉缝合网络（cross-stitch network）[25] 和闸门网络（sluice network）[29]，通过构建深度专家信息融合网络生成任务特定的输入，以实现软专家知识共享。除了复杂的垂直深度专家交叉外，水平专家权重估计是另一种定制任务特定塔输入的方式。近年来提出的多重门控专家混合（Multi-gate Mixture-of-Experts, MMoE）[23] 提供了一种多重门控机制，为不同专家分配不同权重，以平衡不同任务。
+在早期，一些工作利用硬专家共享架构，通过多个任务特定的塔（tower）接收相同的专家输出，构建了最简单的多任务学习系统，包括共享底层（shared-bottom）[3] 和专家混合（Mixture-of-Experts, MoE）[17]。随后，提出了cross-stitch network[25] 和sluice network[29]，通过构建深度专家信息融合网络生成任务特定的输入，以实现软专家知识共享。除了复杂的垂直深度专家交叉外，水平专家权重估计是另一种定制任务特定塔输入的方式。近年来提出的多重门控专家混合（Multi-gate Mixture-of-Experts, MMoE）[23] 提供了一种多重门控机制，为不同专家分配不同权重，以平衡不同任务。
 
 随着基于神经网络的推荐系统浪潮的兴起，MMoE 的变体方法在提升模型能力和准确性方面也发挥了重要作用。开创性工作来自 YouTube 排序系统 [40]，该系统通过不同的门控网络利用多个共享专家来建模真实的用户-物品交互。为了缓解任务冲突跷跷板（task-conflict seesaw）问题 [5, 31, 33]，MMoE 的变体 CGC [33] 和 PLE [33] 不仅利用了共享专家，还引入了额外的特定专家，以实现更灵活的专家共享。基于共享/特定的思想，许多 MMoE 变体被提出，包括：
 
@@ -117,123 +122,123 @@ kuaishou在《HoME: Hierarchy of Multi-Gate Experts for Multi-Task Learning at K
 
 ## 3.1 预备知识：工业推荐系统中的多任务学习
 
-工业推荐系统采用两阶段设计：（1）数百个候选物品的生成[35, 36]；（2）候选物品的排序[7, 24, 40]，以选出几十个最顶部的物品推荐给用户。由于这两个阶段的目标不同，因此使用的技术也完全不同：生成过程侧重于用户侧特征建模和粗略的物品采样，而排序过程则侧重于用户和物品特征的融合以及细粒度的用户多交互拟合。因此，多任务学习模型通常被用于排序过程中，以估计特定用户-物品对的各种交互概率。为简洁起见，模型生成的概率通常有一个简短的名称（\(x_{tr}\)），例如点击概率为\(ctr\)，有效观看概率为\(evtr\)，点赞概率为\(ltr\)，评论概率为\(cmtr\)等。
+工业推荐系统采用两阶段设计：（1）数百个候选物品的生成[35, 36]；（2）候选物品的排序[7, 24, 40]，以选出几十个最顶部的物品推荐给用户。由于这两个阶段的目标不同，因此使用的技术也完全不同：生成过程侧重于用户侧特征建模和粗略的物品采样，而排序过程则侧重于用户和物品特征的融合以及细粒度的用户多交互拟合。因此，多任务学习模型通常被用于排序过程中，以估计特定用户-物品对的各种交互概率。为简洁起见，模型生成的概率通常有一个简短的名称（$x_{tr}$），例如点击概率为$ctr$，有效观看概率为$evtr$，点赞概率为$ltr$，评论概率为$cmtr$等。
 
 ### 3.1.1 标签与特征
 
 形式上，这种排序学习过程通常被组织为多二元分类的形式，每个用户-物品样本包含两类信息——监督标签和输入特征：
 
-- **监督信号**：该用户-物品观看体验的真实标签，例如点击\(y_{ctr} \in \{0, 1\}\)，有效观看\(y_{evtr} \in \{0, 1\}\)，点赞\(y_{ltr} \in \{0, 1\}\)，评论\(y_{cmtr} \in \{0, 1\}\)以及其他标签。
+- **监督信号**：该用户-物品观看体验的真实标签，例如点击$y_{ctr} \in \{0, 1\}$，有效观看$y_{evtr} \in \{0, 1\}$，点赞$y_{ltr} \in \{0, 1\}$，评论$y_{cmtr} \in \{0, 1\}$以及其他标签。
   
 - **特征输入**：MoE的输入旨在从多个角度描述用户和物品的状态，大致可以分为四类：（1）ID和类别特征，我们使用简单的查找操作符来获取它们的嵌入，例如用户ID、物品ID、标签ID、是否为活跃用户、是否关注作者、场景ID等；（2）统计特征，需要设计分桶策略将其离散化并分配ID，例如过去一个月观看的短视频数量、过去一个月的短视频观看时长等；（3）反映用户短期和长期兴趣的序列特征，通常通过一阶段或两阶段的注意力机制建模，例如DIN [42]、DIEN [41]、SIM [27]、TWIN [4]；（4）预训练的多模态嵌入，例如文本嵌入[10]、asr嵌入[39]、视频嵌入[21]等。
 
-将所有这些结合起来，我们可以获得多任务训练样本（例如，标签为\(\{y_{ctr}, y_{evtr}, \dots\}\)，输入为\(\mathbf{v} = [v_1, v_2, \dots, v_n]\)），其中\(n\)表示特征的总数。
+将所有这些结合起来，我们可以获得多任务训练样本（例如，标签为$\{y_{ctr}, y_{evtr}, \dots\}$，输入为$\mathbf{v} = [v_1, v_2, \dots, v_n]$），其中$n$表示特征的总数。
 
 ### 3.1.2 基于混合专家（MoE）的XTR预测
 
-给定训练用户-物品样本的标签 \(y_{ctr}, y_{evtr}, \dots\) 和特征 \(\mathbf{v}\)，接下来我们利用多任务模块进行预测。具体来说，我们展示了一种广泛使用的共享/特定范式MoE变体CGC的细节如下：
+给定训练用户-物品样本的标签 $y_{ctr}, y_{evtr}, \dots$ 和特征 $\mathbf{v}$，接下来我们利用多任务模块进行预测。具体来说，我们展示了一种广泛使用的共享/特定范式MoE变体CGC的细节如下：
 
-\[
+$$
 \begin{aligned}
 \hat{y}_{ctr} &= \text{Tower}_{ctr}\left(\text{Sum}\left(\text{Gate}_{ctr}(\mathbf{v}), \{\text{Experts}_{\{shared,ctr\}}(\mathbf{v})\}\right)\right), \\
 \hat{y}_{evtr} &= \text{Tower}_{evtr}\left(\text{Sum}\left(\text{Gate}_{evtr}(\mathbf{v}), \{\text{Experts}_{\{shared,evtr\}}(\mathbf{v})\}\right)\right), \\
 \hat{y}_{ltr} &= \text{Tower}_{ltr}\left(\text{Sum}\left(\text{Gate}_{ltr}(\mathbf{v}), \{\text{Experts}_{\{shared,ltr\}}(\mathbf{v})\}\right)\right),
 \end{aligned}
-\]
+$$
 
 其中：
 
-\[
+$$
 \begin{aligned}
 \text{Tower}(\cdot) &= \text{Sigmoid}\left(\text{MLP}_T(\cdot)\right), \\
 \text{Experts}(\cdot) &= \text{ReLU}\left(\text{MLP}_E(\cdot)\right), \\
 \text{Gate}(\cdot) &= \text{Softmax}\left(\text{MLP}_G(\cdot)\right),
 \end{aligned}
-\]
+$$
 
 (1)
 
-其中，\(\text{Expert}_{shared}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^D\) 和 \(\text{Expert}_{xtr}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^D\) 分别是ReLU激活的共享和特定专家网络，\(\text{Gate}_{xtr}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^N\) 是对应任务的Softmax激活的门网络，\(N\) 是相关共享和特定专家的数量，\(\text{Sum}\) 用于根据门生成的权重聚合 \(N\) 个专家的输出，\(\text{Tower}_{xtr}: \mathbb{R}^D \rightarrow \mathbb{R}\) 是Sigmoid激活的任务特定网络，用于衡量相应的交互概率 \(\hat{y}\)。
+其中，$\text{Expert}_{shared}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^D$ 和 $\text{Expert}_{xtr}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^D$ 分别是ReLU激活的共享和特定专家网络，$\text{Gate}_{xtr}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^N$ 是对应任务的Softmax激活的门网络，$N$ 是相关共享和特定专家的数量，$\text{Sum}$ 用于根据门生成的权重聚合 $N$ 个专家的输出，$\text{Tower}_{xtr}: \mathbb{R}^D \rightarrow \mathbb{R}$ 是Sigmoid激活的任务特定网络，用于衡量相应的交互概率 $\hat{y}$。
 
-在获得所有估计分数 \(\hat{y}_{ctr}, \dots\) 和真实标签 \(y_{ctr}, \dots\) 后，我们直接最小化交叉熵二元分类损失来训练多任务学习模型：
+在获得所有估计分数 $\hat{y}_{ctr}, \dots$ 和真实标签 $y_{ctr}, \dots$ 后，我们直接最小化交叉熵二元分类损失来训练多任务学习模型：
 
-\[
+$$
 \mathcal{L} = -\sum_{xtr \in \{ctr, \dots\}} \left( y_{xtr} \log(\hat{y}_{xtr}) + (1 - y_{xtr}) \log(1 - \hat{y}_{xtr}) \right),
-\]
+$$
 
 (2)
 
 在在线服务中，常见的操作是设计一个可控的复杂方程，将XTRs组合为一个排序分数：
 
-\[
+$$
 \text{ranking\_score} = \alpha \cdot \hat{y}_{ctr} + \beta \cdot \hat{y}_{evtr} + \gamma \cdot \hat{y}_{cmtr} + \dots,
-\]
+$$
 
 (3)
 
-其中 \(\alpha, \beta, \gamma\) 是超参数。实际上，公式(3)在工业推荐系统中非常复杂，涉及许多策略。我们仅展示一个简单案例。在接下来的部分中，我们将重点改进公式(1)中的多任务学习过程的稳定性。
+其中 $\alpha, \beta, \gamma$ 是超参数。实际上，公式(3)在工业推荐系统中非常复杂，涉及许多策略。我们仅展示一个简单案例。在接下来的部分中，我们将重点改进公式(1)中的多任务学习过程的稳定性。
 
 ---
 
 ### 3.2 专家归一化与Swish机制
 
-尽管公式(1)中的原始MMoE系统取得了显著的改进，但仍然存在严重的专家崩溃问题。将专家的 \(\text{MLP}_E\) 函数生成的表示记为 \(\{z_{shared}, z_{ctr}, z_{evtr}, \dots\}\)，我们发现它们的均值和方差值存在显著差异。受Transformer的启发，归一化操作是成功训练非常深度神经网络的关键技术之一。我们为每个专家引入了批归一化（Batch Normalization）[16]，以支持HoME生成可比较的输出 \(z_{norm} \in \mathbb{R}^D\)：
+尽管公式(1)中的原始MMoE系统取得了显著的改进，但仍然存在严重的专家崩溃问题。将专家的 $\text{MLP}_E$ 函数生成的表示记为 $\{z_{shared}, z_{ctr}, z_{evtr}, \dots\}$，我们发现它们的均值和方差值存在显著差异。受Transformer的启发，归一化操作是成功训练非常深度神经网络的关键技术之一。我们为每个专家引入了批归一化（Batch Normalization）[16]，以支持HoME生成可比较的输出 $z_{norm} \in \mathbb{R}^D$：
 
-\[
+$$
 z_{norm} = \text{Batch\_Normalization}(z) = \gamma \frac{z - \mu}{\sqrt{\delta^2 + \epsilon}} + \beta,
-\]
+$$
 
 其中：
 
-\[
+$$
 \begin{aligned}
 \mu &= \text{Batch\_Mean}(z), \\
 \delta^2 &= \text{Batch\_Mean}\left((z - \mu)^2\right),
 \end{aligned}
-\]
+$$
 
 (4)
 
-其中 \(z\) 是任意专家的 \(\text{MLP}_E\) 输出，\(\gamma \in \mathbb{R}^D\) 和 \(\beta \in \mathbb{R}^D\) 是可训练的缩放和偏置参数，用于调整分布，\(\epsilon \in \mathbb{R}^D\) 是一个非常小的因子，用于避免除以零错误。\(\mu \in \mathbb{R}^D\) 和 \(\delta^2 \in \mathbb{R}^D\) 是当前批次相同专家输出的均值和方差。经过专家归一化后，\(z_{norm}\) 的分布接近于标准正态分布 \(N(0, I)\)。因此，\(z_{norm}\) 的一半值将小于0，并在ReLU激活下变为0，导致它们的导数和梯度为0，阻碍模型收敛。因此，我们使用Swish函数替换公式(1)中的ReLU，得到HoME的专家结构：
+其中 $z$ 是任意专家的 $\text{MLP}_E$ 输出，$\gamma \in \mathbb{R}^D$ 和 $\beta \in \mathbb{R}^D$ 是可训练的缩放和偏置参数，用于调整分布，$\epsilon \in \mathbb{R}^D$ 是一个非常小的因子，用于避免除以零错误。$\mu \in \mathbb{R}^D$ 和 $\delta^2 \in \mathbb{R}^D$ 是当前批次相同专家输出的均值和方差。经过专家归一化后，$z_{norm}$ 的分布接近于标准正态分布 $N(0, I)$。因此，$z_{norm}$ 的一半值将小于0，并在ReLU激活下变为0，导致它们的导数和梯度为0，阻碍模型收敛。因此，我们使用Swish函数替换公式(1)中的ReLU，得到HoME的专家结构：
 
-\[
+$$
 \text{HoME\_Expert}(\cdot) = \text{Swish}\left(\text{Batch\_Normalization}\left(\text{MLP}_E(\cdot)\right)\right),
-\]
+$$
 
 (5)
 
-其中 \(\text{HoME\_Expert}(\cdot)\) 是我们HoME中使用的最终结构。在归一化和Swish的设置下，所有专家的输出可以对齐到相似的数值范围，这有助于门网络分配可比较的权重。为简洁起见，在接下来的部分中，我们仍使用 \(\text{Expert}(\cdot)\) 来表示 \(\text{HoME\_Expert}(\cdot)\)。
+其中 $\text{HoME\_Expert}(\cdot)$ 是我们HoME中使用的最终结构。在归一化和Swish的设置下，所有专家的输出可以对齐到相似的数值范围，这有助于门网络分配可比较的权重。为简洁起见，在接下来的部分中，我们仍使用 $\text{Expert}(\cdot)$ 来表示 $\text{HoME\_Expert}(\cdot)$。
 
 ### 3.3 层次掩码机制
 
 针对专家退化问题，已有许多工作提出了新颖的特定专家和共享专家架构来缓解任务冲突。然而，遵循特定和共享范式，我们发现共享专家退化问题仍然存在。我们认为，考虑任务之间的先验相关性可能是有益的，如图1所示；我们的预测任务可以分为两类，例如主动交互任务（如点赞、评论等）和被动观看时间任务（如有效观看、长观看等）。在本节中，我们提出了一种简单而有效的级联层次掩码机制，以建模任务之间的先验归纳偏差。具体来说，我们插入了一个预排序的元专家网络来分组不同的任务，这里包括三种元任务知识来支持我们的两类任务：
 
-\[
+$$
 \begin{aligned}
 z^{inter}_{meta} &= \text{Sum}\left(\text{Gate}^{inter}_{meta}(\mathbf{v}), \{\text{Experts}^{shared,inter}_{meta}(\mathbf{v})\}\right), \\
 z^{watch}_{meta} &= \text{Sum}\left(\text{Gate}^{watch}_{meta}(\mathbf{v}), \{\text{Experts}^{shared,watch}_{meta}(\mathbf{v})\}\right), \\
 z^{shared}_{meta} &= \text{Sum}\left(\text{Gate}^{shared}_{meta}(\mathbf{v}), \{\text{Experts}^{shared,inter,watch}_{meta}(\mathbf{v})\}\right),
 \end{aligned}
-\]
+$$
 
 (6)
 
-其中 \(z^{inter}_{meta}\)、\(z^{watch}_{meta}\)、\(z^{shared}_{meta}\) 是粗粒度的宏观元表示，用于提取：（1）交互类任务的知识，（2）观看时间类任务的知识，以及（3）共享知识。
+其中 $z^{inter}_{meta}$、$z^{watch}_{meta}$、$z^{shared}_{meta}$ 是粗粒度的宏观元表示，用于提取：（1）交互类任务的知识，（2）观看时间类任务的知识，以及（3）共享知识。
 
-在获得这些元表示后，我们接下来根据其对应的元知识和共享元知识进行多任务预测。具体来说，我们利用元知识构建了三种类型的专家：（1）根据 \(z^{shared}_{meta}\) 构建的全局共享专家，（2）根据 \(z^{inter}_{meta}\) 或 \(z^{watch}_{meta}\) 构建的局部共享专家，（3）根据 \(z^{inter}_{meta}\) 或 \(z^{watch}_{meta}\) 构建的每个任务的特定专家。
+在获得这些元表示后，我们接下来根据其对应的元知识和共享元知识进行多任务预测。具体来说，我们利用元知识构建了三种类型的专家：（1）根据 $z^{shared}_{meta}$ 构建的全局共享专家，（2）根据 $z^{inter}_{meta}$ 或 $z^{watch}_{meta}$ 构建的局部共享专家，（3）根据 $z^{inter}_{meta}$ 或 $z^{watch}_{meta}$ 构建的每个任务的特定专家。
 
-对于任务特定的门网络，我们直接使用共享元知识 \(z^{shared}_{meta}\) 和相应类别的元知识的拼接来生成专家的权重。这里，我们以点击和有效观看交互为例：
+对于任务特定的门网络，我们直接使用共享元知识 $z^{shared}_{meta}$ 和相应类别的元知识的拼接来生成专家的权重。这里，我们以点击和有效观看交互为例：
 
-\[
+$$
 \begin{aligned}
 \hat{y}_{ctr} &= \text{Tower}_{ctr}\left(\text{Sum}\left(\text{Gate}_{ctr}(z^{inter}_{meta} \oplus z^{shared}_{meta}), \{\text{Experts}^{shared}(z^{shared}_{meta}), \text{Experts}^{inter,ctr}(z^{inter}_{meta})\}\right)\right), \\
 \hat{y}_{evtr} &= \text{Tower}_{evtr}\left(\text{Sum}\left(\text{Gate}_{evtr}(z^{watch}_{meta} \oplus z^{shared}_{meta}), \{\text{Experts}^{shared}(z^{shared}_{meta}), \text{Experts}^{watch,evtr}(z^{watch}_{meta})\}\right)\right),
 \end{aligned}
-\]
+$$
 
 (7)
 
-其中 \(\oplus\) 表示拼接操作符，\(\text{Experts}^{shared}\) 是所有任务的共享专家，\(\text{Experts}^{inter}\) 和 \(\text{Experts}^{watch}\) 是类别内任务的共享专家。
+其中 $\oplus$ 表示拼接操作符，$\text{Experts}^{shared}$ 是所有任务的共享专家，$\text{Experts}^{inter}$ 和 $\text{Experts}^{watch}$ 是类别内任务的共享专家。
 
 值得注意的是，HoME的第一层元抽象与PLE的主要架构差异，这是基于我们在快手真实多任务推荐场景中的观察（见图5）。基于HoME的先验语义划分的元专家网络，我们可以尽可能避免任务之间的冲突，并最大化任务间的共享效率。
 
@@ -247,52 +252,52 @@ z^{shared}_{meta} &= \text{Sum}\left(\text{Gate}^{shared}_{meta}(\mathbf{v}), \{
 
 针对专家欠拟合问题，我们发现一些数据稀疏任务的门生成权重往往会忽略其特定专家，而为共享专家分配较大的权重。原因可能是我们的模型需要同时预测20多个不同的任务，而这些密集任务的密度可能是稀疏任务的100倍以上。为了增强稀疏任务专家的训练，我们提出了两种门机制，以确保它们能够获得适当的梯度以最大化其有效性：特征门和自门机制。
 
-对于特征门，其目的是为不同任务专家生成不同的输入特征表示，以缓解所有专家共享相同输入特征时可能出现的梯度冲突。形式上，特征门旨在提取每个输入特征元素的重要性，例如 \(\text{Fea\_Gate}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^{|\mathbf{v}|}\)，如果输入是 \(\mathbf{v}\)。然而，在工业推荐系统中，\(\mathbf{v}\) 通常是一个高维向量，例如 \(|\mathbf{v}| > 3000+\)；因此，为元专家引入这些大矩阵是昂贵的。受LLM效率调优技术LoRA [15] 的启发，我们引入了两个小矩阵来近似生成元素重要性的大矩阵：
+对于特征门，其目的是为不同任务专家生成不同的输入特征表示，以缓解所有专家共享相同输入特征时可能出现的梯度冲突。形式上，特征门旨在提取每个输入特征元素的重要性，例如 $\text{Fea\_Gate}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^{|\mathbf{v}|}$，如果输入是 $\mathbf{v}$。然而，在工业推荐系统中，$\mathbf{v}$ 通常是一个高维向量，例如 $|\mathbf{v}| > 3000+$；因此，为元专家引入这些大矩阵是昂贵的。受LLM效率调优技术LoRA [15] 的启发，我们引入了两个小矩阵来近似生成元素重要性的大矩阵：
 
-\[
+$$
 \text{Fea\_LoRA}(\mathbf{v}, d) = 2 \times \text{Sigmoid}\left(\mathbf{v}(BA)\right),
-\]
+$$
 
-其中 \(B \in \mathbb{R}^{|\mathbf{v}| \times d}\)，\(A \in \mathbb{R}^{d \times |\mathbf{v}|}\)，\(BA \in \mathbb{R}^{|\mathbf{v}| \times |\mathbf{v}|}\)。
+其中 $B \in \mathbb{R}^{|\mathbf{v}| \times d}$，$A \in \mathbb{R}^{d \times |\mathbf{v}|}$，$BA \in \mathbb{R}^{|\mathbf{v}| \times |\mathbf{v}|}$。
 
 (8)
 
-注意，我们在Sigmoid函数后应用了一个2×操作符，旨在实现灵活的放大或缩小操作。实际上，\(\text{Fea\_LoRA}\) 函数是生成私有化专家输入的有效方法。在我们的迭代中，我们发现它可以进一步通过多任务思想增强，即引入更多的 \(\text{Fea\_LoRA}\) 从多个方面生成特征重要性作为我们的 \(\text{Fea\_Gate}\)：
+注意，我们在Sigmoid函数后应用了一个2×操作符，旨在实现灵活的放大或缩小操作。实际上，$\text{Fea\_LoRA}$ 函数是生成私有化专家输入的有效方法。在我们的迭代中，我们发现它可以进一步通过多任务思想增强，即引入更多的 $\text{Fea\_LoRA}$ 从多个方面生成特征重要性作为我们的 $\text{Fea\_Gate}$：
 
-\[
+$$
 \text{Fea\_Gate}(\mathbf{v}) = \text{Sum}\left(\text{Gate}_{fea}(\mathbf{v}), \{\text{Fea\_LoRA}_{\{1,2,\dots,L\}}(\mathbf{v}, |\mathbf{v}|/L)\}\right),
-\]
+$$
 
 (9)
 
-其中 \(L\) 是一个超参数，用于控制 \(\text{Fea\_LoRA}\) 的数量，\(\text{Gate}_{fea}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^L\) 用于生成权重以平衡不同 \(\text{Fea\_LoRA}\) 的重要性。注意，我们需要选择一个能被输入长度 \(|\mathbf{v}|\) 整除的 \(L\) 来生成 \(\text{Fea\_LoRA}\) 的维度。因此，我们的专家输入可以如下获得（这里我们展示了第一层元共享专家的输入 \(\mathbf{v}^{shared}_{meta}\)）：
+其中 $L$ 是一个超参数，用于控制 $\text{Fea\_LoRA}$ 的数量，$\text{Gate}_{fea}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^L$ 用于生成权重以平衡不同 $\text{Fea\_LoRA}$ 的重要性。注意，我们需要选择一个能被输入长度 $|\mathbf{v}|$ 整除的 $L$ 来生成 $\text{Fea\_LoRA}$ 的维度。因此，我们的专家输入可以如下获得（这里我们展示了第一层元共享专家的输入 $\mathbf{v}^{shared}_{meta}$）：
 
-\[
+$$
 \mathbf{v}^{shared}_{meta} = \mathbf{v} \odot \text{Fea\_Gate}^{shared}_{meta}(\mathbf{v}),
-\]
+$$
 
 (10)
 
-其中 \(\odot\) 表示逐元素乘积。通过这种方式，不同的专家拥有自己的特征空间，这可以减少梯度冲突的风险，从而保护稀疏任务。
+其中 $\odot$ 表示逐元素乘积。通过这种方式，不同的专家拥有自己的特征空间，这可以减少梯度冲突的风险，从而保护稀疏任务。
 
-此外，最新的MoE研究表明，更深层次的专家网络堆叠可以带来更强大的预测能力 [19, 33]。然而，在我们的实验中，我们发现原始的门网络容易逐层稀释梯度，尤其是对于稀疏任务专家的训练。除了专家输入级别的 \(\text{Fea\_Gate}\)，我们还在专家输出级别添加了基于残差思想的自门机制，以确保顶层的梯度能够有效地传递到底层。具体来说，\(\text{Self\_Gate}\) 只关注其特定专家的输出。以观看时间元专家的输出为例：
+此外，最新的MoE研究表明，更深层次的专家网络堆叠可以带来更强大的预测能力 [19, 33]。然而，在我们的实验中，我们发现原始的门网络容易逐层稀释梯度，尤其是对于稀疏任务专家的训练。除了专家输入级别的 $\text{Fea\_Gate}$，我们还在专家输出级别添加了基于残差思想的自门机制，以确保顶层的梯度能够有效地传递到底层。具体来说，$\text{Self\_Gate}$ 只关注其特定专家的输出。以观看时间元专家的输出为例：
 
-\[
+$$
 z^{shared}_{meta,self} = \text{Sum}\left(\text{Self\_Gate}^{shared}_{meta}(\mathbf{v}), \{\text{Experts}^{shared}(\mathbf{v})\}\right),
-\]
+$$
 
 其中：
 
-\[
+$$
 \text{Self\_Gate}(\cdot) = \begin{cases}
 \text{Sigmoid}\left(\text{MLP}_G(\cdot)\right) & \text{如果只有1个专家}, \\
 \text{Softmax}\left(\text{MLP}_G(\cdot)\right) & \text{其他情况}.
 \end{cases}
-\]
+$$
 
 (11)
 
-其中 \(\text{Self\_Gate}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^K\)，\(K\) 是相关专家的数量，其激活函数为Sigmoid（如果只有1个专家），否则设置为Softmax。类似地，\(z^{inter}_{meta,self}\) 和 \(z^{watch}_{meta,self}\) 可以通过相同的方式获得，然后我们将相应的表示（例如 \(z^{inter}_{meta} + z^{inter}_{meta,self}\)）添加到下一层的支持中。详见第5节以获取HoME的细粒度细节。
+其中 $\text{Self\_Gate}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^K$，$K$ 是相关专家的数量，其激活函数为Sigmoid（如果只有1个专家），否则设置为Softmax。类似地，$z^{inter}_{meta,self}$ 和 $z^{watch}_{meta,self}$ 可以通过相同的方式获得，然后我们将相应的表示（例如 $z^{inter}_{meta} + z^{inter}_{meta,self}$）添加到下一层的支持中。详见第5节以获取HoME的细粒度细节。
 
 ### 4 实验
 
@@ -304,13 +309,13 @@ z^{shared}_{meta,self} = \text{Sum}\left(\text{Self\_Gate}^{shared}_{meta}(\math
 
 我们在快手的短视频数据流场景中进行实验，这是快手最大的推荐场景，每天包括超过4亿用户和500亿条日志。为了公平比较，我们仅更改公式(1)中的多任务学习模块，并保持其他模块不变。具体来说，我们实现了MMoE [23]、CGC [33]、PLE [33]、AdaTT [19] 等模型变体作为基线。对于评估，我们使用广泛使用的排序指标AUC和GAUC [42] 来反映模型的预测能力。具体来说，在我们的短视频服务中，GAUC是最重要的离线指标。其主要思想是分别计算每个用户的AUC，然后加权聚合所有用户的AUC：
 
-\[
+$$
 \text{GAUC} = \sum_{u} w_u \text{AUC}_u \quad \text{其中} \quad w_u = \frac{\#\text{logs}_u}{\sum_{i} \#\text{logs}_i},
-\]
+$$
 
 (12)
 
-其中 \(w_u\) 表示用户日志的比例。
+其中 $w_u$ 表示用户日志的比例。
 
 ---
 
