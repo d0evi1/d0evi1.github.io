@@ -144,9 +144,9 @@ kuaishou在《HoME: Hierarchy of Multi-Gate Experts for Multi-Task Learning at K
 
 $$
 \begin{aligned}
-\widehat{y}^{ctr} &= \text{Tower}^{ctr}\left(\text{Sum}\left(\text{Gate}^{ctr}(\mathbf{v}), \{\text{Experts}^{\{shared,ctr\}}(\mathbf{v})\}\right)\right), \\
-\widehat{y}^{evtr} &= \text{Tower}^{evtr}\left(\text{Sum}\left(\text{Gate}^{evtr}(\mathbf{v}), \{\text{Experts}^{\{shared,evtr\}}(\mathbf{v})\}\right)\right), \\
-\widehat{y}^{ltr} &= \text{Tower}^{ltr}\left(\text{Sum}\left(\text{Gate}^{ltr}(\mathbf{v}), \{\text{Experts}^{\{shared,ltr\}}(\mathbf{v})\}\right)\right),
+\widehat{y}^{ctr} &= \text{Tower}^{\ ctr}\left(\text{Sum}\left(\text{Gate}^{ctr}(\mathbf{v}), \{\text{Experts}^{\ \{shared,ctr\}}(\mathbf{v})\}\right)\right), \\
+\widehat{y}^{evtr} &= \text{Tower}^{\ evtr}\left(\text{Sum}\left(\text{Gate}^{evtr}(\mathbf{v}), \{\text{Experts}^{\ \{shared,evtr\}}(\mathbf{v})\}\right)\right), \\
+\widehat{y}^{ltr} &= \text{Tower}^{\ ltr}\left(\text{Sum}\left(\text{Gate}^{ltr}(\mathbf{v}), \{\text{Experts}^{\ \{shared,ltr\}}(\mathbf{v})\}\right)\right),
 \end{aligned}
 $$
 
