@@ -130,7 +130,11 @@ kuaishou在《HoME: Hierarchy of Multi-Gate Experts for Multi-Task Learning at K
 
 - **监督信号**：该用户-物品观看体验的真实标签，例如点击$y_{ctr} \in \{0, 1\}$，有效观看$y_{evtr} \in \{0, 1\}$，点赞$y_{ltr} \in \{0, 1\}$，评论$y_{cmtr} \in \{0, 1\}$以及其他标签。
   
-- **特征输入**：MoE的输入旨在从多个角度描述用户和物品的状态，大致可以分为四类：（1）ID和类别特征，我们使用简单的查找操作符来获取它们的嵌入，例如用户ID、物品ID、标签ID、是否为活跃用户、是否关注作者、场景ID等；（2）统计特征，需要设计分桶策略将其离散化并分配ID，例如过去一个月观看的短视频数量、过去一个月的短视频观看时长等；（3）反映用户短期和长期兴趣的序列特征，通常通过一阶段或两阶段的注意力机制建模，例如DIN [42]、DIEN [41]、SIM [27]、TWIN [4]；（4）预训练的多模态嵌入，例如文本嵌入[10]、asr嵌入[39]、视频嵌入[21]等。
+- **特征输入**：MoE的输入旨在从多个角度描述用户和物品的状态，大致可以分为四类：
+   - （1）**ID和类别特征**，我们使用简单的查找操作符来获取它们的嵌入，例如用户ID、物品ID、标签ID、是否为活跃用户、是否关注作者、场景ID等；
+   - （2）**统计特征**，需要设计分桶策略将其离散化并分配ID，例如过去一个月观看的短视频数量、过去一个月的短视频观看时长等；
+   - （3）反映用户短期和长期兴趣的**序列特征**，通常通过一阶段或两阶段的注意力机制建模，例如DIN [42]、DIEN [41]、SIM [27]、TWIN [4]；
+   - （4）**预训练的多模态嵌入**，例如文本嵌入[10]、asr嵌入[39]、视频嵌入[21]等。
 
 将所有这些结合起来，我们可以获得多任务训练样本（例如，标签为$\{y_{ctr}, y_{evtr}, \dots\}$，输入为$\mathbf{v} = [v_1, v_2, \dots, v_n]$），其中$n$表示特征的总数。
 
@@ -140,9 +144,9 @@ kuaishou在《HoME: Hierarchy of Multi-Gate Experts for Multi-Task Learning at K
 
 $$
 \begin{aligned}
-\hat{y}_{ctr} &= \text{Tower}_{ctr}\left(\text{Sum}\left(\text{Gate}_{ctr}(\mathbf{v}), \{\text{Experts}_{\{shared,ctr\}}(\mathbf{v})\}\right)\right), \\
-\hat{y}_{evtr} &= \text{Tower}_{evtr}\left(\text{Sum}\left(\text{Gate}_{evtr}(\mathbf{v}), \{\text{Experts}_{\{shared,evtr\}}(\mathbf{v})\}\right)\right), \\
-\hat{y}_{ltr} &= \text{Tower}_{ltr}\left(\text{Sum}\left(\text{Gate}_{ltr}(\mathbf{v}), \{\text{Experts}_{\{shared,ltr\}}(\mathbf{v})\}\right)\right),
+\hat{y}^{ctr} &= \text{Tower}_{ctr}\left(\text{Sum}\left(\text{Gate}_{ctr}(\mathbf{v}), \{\text{Experts}_{\{shared,ctr\}}(\mathbf{v})\}\right)\right), \\
+\hat{y}^{evtr} &= \text{Tower}_{evtr}\left(\text{Sum}\left(\text{Gate}_{evtr}(\mathbf{v}), \{\text{Experts}_{\{shared,evtr\}}(\mathbf{v})\}\right)\right), \\
+\hat{y}^{ltr} &= \text{Tower}_{ltr}\left(\text{Sum}\left(\text{Gate}_{ltr}(\mathbf{v}), \{\text{Experts}_{\{shared,ltr\}}(\mathbf{v})\}\right)\right),
 \end{aligned}
 $$
 
@@ -156,9 +160,14 @@ $$
 \end{aligned}
 $$
 
-(1)
+...(1)
 
-其中，$\text{Expert}_{shared}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^D$ 和 $\text{Expert}_{xtr}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^D$ 分别是ReLU激活的共享和特定专家网络，$\text{Gate}_{xtr}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^N$ 是对应任务的Softmax激活的门网络，$N$ 是相关共享和特定专家的数量，$\text{Sum}$ 用于根据门生成的权重聚合 $N$ 个专家的输出，$\text{Tower}_{xtr}: \mathbb{R}^D \rightarrow \mathbb{R}$ 是Sigmoid激活的任务特定网络，用于衡量相应的交互概率 $\hat{y}$。
+其中：
+
+- $\text{Expert}_{shared}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^D$ 和 $\text{Expert}_{xtr}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^D$ 分别是ReLU激活的共享和特定专家网络，
+- $\text{Gate}_{xtr}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^N$ 是对应任务的Softmax激活的门网络，
+- $N$ 是相关共享和特定专家的数量，$\text{Sum}$ 用于根据门生成的权重聚合 $N$ 个专家的输出，
+- $\text{Tower}_{xtr}: \mathbb{R}^D \rightarrow \mathbb{R}$ 是Sigmoid激活的任务特定网络，用于衡量相应的交互概率 $\hat{y}$。
 
 在获得所有估计分数 $\hat{y}_{ctr}, \dots$ 和真实标签 $y_{ctr}, \dots$ 后，我们直接最小化交叉熵二元分类损失来训练多任务学习模型：
 
@@ -252,25 +261,25 @@ $$
 
 针对专家欠拟合问题，我们发现一些数据稀疏任务的门生成权重往往会忽略其特定专家，而为共享专家分配较大的权重。原因可能是我们的模型需要同时预测20多个不同的任务，而这些密集任务的密度可能是稀疏任务的100倍以上。为了增强稀疏任务专家的训练，我们提出了两种门机制，以确保它们能够获得适当的梯度以最大化其有效性：特征门和自门机制。
 
-对于特征门，其目的是为不同任务专家生成不同的输入特征表示，以缓解所有专家共享相同输入特征时可能出现的梯度冲突。形式上，特征门旨在提取每个输入特征元素的重要性，例如 $\text{Fea\_Gate}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^{|\mathbf{v}|}$，如果输入是 $\mathbf{v}$。然而，在工业推荐系统中，$\mathbf{v}$ 通常是一个高维向量，例如 $|\mathbf{v}| > 3000+$；因此，为元专家引入这些大矩阵是昂贵的。受LLM效率调优技术LoRA [15] 的启发，我们引入了两个小矩阵来近似生成元素重要性的大矩阵：
+对于特征门，其目的是为不同任务专家生成不同的输入特征表示，以缓解所有专家共享相同输入特征时可能出现的梯度冲突。形式上，特征门旨在提取每个输入特征元素的重要性，例如 $\text{Fea\_Gate}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^{\mid\mathbf{v}\mid}$，如果输入是 $\mathbf{v}$。然而，在工业推荐系统中，$\mathbf{v}$ 通常是一个高维向量，例如 $\mid\mathbf{v}\mid > 3000+$；因此，为元专家引入这些大矩阵是昂贵的。受LLM效率调优技术LoRA [15] 的启发，我们引入了两个小矩阵来近似生成元素重要性的大矩阵：
 
 $$
 \text{Fea\_LoRA}(\mathbf{v}, d) = 2 \times \text{Sigmoid}\left(\mathbf{v}(BA)\right),
 $$
 
-其中 $B \in \mathbb{R}^{|\mathbf{v}| \times d}$，$A \in \mathbb{R}^{d \times |\mathbf{v}|}$，$BA \in \mathbb{R}^{|\mathbf{v}| \times |\mathbf{v}|}$。
+其中 $B \in \mathbb{R}^{\mid\mathbf{v}\mid \times d}$，$A \in \mathbb{R}^{d \times \mid\mathbf{v}\mid}$，$BA \in \mathbb{R}^{\mid\mathbf{v}\mid \times \mid\mathbf{v}\mid}$。
 
 (8)
 
 注意，我们在Sigmoid函数后应用了一个2×操作符，旨在实现灵活的放大或缩小操作。实际上，$\text{Fea\_LoRA}$ 函数是生成私有化专家输入的有效方法。在我们的迭代中，我们发现它可以进一步通过多任务思想增强，即引入更多的 $\text{Fea\_LoRA}$ 从多个方面生成特征重要性作为我们的 $\text{Fea\_Gate}$：
 
 $$
-\text{Fea\_Gate}(\mathbf{v}) = \text{Sum}\left(\text{Gate}_{fea}(\mathbf{v}), \{\text{Fea\_LoRA}_{\{1,2,\dots,L\}}(\mathbf{v}, |\mathbf{v}|/L)\}\right),
+\text{Fea\_Gate}(\mathbf{v}) = \text{Sum}\left(\text{Gate}_{fea}(\mathbf{v}), \{\text{Fea\_LoRA}_{\{1,2,\dots,L\}}(\mathbf{v}, \mid\mathbf{v}\mid/L)\}\right),
 $$
 
 (9)
 
-其中 $L$ 是一个超参数，用于控制 $\text{Fea\_LoRA}$ 的数量，$\text{Gate}_{fea}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^L$ 用于生成权重以平衡不同 $\text{Fea\_LoRA}$ 的重要性。注意，我们需要选择一个能被输入长度 $|\mathbf{v}|$ 整除的 $L$ 来生成 $\text{Fea\_LoRA}$ 的维度。因此，我们的专家输入可以如下获得（这里我们展示了第一层元共享专家的输入 $\mathbf{v}^{shared}_{meta}$）：
+其中 $L$ 是一个超参数，用于控制 $\text{Fea\_LoRA}$ 的数量，$\text{Gate}_{fea}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^L$ 用于生成权重以平衡不同 $\text{Fea\_LoRA}$ 的重要性。注意，我们需要选择一个能被输入长度 $\mid\mathbf{v}\mid$ 整除的 $L$ 来生成 $\text{Fea\_LoRA}$ 的维度。因此，我们的专家输入可以如下获得（这里我们展示了第一层元共享专家的输入 $\mathbf{v}^{shared}_{meta}$）：
 
 $$
 \mathbf{v}^{shared}_{meta} = \mathbf{v} \odot \text{Fea\_Gate}^{shared}_{meta}(\mathbf{v}),
@@ -297,7 +306,7 @@ $$
 
 (11)
 
-其中 $\text{Self\_Gate}: \mathbb{R}^{|\mathbf{v}|} \rightarrow \mathbb{R}^K$，$K$ 是相关专家的数量，其激活函数为Sigmoid（如果只有1个专家），否则设置为Softmax。类似地，$z^{inter}_{meta,self}$ 和 $z^{watch}_{meta,self}$ 可以通过相同的方式获得，然后我们将相应的表示（例如 $z^{inter}_{meta} + z^{inter}_{meta,self}$）添加到下一层的支持中。详见第5节以获取HoME的细粒度细节。
+其中 $\text{Self\_Gate}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^K$，$K$ 是相关专家的数量，其激活函数为Sigmoid（如果只有1个专家），否则设置为Softmax。类似地，$z^{inter}_{meta,self}$ 和 $z^{watch}_{meta,self}$ 可以通过相同的方式获得，然后我们将相应的表示（例如 $z^{inter}_{meta} + z^{inter}_{meta,self}$）添加到下一层的支持中。详见第5节以获取HoME的细粒度细节。
 
 ### 4 实验
 
