@@ -164,7 +164,7 @@ $$
 
 其中：
 
-- $\text{Expert}^{shared}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^D$ 和 $\text{Expert}^{xtr}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^D$ 分别是ReLU激活的共享和特定专家网络，
+- $\text{Expert}^{\ shared}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^D$ 和 $\text{Expert}^{\ xtr}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^D$ 分别是ReLU激活的共享和特定专家网络，
 - $\text{Gate}^{\ xtr}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^N$ 是对应任务的Softmax激活的门网络，
 - $N$ 是相关共享和特定专家的数量，
 - $\text{Sum}$ 用于根据门生成的权重聚合 $N$ 个专家的输出，
@@ -173,7 +173,7 @@ $$
 在获得所有估计分数 $\widehat{y}^{ctr}, \dots$ 和真实标签 $y^{ctr}, \dots$ 后，我们直接最小化交叉熵二元分类损失来训练多任务学习模型：
 
 $$
-L = -\sum_{xtr \in \{ctr, \dots\}} \left( y^{xtr} \log(\widehat{y}^{xtr}) + (1 - y_{xtr}) \log(1 - \widehat{y}^{xtr}) \right),
+L = -\sum_{xtr \in \{ctr, \dots\}} \left( y^{xtr} \log(\widehat{y}^{xtr}) + (1 - y^{xtr}) \log(1 - \widehat{y}^{xtr}) \right),
 $$
 
 ...(2)
@@ -181,7 +181,7 @@ $$
 在在线服务中，常见的操作是设计一个可控的复杂方程，将XTRs组合为一个排序分数：
 
 $$
-\text{ranking\_score} = \alpha \cdot \widehat{y}^{ctr} + \beta \cdot \widehat{y}^{evtr} + \gamma \cdot \widehat{y}^{cmtr} + \dots,
+\text{ranking_score} = \alpha \cdot \widehat{y}^{ctr} + \beta \cdot \widehat{y}^{evtr} + \gamma \cdot \widehat{y}^{cmtr} + \dots,
 $$
 
 ...(3)
@@ -194,7 +194,7 @@ $$
 
 ### 3.2 专家归一化与Swish机制
 
-尽管公式(1)中的原始MMoE系统取得了显著的改进，但仍然存在严重的专家崩溃问题。将专家的 $\text{MLP}_E$ 函数生成的表示记为 $\{z_{shared}, z_{ctr}, z_{evtr}, \dots\}$，我们发现它们的均值和方差值存在显著差异。受Transformer的启发，归一化操作是成功训练非常深度神经网络的关键技术之一。我们为每个专家引入了批归一化（Batch Normalization）[16]，以支持HoME生成可比较的输出 $z_{norm} \in \mathbb{R}^D$：
+尽管公式(1)中的原始MMoE系统取得了显著的改进，但仍然存在严重的专家崩溃问题。将专家的 $MLP_E$ 函数生成的表示记为 $\{ z_{shared}, z_{ctr}, z_{evtr}, \dots \}$，我们发现它们的均值和方差值存在显著差异。受Transformer的启发，归一化操作是成功训练非常深度神经网络的关键技术之一。我们为每个专家引入了批归一化（Batch Normalization）[16]，以支持HoME生成可比较的输出 $z_{norm} \in R^D$：
 
 $$
 z_{norm} = \text{Batch\_Normalization}(z) = \gamma \frac{z - \mu}{\sqrt{\delta^2 + \epsilon}} + \beta,
