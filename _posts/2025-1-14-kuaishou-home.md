@@ -164,28 +164,31 @@ $$
 
 其中：
 
-- $\text{Expert}^{shared}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^D$ 和 $\text{Expert}_{xtr}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^D$ 分别是ReLU激活的共享和特定专家网络，
-- $\text{Gate}^{xtr}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^N$ 是对应任务的Softmax激活的门网络，
-- $N$ 是相关共享和特定专家的数量，$\text{Sum}$ 用于根据门生成的权重聚合 $N$ 个专家的输出，
-- $\text{Tower}^{xtr}: \mathbb{R}^D \rightarrow \mathbb{R}$ 是Sigmoid激活的任务特定网络，用于衡量相应的交互概率 $\hat{y}$。
+- $\text{Expert}^{shared}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^D$ 和 $\text{Expert}^{xtr}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^D$ 分别是ReLU激活的共享和特定专家网络，
+- $\text{Gate}^{\ xtr}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^N$ 是对应任务的Softmax激活的门网络，
+- $N$ 是相关共享和特定专家的数量，
+- $\text{Sum}$ 用于根据门生成的权重聚合 $N$ 个专家的输出，
+- $\text{Tower}^{\ xtr}: \mathbb{R}^D \rightarrow \mathbb{R}$ 是Sigmoid激活的任务特定网络，用于衡量相应的交互概率 $\widehat{y}$。
 
 在获得所有估计分数 $\widehat{y}^{ctr}, \dots$ 和真实标签 $y^{ctr}, \dots$ 后，我们直接最小化交叉熵二元分类损失来训练多任务学习模型：
 
 $$
-\mathcal{L} = -\sum_{xtr \in \{ctr, \dots\}} \left( y_{xtr} \log(\hat{y}_{xtr}) + (1 - y_{xtr}) \log(1 - \hat{y}_{xtr}) \right),
+L = -\sum_{xtr \in \{ctr, \dots\}} \left( y^{xtr} \log(\widehat{y}^{xtr}) + (1 - y_{xtr}) \log(1 - \widehat{y}^{xtr}) \right),
 $$
 
-(2)
+...(2)
 
 在在线服务中，常见的操作是设计一个可控的复杂方程，将XTRs组合为一个排序分数：
 
 $$
-\text{ranking\_score} = \alpha \cdot \hat{y}_{ctr} + \beta \cdot \hat{y}_{evtr} + \gamma \cdot \hat{y}_{cmtr} + \dots,
+\text{ranking\_score} = \alpha \cdot \widehat{y}^{ctr} + \beta \cdot \widehat{y}^{evtr} + \gamma \cdot \widehat{y}^{cmtr} + \dots,
 $$
 
-(3)
+...(3)
 
-其中 $\alpha, \beta, \gamma$ 是超参数。实际上，公式(3)在工业推荐系统中非常复杂，涉及许多策略。我们仅展示一个简单案例。在接下来的部分中，我们将重点改进公式(1)中的多任务学习过程的稳定性。
+其中：
+
+- $\alpha, \beta, \gamma$ 是超参数。实际上，公式(3)在工业推荐系统中非常复杂，涉及许多策略。我们仅展示一个简单案例。在接下来的部分中，我们将重点改进公式(1)中的多任务学习过程的稳定性。
 
 ---
 
