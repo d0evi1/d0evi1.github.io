@@ -194,18 +194,18 @@ $$
 
 ### 3.2 专家归一化与Swish机制
 
-尽管公式(1)中的原始MMoE系统取得了显著的改进，但仍然存在严重的专家崩溃问题。将专家的 $MLP_E$ 函数生成的表示记为 $\{ z_{shared}, z_{ctr}, z_{evtr}, \dots \}$，我们发现它们的均值和方差值存在显著差异。受Transformer的启发，归一化操作是成功训练非常深度神经网络的关键技术之一。我们为每个专家引入了批归一化（Batch Normalization）[16]，以支持HoME生成可比较的输出 $z_{norm} \in R^D$：
+尽管公式(1)中的原始MMoE系统取得了显著的改进，但仍然存在严重的专家崩溃问题。将专家的 $MLP\_E$ 函数生成的表示记为 $\{ z^{shared}, z^{ctr}, z^{evtr}, \dots \}$，我们发现它们的均值和方差值存在显著差异。受Transformer的启发，归一化操作是成功训练非常深度神经网络的关键技术之一。我们为每个专家引入了批归一化（Batch Normalization）[16]，以支持HoME生成可比较的输出 $z_{norm} \in R^D$：
 
 $$
-z_{norm} = \text{Batch\_Normalization}(z) = \gamma \frac{z - \mu}{\sqrt{\delta^2 + \epsilon}} + \beta,
+z_{norm} = \text{Batch_Normalization}(z) = \gamma \frac{z - \mu}{\sqrt{\delta^2 + \epsilon}} + \beta,
 $$
 
 其中：
 
 $$
 \begin{aligned}
-\mu &= \text{Batch\_Mean}(z), \\
-\delta^2 &= \text{Batch\_Mean}\left((z - \mu)^2\right),
+\mu &= \text{Batch_Mean}(z), \\
+\delta^2 &= \text{Batch_Mean}\left((z - \mu)^2\right),
 \end{aligned}
 $$
 
