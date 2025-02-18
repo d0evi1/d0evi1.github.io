@@ -211,15 +211,26 @@ $$
 
 (4)
 
-其中 $z$ 是任意专家的 $\text{MLP}_E$ 输出，$\gamma \in \mathbb{R}^D$ 和 $\beta \in \mathbb{R}^D$ 是可训练的缩放和偏置参数，用于调整分布，$\epsilon \in \mathbb{R}^D$ 是一个非常小的因子，用于避免除以零错误。$\mu \in \mathbb{R}^D$ 和 $\delta^2 \in \mathbb{R}^D$ 是当前批次相同专家输出的均值和方差。经过专家归一化后，$z_{norm}$ 的分布接近于标准正态分布 $N(0, I)$。因此，$z_{norm}$ 的一半值将小于0，并在ReLU激活下变为0，导致它们的导数和梯度为0，阻碍模型收敛。因此，我们使用Swish函数替换公式(1)中的ReLU，得到HoME的专家结构：
+其中：
+
+- $z$ 是任意专家的 $\text{MLP}_E$ 输出，
+- $\gamma \in R^D$ 和 $\beta \in R^D$ 是可训练的缩放和偏置参数，用于调整分布，
+- $\epsilon \in R^D$ 是一个非常小的因子，用于避免除以零错误
+- $\mu \in R^D$ 和 $\delta^2 \in R^D$ 是当前批次相同专家输出的均值和方差。
+
+经过专家归一化后，$z_{norm}$ 的分布接近于标准正态分布 $N(0, I)$。因此，$z_{norm}$ 的一半值将小于0，并在ReLU激活下变为0，导致它们的导数和梯度为0，阻碍模型收敛。因此，我们使用Swish函数替换公式(1)中的ReLU，得到HoME的专家结构：
 
 $$
 \text{HoME\_Expert}(\cdot) = \text{Swish}\left(\text{Batch\_Normalization}\left(\text{MLP}_E(\cdot)\right)\right),
 $$
 
-(5)
+...(5)
 
-其中 $\text{HoME\_Expert}(\cdot)$ 是我们HoME中使用的最终结构。在归一化和Swish的设置下，所有专家的输出可以对齐到相似的数值范围，这有助于门网络分配可比较的权重。为简洁起见，在接下来的部分中，我们仍使用 $\text{Expert}(\cdot)$ 来表示 $\text{HoME\_Expert}(\cdot)$。
+其中：
+
+- $\text{HoME\_Expert}(\cdot)$ 是我们HoME中使用的最终结构。
+
+在归一化和Swish的设置下，所有专家的输出可以对齐到相似的数值范围，这有助于门网络分配可比较的权重。为简洁起见，在接下来的部分中，我们仍使用 $\text{Expert}(\cdot)$ 来表示 $\text{HoME\_Expert}(\cdot)$。
 
 ### 3.3 层次掩码机制
 
