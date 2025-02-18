@@ -194,7 +194,7 @@ $$
 
 ### 3.2 专家归一化与Swish机制
 
-尽管公式(1)中的原始MMoE系统取得了显著的改进，但仍然存在严重的专家崩溃问题。将专家的 $MLP\_E$ 函数生成的表示记为 $\{ z^{shared}, z^{ctr}, z^{evtr}, \dots \}$，我们发现它们的均值和方差值存在显著差异。受Transformer的启发，归一化操作是成功训练非常深度神经网络的关键技术之一。我们为每个专家引入了批归一化（Batch Normalization）[16]，以支持HoME生成可比较的输出 $z_{norm} \in R^D$：
+尽管公式(1)中的原始MMoE系统取得了显著的改进，但仍然存在严重的专家崩溃问题。将专家的 $MLP\_E$ 函数生成的表示记为 $\{ z^{shared}, z^{ctr}, z^{evtr}, \dots \}$，我们发现**它们的均值和方差值存在显著差异**。受Transformer的启发，归一化操作是成功训练非常深度神经网络的关键技术之一。我们为每个专家引入了批归一化（Batch Normalization）[16]，以支持HoME生成可比较的输出 $z_{norm} \in R^D$：
 
 $$
 z_{norm} = \text{Batch_Normalization}(z) = \gamma \frac{z - \mu}{\sqrt{\delta^2 + \epsilon}} + \beta,
@@ -221,7 +221,7 @@ $$
 经过专家归一化后，$z_{norm}$ 的分布接近于标准正态分布 $N(0, I)$。因此，$z_{norm}$ 的一半值将小于0，并在ReLU激活下变为0，导致它们的导数和梯度为0，阻碍模型收敛。因此，我们使用Swish函数替换公式(1)中的ReLU，得到HoME的专家结构：
 
 $$
-\text{HoME\_Expert}(\cdot) = \text{Swish}\left(\text{Batch\_Normalization}\left(\text{MLP}_E(\cdot)\right)\right),
+\text{HoME_Expert}(\cdot) = \text{Swish}\left(\text{Batch_Normalization}\left(\text{MLP}_E(\cdot)\right)\right),
 $$
 
 ...(5)
@@ -230,7 +230,7 @@ $$
 
 - $\text{HoME\_Expert}(\cdot)$ 是我们HoME中使用的最终结构。
 
-在归一化和Swish的设置下，所有专家的输出可以对齐到相似的数值范围，这有助于门网络分配可比较的权重。为简洁起见，在接下来的部分中，我们仍使用 $\text{Expert}(\cdot)$ 来表示 $\text{HoME\_Expert}(\cdot)$。
+**在归一化和Swish的设置下，所有专家的输出可以对齐到相似的数值范围，这有助于门网络（gating network）分配可比较的权重**。为简洁起见，在接下来的部分中，我们仍使用 $\text{Expert}(\cdot)$ 来表示 $\text{HoME\_Expert}(\cdot)$。
 
 ### 3.3 层次掩码机制
 
@@ -238,17 +238,27 @@ $$
 
 $$
 \begin{aligned}
-z^{inter}_{meta} &= \text{Sum}\left(\text{Gate}^{inter}_{meta}(\mathbf{v}), \{\text{Experts}^{shared,inter}_{meta}(\mathbf{v})\}\right), \\
-z^{watch}_{meta} &= \text{Sum}\left(\text{Gate}^{watch}_{meta}(\mathbf{v}), \{\text{Experts}^{shared,watch}_{meta}(\mathbf{v})\}\right), \\
-z^{shared}_{meta} &= \text{Sum}\left(\text{Gate}^{shared}_{meta}(\mathbf{v}), \{\text{Experts}^{shared,inter,watch}_{meta}(\mathbf{v})\}\right),
+z^{inter}_{meta} &= \text{Sum}\left(\text{Gate}^{\ inter}_{\ meta}(\mathbf{v}), \{\text{Experts}^{\ shared,inter}_{\ meta}(\mathbf{v})\}\right), \\
+z^{watch}_{meta} &= \text{Sum}\left(\text{Gate}^{\ watch}_{\ meta}(\mathbf{v}), \{\text{Experts}^{\ shared,watch}_{\ meta}(\mathbf{v})\}\right), \\
+z^{shared}_{meta} &= \text{Sum}\left(\text{Gate}^{\ shared}_{\ meta}(\mathbf{v}), \{\text{Experts}^{\ shared,inter,watch}_{\ meta}(\mathbf{v})\}\right),
 \end{aligned}
 $$
 
 (6)
 
-其中 $z^{inter}_{meta}$、$z^{watch}_{meta}$、$z^{shared}_{meta}$ 是粗粒度的宏观元表示，用于提取：（1）交互类任务的知识，（2）观看时间类任务的知识，以及（3）共享知识。
+其中：
 
-在获得这些元表示后，我们接下来根据其对应的元知识和共享元知识进行多任务预测。具体来说，我们利用元知识构建了三种类型的专家：（1）根据 $z^{shared}_{meta}$ 构建的全局共享专家，（2）根据 $z^{inter}_{meta}$ 或 $z^{watch}_{meta}$ 构建的局部共享专家，（3）根据 $z^{inter}_{meta}$ 或 $z^{watch}_{meta}$ 构建的每个任务的特定专家。
+- $z^{inter}_{meta}$、$z^{watch}_{meta}$、$z^{shared}_{meta}$ 是**粗粒度的宏观元表示**，用于提取：
+
+- （1）交互类任务的知识
+- （2）观看时间类任务的知识
+- （3）共享知识
+
+在获得这些元表示后，我们接下来根据其对应的元知识和共享元知识进行多任务预测。具体来说，我们利用元知识构建了三种类型的专家：
+
+- （1）根据 $z^{shared}_{meta}$ 构建的全局共享专家
+- （2）根据 $z^{inter}_{meta}$ 或 $z^{watch}_{meta}$ 构建的局部共享专家
+- （3）根据 $z^{inter}_{meta}$ 或 $z^{watch}_{meta}$ 构建的每个任务的特定专家
 
 对于任务特定的门网络，我们直接使用共享元知识 $z^{shared}_{meta}$ 和相应类别的元知识的拼接来生成专家的权重。这里，我们以点击和有效观看交互为例：
 
