@@ -264,14 +264,18 @@ $$
 
 $$
 \begin{aligned}
-\hat{y}_{ctr} &= \text{Tower}_{ctr}\left(\text{Sum}\left(\text{Gate}_{ctr}(z^{inter}_{meta} \oplus z^{shared}_{meta}), \{\text{Experts}^{shared}(z^{shared}_{meta}), \text{Experts}^{inter,ctr}(z^{inter}_{meta})\}\right)\right), \\
-\hat{y}_{evtr} &= \text{Tower}_{evtr}\left(\text{Sum}\left(\text{Gate}_{evtr}(z^{watch}_{meta} \oplus z^{shared}_{meta}), \{\text{Experts}^{shared}(z^{shared}_{meta}), \text{Experts}^{watch,evtr}(z^{watch}_{meta})\}\right)\right),
+\widehat{y}^{ctr} &= \text{Tower}^{ctr}\left(\text{Sum}\left(\text{Gate}^{ctr}(z^{inter}_{meta} \oplus z^{shared}_{meta}), \{\text{Experts}^{shared}(z^{shared}_{meta}), \text{Experts}^{inter,ctr}(z^{inter}_{meta})\}\right)\right), \\
+\widehat{y}_{evtr} &= \text{Tower}^{evtr}\left(\text{Sum}\left(\text{Gate}^{evtr}(z^{watch}_{meta} \oplus z^{shared}_{meta}), \{\text{Experts}^{shared}(z^{shared}_{meta}), \text{Experts}^{watch,evtr}(z^{watch}_{meta})\}\right)\right),
 \end{aligned}
 $$
 
 (7)
 
-其中 $\oplus$ 表示拼接操作符，$\text{Experts}^{shared}$ 是所有任务的共享专家，$\text{Experts}^{inter}$ 和 $\text{Experts}^{watch}$ 是类别内任务的共享专家。
+其中：
+
+-  $\oplus$ 表示拼接操作符，
+- $\text{Experts}^{shared}$ 是所有任务的共享专家，
+- $\text{Experts}^{inter}$ 和 $\text{Experts}^{watch}$ 是类别内任务的共享专家。
 
 值得注意的是，HoME的第一层元抽象与PLE的主要架构差异，这是基于我们在快手真实多任务推荐场景中的观察（见图5）。基于HoME的先验语义划分的元专家网络，我们可以尽可能避免任务之间的冲突，并最大化任务间的共享效率。
 
