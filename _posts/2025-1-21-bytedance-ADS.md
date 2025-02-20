@@ -6,7 +6,7 @@ modified: 2025-1-21
 tags: 
 ---
 
-字节在《Adaptive Domain Scaling for Personalized Sequential Modeling in Recommenders》提出了它们的多场景建模模型ADS：
+字节在《Adaptive Domain Scaling for Personalized Sequential Modeling in Recommenders》提出了它们的关于序列建模的多场景建模实现ADS：
 
 # 摘要
 
