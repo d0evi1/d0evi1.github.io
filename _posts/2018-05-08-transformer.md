@@ -42,9 +42,9 @@ Transformer遵循了这一整体架构，但在编码器-解码器(encoder-decod
 
 ## 3.1 Encoder Stacks和Decoder Stacks
 
-**Encoder**：encoder由一个N=6的相同层（identical layers）的stack组成。**每一layer具有两个sub-layers。第1个是一个multi-head self-attention机制，第2个是一个简单的position-wise FC 前馈网络**。我们在两个sub-layers的每一个上采用一个residual connection[10]，后跟着layer nomalization[1]。也就是说：**每一sub-layer的output是 $$LayerNorm(x + Sublayer(x))$$**，其中Sublayer(x)是通过sub-layer自身实现的函数。为了促进这些residual connections，模型中的所有sub-layers以及embedding layers会生成维度 $$d_{model}=512$$的outputs。
+**编码器**：编码器由$N = 6$个相同的层堆叠而成。每一层包含两个子层：第一个是多头自注意力机制(MHA)，第二个是简单的逐位置全连接前馈网络（point-wise FCN）。我们在每个子层周围使用了**残差连接（residual connection）**[10]，并在其后进行**层归一化**[1]。也就是说，每个子层的输出为$\text{LayerNorm}(x + \text{Sublayer}(x))$，其中$\text{Sublayer}(x)$是子层自身实现的函数。为了支持这些残差连接，模型中的所有子层以及嵌入层的输出维度均为$d_{\text{model}} = 512$。
 
-**Decoder**：该decoder也由一个N=6的相同层（identical layers）的stacks组成。除了包含在每个encoder layer中的两个sub-layers之外，**decoder会插入第三个sub-layer，从而在encoder stack的output上执行multi-head attention**。与encoder相似，我们在每个sub-layers周围采用residual connections，后跟layer normalization。**同时我们在decoder stack中修改了self-attention sub-layer，来阻止position与后序位置有联系**。这种masking机制，结合上output embeddings由一个位置偏移(offset by one position)的事实，可以确保对于位置i的预测只依赖于在位置小于i上的已知outputs。
+**解码器**：解码器同样由$N = 6$个相同的层堆叠而成。除了每一编码器层中的两个子层外，解码器还插入了一个第三子层，该子层对编码器堆栈的输出执行多头注意力机制。与编码器类似，我们在每个子层周围使用了残差连接，并在其后进行层归一化。此外，我们对解码器堆栈中的自注意力子层进行了修改，以防止当前位置关注到后续位置。这种掩码机制结合输出嵌入向右偏移一个位置的事实，确保了位置$i$的预测只能依赖于位置小于$i$的已知输出。
 
 ## 3.2 Attention
 
