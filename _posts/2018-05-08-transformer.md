@@ -42,13 +42,13 @@ Transformer遵循了这一整体架构，但在编码器-解码器(encoder-decod
 
 ## 3.1 Encoder Stacks和Decoder Stacks
 
-**编码器**：编码器由$N = 6$个相同的层堆叠而成。每一层包含两个子层：第一个是多头自注意力机制(MHA)，第二个是简单的逐位置全连接前馈网络（point-wise FCN）。我们在每个子层周围使用了**残差连接（residual connection）**[10]，并在其后进行**层归一化**[1]。也就是说，每个子层的输出为$\text{LayerNorm}(x + \text{Sublayer}(x))$，其中$\text{Sublayer}(x)$是子层自身实现的函数。为了支持这些残差连接，模型中的所有子层以及嵌入层的输出维度均为$d_{\text{model}} = 512$。
+**编码器**：编码器由$N = 6$个相同的层堆叠而成。每一层包含两个子层：第一个是**多头自注意力机制(MHA)**，第二个是简单的**逐位置全连接前馈网络（position-wise FCN）**。我们在每个子层周围使用了**残差连接（residual connection）**[10]，并在其后进行**层归一化（layer-normalization）**[1]。也就是说，每个子层的输出为$\text{LayerNorm}(x + \text{Sublayer}(x))$，其中$\text{Sublayer}(x)$是子层自身实现的函数。为了支持这些残差连接，模型中的所有子层以及嵌入层的输出维度均为$d_{\text{model}} = 512$。
 
-**解码器**：解码器同样由$N = 6$个相同的层堆叠而成。除了每一编码器层中的两个子层外，解码器还插入了一个第三子层，该子层对编码器堆栈的输出执行多头注意力机制。与编码器类似，我们在每个子层周围使用了残差连接，并在其后进行层归一化。此外，我们对解码器堆栈中的自注意力子层进行了修改，以防止当前位置关注到后续位置。这种掩码机制结合输出嵌入向右偏移一个位置的事实，确保了位置$i$的预测只能依赖于位置小于$i$的已知输出。
+**解码器**：解码器同样由$N = 6$个相同的层堆叠而成。除了每一编码器层中的两个子层外，解码器还插入了一个第三子层：**该子层对编码器堆栈的输出执行多头注意力机制(MHA)**。与编码器类似，我们在每个子层周围使用了残差连接，并在其后进行层归一化。此外，**我们对解码器堆栈中的自注意力子层进行了修改，以防止当前位置关注到后续位置**。这种掩码机制结合输出嵌入向右偏移一个位置的事实，确保了位置$i$的预测只能依赖于位置小于$i$的已知输出。
 
 ## 3.2 Attention
 
-attention函数可以被描述成：将一个query和一个key-value pairs集合映射到一个output上，其中：query, keys, values和output都是向量(vectors)。output由对values进行加权计算得到，其中为每个value分配的weight通过query和对应的key的一个兼容函数计算得到。
+注意力函数可以被描述为将一个查询（query）和一组键值对（key-value pairs）映射到一个输出（output），其中查询(Q)、键(K)、值(V)和输出(O)都是向量。**输出是值的加权和**，其中每个值的权重通过查询与相应键的兼容性函数计算得出。
 
 
 <img src="http://pic.yupoo.com/wangdren23_v/ba75c826/4d85c908.png" alt="2.png">
@@ -74,9 +74,9 @@ $$
 
 ### 3.2.2 Multi-Head Attention
 
-我们不会使用$$d_{model}$$维的keys、values和queries来执行单个attention函数，**我们发现：使用学到的不同线性投影将queries、keys和values各自投影到$$d_k$$、$$d_k$$、$$d_v$$维上是有好处的**。在关于queries、keys和values的每一个投影版本上，我们会并行执行attention函数，生成$$d_v$$维的output values。这些值被拼接在一起(concatenated)，再进行投影，产生最后值，如图2所示。
+我们并没有使用单一的注意力函数来处理$d_{\text{model}}$维的键、值和查询，而是发现将查询、键和值分别通过不同的可学习线性投影进行$h$次线性投影到$d_k$、$d_k$和$d_v$维度更为有效。然后，我们在这些投影后的查询、键和值上并行执行注意力函数，生成$d_v$维的输出值。这些输出值被拼接起来并再次投影，最终得到输出结果，如图2所示。
 
-Multi-head attention允许模型联合处理在不同位置处来自不同表示子空间的信息。使用单个attention head，求平均会禁止这样做。
+**多头注意力机制**允许模型在不同位置同时关注来自不同表示子空间的信息。如果仅使用单一的注意力头，平均操作会抑制这种能力。
 
 
 $$
@@ -84,17 +84,14 @@ MultiHead(Q, K, V) = Concat(head_1, \cdots, head_h) W^O \\
 head_i = Attention(Q W_i^Q, KW_i^K, V W_i^V)
 $$
 
-其中，投影是参数矩阵：
+其中，投影的参数矩阵为：
 
-$$
-W_i^Q \in R^{d_{model} \ \ \times d_k}, \\
-W_i^K \in R^{d_{model} \ \ \times d_k}, \\
-W_i^V \in R^{d_{model} \ \ \times d_v}, \\
-W^O \in R^{h d_v \ \times d_{model}}
-$$
+- $W^Q_i \in \mathbb{R}^{d_{\text{model}} \times d_k}$
+- $W^K_i \in \mathbb{R}^{d_{\text{model}} \times d_k}$
+- $W^V_i \in \mathbb{R}^{d_{\text{model}} \times d_v}$
+- $W^O \in \mathbb{R}^{h d_v \times d_{\text{model}}}$
 
-
-在本工作中，我们使用h=8的并行attention layers或heads。对于每一者，我们会使用$$d_k = d_v = d_{model}/h = 64$$ 。由于每个head的维度缩减，总的计算开销与具有完整维度的single-head attention相似。
+在本研究中，我们采用了$h = 8$个并行的注意力层（即头）。对于每个头，我们使用$d_k = d_v = d_{\text{model}} / h = 64$。由于每个头的维度减少，总计算成本与全维度的单头注意力机制相似。
 
 ### 3.2.3 在模型中Attention的应用
 
