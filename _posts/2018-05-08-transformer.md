@@ -95,11 +95,11 @@ $$
 
 ### 3.2.3 在模型中Attention的应用
 
-Transformer以三种不同的方式使用multi-head attention：
+Transformer在以下三种不同的场景中使用多头注意力机制（MHA）：
 
-- **"encoder-decoder attention" layers中**：queries来自前一decoder layer，memory keys和values来自encoder的output。这允许在decoder中的每个position会注意(attend)在输入序列中的所有位置。这种方式模仿了在seq2seq模型中典型的encoder-decoder attention机制[31,2,8]。
-- **encoder中**：encoder包含了self-attention layers。在一个self-attention layer中，所有的keys, values和queries来自相同的地方：在encoder中的前一layer的output。在encoder中每个position可以注意（attend）在encoder的前一layer中的所有位置。
-- **decoder中**：相似的，在decoder中self-attention layers允许在decoder中的每一position注意到在decoder中的所有positions，直到包含该position。我们需要阻止在decoder中的左侧信息流，来保留自回归(auto-regressive)属性。我们通过对softmax（它对应到无效连接）的输入的所有值进行掩码（masking out，设置为$$-\infty$$）来实现该scaled dot-product attention内部。见图2.
+- 1. **编码器-解码器注意力层（encoder-decoder attention）**：查询（queries）来自解码器的前一层，而键（keys）和值（values）来自编码器的输出。这使得解码器中的每个位置都可以关注输入序列中的所有位置。这种机制模仿了序列到序列模型（如[31, 2, 8]）中典型的编码器-解码器注意力机制。
+- 2. **编码器中的自注意力层**：在自注意力层中，**所有的键、值和查询都来自同一个地方**，即编码器前一层的输出。编码器中的每个位置都可以关注编码器前一层的所有位置。
+- 3. **解码器中的自注意力层**：类似地，解码器中的自注意力层允许解码器中的每个位置关注解码器中该位置及其之前的所有位置。为了防止信息从左向右流动以保持自回归特性，我们在缩放点积注意力中通过掩码（将非法连接对应的softmax输入设置为$-\infty$）来实现这一点。参见图2。
 
 ## 3.3 Position-wise前馈网络
 
@@ -111,11 +111,16 @@ $$
 
 ...(2)
 
-其中，线性转换在不同的positions上是相同的，在层与层间它们使用不同参数。另一种方式是，使用kernel size为1的两个convolutions。输入和输出的维度是$$d_{model}=512$$，inner-layer具有维度$$d_{ff}=2048$$。
+其中:
+
+- 线性转换在不同的positions上是相同的，在层与层间它们使用不同参数。
+
+另一种方式是，使用kernel size为1的两个convolutions。输入和输出的维度是$$d_{model}=512$$，inner-layer具有维度$$d_{ff}=2048$$。
 
 ## 3.4 Embedding和softmax
 
-与其它序列转换模型相似，我们使用学到的embeddings来将input tokens和output tokens转换成$$d_{model}$$维的向量。我们也使用常见的学到的线性转换和softmax函数来将decoder output转换成要预测的下一token的概率。在我们的模型中，我们在两个embedding layers和pre-softmax线性转换间共享相同的权重矩阵，这与[24]相同。在embedding layers中，我们会使用$$\sqrt{d_{model}}$$乘以这些权重。
+与其他序列转换模型类似，我们使用可学习的嵌入将输入标记和输出标记转换为维度为$d_{\text{model}}$的向量。我们还使用常见的**可学习线性变换和softmax函数**，将解码器输出转换为预测的下一个标记的概率。在我们的模型中，两个嵌入层和softmax前的线性变换共享相同的权重矩阵，类似于[24]的做法。在嵌入层中，我们将这些权重乘以$\sqrt{d_{\text{model}}}$。
+
 
 ## 3.5 Positional Encoding
 
