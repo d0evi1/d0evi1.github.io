@@ -8,32 +8,33 @@ tags:
 
 google在2017年paper《Attention Is All You Need》提出了transformer，我们可以看下：
 
+## 摘要
+
+目前主流的序列转换模型主要基于复杂的循环神经网络或卷积神经网络，这些模型通常包含编码器和解码器两部分。性能最佳的模型还通过注意力机制将编码器和解码器连接起来。我们提出了一种新的简单网络架构——Transformer，它完全基于注意力机制，摒弃了循环和卷积结构。在两个机器翻译任务上的实验表明，这些模型在质量上表现更优，同时具有更高的并行性，且训练时间显著减少。我们的模型在WMT 2014英语到德语翻译任务上取得了28.4的BLEU分数，比现有的最佳结果（包括集成模型）提高了超过2个BLEU分数。在WMT 2014英语到法语翻译任务上，我们的模型在8个GPU上训练了3.5天后，取得了41.0的BLEU分数，创下了新的单模型最佳成绩，而训练成本仅为文献中最佳模型的一小部分。
+
 # 1.介绍
 
-在序列建模(sequence modeling)和转换问题(transduction problems，比如：语言建模和机器翻译)上，RNN, LSTM和GRNN已经成为state-of-art的方法。大多数努力源自于recurrent语言模型和encoder-decoder架构的持续推动。
+循环神经网络（RNN）、长短期记忆网络（LSTM）[12]以及门控循环神经网络（GRU）[7]，尤其在**序列建模**和**转换问题**（如语言建模和机器翻译）中，已被确立为领先的技术手段[29, 2, 5]。随后，众多研究不断推进循环语言模型和编码器-解码器架构的边界[31, 21, 13]。循环模型通常沿着输入和输出序列的符号位置进行因子分解计算。将位置与计算时间的步骤对齐，它们生成一系列隐藏状态$h_t$，作为前一个隐藏状态$h_{t-1}$和位置$t$的输入的函数。**这种固有的顺序性质阻碍了训练样本内的并行化，这在序列较长时变得尤为关键，因为内存限制限制了跨样本的批处理**。最近的工作通过因子分解技巧[18]和条件计算[26]在计算效率上取得了显著提升，同时后者也提高了模型性能。然而，顺序计算的基本限制仍然存在。
 
-recurrent模型通常会沿着输入和输出序列的符号位置(symbol position)进行因子计算。在计算时对位置（position）进行排列，他们可以生成一个hidden states $$h_t$$的序列，它是关于前一hidden state $$h_{t-1}$$和位置t做为输入的一个函数。**这种天然的序列特性排除了在训练样本中的并发性(这对于更长序列长度很重要)，因为内存约束会限制在样本上进行batching**。最近工作表明，因子分解tricks[18]和条件计算[26]可以在计算效率上进行有效提升，同时也会提升模型效果。然而，序列化计算的基本限制仍然存在。
+注意力机制已成为各种任务中引人注目的序列建模和转换模型的一个组成部分，它允许建模依赖关系而不考虑它们在输入或输出序列中的距离[2, 16]。然而，在除少数情况外的所有情况下[22]，这种注意力机制是与循环网络结合使用的。
 
-Attention机制已经在许多任务中成为序列建模（sequence modeling）和转化模型（transduction model）的不可欠缺的一个部件，它可以在无需考虑input或output序列上的距离[2,16]的情况下来建模依赖(dependencies)。除了极少的cases外，几乎所有这样的attention机制都会与一个recurrent network一起使用。
-
-**在该工作中，我们提出了Transformer，这种模型结构可以避免recurrence，它完全依赖attention机制来抽取在input和output间的全局依赖性**。Transformer允许更大的并行度(parallelization)，在eight P100 GPUs上训练12小时后，在翻译质量上可以达到一种新的state-of-art效果。
+在本研究中，我们提出了**Transformer**，这是一种摒弃循环结构而完全依赖注意力机制来捕捉输入和输出之间全局依赖关系的模型架构。Transformer允许显著更多的并行化，并且只需在八个P100 GPU上训练十二小时，就能在翻译质量上达到新的技术高峰。
 
 # 2.背景
 
-减小序列化计算开销的目标，也构成了Extended Neural GPU
-[20], ByteNet [15] and ConvS2S [8]的基础，它们都使用CNN作为基本构建块，对所有input和output positions并行计算hidden representations。在这些模型中，两个专门的input或output positions的相关信号所需要的ops数目，会随着positions间的距离而增长：这对于ConvS2S是线性的，对于ByteNet是成log关系。**这使得很难学习在较远位置（distant positions）间的依赖[11]**。在Transformer中，操作（operations）的数目可以**减小到常数级别**，虽然在有效识别率上会有损失的代价（因为会对attention-weighted positions进行平均），我们会使用第3.2节中的Multi-Head Attention来消除这现象。
+减少顺序计算的目标，也构成了**Extended Neural GPU**[20]、**ByteNet**[15]和**ConvS2S**[8]的基础，这些模型都使用卷积神经网络作为基本构建块，并行计算所有输入和输出位置的隐藏表示。在这些模型中，关联来自两个任意输入或输出位置的信号所需的操作次数随位置之间的距离增长，对于ConvS2S是线性增长，而对于ByteNet是对数增长。这使得学习远距离位置之间的依赖关系变得更加困难[11]。在Transformer中，这一操作次数被**减少到一个常数**，尽管由于**对基于注意力加权位置（attention-weighted positions）进行平均而导致有效分辨率降低**，但我们通过**多头注意力机制**（Multi-Head Attention）来抵消这种影响，详见第3.2节。
 
-self-attention，有时被称为"intra-attention"，是一种与单个序列上不同位置有关的attention机制，它的目的是**计算该序列的一种表示（representation）**。self-attention已经被成功用于许多任务，包括：阅读理解(reading comprehension)、抽象式摘要(abstractive summarization)、文字蕴含（textual entailment）、独立句子表示任务[4,22,23,19]。
+**自注意力机制**（Self-attention），有时也称为内部注意力机制（intra-attention），是一种将单个序列的不同位置关联起来以计算序列表示的注意力机制。自注意力机制已成功应用于多种任务，包括阅读理解、抽象摘要、文本蕴含以及学习任务无关的句子表示[4, 22, 23, 19]。
 
-end-to-end memory networks基于一个recurrent attention机制（而非基于sequence-aligned recurrence），已经展示出在单语言问答上和语言建模任务上很好的效果[28]。
+**端到端记忆网络**（End-to-end memory networks）基于循环注意力机制，而不是序列对齐的循环结构，已被证明在简单语言问答和语言建模任务中表现良好[28]。
 
-据我们所知，**Transformer是首个完全依赖于self-attention的转换模型（transduction model），它无需使用sequence-aligned RNNs或convolution，就可以计算input和output的表示(representations)**。在以下部分，我们会描述Transformer、motivation self-attention、以及在模型上的优点[14,15]，[8]。
+然而，据我们所知，**Transformer**是第一个完全依赖自注意力机制来计算输入和输出表示的转换模型，而不使用序列对齐的RNN或卷积网络。在接下来的章节中，我们将描述Transformer的架构，探讨自注意力机制（self-attention）的动机，并讨论其相对于[14, 15]和[8]等模型的优势。
 
 # 3.模型结构
 
-大多数比赛采用的神经序列转换模型(neural sequence transduction models)都有一个encoder-decoder结构[5,2,29]。这里，encoder会将一个关于符号表示$$(x_1, \cdots, x_n)$$的输入序列映射到一个连续表示$$z=(z_1, \cdots, z_n)$$的序列上。在给定z后，decoder接着生成一个关于符号(symbols)的output序列$$(y_1, \cdots, y_m)$$，一次一个元素。在每个step上，模型是自回归的（auto-regressive），当生成下一输出时，它会消费前面生成的符号作为额外输入。
+大多数具有竞争力的神经序列转换模型都采用**编码器-解码器**结构[5, 2, 29]。在这种结构中，编码器将输入符号表示序列$(x_1, ..., x_n)$映射为一个连续表示序列$z = (z_1, \cdots, z_n)$。在给定$z$的情况下，解码器逐步生成一个符号输出序列$(y_1, \cdots, y_m)$，每次生成一个元素。在每一步中，模型是**自回归**的[9]，在生成下一个符号时，会将之前生成的符号作为额外输入。
 
-Transformer会遵循这样的总体架构：它使用stacked self-attention、point-wise FC-layers的encoder-decoder，如图1的左右所示：
+Transformer遵循了这一整体架构，但在编码器-解码器(encoder-decoder)中使用了堆叠的**自注意力机制**和**逐点全连接层(point-wise FC-layers)**，分别如图1的左半部分和右半部分所示。
 
 <img src="http://pic.yupoo.com/wangdren23_v/b4bb3caf/81ba10cc.png" alt="1.png">
 
