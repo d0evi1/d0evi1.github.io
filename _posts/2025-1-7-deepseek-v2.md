@@ -14,21 +14,30 @@ Deepseek AI在《DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Exp
 
 我们在Transformer框架（Vaswani et al., 2017）中优化了注意力模块和前馈网络（FFNs），分别提出了**多头隐注意力（MLA）**和**DeepSeekMoE**。
 
-1. **在注意力机制方面**，多头注意力（MHA）（Vaswani et al., 2017）的键值（KV）缓存对LLM的推理效率构成了显著障碍。为了解决这一问题，研究者们探索了多种方法，包括分组查询注意力（GQA）（Ainslie et al., 2023）和多查询注意力（MQA）（Shazeer, 2019）。然而，这些方法在减少KV缓存的同时往往会牺牲性能。为了兼顾两者，我们引入了MLA，这是一种配备低秩键值联合压缩的注意力机制。实验表明，MLA在性能上优于MHA，同时显著减少了推理过程中的KV缓存，从而提升了推理效率。
+1. **在注意力机制方面**，多头注意力（MHA）（Vaswani et al., 2017）的**键值（KV）缓存对LLM的推理效率构成了显著障碍**。为了解决这一问题，研究者们探索了多种方法，包括分组查询注意力（GQA）（Ainslie et al., 2023）和多查询注意力（MQA）（Shazeer, 2019）。然而，这些方法在减少KV缓存的同时往往会牺牲性能。为了兼顾两者，我们引入了MLA，这是一种配备**低秩键值联合压缩（low-rank key-value joint compression）**的注意力机制。实验表明，MLA在性能上优于MHA，同时显著减少了推理过程中的KV缓存，从而提升了推理效率。
 
 2. **在前馈网络（FFNs）方面**，我们采用了DeepSeekMoE架构（Dai et al., 2024），该架构通过细粒度的专家分割和共享专家隔离，实现了更高的专家专业化潜力。与传统的MoE架构（如GShard（Lepikhin et al., 2021））相比，DeepSeekMoE展现出了显著优势，使我们能够以较低的成本训练强大的模型。在训练过程中，我们采用专家并行策略，并设计了补充机制来控制通信开销并确保负载均衡。
 
+通过结合这两种技术，DeepSeek-V2在性能（图1(a)）、训练成本和推理吞吐量（图1(b)）方面均表现出色。**我们构建了一个高质量、多来源的预训练语料库，包含8.1T token**。与DeepSeek 67B（我们之前的版本）（DeepSeek-AI, 2024）使用的语料库相比，该语料库的数据量更大，尤其是中文数据，且数据质量更高。
+
+- 首先我们在完整的预训练语料库上对DeepSeek-V2进行预训练。
+- 然后，我们收集了**1.5M个对话会话**，涵盖数学、代码、写作、推理、安全等多个领域，用于对DeepSeek-V2 Chat（SFT）进行监督微调。
+- 最后，我们遵循DeepSeekMath（Shao et al., 2024）的方法，采用**组相对策略优化（GRPO）**进一步对齐模型与人类偏好，生成DeepSeek-V2 Chat（RL）。
+
+我们在广泛的中英文基准测试中评估了DeepSeek-V2，并将其与代表性的开源模型进行了比较。评估结果表明，即使仅激活21B参数，DeepSeek-V2仍然在开源模型中表现出顶级性能，成为最强的开源MoE语言模型。
+
+- 图1(a)显示，在MMLU上，DeepSeek-V2仅以少量激活参数就达到了顶级性能。
+- 如图1(b)所示，与DeepSeek 67B相比，DeepSeek-V2节省了42.5%的训练成本，减少了93.3%的KV缓存，并将最大生成吞吐量提升至5.76倍。
+
+我们还在开放式基准测试中评估了DeepSeek-V2 Chat（SFT）和DeepSeek-V2 Chat（RL）。值得注意的是，DeepSeek-V2 Chat（RL）在AlpacaEval 2.0（Dubois et al., 2024）上达到了38.9的长度控制胜率，在MT-Bench（Zheng et al., 2023）上获得了8.97的综合评分，在AlignBench（Liu et al., 2023）上获得了7.91的综合评分。英文开放式对话评估表明，DeepSeek-V2 Chat（RL）在开源聊天模型中具有顶级性能。此外，AlignBench的评估表明，在中文方面，DeepSeek-V2 Chat（RL）超越了所有开源模型，甚至击败了大多数闭源模型。
+
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c03d34cef444d7a19a24d47b6d0570b9d6090d848e2fae434ca836680cc6df78f879859ad5fe5a92649295610441d1e4?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
 
-图1
-
-通过结合这两种技术，DeepSeek-V2在性能（图1(a)）、训练成本和推理吞吐量（图1(b)）方面均表现出色。我们构建了一个高质量、多来源的预训练语料库，包含8.1T token。与DeepSeek 67B（我们之前的版本）（DeepSeek-AI, 2024）使用的语料库相比，该语料库的数据量更大，尤其是中文数据，且数据质量更高。我们首先在完整的预训练语料库上对DeepSeek-V2进行预训练。然后，我们收集了1.5M个对话会话，涵盖数学、代码、写作、推理、安全等多个领域，用于对DeepSeek-V2 Chat（SFT）进行监督微调。最后，我们遵循DeepSeekMath（Shao et al., 2024）的方法，采用**组相对策略优化（GRPO）**进一步对齐模型与人类偏好，生成DeepSeek-V2 Chat（RL）。
-
-我们在广泛的中英文基准测试中评估了DeepSeek-V2，并将其与代表性的开源模型进行了比较。评估结果表明，即使仅激活21B参数，DeepSeek-V2仍然在开源模型中表现出顶级性能，成为最强的开源MoE语言模型。图1(a)显示，在MMLU上，DeepSeek-V2仅以少量激活参数就达到了顶级性能。此外，如图1(b)所示，与DeepSeek 67B相比，DeepSeek-V2节省了42.5%的训练成本，减少了93.3%的KV缓存，并将最大生成吞吐量提升至5.76倍。我们还在开放式基准测试中评估了DeepSeek-V2 Chat（SFT）和DeepSeek-V2 Chat（RL）。值得注意的是，DeepSeek-V2 Chat（RL）在AlpacaEval 2.0（Dubois et al., 2024）上达到了38.9的长度控制胜率，在MT-Bench（Zheng et al., 2023）上获得了8.97的综合评分，在AlignBench（Liu et al., 2023）上获得了7.91的综合评分。英文开放式对话评估表明，DeepSeek-V2 Chat（RL）在开源聊天模型中具有顶级性能。此外，AlignBench的评估表明，在中文方面，DeepSeek-V2 Chat（RL）超越了所有开源模型，甚至击败了大多数闭源模型。
+图1 (a)不同开源模型中MMLU精度与激活参数的对比。(b) DeepSeek-67B（Dense）和DeepSeek-v2的训练成本和推理效率。
 
 为了促进对MLA和DeepSeekMoE的进一步研究和开发，我们还向开源社区发布了**DeepSeek-V2-Lite**，这是一个配备MLA和DeepSeekMoE的小型模型。其总参数量为15.7B，每个token激活2.4B参数。关于DeepSeek-V2-Lite的详细描述见附录B。
 
-在本文的其余部分，我们首先详细描述了DeepSeek-V2的模型架构（第2节）。随后，我们介绍了预训练工作，包括训练数据构建、超参数设置、基础设施、长上下文扩展以及模型性能和效率的评估（第3节）。接着，我们展示了对齐工作，包括监督微调（SFT）、强化学习（RL）、评估结果及其他讨论（第4节）。最后，我们总结了结论，探讨了DeepSeek-V2的当前局限性，并展望了未来的工作（第5节）。
+在本文的其余部分，我们首先详细描述了DeepSeek-V2的模型架构（第2节）。随后，我们介绍了预训练工作，包括训练数据构建、超参数设置、基础设施、长上下文扩展以及模型性能和效率的评估（第3节）。接着，我们展示了对齐工作（alignment），包括监督微调（SFT）、强化学习（RL）、评估结果及其他讨论（第4节）。最后，我们总结了结论，探讨了DeepSeek-V2的当前局限性，并展望了未来的工作（第5节）。
 
 ## 2. 架构
 
@@ -36,17 +45,24 @@ Deepseek AI在《DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Exp
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/20621c28bc61d4dff59b1ce6eccf40ad260eda493f06d6d6326ad4269ee4f269cc19d8bead0dc52849da02579356f108?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
-图2
+图2 DeepSeek-V2架构示意图。MLA通过显著减少生成的KV缓存来确保高效的推理，DeepSeekMoE通过稀疏架构以经济的成本训练强模型
 
 ### 2.1 多头隐注意力：提升推理效率
 
-传统的Transformer模型通常采用多头注意力（MHA）（Vaswani et al., 2017），但在生成过程中，其庞大的键值（KV）缓存会成为限制推理效率的瓶颈。为了减少KV缓存，研究者提出了多查询注意力（MQA）（Shazeer, 2019）和分组查询注意力（GQA）（Ainslie et al., 2023）。这些方法需要更少的KV缓存，但其性能无法与MHA媲美（我们在附录D.1中提供了MHA、GQA和MQA的消融实验）。
+传统的Transformer模型通常采用多头注意力（MHA）（Vaswani et al., 2017），但**在生成过程中，其庞大的键值（KV）缓存会成为限制推理效率的瓶颈**。为了减少KV缓存，研究者提出了**多查询注意力（MQA）**（Shazeer, 2019）和**分组查询注意力（GQA）**（Ainslie et al., 2023）。这些方法需要更少的KV缓存，但其性能无法与MHA媲美（我们在附录D.1中提供了MHA、GQA和MQA的消融实验）。
 
 对于DeepSeek-V2，我们设计了一种创新的注意力机制，称为**多头隐注意力（MLA）**。MLA配备了低秩键值联合压缩，不仅性能优于MHA，而且所需的KV缓存显著减少。以下我们将介绍其架构，并在附录D.2中提供MLA与MHA的对比。
 
 #### 2.1.1 预备知识：标准多头注意力
 
-我们首先介绍标准MHA机制作为背景。设$d$为嵌入维度，$n_h$为注意力头的数量，$d_h$为每个头的维度，$h_t \in \mathbb{R}^d$为第$t$个token在注意力层的输入。标准MHA首先通过三个矩阵$W_Q$、$W_K$、$W_V \in \mathbb{R}^{d_h n_h \times d}$分别生成$q_t$、$k_t$、$v_t \in \mathbb{R}^{d_h n_h}$：
+我们首先介绍标准MHA机制作为背景。设：
+
+- $d$为嵌入维度
+- $n_h$为注意力头的数量
+- $d_h$为每个头的维度
+- $h_t \in \mathbb{R}^d$为第$t$个token在注意力层的输入
+
+标准MHA首先通过三个矩阵$W_Q$、$W_K$、$W_V \in \mathbb{R}^{d_h n_h \times d}$分别生成$q_t$、$k_t$、$v_t \in \mathbb{R}^{d_h n_h}$：
 
 $$
 q_t = W_Q h_t, \quad (1) \\
@@ -61,7 +77,7 @@ $$
 [q_{t,1}; q_{t,2}; \dots; q_{t,n_h}] = q_t, \quad (4) \\
 [k_{t,1}; k_{t,2}; \dots; k_{t,n_h}] = k_t, \quad (5) \\
 [v_{t,1}; v_{t,2}; \dots; v_{t,n_h}] = v_t, \quad (6) \\
-o_{t,i} = \sum_{j=1}^t \text{Softmax}_j \left( \frac{q_{t,i}^T k_{j,i}}{\sqrt{d_h}} \right) v_{j,i}, \quad (7) \\
+o_{t,i} = \sum_{j=1}^t \text{Softmax}\ _j \left( \frac{q_{t,i}^T k_{j,i}}{\sqrt{d_h}} \right) v_{j,i}, \quad (7) \\
 u_t = W_O [o_{t,1}; o_{t,2}; \dots; o_{t,n_h}], \quad (8)
 $$
 
@@ -70,7 +86,7 @@ $$
 - $q_{t,i}$、$k_{t,i}$、$v_{t,i} \in \mathbb{R}^{d_h}$ 分别表示第 $i$ 个注意力头的查询、键和值；
 - $W_O \in \mathbb{R}^{d \times d_h n_h}$ 表示输出投影矩阵。
 
-在推理过程中，所有键和值都需要被缓存以加速推理，因此MHA需要为每个token缓存 $2 n_h d_h l$ 个元素（$l$ 为层数）。在模型部署中，这种庞大的KV缓存是一个巨大的瓶颈，限制了最大批处理大小和序列长度。
+**在推理过程中，所有键和值都需要被缓存以加速推理**，因此MHA需要为每个token缓存 $2 n_h d_h l$ 个元素（$l$ 为层数）。在模型部署中，这种庞大的KV缓存是一个巨大的瓶颈，限制了最大batch-size和序列长度。
 
 ### 2.1.2 低秩键值联合压缩
 
@@ -89,7 +105,7 @@ $$
 - $W_{DKV} \in \mathbb{R}^{d_c \times d}$ 是下投影矩阵；
 - $W_{UK}$ 和 $W_{UV} \in \mathbb{R}^{d_h n_h \times d_c}$ 分别是键和值的上投影矩阵。
 
-在推理过程中，MLA只需缓存 $c^{KV}_t$，因此其KV缓存仅为 $d_c l$ 个元素。此外，在推理过程中，由于 $W_{UK}$ 可以被吸收到 $W_Q$ 中，$W_{UV}$ 可以被吸收到 $W_O$ 中，我们甚至不需要显式计算键和值来进行注意力计算。图3直观地展示了MLA中的KV联合压缩如何减少KV缓存。
+在推理过程中，MLA只需缓存$c^{KV}_t$，因此其KV缓存仅为 $d_c l$ 个元素。此外，在推理过程中，由于 $W_{UK}$ 可以被吸收到 $W_Q$ 中，$W_{UV}$ 可以被吸收到 $W_O$ 中，我们甚至不需要显式计算键和值来进行注意力计算。图3直观地展示了MLA中的KV联合压缩如何减少KV缓存。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/76af75a1498979d22d9a3f26179570dc77f16ed2b43156b6ffa8ab4249b85fb36c81869e60fb29b9e72a2864801a1bb7?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
 
