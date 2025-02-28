@@ -10,9 +10,9 @@ Deepseek AI在《DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Exp
 
 # 1.介绍
 
-在过去的几年中，大型语言模型（LLMs）（Anthropic, 2023; Google, 2023; OpenAI, 2022, 2023）经历了快速发展，为通用人工智能（AGI）的曙光提供了初步的展望。通常，随着参数数量的增加，LLM的智能水平会显著提升，使其能够在各种任务中展现出涌现能力（Wei et al., 2022）。然而，这种改进的代价是更大的训练计算资源需求以及推理吞吐量的潜在下降。这些限制对LLM的广泛采用和利用构成了重大挑战。为了解决这一问题，我们提出了**DeepSeek-V2**，一个强大的开源混合专家（MoE）语言模型，其特点是通过创新的Transformer架构实现经济的训练和高效的推理。该模型总参数量为236B，每个token激活21B参数，并支持128K token的上下文长度。
+在过去的几年中，大型语言模型（LLMs）（Anthropic, 2023; Google, 2023; OpenAI, 2022, 2023）经历了快速发展，为**通用人工智能（AGI）**的曙光提供了初步的展望。通常，随着参数数量的增加，LLM的智能水平会显著提升，使其能够在各种任务中展现出**涌现（emergent）**能力（Wei et al., 2022）。然而，这种改进的代价是：**更大的训练计算资源需求以及推理吞吐量的潜在下降**。这些限制对LLM的广泛采用和利用构成了重大挑战。为了解决这一问题，我们提出了**DeepSeek-V2**，一个强大的开源混合专家（MoE）语言模型，其特点是通过创新的Transformer架构实现经济的训练和高效的推理。该模型总参数量为236B，每个token激活21B参数，并支持128K token的上下文长度。
 
-我们在Transformer框架（Vaswani et al., 2017）中优化了注意力模块和前馈网络（FFNs），分别提出了**多头潜在注意力（MLA）**和**DeepSeekMoE**。
+我们在Transformer框架（Vaswani et al., 2017）中优化了注意力模块和前馈网络（FFNs），分别提出了**多头隐注意力（MLA）**和**DeepSeekMoE**。
 
 1. **在注意力机制方面**，多头注意力（MHA）（Vaswani et al., 2017）的键值（KV）缓存对LLM的推理效率构成了显著障碍。为了解决这一问题，研究者们探索了多种方法，包括分组查询注意力（GQA）（Ainslie et al., 2023）和多查询注意力（MQA）（Shazeer, 2019）。然而，这些方法在减少KV缓存的同时往往会牺牲性能。为了兼顾两者，我们引入了MLA，这是一种配备低秩键值联合压缩的注意力机制。实验表明，MLA在性能上优于MHA，同时显著减少了推理过程中的KV缓存，从而提升了推理效率。
 
@@ -32,17 +32,17 @@ Deepseek AI在《DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Exp
 
 ## 2. 架构
 
-总体而言，DeepSeek-V2仍然基于Transformer架构（Vaswani et al., 2017），其中每个Transformer块由一个注意力模块和一个前馈网络（FFN）组成。然而，对于注意力模块和FFN，我们设计并采用了创新的架构。对于注意力模块，我们设计了**多头潜在注意力（MLA）**，利用低秩键值联合压缩来消除推理时键值（KV）缓存的瓶颈，从而支持高效推理。对于FFN，我们采用了**DeepSeekMoE架构**（Dai et al., 2024），这是一种高性能的MoE架构，能够以较低的成本训练强大的模型。图2展示了DeepSeek-V2的架构示意图，本节将详细介绍MLA和DeepSeekMoE的细节。对于其他微小细节（例如层归一化和FFN中的激活函数），除非特别说明，DeepSeek-V2遵循DeepSeek 67B（DeepSeek-AI, 2024）的设置。
+总体而言，DeepSeek-V2仍然基于Transformer架构（Vaswani et al., 2017），其中每个Transformer块由一个注意力模块和一个前馈网络（FFN）组成。然而，对于注意力模块和FFN，我们设计并采用了创新的架构。对于注意力模块，我们设计了**多头隐注意力（MLA）**，利用低秩键值联合压缩来消除推理时键值（KV）缓存的瓶颈，从而支持高效推理。对于FFN，我们采用了**DeepSeekMoE架构**（Dai et al., 2024），这是一种高性能的MoE架构，能够以较低的成本训练强大的模型。图2展示了DeepSeek-V2的架构示意图，本节将详细介绍MLA和DeepSeekMoE的细节。对于其他微小细节（例如层归一化和FFN中的激活函数），除非特别说明，DeepSeek-V2遵循DeepSeek 67B（DeepSeek-AI, 2024）的设置。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/20621c28bc61d4dff59b1ce6eccf40ad260eda493f06d6d6326ad4269ee4f269cc19d8bead0dc52849da02579356f108?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=2.jpg&amp;size=750">
 
 图2
 
-### 2.1 多头潜在注意力：提升推理效率
+### 2.1 多头隐注意力：提升推理效率
 
 传统的Transformer模型通常采用多头注意力（MHA）（Vaswani et al., 2017），但在生成过程中，其庞大的键值（KV）缓存会成为限制推理效率的瓶颈。为了减少KV缓存，研究者提出了多查询注意力（MQA）（Shazeer, 2019）和分组查询注意力（GQA）（Ainslie et al., 2023）。这些方法需要更少的KV缓存，但其性能无法与MHA媲美（我们在附录D.1中提供了MHA、GQA和MQA的消融实验）。
 
-对于DeepSeek-V2，我们设计了一种创新的注意力机制，称为**多头潜在注意力（MLA）**。MLA配备了低秩键值联合压缩，不仅性能优于MHA，而且所需的KV缓存显著减少。以下我们将介绍其架构，并在附录D.2中提供MLA与MHA的对比。
+对于DeepSeek-V2，我们设计了一种创新的注意力机制，称为**多头隐注意力（MLA）**。MLA配备了低秩键值联合压缩，不仅性能优于MHA，而且所需的KV缓存显著减少。以下我们将介绍其架构，并在附录D.2中提供MLA与MHA的对比。
 
 #### 2.1.1 预备知识：标准多头注意力
 
