@@ -65,9 +65,9 @@ Deepseek AI在《DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Exp
 标准MHA首先通过三个矩阵$W_Q$、$W_K$、$W_V \in \mathbb{R}^{d_h n_h \times d}$分别生成$q_t$、$k_t$、$v_t \in \mathbb{R}^{d_h n_h}$：
 
 $$
-q_t = W_Q h_t, \quad (1) \\
-k_t = W_K h_t, \quad (2) \\
-v_t = W_V h_t. \quad (3)
+q_t = W^Q h_t, \quad (1) \\
+k_t = W^K h_t, \quad (2) \\
+v_t = W^V h_t. \quad (3)
 $$
 
 
@@ -93,17 +93,17 @@ $$
 MLA的核心是通过低秩联合压缩键和值来减少KV缓存：
 
 $$
-c^{KV}_t = W_{DKV} h_t, \quad (9) \\
-k^C_t = W_{UK} c^{KV}_t, \quad (10) \\
-v^C_t = W_{UV} c^{KV}_t, \quad (11)
+c^{KV}_t = W^{DKV} h_t, \quad (9) \\
+k^C_t = W^{UK} c^{KV}_t, \quad (10) \\
+v^C_t = W^{UV} c^{KV}_t, \quad (11)
 $$
 
 其中:
 
 - $c^{KV}_t \in \mathbb{R}^{d_c}$ 是键和值的压缩潜在向量；
 - $d_c (\ll d_h n_h)$ 表示KV压缩维度；
-- $W_{DKV} \in \mathbb{R}^{d_c \times d}$ 是下投影矩阵；
-- $W_{UK}$ 和 $W_{UV} \in \mathbb{R}^{d_h n_h \times d_c}$ 分别是键和值的上投影矩阵。
+- $W^{DKV} \in \mathbb{R}^{d_c \times d}$ 是下投影矩阵；
+- $W^{UK}$ 和 $W^{UV} \in \mathbb{R}^{d_h n_h \times d_c}$ 分别是键和值的上投影矩阵。
 
 在推理过程中，MLA只需缓存$c^{KV}_t$，因此其KV缓存仅为 $d_c l$ 个元素。此外，在推理过程中，由于 $W_{UK}$ 可以被吸收到 $W_Q$ 中，$W_{UV}$ 可以被吸收到 $W_O$ 中，我们甚至不需要显式计算键和值来进行注意力计算。图3直观地展示了MLA中的KV联合压缩如何减少KV缓存。
 
@@ -114,15 +114,15 @@ $$
 此外，为了减少训练期间的激活内存，我们还对查询进行了低秩压缩，尽管这并不能减少KV缓存：
 
 $$
-c^Q_t = W_{DQ} h_t, \quad (12) \\
-q^C_t = W_{UQ} c^Q_t, \quad (13)
+c^Q_t = W^{DQ} h_t, \quad (12) \\
+q^C_t = W^{UQ} c^Q_t, \quad (13)
 $$
 
 其中:
 
 - $c^Q_t \in \mathbb{R}^{d'_c}$ 是查询的压缩潜在向量；
 - $d'_c (\ll d_h n_h)$ 表示查询压缩维度；
-- $W_{DQ} \in \mathbb{R}^{d'_c \times d}$ 和 $W_{UQ} \in \mathbb{R}^{d_h n_h \times d'_c}$ 分别是查询的下投影和上投影矩阵。
+- $W^{DQ} \in \mathbb{R}^{d'_c \times d}$ 和 $W_{UQ} \in \mathbb{R}^{d_h n_h \times d'_c}$ 分别是查询的下投影和上投影矩阵。
 
 ### 2.1.3 解耦的旋转位置嵌入
 
@@ -131,15 +131,20 @@ $$
 作为解决方案，我们提出了**解耦RoPE策略**，该策略使用额外的多头查询 $q^R_{t,i} \in \mathbb{R}^{d^R_h}$ 和一个共享键 $k^R_t \in \mathbb{R}^{d^R_h}$ 来承载RoPE，其中 $d^R_h$ 表示解耦查询和键的每头维度。配备解耦RoPE策略后，MLA执行以下计算：
 
 $$
-[q^R_{t,1}; q^R_{t,2}; \dots; q^R_{t,n_h}] = q^R_t = \text{RoPE}(W_{QR} c^Q_t), \quad (14) \\
-k^R_t = \text{RoPE}(W_{KR} h_t), \quad (15) \\
+[q^R_{t,1}; q^R_{t,2}; \dots; q^R_{t,n_h}] = q^R_t = \text{RoPE}(W^{QR} c^Q_t), \quad (14) \\
+k^R_t = \text{RoPE}(W^{KR} h_t), \quad (15) \\
 q_{t,i} = [q^C_{t,i}; q^R_{t,i}], \quad (16) \\
 k_{t,i} = [k^C_{t,i}; k^R_t], \quad (17) \\
 o_{t,i} = \sum_{j=1}^t \text{Softmax}_j \left( \frac{q_{t,i}^T k_{j,i}}{\sqrt{d_h + d^R_h}} \right) v^C_{j,i}, \quad (18) \\
-u_t = W_O [o_{t,1}; o_{t,2}; \dots; o_{t,n_h}], \quad (19)
+u_t = W^O [o_{t,1}; o_{t,2}; \dots; o_{t,n_h}], \quad (19)
 $$
 
-其中，$W_{QR} \in \mathbb{R}^{d^R_h n_h \times d'_c}$ 和 $W_{KR} \in \mathbb{R}^{d^R_h \times d}$ 是生成解耦查询和键的矩阵；$\text{RoPE}(\cdot)$ 表示应用RoPE矩阵的操作；$[\cdot; \cdot]$ 表示拼接操作。在推理过程中，解耦键也需要被缓存。因此，DeepSeek-V2需要的总KV缓存为 $(d_c + d^R_h) l$ 个元素。
+其中：
+
+- $W^{QR} \in \mathbb{R}^{d^R_h n_h \times d'_c}$ 和 $W^{KR} \in \mathbb{R}^{d^R_h \times d}$ 是生成解耦查询和键的矩阵；
+- $\text{RoPE}(\cdot)$ 表示应用RoPE矩阵的操作；$[\cdot; \cdot]$ 表示拼接操作。
+
+在推理过程中，解耦键也需要被缓存。因此，DeepSeek-V2需要的总KV缓存为 $(d_c + d^R_h) l$ 个元素。
 
 为了展示MLA的完整计算过程，我们在附录C中整理并提供了其完整公式。
 
@@ -169,7 +174,15 @@ s_{i,t}, & s_{i,t} \in \text{Topk}(\{s_{j,t} | 1 \leq j \leq N_r\}, K_r), \\
 s_{i,t} = \text{Softmax}_i (u_t^T e_i), \quad (22)
 $$
 
-其中，$N_s$ 和 $N_r$ 分别表示共享专家和路由专家的数量；$\text{FFN}^{(s)}_i (\cdot)$ 和 $\text{FFN}^{(r)}_i (\cdot)$ 分别表示第 $i$ 个共享专家和第 $i$ 个路由专家；$K_r$ 表示激活的路由专家数量；$g_{i,t}$ 是第 $i$ 个专家的门控值；$s_{i,t}$ 是token与专家的亲和度；$e_i$ 是第 $i$ 个路由专家在该层的中心点；$\text{Topk}(\cdot, K)$ 表示从第 $t$ 个token与所有路由专家的亲和度分数中选取最高的 $K$ 个分数。
+其中：
+
+- $N_s$ 和 $N_r$ 分别表示共享专家和路由专家的数量；
+- $\text{FFN}^{(s)}_i (\cdot)$ 和 $\text{FFN}^{(r)}_i (\cdot)$ 分别表示第 $i$ 个共享专家和第 $i$ 个路由专家；
+- $K_r$ 表示激活的路由专家数量；
+- $g_{i,t}$ 是第 $i$ 个专家的门控值；
+- $s_{i,t}$ 是token与专家的亲和度；
+- $e_i$ 是第 $i$ 个路由专家在该层的中心点；
+- $\text{Topk}(\cdot, K)$ 表示从第 $t$ 个token与所有路由专家的亲和度分数中选取最高的 $K$ 个分数。
 
 #### 2.2.2 设备限制路由
 
@@ -219,7 +232,9 @@ f'_i = \frac{1}{|E_i|} \sum_{j \in E_i} f_j, \quad (27) \\
 P'_i = \sum_{j \in E_i} P_j, \quad (28)
 $$
 
-其中，$\alpha_2$ 是一个超参数，称为设备级均衡因子。
+其中：
+
+- $\alpha_2$ 是一个超参数，称为设备级均衡因子。
 
 #### 通信均衡损失
 
@@ -231,7 +246,11 @@ f''_i = \frac{D}{M T} \sum_{t=1}^T \mathbb{1}(\text{Token } t \text{ 被发送�
 P''_i = \sum_{j \in E_i} P_j, \quad (31)
 $$
 
-其中，$\alpha_3$ 是一个超参数，称为通信均衡因子。设备限制路由机制的原则是确保每个设备最多向其他设备传输 $M T$ 个隐藏状态。同时，通信均衡损失用于鼓励每个设备从其他设备接收大约 $M T$ 个隐藏状态。通信均衡损失保证了设备之间的信息交换均衡，从而提高了通信效率。
+其中：
+
+- $\alpha_3$ 是一个超参数，称为通信均衡因子。
+
+设备限制路由机制的原则是确保每个设备最多向其他设备传输 $M T$ 个隐藏状态。同时，通信均衡损失用于鼓励每个设备从其他设备接收大约 $M T$ 个隐藏状态。通信均衡损失保证了设备之间的信息交换均衡，从而提高了通信效率。
 
 ### 2.2.4 Token丢弃策略
 
@@ -328,7 +347,10 @@ $$
 J_{\text{GRPO}}(\theta) = \mathbb{E}\left[q \sim P(Q), \{o_i\}_{i=1}^G \sim \pi_{\theta_{\text{old}}}(O|q)\right] \frac{1}{G} \sum_{i=1}^G \min\left(\frac{\pi_{\theta}(o_i|q)}{\pi_{\theta_{\text{old}}}(o_i|q)} A_i, \text{clip}\left(\frac{\pi_{\theta}(o_i|q)}{\pi_{\theta_{\text{old}}}(o_i|q)}, 1-\epsilon, 1+\epsilon\right) A_i\right) - \beta D_{\text{KL}}(\pi_{\theta} || \pi_{\text{ref}}),
 $$
 
-其中 $\epsilon$ 和 $\beta$ 是超参数，$A_i$ 是优势值，通过每组输出对应的奖励 $\{r_1, r_2, \dots, r_G\}$ 计算：
+其中：
+
+- $\epsilon$ 和 $\beta$ 是超参数，
+- $A_i$ 是优势值，通过每组输出对应的奖励 $\{r_1, r_2, \dots, r_G\}$ 计算：
 
 $$
 A_i = \frac{r_i - \text{mean}(\{r_1, r_2, \dots, r_G\})}{\text{std}(\{r_1, r_2, \dots, r_G\})}.
@@ -346,11 +368,16 @@ $$
 r_i = c_1 \cdot RM_{\text{helpful}}(o_i) + c_2 \cdot RM_{\text{safety}}(o_i) + c_3 \cdot RM_{\text{rule}}(o_i),
 $$
 
-其中 $c_1, c_2, c_3$ 是对应的系数。
+其中：
+
+- $c_1, c_2, c_3$ 是对应的系数。
 
 为了获得可靠的奖励模型，我们精心收集了偏好数据，并进行了严格的质量过滤和比例调整。我们基于编译器反馈获取代码偏好数据，基于真实标签获取数学偏好数据。对于奖励模型训练，我们使用 DeepSeek-V2 Chat（SFT）初始化奖励模型，并使用点对或对对的损失进行训练。在实验中，我们观察到 RL 训练能够充分挖掘和激活模型的潜力，使其能够从可能的响应中选择正确且令人满意的答案。
 
-**训练效率优化**：在极大模型上进行 RL 训练对训练框架提出了高要求。我们实施了以下工程优化：（1）采用混合引擎，分别针对训练和推理采用不同的并行策略以提高 GPU 利用率；（2）利用 vLLM（Kwon et al., 2023）作为推理后端，加速推理速度；（3）精心设计模型卸载到 CPU 和加载回 GPU 的调度策略，以实现训练速度和内存消耗的近最优平衡。
+**训练效率优化**：在极大模型上进行 RL 训练对训练框架提出了高要求。我们实施了以下工程优化：
+- （1）采用混合引擎，分别针对训练和推理采用不同的并行策略以提高 GPU 利用率；
+- （2）利用 vLLM（Kwon et al., 2023）作为推理后端，加速推理速度；
+- （3）精心设计模型卸载到 CPU 和加载回 GPU 的调度策略，以实现训练速度和内存消耗的近最优平衡。
 
 #### 4.3. 评估结果
 
