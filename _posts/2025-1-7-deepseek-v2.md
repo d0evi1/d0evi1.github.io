@@ -122,7 +122,7 @@ $$
 
 - $c^Q_t \in \mathbb{R}^{d'_c}$ 是查询的压缩隐向量；
 - $d'_c (\ll d_h n_h)$ 表示查询压缩维度；
-- $W^{DQ} \in \mathbb{R}^{d'_c \times d}$ 和 $W_{UQ} \in \mathbb{R}^{d_h n_h \times d'_c}$ 分别是查询的下投影和上投影矩阵。
+- $W^{DQ} \in R^{d'_c \times d}$ 和 $W_{UQ} \in R^{d_h n_h \times d'_c}$ 分别是查询的下投影和上投影矩阵。
 
 ### 2.1.3 解耦的旋转位置嵌入
 
