@@ -58,7 +58,7 @@ Deepseek AI在《DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Exp
 我们首先介绍标准MHA机制作为背景。设：
 
 - $d$为嵌入维度
-- $n_h$为注意力头的数量
+- $n_h$为注意力头（attention heads）的数量
 - $d_h$为每个头的维度
 - $h_t \in \mathbb{R}^d$为第$t$个token在注意力层的输入
 
@@ -101,11 +101,11 @@ $$
 其中:
 
 - $c^{KV}_t \in \mathbb{R}^{d_c}$ 是键和值的压缩隐向量；
-- $d_c (\ll d_h n_h)$ 表示KV压缩维度；
-- $W^{DKV} \in \mathbb{R}^{d_c \times d}$ 是下投影矩阵；
-- $W^{UK}$ 和 $W^{UV} \in \mathbb{R}^{d_h n_h \times d_c}$ 分别是键和值的上投影矩阵。
+- $d_c (\ll d_h n_h)$ 表示**KV压缩维度**；
+- $W^{DKV} \in \mathbb{R}^{d_c \times d}$ 是**下投影矩阵(down-projection matrix)**；
+- $W^{UK}$ 和 $W^{UV} \in \mathbb{R}^{d_h n_h \times d_c}$ 分别是键和值的**上投影矩阵(up-projection matrices)**。
 
-在推理过程中，MLA只需缓存 $c_t^{KV}$，因此其KV缓存仅为 $d_c l$ 个元素。此外，在推理过程中，由于 $W^{UK}$ 可以被吸收到 $W^Q$ 中，$W^{UV}$ 可以被吸收到 $W_O$中，我们甚至不需要显式计算键和值来进行注意力计算。图3直观地展示了MLA中的KV联合压缩如何减少KV缓存。
+在推理过程中，MLA只需缓存 $c_t^{KV}$，因此其KV缓存仅为 $d_c l$ 个元素。此外，在推理过程中，由于 $W^{UK}$ 可以被吸收到 $W^Q$ 中，$W^{UV}$ 可以被吸收到 $W_O$中，我们甚至**不需要显式计算键和值来进行注意力计算**。图3直观地展示了MLA中的KV联合压缩如何减少KV缓存。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/76af75a1498979d22d9a3f26179570dc77f16ed2b43156b6ffa8ab4249b85fb36c81869e60fb29b9e72a2864801a1bb7?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=3.jpg&amp;size=750">
 
