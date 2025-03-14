@@ -1,12 +1,12 @@
 ---
 layout: post
-title: TiDiff介绍
+title: T2Diff介绍
 description: 
 modified: 2025-1-7
 tags: 
 ---
 
-kuaishou在《Unleashing the Potential of Two-Tower Models: Diffusion-Based Cross-Interaction for Large-Scale Matching》提出了使用diffusion的方法来做双塔模型：
+kuaishou团队在《Unleashing the Potential of Two-Tower Models: Diffusion-Based Cross-Interaction for Large-Scale Matching》提出了使用diffusion的方法来做双塔模型：
 
 # 摘要
 
