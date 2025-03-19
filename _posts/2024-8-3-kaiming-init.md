@@ -24,10 +24,6 @@ kaiming在MS在《Delving Deep into Rectifiers: Surpassing Human-Level Performan
 
 在1000类ImageNet 2012数据集上，我们的PReLU网络（PReLU-net）实现了单模型5.71%的top-5错误率，超越了所有现有的多模型结果。此外，我们的多模型结果在测试集上达到了4.94%的top-5错误率，相对于ILSVRC 2014冠军（GoogLeNet，6.66% [29]）相对提升了26%。据我们所知，我们的成果首次在这一视觉识别挑战中超越了人类水平表现（5.1%，[22]）。
 
-<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ace4c32426b4267101af9ad1754028fe8f2ac10cbe36def3bbce37f87a9f4e658b343172ed3a32c2e621cc5b6e8a6d1c?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
-
-图 1
-
 # 2. 方法
 
 在本节中，我们首先介绍PReLU激活函数（第2.1节），然后推导出用于深度修正网络的初始化方法（第2.2节），最后讨论我们的架构设计（第2.3节）。
@@ -48,7 +44,17 @@ a_i y_i, & \text{if } y_i \leq 0
 \end{cases}
 $$
 
-其中，$ y_i $ 是第 $ i $ 个通道上非线性激活函数 $ f $ 的输入，$ a_i $ 是控制负半轴斜率的系数。下标 $ i $ 表示我们允许非线性激活在不同通道上变化。当 $ a_i = 0 $ 时，该函数退化为ReLU；当 $ a_i $ 是一个可学习的参数时，我们将公式（1）称为**参数化ReLU（PReLU）**。图1展示了ReLU和PReLU的形状。公式（1）等价于 $ f(y_i) = \max(0, y_i) + a_i \min(0, y_i) $。
+其中：
+
+- $ y_i $ 是第 $ i $ 个通道上非线性激活函数 $ f $ 的输入
+- $ a_i $ 是控制负半轴斜率的系数。
+- 下标 $ i $ 表示我们允许非线性激活在不同通道上变化。
+
+当 $ a_i = 0 $ 时，该函数退化为ReLU；当 $ a_i $ 是一个可学习的参数时，我们将公式（1）称为**参数化ReLU（PReLU）**。图1展示了ReLU和PReLU的形状。公式（1）等价于 $ f(y_i) = \max(0, y_i) + a_i \min(0, y_i) $。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/ace4c32426b4267101af9ad1754028fe8f2ac10cbe36def3bbce37f87a9f4e658b343172ed3a32c2e621cc5b6e8a6d1c?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=1.jpg&amp;size=750">
+
+图 1 ReLU vs. PReLU。对于PReLU，negative part的系数不是常数，是自适应学习的
 
 如果 $ a_i $ 是一个较小的固定值，PReLU就变成了[20]中的**Leaky ReLU（LReLU）**（$ a_i = 0.01 $）。LReLU的动机是避免零梯度。[20]中的实验表明，与ReLU相比，LReLU对准确性的影响可以忽略不计。相反，我们的方法自适应地学习PReLU参数，并与整个模型联合训练。我们希望端到端的训练能够产生更专门的激活函数。
 
