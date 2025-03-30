@@ -104,7 +104,7 @@ kuaishou直播团队在《Moment&Cross: Next-Generation Real-Time Cross-Domain C
 
 ### 2.2 理论基础：基于正样本未标注学习的CTR模型训练
 
-广义而言，点击率预测（CTR）模型[36]位于推荐系统（RecSys）[26]的最终环节，用于对每个用户最相关的数十个物品进行排序，因此也被称为**全排序模型（fullrank）**[38]。实际上，全排序模型不仅要预测用户点击候选物品的概率（即CTR），还需同时预测：
+广义而言，点击率预测（CTR）模型[36]位于推荐系统（RecSys）[26]的最终环节，用于**对每个用户最相关的数十个物品进行排序**，因此也被称为**全排序模型（fullrank）**[38]。实际上，全排序模型不仅要预测用户点击候选物品的概率（即CTR），还需同时预测：
 
 - 长观看概率（LVTR： long-view）
 - 点赞概率（LTR： like）
@@ -137,12 +137,12 @@ $$V = [v_1, v_2, \dots, v_n]$$
 在我们的直播场景模型中，人工设计了 $n > 400$ 维原始特征来表征用户、物品及上下文状态。基于输入样本特征和标签，模型学习过程可形式化为：  
 
 $$
-\hat{y}^{ctr}, \hat{y}^{lvtr}, \hat{y}^{ltr}, \dots = f_\theta([v_1, v_2, \dots, v_n]) \quad (1)
+\widehat{y}^{ctr}, \widehat{y}^{lvtr}, \widehat{y}^{ltr}, \dots = f_\theta([v_1, v_2, \dots, v_n]) \quad (1)
 $$
 
 其中：
 
-- $\hat{y}^{ctr}$、$\hat{y}^{lvtr}$、$\hat{y}^{ltr}$ 等表示模型预测的概率值
+- $\widehat{y}^{ctr}$、$\widehat{y}^{lvtr}$、$\widehat{y}^{ltr}$ 等表示模型预测的概率值
 - $f_\theta(\cdot)$ 是一个多任务学习模块，可采用 **MMoE**[22] 或 **PLE**[28] 等架构实现。
 
 接着，我们利用用户的真实行为数据监督模型训练，以优化模型参数。
@@ -150,19 +150,19 @@ $$
 对于**快速数据流（5分钟延迟样本）**，它会上报所有观测到的正label和负label，因此采用标准的**负对数似然loss**进行训练：  
 
 $$
-L_{fast} = -\sum_{xtr \in \{ctr, \dots\}} \left[ y^{xtr} \log(\hat{y}^{xtr}) + (1 - y^{xtr}) \log(1 - \hat{y}^{xtr}) \right] \quad (2)
+L_{fast} = -\sum_{xtr \in \{ctr, \dots\}} \left[ y^{xtr} \log(\widehat{y}^{xtr}) + (1 - y^{xtr}) \log(1 - \widehat{y}^{xtr}) \right] \quad (2)
 $$
 
 对于**慢速数据流（1小时延迟样本）**，它仅上报**缺失的正标签（即未被及时记录的正样本）**，掩码掉其他一致的正标签。因此，我们采用 **正-无标记损失（Positive-Unlabeled Loss）**[11,18,19] 来修正历史数据中因延迟上报导致的“伪负样本（false negative）”误差梯度：
 
 $$
-L_{slow} = -\sum_{xtr \in missing} \left[ \log(\hat{y}^{xtr}) - \log(1 - \hat{y}^{xtr}) \right]
+L_{slow} = -\sum_{xtr \in missing} \left[ \log(\widehat{y}^{xtr}) - \log(1 - \widehat{y}^{xtr}) \right]
 $$ 
 
 其中，$missing$ 表示仅在1小时时间窗口内观测到的正样本标签。通过结合这两种损失函数 $\mathcal{L}_{fast}$ 和 $\mathcal{L}_{slow}$，我们的模型在直播推荐服务中实现了效果与效率的平衡训练。当模型收敛后，可将其部署为在线全排序模型，用于实时响应用户请求并选取最高分物品，计算方式如下：
 
 $$
-Ranking\_Score = (1 + \hat{y}_{ctr})^\alpha * (1 + \hat{y}_{lvtr})^\beta * (1 + \hat{y}_{ltr})^\gamma * ...
+Ranking\_Score = (1 + \widehat{y}_{ctr})^\alpha * (1 + \widehat{y}_{lvtr})^\beta * (1 + \widehat{y}_{ltr})^\gamma * ...
 $$
 
 其中：
@@ -178,19 +178,19 @@ $$
 
 2. **多任务预测**：
    $$
-   [\hat{y}_{ctr}, \hat{y}_{lvtr}, \hat{y}_{ltr}, ...] = f_\theta(\mathbf{V})
+   [\widehat{y}_{ctr}, \widehat{y}_{lvtr}, \widehat{y}_{ltr}, ...] = f_\theta(\mathbf{V})
    $$
    其中$f_\theta(\cdot)$可采用MMoE[22]或PLE[28]等多任务结构
 
 #### 训练策略
 1. **5分钟快数据流**：使用标准交叉熵损失
    $$
-   \mathcal{L}_{fast} = -\sum_{xtr} \left[ y^{xtr} \log(\hat{y}^{xtr}) + (1-y^{xtr}) \log(1-\hat{y}^{xtr}) \right]
+   \mathcal{L}_{fast} = -\sum_{xtr} \left[ y^{xtr} \log(\widehat{y}^{xtr}) + (1-y^{xtr}) \log(1-\widehat{y}^{xtr}) \right]
    $$
 
 2. **1小时慢数据流**：采用正样本未标注损失[11,18,19]修正假阴性样本
    $$
-   \mathcal{L}_{slow} = -\sum_{missing} \left[ \log(\hat{y}^{xtr}) - \log(1-\hat{y}^{xtr}) \right]
+   \mathcal{L}_{slow} = -\sum_{missing} \left[ \log(\widehat{y}^{xtr}) - \log(1-\widehat{y}^{xtr}) \right]
    $$
 
 ### 2.3 Moment方案：30秒实时数据流与首事件掩码学习
@@ -206,7 +206,7 @@ $$
 
 2. **首事件掩码策略**：
    $$
-   \mathcal{L}_{moment} = -\sum_{xtr}^{first,exit} \left[ y^{xtr} \log(\hat{y}^{xtr}) + (1-y^{xtr}) \log(1-\hat{y}^{xtr}) \right]
+   \mathcal{L}_{moment} = -\sum_{xtr}^{first,exit} \left[ y^{xtr} \log(\widehat{y}^{xtr}) + (1-y^{xtr}) \log(1-\widehat{y}^{xtr}) \right]
    $$
    其中：
    - $first$：每种行为的首次正样本
