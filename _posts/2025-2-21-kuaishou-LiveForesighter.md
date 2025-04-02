@@ -1,8 +1,8 @@
 ---
 layout: post
-title: kuaishou MomentCross介绍
+title: kuaishou LiveForesighter介绍
 description: 
-modified: 2025-2-9
+modified: 2025-2-21
 tags: 
 ---
 
