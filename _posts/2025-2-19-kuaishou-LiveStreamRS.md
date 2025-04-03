@@ -232,13 +232,13 @@ $$
 
 $\alpha_b$为各目标的融合权重。  
 
-#### 3.3.2 时间敏感的重推策略  
+#### 3.3.2 时间敏感的Re-reco策略  
 
 尽管Sliver数据流训练的模型具有时效性，但推荐结果仍可能因客户端请求到实际曝光的延迟而失效。如图6所示，造成延迟的主因是直播推荐与短视频推荐在一次请求中混合，导致直播曝光时间不确定。  
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/640a2169617e00ea579c5c2a2cc4d6122effade7d6ef30c0dd5d5b492ac5a77c4e4c649d2731e0b44d64c48136c9c31f?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=6.jpg&amp;size=750">
 
-图6
+图6 一种对时效性敏感的重新推荐策略示意图。我们在直播曝光之前递归调用直播推荐模型。
 
 为此，我们提出**时间敏感的重推策略**：当直播间未被曝光时，每30秒重新请求时效敏感的直播推荐模型（re-reco），并用新结果替换原始推荐。该策略通过缩短延迟$\tau$保障了特征时效性，同时提升了整个在线推荐服务的实时性。
 
@@ -246,13 +246,10 @@ $\alpha_b$为各目标的融合权重。
 本节通过大量实验验证所提出数据流方法的有效性。首先在离线环境下评估提出方法，随后报告在快手APP上的在线实验结果，最后展示提出的Sliver数据流在快手直播平台的实际部署方案。
 
 #### 4.1 离线评估  
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/83d856f3a859eb8d618b73f776520751285a83d06b8553e87ae7146a48a3f6912812d8a8f9410c6828c1bd244a0863c8?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t1.jpg&amp;size=750">
+
 **表1：数据集信息**  
-| **类型**          | **内容**                          |
-|------------------|----------------------------------|
-| 用户特征        | ID、性别、年龄、城市、历史点击主播 |
-| 直播特征        | ID、直播类型                     |
-| 主播特征        | ID、性别、主播类型               |
-| 用户行为        | 曝光、点击、关注、点赞、退出     |
 
 **4.1.1 数据集**  
 针对直播推荐系统时序动态性研究的数据稀缺问题，我们收集并开源了来自快手平台的工业级直播数据集，包含详细时间戳信息。该平台日活跃直播用户超过300万。我们从2023年12月27日至29日的日志中抽取1%用户的三天数据子集（根据请求时间戳）。如表1所示，出于商业隐私考虑，数据集仅包含在线推荐系统的部分代表性特征和行为。每个行为均提供精确的发生时间戳，并根据时间戳信息按3.2节方法划分三种数据流。
@@ -282,6 +279,11 @@ $$
 
 **4.1.5 结果分析**  
 表2展示了四种典型多任务模型在三种任务、不同数据流设置下的结果。可以看出：
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/2bffb8a26617184d5fb9f857caf64fb0e6165ec1a09e1214c6047eaeaa22d8956d13e36850de64b74738d487ce864c8a?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t2.jpg&amp;size=750">
+
+表2
+
 - Sliver数据流在所有模型和任务上均优于两种固定窗口数据流
 - 具体改进：
   - 点击行为：平均AUC提升4.55%-5.57%（RelaImpr）
@@ -299,10 +301,17 @@ $$
 我们在中国最大直播平台之一的快手APP上部署Sliver数据流，在精选页和单列页进行在线A/B测试，评估指标为CTR和新增关注数（NFN）。由于在线数据流经历两次升级（1小时→5分钟→Sliver），结果分两部分呈现：
 
 **表3**显示五分钟数据流相比一小时数据流在四天测试中的提升：
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/7c5bca129e60f1ad4e1227339aabf3a21b92069cb11d3109289e914932f5d6ecfb413a82335895ba50abe4a2c690f294?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t3.jpg&amp;size=750">
+
+
 - 精选页：CTR平均提升13.653%，NFN提升6.091%
 - 单列页：CTR提升9.470%，NFN提升5.666%
 
 **表4**显示升级到Sliver数据流并采用重推策略后的进一步改进：
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b59da32c86b56091ca3477446b5121c5ca4e1890795902b931b32339d842f0b19d397fe7e1db50b6cf5d4093c095c4eb?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t4.jpg&amp;size=750">
+
 - 精选页：CTR再提升8.304%，NFN提升3.697%
 - 单列页：CTR再提升6.765%，NFN提升2.783%
 
@@ -313,7 +322,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a8e82b96d96d52d2bc5ee0ba451ff0ab80fb79af4681729680518cc50af5d635ce122c28095e9fc1fe2e2fed65fbeae5?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=7.jpg&amp;size=750">
 
-图7
+图7 该图展示了快手直播平台推荐系统的架构。左侧部分展示了在线服务的工作流程，包括首次请求服务和重新推荐服务。右侧部分展示了我们提出的Sliver数据流的工作流程。
 
 **在线服务流程**：
 1. 用户启动APP时，客户端请求直播推荐服务，依次调用召回、粗排和精排服务
