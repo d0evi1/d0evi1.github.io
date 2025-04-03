@@ -213,13 +213,13 @@ $$
 $\theta_s$和$\theta_b$分别为多任务模型$f$的共享参数和任务专属参数。采用多目标损失优化模型： 
 
 $$
-\mathcal{L} = \sum_{b \in B} w_b * \mathcal{L}_b \tag{9}
+L = \sum_{b \in B} w_b * L_b \tag{9}
 $$  
 
-$w_b$和$\mathcal{L}_b$为各任务的权重和损失，使用标准对数似然函数[38]优化不同目标： 
+$w_b$和$L_b$为各任务的权重和损失，使用标准对数似然函数[38]优化不同目标： 
 
 $$
-\mathcal{L}^b_\mu = -\frac{1}{N_b} \sum \left( y^b_\mu \log \hat{y}^b_\mu + (1-y^b_\mu) \log(1-\hat{y}^b_\mu) \right) \tag{10}
+L^b_\mu = -\frac{1}{N_b} \sum \left( y^b_\mu \log \hat{y}^b_\mu + (1-y^b_\mu) \log(1-\hat{y}^b_\mu) \right) \tag{10}
 $$  
 
 $N_b$为时刻$\mu$行为$b$的样本数。最终通过多目标预测结果计算融合分数$s_{t+1}$，用于$t+1$时刻的在线排序：
