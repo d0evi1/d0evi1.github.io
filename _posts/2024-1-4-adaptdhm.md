@@ -135,7 +135,7 @@ $$
 在公共数据集中，我们使用AUC作为评估指标。对于工业数据集，我们采用了一种AUC的变体，称为Group AUC (GAUC) [18, 23]，因为它更适合比较推荐系统中的在线性能。GAUC计算了相应展示下不同会话的AUC的平均值。计算公式如下：
 
 $$
-\text{GAUC} = \frac{\sum_{i=1}^n (\# \text{impressions}_i \times \text{AUC}_i)}{\sum_{i=1}^n \# \text{impressions}_i},
+GAUC = \frac{\sum_{i=1}^n (\# impressions_i \ \times \text{AUC}_i)}{\sum_{i=1}^n \# impressions_i},
 $$
 
 其中：
@@ -147,11 +147,15 @@ $$
 
 从表1和表2的结果中，我们得出几个重要观察：
 
-- 1. AdaptDHM在公共和工业数据集上的性能均提升了超过1‰。注意，CTR任务中0.1%的AUC提升被认为是一个很大的进步。
-- 2. DNN在公共数据集上表现优于其他多领域模型，但在工业数据集上表现较差。这两个数据集的主要区别在于，工业数据集中的数据是基于先前的可靠业务知识手动划分的，而公共数据集则是通过一些随机挑选的领域感知特征进行划分的。这表明显式建模方式严重依赖于有效的数据划分以进行特定领域的学习。
-- 3. AdaptDHM在10个业务领域上展示了令人印象深刻的泛化能力，在大多数领域中表现优于其他模型。
+- 1.AdaptDHM在公共和工业数据集上的性能均提升了超过1‰。注意，CTR任务中0.1%的AUC提升被认为是一个很大的进步。
+- 2.DNN在公共数据集上表现优于其他多领域模型，但在工业数据集上表现较差。这两个数据集的主要区别在于，工业数据集中的数据是基于先前的可靠业务知识手动划分的，而公共数据集则是通过一些随机挑选的领域感知特征进行划分的。这表明**显式建模方式严重依赖于有效的数据划分**以进行特定领域的学习。
+- 3.AdaptDHM在10个业务领域上展示了令人印象深刻的泛化能力，在大多数领域中表现优于其他模型。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/d9e96846fc8d18dc0ce694774d116ad33c59702b24cea3d10978efe0ed340c741b8084915c6b32d417b8b3f15be58a72?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t1.jpg&amp;size=750">
 
 表1 公共数据集、工业数据集上的整体性能比较 
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/7e503aa2d0c6f586bbde5ee9bff07e065f45aadb24fa78064df1a1550ffd3ac17fa64481d8dcaaee16374e6feb58336d?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t2.jpg&amp;size=750">
 
 表2 工业数据集的单域比较
 
@@ -165,6 +169,8 @@ $$
 
 ### 内存和计算复杂度
 由于框架优雅，我们的模型在参数上非常高效。我们将特定领域的MLP参数表示为 $P_{\text{mlp}}$（约数百万参数）。领域数量、共享MLP层（或称为PLE中的共享专家）的数量和簇的数量分别用 $M$、$S$ 和 $K$ 表示。每个模型的内存和计算成本如表3所示。
+
+<img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/7821f8947fafdceef4f0ba29354f06e7bdea827b4c5e9978e2e9c464ef215f505effbb34d82630a6bdafdc11fe7fdbc5?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t3.jpg&amp;size=750">
 
 表3 不同模型的参数比较
 
