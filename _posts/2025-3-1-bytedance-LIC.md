@@ -68,37 +68,37 @@ $$
 
 ### 3.2 基于时钟的通用搜索单元(Clock-GSU)
 
-Clock-GSU旨在从长期行为中提取与候选商品$q$相关且围绕当前时间$t_{cur}$的子序列。首先定义时间提取函数$g(\cdot)$（例如$g(2024.12.10\ 13:30:00) = 13:30:00$），两个行为${b}_n$与${b}_m$的相对时间差记为$\Delta(t_{b_n}, t_{b_m})$（例如$\Delta(23:00:00, 1:00:00)=120$分钟，$\Delta(11:00:00, 17:00:00)=360$分钟）。
+Clock-GSU旨在从长期行为中提取与候选商品$q$相关且围绕当前时间$t_{cur}$的子序列。首先定义时间提取函数$g(\cdot)$（例如$g(2024.12.10\ 13:30:00) = 13:30:00$），两个行为$b_n$与$b_m$的相对时间差记为$\Delta(t_{b_n}, t_{b_m})$（例如$\Delta(23:00:00, 1:00:00)=120$分钟，$\Delta(11:00:00, 17:00:00)=360$分钟）。
 
 候选商品与历史行为的相关性得分$\alpha \in \mathbb{R}$计算如下：
 
 $$
-\alpha({b}_m, {q}) = \underbrace{\frac{(W_b \times {b}_m) \odot (W_q \times {q})^T}{\sqrt{d}}}_{\text{商品相似度}} + \underbrace{s(\Delta(t_{b_m}, t_{cur}))}_{\text{时间相似度}} \tag{2}
+\alpha(b_m, q) = \underbrace{\frac{(W_b \times b_m) \odot (W_q \times q)^T}{\sqrt{d}}}_{\text{商品相似度}} + \underbrace{s(\Delta(t_{b_m}, t_{cur}))}_{\text{时间相似度}} \tag{2}
 $$
 
-其中$W_b \in \mathbb{R}^{d \times L}$和$W_q \in \mathbb{R}^{d \times H}$为可学习参数，$d$为潜在向量维度。$s(\cdot)$是以$[\Delta, \sqrt{\Delta}, \Delta^2, \log(\Delta+1)]$为输入的双层神经网络。基于相关性得分，Clock-GSU可从万级长度的用户行为中执行Top-K搜索，所得子序列记为$\{{z}_1, \cdots, {z}_K\}$（LIC中$K=100$）。
+其中$W_b \in \mathbb{R}^{d \times L}$和$W_q \in \mathbb{R}^{d \times H}$为可学习参数，$d$为潜在向量维度。$s(\cdot)$是以$[\Delta, \sqrt{\Delta}, \Delta^2, \log(\Delta+1)]$为输入的双层神经网络。基于相关性得分，Clock-GSU可从万级长度的用户行为中执行Top-K搜索，所得子序列记为$\{z_1, \cdots, z_K\}$（LIC中$K=100$）。
 
-与现有上下文感知方法[1,2,4,6]使用绝对时间差不同，我们提出的相对时间差能更好建模流式推荐系统中用户日内动态兴趣。为加速Top-K搜索，$W_b \times {b}_m$和$W_q \times {q}$的结果会预计算并存储在线参数服务器(PS)中，$s(\cdot)$的[8,1]维参数也存储于PS。由于$s(\cdot)$结构简单，其时间复杂度远低于$(W_b \times {b}_m) \odot (W_q \times {q})^T$。
+与现有上下文感知方法[1,2,4,6]使用绝对时间差不同，我们提出的相对时间差能更好建模流式推荐系统中用户日内动态兴趣。为加速Top-K搜索，$W_b \times b_m$和$W_q \times q$的结果会预计算并存储在线参数服务器(PS)中，$s(\cdot)$的[8,1]维参数也存储于PS。由于$s(\cdot)$结构简单，其时间复杂度远低于$(W_b \times b_m) \odot (W_q \times q)^T$。
 
 ### 3.3 基于时钟的精确搜索单元(Clock-ESU)
 
-Clock-GSU检索出的Top-K子序列$\{{z}_1, \cdots, {z}_K\}$是与候选商品及时段相关的行为。Clock-ESU则旨在提取用户当前兴趣表示${v}_{cur}$。
+Clock-GSU检索出的Top-K子序列$\{z_1, \cdots, z_K\}$是与候选商品及时段相关的行为。Clock-ESU则旨在提取用户当前兴趣表示$v_{cur}$。
 
-受长期序列方法[1,4,6]中多头注意力启发，我们采用多头时间差感知注意力机制计算相关性得分。令$Z \in \mathbb{R}^{K \times L}$表示Top-K行为矩阵，为增强时间感知能力，我们将$[\Delta, \sqrt{\Delta}, \Delta^2, \log(\Delta+1)]$融合到行为表示${z}$中。单头表示${r}_i$计算如下：
-
-$$
-{r}_i = \text{Softmax}({\alpha}_i)^T Z W_v^i \tag{3}
-$$
-
-其中$W_v^i \in \mathbb{R}^{L \times d}$为第$i$个头的可学习参数矩阵，${\alpha}_i$表示通过公式(2)计算的第$i$个头的Top-K相关性得分（每个头具有不同的$W_b$和$W_q$参数矩阵）。实际使用4个头，用户当前兴趣表示为：
+受长期序列方法[1,4,6]中多头注意力启发，我们采用多头时间差感知注意力机制计算相关性得分。令$Z \in \mathbb{R}^{K \times L}$表示Top-K行为矩阵，为增强时间感知能力，我们将$[\Delta, \sqrt{\Delta}, \Delta^2, \log(\Delta+1)]$融合到行为表示$z$中。单头表示$r_i$计算如下：
 
 $$
-{v}_{cur} = h([{r}_1, \cdots, {r}_4]) \tag{4}
+r_i = \text{Softmax}(\alpha_i)^T Z W_v^i \tag{3}
 $$
 
-其中$h(\cdot)$为双层深度网络。最终将${v}_{cur}$输入$f(\cdot)$进行预测。
+其中$W_v^i \in \mathbb{R}^{L \times d}$为第$i$个头的可学习参数矩阵，$\alpha_i$表示通过公式(2)计算的第$i$个头的Top-K相关性得分（每个头具有不同的$W_b$和$W_q$参数矩阵）。实际使用4个头，用户当前兴趣表示为：
 
-需注意，Clock-GSU和Clock-ESU均包含时间相似度计算：Clock-GSU能检索临近当前时间的相关商品，Clock-ESU能自适应建模Top-K行为在商品和时间两方面的相关性。两个模块均采用多头注意力机制，Clock-GSU中各头的$(W_b \times {b}_m)$和$(W_q \times {q})$会预计算存储于在线PS，实际计算时直接拼接各头的预计算嵌入来计算商品相似度。
+$$
+v_{cur} = h([r_1, \cdots, r_4]) \tag{4}
+$$
+
+其中$h(\cdot)$为双层深度网络。最终将$v_{cur}$输入$f(\cdot)$进行预测。
+
+需注意，Clock-GSU和Clock-ESU均包含时间相似度计算：Clock-GSU能检索临近当前时间的相关商品，Clock-ESU能自适应建模Top-K行为在商品和时间两方面的相关性。两个模块均采用多头注意力机制，Clock-GSU中各头的$(W_b \times b_m)$和$(W_q \times q)$会预计算存储于在线PS，实际计算时直接拼接各头的预计算嵌入来计算商品相似度。
 
 # 
 
