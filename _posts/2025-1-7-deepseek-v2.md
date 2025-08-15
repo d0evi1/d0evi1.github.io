@@ -10,7 +10,7 @@ Deepseek AI在《DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Exp
 
 # 1.介绍
 
-在过去的几年中，大型语言模型（LLMs）（Anthropic, 2023; Google, 2023; OpenAI, 2022, 2023）经历了快速发展，为**通用人工智能（AGI）**的曙光提供了初步的展望。通常，随着参数数量的增加，LLM的智能水平会显著提升，使其能够在各种任务中展现出**涌现（emergent）**能力（Wei et al., 2022）。然而，这种改进的代价是：**更大的训练计算资源需求以及推理吞吐量的潜在下降**。这些限制对LLM的广泛采用和利用构成了重大挑战。为了解决这一问题，我们提出了**DeepSeek-V2**，一个强大的开源混合专家（MoE）语言模型，其特点是通过创新的Transformer架构实现经济的训练和高效的推理。该模型总参数量为236B，每个token激活21B参数，并支持128K token的上下文长度。
+在过去的几年中，大型语言模型（LLMs）（Anthropic, 2023; Google, 2023; OpenAI, 2022, 2023）经历了快速发展，为**通用人工智能（AGI）**的曙光提供了初步的展望。通常，随着参数数量的增加，LLM的智能水平会显著提升，使其能够在各种任务中展现出**涌现（emergent）**能力（Wei et al., 2022）。然而，这种改进的代价是：**更大的训练计算资源需求以及推理吞吐量的潜在下降**。这些限制对LLM的广泛采用和利用构成了重大挑战。为了解决这一问题，我们提出了**DeepSeek-V2**，一个强大的开源混合专家（MoE）语言模型，其特点是通过创新的Transformer架构实现经济的训练和高效的推理。该模型总参数量为236B，每个token激活21B参数，并支持**128K token的上下文长度**。
 
 我们在Transformer框架（Vaswani et al., 2017）中优化了注意力模块和前馈网络（FFNs），分别提出了**多头隐注意力（MLA）**和**DeepSeekMoE**。
 
@@ -57,10 +57,10 @@ Deepseek AI在《DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Exp
 
 我们首先介绍标准MHA机制作为背景。设：
 
-- $d$为嵌入维度
-- $n_h$为注意力头（attention heads）的数量
-- $d_h$为每个头的维度
-- $h_t \in \mathbb{R}^d$为第$t$个token在注意力层的输入
+- $d$：为嵌入维度
+- $n_h$：为注意力头（attention heads）的数量
+- $d_h$：为每个头的维度
+- $h_t \in \mathbb{R}^d$：为第$t$个token在注意力层的输入
 
 标准MHA首先通过三个矩阵$W_Q$、$W_K$、$W_V \in \mathbb{R}^{d_h n_h \times d}$分别生成$q_t$、$k_t$、$v_t \in \mathbb{R}^{d_h n_h}$：
 
@@ -86,11 +86,11 @@ $$
 - $q_{t,i}$、$k_{t,i}$、$v_{t,i} \in \mathbb{R}^{d_h}$ 分别表示第 $i$ 个注意力头的查询、键和值；
 - $W_O \in \mathbb{R}^{d \times d_h n_h}$ 表示输出投影矩阵。
 
-**在推理过程中，所有键和值都需要被缓存以加速推理**，因此MHA需要为每个token缓存 $2 n_h d_h l$ 个元素（$l$ 为层数）。在模型部署中，这种庞大的KV缓存是一个巨大的瓶颈，限制了最大batch-size和序列长度。
+**在推理过程中，所有K和V都需要被缓存以加速推理**，因此MHA需要为每个token缓存 $2 n_h d_h l$ 个元素（$l$ 为层数）。在模型部署中，这种庞大的KV缓存是一个巨大的瓶颈，限制了最大batch-size和序列长度。
 
-### 2.1.2 低秩键值联合压缩
+### 2.1.2 低秩键值联合压缩(Low-Rank Key-Value Joint Compression)
 
-MLA的核心是：通过低秩联合压缩键和值来**减少KV缓存**：
+MLA的核心是：通过低秩联合压缩K和V来**减少KV缓存**：
 
 $$
 c^{KV}_t = W^{DKV} h_t, \quad (9) \\
@@ -100,10 +100,10 @@ $$
 
 其中:
 
-- $c^{KV}_t \in \mathbb{R}^{d_c}$ 是键和值的压缩隐向量；
+- $c^{KV}_t \in \mathbb{R}^{d_c}$ 是K和V的压缩隐向量；
 - $d_c (\ll d_h n_h)$ 表示**KV压缩维度**；
 - $W^{DKV} \in \mathbb{R}^{d_c \times d}$ 是**下投影矩阵(down-projection matrix)**；
-- $W^{UK}$ 和 $W^{UV} \in \mathbb{R}^{d_h n_h \times d_c}$ 分别是键和值的**上投影矩阵(up-projection matrices)**。
+- $W^{UK}$ 和 $W^{UV} \in \mathbb{R}^{d_h n_h \times d_c}$ 分别是K和V的**上投影矩阵(up-projection matrices)**。
 
 在推理过程中，MLA只需缓存 $c_t^{KV}$，因此其KV缓存仅为 $d_c l$ 个元素。此外，在推理过程中，由于 $W^{UK}$ 可以被吸收到 $W^Q$ 中，$W^{UV}$ 可以被吸收到 $W_O$中，我们甚至**不需要显式计算键和值来进行注意力计算**。图3直观地展示了MLA中的KV联合压缩如何减少KV缓存。
 
@@ -126,7 +126,7 @@ $$
 
 ### 2.1.3 解耦的旋转位置嵌入
 
-我们计划为DeepSeek-V2使用旋转位置嵌入（RoPE）（Su et al., 2024），这与DeepSeek 67B（DeepSeek-AI, 2024）一致。然而，RoPE与低秩KV压缩不兼容。具体来说，RoPE对键和查询都是位置敏感的。如果我们对键 $k^C_t$ 应用RoPE，公式10中的 $W_{UK}$ 将与一个位置敏感的RoPE矩阵耦合。这样，$W_{UK}$ 在推理过程中无法再被吸收到 $W_Q$ 中，因为与当前生成token相关的RoPE矩阵会位于 $W_Q$ 和 $W_{UK}$ 之间，而矩阵乘法不满足交换律。因此，我们必须在推理过程中重新计算所有前缀token的键，这将显著降低推理效率。
+我们计划为DeepSeek-V2使用**旋转位置嵌入（RoPE）**（Su et al., 2024），这与DeepSeek 67B（DeepSeek-AI, 2024）一致。然而，RoPE与低秩KV压缩不兼容。具体来说，RoPE对键和查询都是位置敏感的。如果我们**对键 $k^C_t$ 应用RoPE**，公式10中的 $W^{UK}$ 将与一个位置敏感的RoPE矩阵耦合。这样，$W^{UK}$ 在推理过程中无法再被吸收到 $W^Q$ 中，因为与当前生成token相关的RoPE矩阵会位于 $W^Q$ 和 $W^{UK}$ 之间，而矩阵乘法不满足交换律。因此，我们必须在推理过程中重新计算所有前缀token的键，这将显著降低推理效率。
 
 作为解决方案，我们提出了**解耦RoPE策略**，该策略使用额外的多头查询 $q^R_{t,i} \in \mathbb{R}^{d^R_h}$ 和一个共享键 $k^R_t \in \mathbb{R}^{d^R_h}$ 来承载RoPE，其中 $d^R_h$ 表示解耦查询和键的每头维度。配备解耦RoPE策略后，MLA执行以下计算：
 
