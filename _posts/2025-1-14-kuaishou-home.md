@@ -289,9 +289,9 @@ $$
 
 ---
 
-### 3.4 特征门控（feature gate）与自门（self-gate）机制
+### 3.4 特征门控（feature gate）与自门控（self-gate）机制
 
-针对专家欠拟合问题，我们发现一些**数据稀疏任务**的门生成权重往往会忽略其特定专家，而**为共享专家分配较大的权重**。原因可能是我们的模型需要同时**预测20多个不同的任务**，而这些密集任务的密度可能是稀疏任务的100倍以上。为了增强稀疏任务专家的训练，我们提出了两种门机制，以确保它们能够获得适当的梯度以最大化其有效性：特征门和自门机制。
+针对专家欠拟合问题，我们发现一些**数据稀疏任务**的门生成权重往往会忽略其特定专家，而**为共享专家分配较大的权重**。原因可能是：我们的模型需要同时**预测20多个不同的任务**，而这些密集任务的密度可能是稀疏任务的100倍以上。为了增强稀疏任务专家的训练，我们提出了两种门机制：特征门和自门机制，以确保它们能够**获得适当的梯度以最大化其有效性**。
 
 特征门控（feature gate）的目的是：**为不同任务专家生成不同的输入特征表示**，以缓解所有专家共享相同输入特征时可能出现的梯度冲突。形式上，特征门旨在**提取每个输入特征元素的重要性**，例如 $\text{Fea\_Gate}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^{\mid\mathbf{v}\mid}$，如果输入是 $\mathbf{v}$。然而，在工业推荐系统中，$\mathbf{v}$ 通常是一个高维向量，例如 $\mid\mathbf{v}\mid > 3000+$；因此，为元专家引入这些大矩阵是昂贵的。受LLM效率调优技术LoRA [15] 的启发，我们**引入了两个小矩阵**来近似生成元素重要性的大矩阵：
 
@@ -305,10 +305,10 @@ $$
 
 (8)
 
-注意，我们在Sigmoid函数后应用了一个**2×操作符，旨在实现灵活的放大或缩小操作**。实际上，$\text{Fea_LoRA}$ 函数是生成私有化专家输入的有效方法。在我们的迭代中，我们发现它可以进一步通过多任务思想增强，即引入更多的 $\text{Fea_LoRA}$ 从多个方面生成特征重要性作为我们的 $\text{Fea_Gate}$：
+注意，我们在Sigmoid函数后应用了一个**2×操作符，旨在实现灵活的放大或缩小操作**。实际上，$\text{Fea_LoRA}$ 函数是生成私有化专家输入的有效方法。在我们的迭代中，我们发现它可以进一步通过**多任务思想增强**，即引入更多的 $\text{Fea_LoRA}$ 从多个方面生成特征重要性作为我们的 $\text{Fea_Gate}$：
 
 $$
-\text{Fea_Gate}(\mathbf{v}) = \text{Sum}\left(\text{Gate}_{\ fea}(\mathbf{v}), \{\text{Fea_LoRA}_{\{1,2,\dots,L\}}(\mathbf{v}, \mid\mathbf{v}\mid/L)\}\right),
+\text{Fea_Gate}(\mathbf{v}) = \text{Sum}\left(\text{Gate}^{\fea}(\mathbf{v}), \{\text{Fea_LoRA}^{\{1,2,\dots,L\}}(\mathbf{v}, \mid\mathbf{v}\mid/L)\}\right),
 $$
 
 (9)
@@ -316,12 +316,12 @@ $$
 其中：
 
 - $L$ 是一个超参数，用于控制 $\text{Fea\_LoRA}$ 的数量
-- $\text{Gate}_{fea}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^L$ 用于生成权重以平衡不同 $\text{Fea\_LoRA}$ 的重要性。
+- $\text{Gate}^{fea}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^L$ ：用于生成权重以平衡不同 $\text{Fea\_LoRA}$ 的重要性
 
 注意，我们需要选择一个能被输入长度 $\mid\mathbf{v}\mid$ 整除的 $L$ 来生成 $\text{Fea\_LoRA}$ 的维度。因此，我们的专家输入可以如下获得（这里我们展示了第一层元共享专家的输入 $\mathbf{v}^{shared}_{meta}$）：
 
 $$
-\mathbf{v}^{shared}_{meta} = \mathbf{v} \odot \text{Fea\_Gate}^{shared}_{meta}(\mathbf{v}),
+\mathbf{v}^{shared}_{meta} = \mathbf{v} \odot \text{Fea_Gate}^{shared}_{meta}(\mathbf{v}),
 $$
 
 (10)
