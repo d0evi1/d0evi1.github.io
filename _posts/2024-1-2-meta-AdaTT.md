@@ -315,17 +315,17 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/28c04d2e2cdce621524ef292806652ef44dd33e79c391f0d2b3833388df13cda245b29ac04aac389b4792adabf0b3742?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t1.jpg&amp;size=750">
 
-表1：消费+互动任务组中，消费任务的表现
+表1：消费+互动任务组中，消费型任务的表现
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/440d5af2a351d32cfbe17903ef02298bc7be71d707c835f5d51c0faecf2680f349d011ab7e6f88f6384f568ae9dadac4?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t2.jpg&amp;size=750">
 
-表2：消费型+互动型任务组中参与任务的表现
+表2：消费+互动任务组中，参与度任务的表现
 
 结果表明，在这两类任务上，AdaTT的表现均优于其他所有模型，不仅收敛速度更快，而且预测质量更高。在使用100亿样本进行训练后，两个AdaTT模型在这两项任务上均已展现出显著的NE提升。就基线模型而言，PLE在消费任务上的收敛速度明显更慢。而交叉缝合模型与AdaTT相比差距较大，这凸显了在任务关系建模中自适应融合的重要性。
 
 值得注意的是，**与消费任务相比，PLE和AdaTT在参与度任务（该任务中正样本事件较少）上展现出了更大的改进幅度**。然而，这种趋势在MMoE和ML-MMoE中并不明显，这突显了任务特定学习的重要性。
 
-有趣的是，尽管ML-MMoE通过增加额外的融合操作拥有更高的灵活性，但其在两项任务上的表现却均不如MMoE，说明其在专家融合方面的性能较差。这很可能是由于其设计中缺乏区分性以及未引入先验知识所导致。共享专家高度对称，所有门控模块都会使用这些专家，且没有明确建模的任务特定专家。此外，所有门控模块接收的都是相同的原始输入。融合层数的增加带来了更多的路径选择，使得ML-MMoE更难为预测每一个特定任务学习到不同的权重组合。
+有趣的是，尽管ML-MMoE通过增加额外的融合操作拥有更高的灵活性，但其**在两项任务上的表现却均不如MMoE，说明其在专家融合方面的性能较差**。这很可能是由于其设计中缺乏区分性以及未引入先验知识所导致。共享专家高度对称，所有门控模块都会使用这些专家，且没有明确建模的任务特定专家。此外，所有门控模块接收的都是相同的原始输入。**融合层数的增加带来了更多的路径选择，使得ML-MMoE更难为预测每一个特定任务学习到不同的权重组合**。
 
 ### 4.2.5 关于两项消费任务组的实验
 
@@ -333,7 +333,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/6d76e57b0fc3a6d8686d009be25efcb36c20c03975d28e216c95e7e8ca111d6471005535f4c6513ad09d5dabe2122051?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t3.jpg&amp;size=750">
 
-表3
+表3 表3：消费任务组的表现
 
 即使采用较简单共享机制的MTL模型也能取得不错的效果，因此不同模型间的NE差异不那么显著。然而，即便如此，AdaTT仍然在所有MTL模型中展现出了最佳的性能表现。
 
@@ -343,7 +343,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/2ada6c5db073af232cb9b3462545256215dd214208df6faa24df7a49d161a70fb7fd1f95c8c4bc1eaf484c04dcf8bd0a?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t4.jpg&amp;size=750">
 
-表4
+表4 表4：模型在5项任务组上的表现
 
 ### 4.3.1 公开数据集评估
 
@@ -357,7 +357,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/60dee3150e9eb25265f104f2bf5fa607a5cb6aa4cd6f9ce5de03016291725db9149871a40366e3fd40b62858fd70d5bc?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t5.jpg&amp;size=750">
 
-表5
+表5：UCI人口普查收入数据集上3个任务的性能。我们使用两级融合比较PLE、ML-MMoE和AdaTT。专家网络和任务塔网络是单层多层感知机（MLP），并列出了它们的隐藏维度。仅利用特定于任务的专家的AdaTT-sp设置，使AdaTT能够实现其最佳结果。
 
 ## 4.4 𝑁𝑎𝑡𝑖𝑣𝑒𝐸𝑥𝑝𝑒𝑟𝑡𝐿𝐹 模块的消融实验
 
@@ -365,7 +365,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a2b74d53936454047488d287da8f0dfc7a028973e8ed963449e19d187937ef192ee3c84f40666db19f17a535fe35bccb?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t6.jpg&amp;size=750">
 
-表6
+表6：NativeExpertLF模块的消融研究。各项任务上的性能下降均表明了残差机制与单独融合的重要性。
 
 尽管从理论上讲，𝐴𝑙𝑙𝐸𝑥𝑝𝑒𝑟𝑡𝐺𝐹 模块能够学习灵活的专家组合方式，但我们的实验仍然表明：将原生专家（即各任务专属专家）单独进行组合，并将 𝐴𝑙𝑙𝐸𝑥𝑝𝑒𝑟𝑡𝐺𝐹 的输出作为残差加回去，这一做法具有重要作用。具体而言，当消融掉 𝑁𝑎𝑡𝑖𝑣𝑒𝐸𝑥𝑝𝑒𝑟𝑡𝐿𝐹 模块时该术语在所有任务中都会导致损失增加，在分类任务中归一化误差（NE）上升了0.107%–0.222%，在回归任务中均方误差（MSE）上升了0.158%。
 
@@ -389,7 +389,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/7e0f80c50cdc134170796a084a6bca23479cb93400f2ee6c71ba7d535634f7267350f0f768f92410fafc8e89bc8daca1?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t7.jpg&amp;size=750">
 
-表7
+表7：AdaTT在不同任务专家数量下的表现。
 
 可以观察到，随着专家数量的增加，所有任务的性能都有所提升。然而，这种提升并不是一致的：在本研究中，当专家数量增加到2时，参与度任务在NE（参与度指标）上相比消费类任务仅表现出轻微的改善。但随着专家数量进一步增加到3和4时，趋势发生了逆转，参与度任务在各项指标上展现出了更为显著的差异。
 
@@ -399,7 +399,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/6dbd2486507dca25de6b1a162763115777dd54fa0c5244a908889bee310ab175a0b80a58b7956049961207971a0efc3d?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t8.jpg&amp;size=750">
 
-表8
+表8：AdaTT的性能随着融合级别提升的变化情况。我们在第一列中表示每个融合级别的专家隐藏维度。
 
 # 5 结论
 
