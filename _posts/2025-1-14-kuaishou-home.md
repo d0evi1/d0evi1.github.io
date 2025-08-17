@@ -351,7 +351,11 @@ $$
 
 (11)
 
-其中 $\text{Self_Gate}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^K$，$K$ 是相关专家的数量，其激活函数为Sigmoid（如果只有1个专家），否则设置为Softmax。类似地，$z^{inter}_{meta,self}$ 和 $z^{watch}_{meta,self}$ 可以通过相同的方式获得，然后我们将相应的表示（例如 $z^{inter}_{meta} + z^{inter}_{meta,self}$）添加到下一层的支持中。详见第5节以获取HoME的细粒度细节。
+其中：
+
+- $\text{Self_Gate}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^K$，$K$ 是相关专家的数量，其激活函数为Sigmoid（如果只有1个专家），否则设置为Softmax。
+
+类似地，$z_{meta,self}^{inter}$ 和 $z_{meta,self}^{watch}$ 可以通过相同的方式获得，然后我们将相应的表示（例如 $z_{meta}^{inter} + z_{meta,self}^{inter}$）添加到下一层的支持中。详见第5节以获取HoME的细粒度细节。
 
 ### 4 实验
 
