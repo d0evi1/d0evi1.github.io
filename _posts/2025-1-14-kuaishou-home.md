@@ -385,11 +385,11 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/290354faf2ea53c1b2cccc026f32cbbfcd29b761881d045ef67652373603e2892ba967b198b8f804b682fe3484c86667?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t1.jpg&amp;size=750">
 
-表1
+表1：快手短视频服务离线结果（%）（AUC和GAUC）。
 
 注意，在离线评估中，AUC或GAUC的0.03%~0.05%提升足以为我们的业务带来显著的在线收益。我们首先展示了HoME_Expert在MMoE上的有效性，即MMoE*。然后，我们将HoME与所有改进的基线进行比较，这些基线都配备了HoME_Expert，例如“CGC* w/o shared”，这是CGC的变体，忽略了共享专家和所有门网络。此外，我们还为HoME实现了消融变体：“w/o fg2”和“w/o fg”分别忽略了第二层特征门和所有特征门；“w/o sg”忽略了所有自门；“w/o mask”保留了HoME架构，但所有专家都是共享的。我们有以下观察：
 
-1. **MMoE*显著优于原始MMoE方法**，这表明我们的专家归一化和Swish机制可以克服专家崩溃问题，平衡专家输出，并鼓励专家网络承担应有的责任。
+1. **MMoE*显著优于原始MMoE方法**，这表明我们的**专家归一化和Swish机制**可以克服专家崩溃问题，平衡专家输出，并鼓励专家网络承担应有的责任。
 2. **“CGC* w/o shared”可以看作是每个任务具有特定专家的Shared-bottom**。MMoE*比这种简单的“CGC* w/o shared”解决方案弱（在我们的实验中参数增加了24%），这表明MMoE系统在真实的大规模数据流场景中容易退化。
 3. **与“CGC* w/o shared”相比，CGC*没有显著改进**，这表明CGC*的共享专家正在退化为某些特定专家。
 4. **与MMoE*相比，PLE*和AdaTT*表现更好**，这表明在解决专家崩溃问题后，堆叠多个专家网络层并增加模型参数是释放多任务模块潜力的一种有前途的方法。
@@ -408,13 +408,13 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/1b495a5444b77bc27c0391fb657ec4181ce2eeafd2f3affcafa134df936c6bbc9d086c10a5f92e77b1448a71924e1402?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t2.jpg&amp;size=750">
 
-表2
+表2：专家网络超参数敏感性讨论，涉及专家数量问题。
 
 对于特征LoRA数量，我们在“HoME w/o fg2”变体下进行实验，该变体仅涉及第一层特征门，同时在表1中显示出显著改进。具体来说，在我们的实现中，更多的LoRA数量只会减少隐藏维度，而不会增加额外的参数，这可能会降低单个LoRA的能力。从表3中，我们可以观察到两个LoRA的变体显示出最佳结果，这表明在平衡LoRA数量和LoRA建模能力以提供更多增量信息方面存在瓶颈。
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/338718c772b48b2ceccc1bbb527daa7631f457426c6efbf2bba2ce32c32cfe67cb3b77388de805d01cfdb3acca46bc7d?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t3.jpg&amp;size=750">
 
-表3
+表3：Feature-Gate超参数敏感性讨论，涉及LoRA数量的情况。
 
 ---
 
@@ -427,7 +427,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/fa12b733eff7b7478dac4ce353683e33880c4c30bf4fd59dd8c2fe3cd1c646c32859f82cd05cf03be8024c5a844c4ed9?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=6.jpg&amp;size=750">
 
-图6
+图6：我们HoME的特征门热度图、专家输出分布以及门权重流向。
 
 ---
 
@@ -437,7 +437,7 @@ $$
 
 <img alt="图片名称" src="https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a37798b2339ffc0864104aeefbdd87eaeb84d71b0134bd662a71b9deed5665846982507e959689e74f059eb388cfc7a3?pictype=scale&amp;from=30113&amp;version=3.3.3.3&amp;fname=t4.jpg&amp;size=750">
 
-表4
+表4：快手短视频服务的在线A/B测试结果。
 
 ---
 
