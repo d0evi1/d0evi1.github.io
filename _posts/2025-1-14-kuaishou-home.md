@@ -301,14 +301,16 @@ $$
 
 其中:
 
-- $B \in \mathbb{R}^{\mid\mathbf{v}\mid \times d}$，$A \in \mathbb{R}^{d \times \mid\mathbf{v}\mid}$，$BA \in \mathbb{R}^{\mid\mathbf{v}\mid \times \mid\mathbf{v}\mid}$。
+- $B \in \mathbb{R}^{\mid\mathbf{v}\mid \times d}$，
+- $A \in \mathbb{R}^{d \times \mid\mathbf{v}\mid}$，
+- $BA \in \mathbb{R}^{\mid\mathbf{v}\mid \times \mid\mathbf{v}\mid}$
 
 (8)
 
 注意，我们在Sigmoid函数后应用了一个**2×操作符，旨在实现灵活的放大或缩小操作**。实际上，$\text{Fea_LoRA}$ 函数是生成私有化专家输入的有效方法。在我们的迭代中，我们发现它可以进一步通过**多任务思想增强**，即引入更多的 $\text{Fea_LoRA}$ 从多个方面生成特征重要性作为我们的 $\text{Fea_Gate}$：
 
 $$
-\text{Fea_Gate}(\mathbf{v}) = \text{Sum}\left(\text{Gate}^{\fea}(\mathbf{v}), \{\text{Fea_LoRA}^{\{1,2,\dots,L\}}(\mathbf{v}, \mid\mathbf{v}\mid/L)\}\right),
+\text{Fea_Gate}(\mathbf{v}) = \text{Sum}\left(\text{Gate}^{fea}(\mathbf{v}), \{\text{Fea_LoRA}^{\{1,2,\dots,L\}}(\mathbf{v}, \mid\mathbf{v}\mid/L)\}\right),
 $$
 
 (9)
@@ -326,18 +328,22 @@ $$
 
 (10)
 
-其中 $\odot$ 表示逐元素乘积。通过这种方式，不同的专家拥有自己的特征空间，这可以减少梯度冲突的风险，从而保护稀疏任务。
+其中：
 
-此外，最新的MoE研究表明，更深层次的专家网络堆叠可以带来更强大的预测能力 [19, 33]。然而，在我们的实验中，我们发现原始的门网络容易逐层稀释梯度，尤其是对于稀疏任务专家的训练。除了专家输入级别的 $\text{Fea\_Gate}$，我们还在专家输出级别添加了基于残差思想的自门机制，以确保顶层的梯度能够有效地传递到底层。具体来说，$\text{Self\_Gate}$ 只关注其特定专家的输出。以观看时间元专家的输出为例：
+- $\odot$ 表示逐元素乘积。
+
+通过这种方式，**不同的专家拥有自己的特征空间，这可以减少梯度冲突的风险**，从而保护稀疏任务。
+
+此外，最新的MoE研究表明，更深层次的专家网络堆叠可以带来更强大的预测能力 [19, 33]。然而，在我们的实验中，我们发现**原始的门网络容易逐层稀释梯度**，尤其是对于稀疏任务专家的训练。除了专家输入级别的 $\text{Fea_Gate}$，我们还在专家输出级别添加了**基于残差思想的自门机制（self-gate）**，以确保顶层的梯度能够有效地传递到底层。具体来说，$\text{Self_Gate}$ 只关注其特定专家的输出。以观看时间元专家的输出为例：
 
 $$
-z^{shared}_{meta,self} = \text{Sum}\left(\text{Self\_Gate}^{shared}_{meta}(\mathbf{v}), \{\text{Experts}^{shared}(\mathbf{v})\}\right),
+z^{shared}_{meta,self} = \text{Sum}\left(\text{Self_Gate}^{shared}_{meta}(\mathbf{v}), \{\text{Experts}^{shared}(\mathbf{v})\}\right),
 $$
 
 其中：
 
 $$
-\text{Self\_Gate}(\cdot) = \begin{cases}
+\text{Self_Gate}(\cdot) = \begin{cases}
 \text{Sigmoid}\left(\text{MLP}_G(\cdot)\right) & \text{如果只有1个专家}, \\
 \text{Softmax}\left(\text{MLP}_G(\cdot)\right) & \text{其他情况}.
 \end{cases}
@@ -345,7 +351,7 @@ $$
 
 (11)
 
-其中 $\text{Self\_Gate}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^K$，$K$ 是相关专家的数量，其激活函数为Sigmoid（如果只有1个专家），否则设置为Softmax。类似地，$z^{inter}_{meta,self}$ 和 $z^{watch}_{meta,self}$ 可以通过相同的方式获得，然后我们将相应的表示（例如 $z^{inter}_{meta} + z^{inter}_{meta,self}$）添加到下一层的支持中。详见第5节以获取HoME的细粒度细节。
+其中 $\text{Self_Gate}: \mathbb{R}^{\mid\mathbf{v}\mid} \rightarrow \mathbb{R}^K$，$K$ 是相关专家的数量，其激活函数为Sigmoid（如果只有1个专家），否则设置为Softmax。类似地，$z^{inter}_{meta,self}$ 和 $z^{watch}_{meta,self}$ 可以通过相同的方式获得，然后我们将相应的表示（例如 $z^{inter}_{meta} + z^{inter}_{meta,self}$）添加到下一层的支持中。详见第5节以获取HoME的细粒度细节。
 
 ### 4 实验
 
